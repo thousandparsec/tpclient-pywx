@@ -21,38 +21,28 @@ class MainControl:
 			config.starmap = Blank()
 			config.system = Blank()
 
-			sc_width = 1024
-			sc_height = 768
-
-			map_width = 600
-			map_height = 500
-
-			padding = 5
-
-			middle = sc_width-map_width-padding
-
 			config.main.pos = (0,0)
-			config.main.size = (middle, 50)
+			config.main.size = (419, 51)
 			config.main.show = True
 			
-			config.info.pos = (0,0)
-			config.info.size = (middle, 50)
+			config.info.pos = (1,75)
+			config.info.size = (425, 176)
 			config.info.show = True
 			
-			config.message.pos = (0, map_height-padding*4)
-			config.message.size = (middle, 200)
+			config.message.pos = (1, 578)
+			config.message.size = (396, 163)
 			config.message.show = True
 
-			config.order.pos = (0, 55)
-			config.order.size = (middle, map_height-55-padding*4)
+			config.order.pos = (1, 251)
+			config.order.size = (213, 327)
 			config.order.show = True
 
-			config.starmap.pos = (middle+padding, 0)
-			config.starmap.size = (map_width-padding, map_height-padding*2)
+			config.starmap.pos = (426, 0)
+			config.starmap.size = (600, 523)
 			config.starmap.show = True
 
-			config.system.pos = (middle+padding, map_height)
-			config.system.size = (map_width-padding, 200)
+			config.system.pos = (769, 523)
+			config.system.size = (257, 218)
 			config.system.show = True
 		
 			config.raise_ = "All on All" 
