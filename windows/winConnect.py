@@ -6,6 +6,15 @@ from network import protocol
 from network.events import *
 from utils import *
 
+if wxVERSION_NUMBER <= 2302:
+	class wxProgressDialog:
+		def __init__(self, *kw, **args):
+			print "Your version of wxPython doesn't have working Progress dialogs."
+			print "If you want progress dialogs please upgrade to a newer version."
+
+		def Update(self, no):
+			pass
+
 try:
 	from wxPython.lib.evtmgr import eventManager
 except ImportError:

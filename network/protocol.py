@@ -142,6 +142,7 @@ class Object(Processed):
 						self.vel[X], self.vel[Y], self.vel[Z],
 						self.accel[X], self.accel[Y], self.accel[Z],
 						len(self.contains))
+
 		for id in self.contains:
 			output += pack(Object.struct3, id)
 
@@ -303,3 +304,12 @@ if __name__ == "__main__":
 	r = readpacket(s)
 	pprint.pprint(r)
 	pprint.pprint(str(r))
+
+	for i in r.contains:	
+		g = GetObject(id=i)
+		pprint.pprint(g)
+		pprint.pprint(str(g))
+		s.send(str(g))
+		r = readpacket(s)
+		pprint.pprint(r)
+		pprint.pprint(str(r))
