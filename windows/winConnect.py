@@ -5,7 +5,10 @@ from network import protocol
 from network.events import *
 from utils import *
 
-from wxPython.lib.evtmgr import eventManager
+try:
+	from wxPython.lib.evtmgr import eventManager
+except ImportError:
+	from extra.evtmgr import eventManager
 
 defaultServers = ["127.0.0.1:6923","code-bear.dyndns.org:6923","mithro.dyndns.org:6923"] 
 
