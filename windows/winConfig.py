@@ -31,8 +31,8 @@ class winConfig(winBase):
 		item2 = wx.Notebook( panel, ID_NOTEBOOK, wx.DefaultPosition, wx.DefaultSize, 0 )
 		item1 = wx.NotebookSizer( item2 )
 
-		item3 = panelConfigStartup(application, self, item2)
-		item2.AddPage( item3, "Startup" )
+#		item3 = panelConfigStartup(application, self, item2)
+#		item2.AddPage( item3, "Startup" )
 
 		item4 = panelConfigWindows(application, self, item2)
 		item2.AddPage( item4, "Windows" )

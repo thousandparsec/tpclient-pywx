@@ -38,6 +38,7 @@ Short Term
 	* Stop annoying flicker on save
 
 	* Fixup and cleanup the Config dialog..
+	* Fixup and cleanup the Main dialog...
 
 	* Remove the lang stuff and fix it to use gettext or something
 
