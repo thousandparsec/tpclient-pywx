@@ -74,7 +74,7 @@ def create_menu(source, target):
 	bar.Append( file, _("File") )
 	bar.Append( stat, _("Statistics") )
 	bar.Append( win,  _("Windows") )
-	bar.Append( help, _("Help") )
+	bar.Append( help, _("&Help") )
 
 	wx.EVT_MENU(source, ID_OPEN,	target.OnConnect)
 	wx.EVT_MENU(source, ID_CONFIG,	target.OnConfig)
