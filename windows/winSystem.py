@@ -39,6 +39,7 @@ class winSystem(winBase):
 				wxRemotelyScrolledTreeCtrl.__init__(self, parent, ID, pos, size, style)
 
 				self.icons = {}
+				self.icons['Blank'] = wxImage("graphics/blank-icon.png").ConvertToBitmap()
 				self.icons['Container'] = wxImage("graphics/link-icon.png").ConvertToBitmap()
 				self.icons['StarSystem'] = wxImage("graphics/system-icon.png").ConvertToBitmap()
 				self.icons['Fleet'] = wxImage("graphics/ship-icon.png").ConvertToBitmap()
@@ -127,7 +128,7 @@ class winSystem(winBase):
 		new_root = None
 		
 		if root == None:
-			new_root = self.tree.AddRoot("Known Universe")
+			new_root = self.tree.AddRoot("Known Universe", self.tree.icons['Blank'])
 		else:
 			if object != None:
 				if self.tree.icons.has_key(object.__class__.__name__):
