@@ -259,7 +259,7 @@ class winOrder(winBase):
 				self.application.cache.orders[self.oid].insert(nslot, order)
 				self.application.cache.objects[self.oid].order_number += 1
 				
-			self.OnSelectObject(wx.local.SelectObjectEvent(self.oid))
+			self.OnSelectObject(wx.local.SelectObjectEvent(self.oid), force=True)
 		else:
 			slot = self.type_list.FindString(t)
 			if slot == wx.NOT_FOUND:
