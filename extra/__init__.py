@@ -98,11 +98,14 @@ class wxListCtrl(wx.ListCtrlOrig, wx.lib.mixins.listctrl.ListCtrlAutoWidthMixin,
 		self.SetToolTipCurrent(slot)
 
 	def _doResize(self):
-		try:
-			if not isinstance(self, wx.core._wxPyDeadObject):
-				wx.lib.mixins.listctrl.ListCtrlAutoWidthMixin._doResize(self)
-		except wx.core.PyDeadObjectError:
-			pass
+		if hasattr(wx, 'core'):
+			try:
+				if not isinstance(self, wx.core._wxPyDeadObject):
+					wx.lib.mixins.listctrl.ListCtrlAutoWidthMixin._doResize(self)
+			except wx.core.PyDeadObjectError:
+				pass
+		else:
+			wx.lib.mixins.listctrl.ListCtrlAutoWidthMixin._doResize(self)
 	
 	def GetSelected(self):
 		slots = [-1,]

@@ -29,7 +29,7 @@ gettext.install("pywx-client")
 # wx.Python imports
 import wx
 import extra
-import extra.fixdc
+#import extra.fixdc
 
 # Python Imports
 import time

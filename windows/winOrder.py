@@ -292,6 +292,7 @@ class winOrder(winBase):
 		
 		self.order_list.DeleteAllItems()
 		for slot in range(0, object.order_number):
+			print self.oid, slot
 			order = self.application.cache.orders[self.oid][slot]
 
 			self.order_list.InsertStringItem(slot, "")

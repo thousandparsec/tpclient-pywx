@@ -254,6 +254,7 @@ class winDesign(winBase):
 		self.categories.SetLabel(c)
 
 		# Set the description
+		self.desc.SetValue(str(component.description))
 
 		# Set if edit can work
 		if component.used == 0 and component.base != 0:

@@ -1,3 +1,5 @@
+if false:
+	return
 """
 This module will do surgery on the wx.DC class in wxPython 2.5.1.5 to
 make it act like the wx.DC class in later versions will.  To use this
