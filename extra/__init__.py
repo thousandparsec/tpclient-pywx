@@ -35,8 +35,27 @@ class wxListCtrl(wx.ListCtrlOrig, wx.lib.mixins.listctrl.ListCtrlAutoWidthMixin,
 		wx.lib.mixins.listctrl.ListCtrlAutoWidthMixin.__init__(self)
 		ToolTipItemMixIn.__init__(self)
 
-		self.objects = {}
+		self.objects = []
 		self.Bind(wx.EVT_MOTION, self.OnMouseMotion)
+
+	def InsertItem(self, item):
+		self._increasePyData(slot)
+		wx.ListCtrlOrig.InsertItem(self, item)
+		
+	def InsertStringItem(self, slot, label):
+		self._increasePyData(slot)
+		wx.ListCtrlOrig.InsertStringItem(self, slot, label)
+		
+	def InsertImageItem(self, slot, imageIndex):
+		self._increasePyData(slot)
+		wx.ListCtrlOrig.InsertImageItem(self, slot, imageIndex)
+		
+	def InsertImageStringItem(self, slot, label, imageIndex):
+		self._increasePyData(slot)
+		wx.ListCtrlOrig.InsertImageStringItem(self, slot, label, imageIndex)
+
+	def _increasePyData(self, slot):
+		self.objects.insert(slot, None)
 
 	def SetItemPyData(self, slot, data):
 		self.objects[slot] = data
@@ -44,9 +63,17 @@ class wxListCtrl(wx.ListCtrlOrig, wx.lib.mixins.listctrl.ListCtrlAutoWidthMixin,
 	def GetItemPyData(self, slot):
 		try:
 			return self.objects[slot]
-		except:
+		except IOError:
 			return None
 
+	def DeleteItem(self, slot):
+		del self.objects[slot]
+		wx.ListCtrlOrig.DeleteItem(self, slot)
+
+	def DeleteAllItems(self):
+		self.objects = []
+		wx.ListCtrlOrig.DeleteAllItems(self)
+	
 	def FindItemByPyData(self, data):
 		slot = -1
 		while True:

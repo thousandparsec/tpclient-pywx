@@ -37,6 +37,8 @@ Short Term
 
 	* Fixup and cleanup the Config dialog..
 
+	* Remove the lang stuff and fix it to use gettext or something
+
 Longer Term
 	* Add a info panel (DONE)
 		* Add data to the info panel (DONE)
