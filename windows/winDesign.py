@@ -44,23 +44,23 @@ class winDesign(winBase):
 		# The title
 		self.titleedit = wx.TextCtrl( panel, -1, "Title", size=(-1,wx.local.buttonSize[1]), style=wx.TE_CENTRE)
 		self.titleedit.SetFont(wx.local.normalFont)
-		self.top.AddWindow( self.titleedit, 1, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
+		self.top.Add( self.titleedit, 1, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
 		
 		self.title = wx.StaticText( panel, -1, "Title", size=(-1,wx.local.buttonSize[1]), style=wx.ALIGN_CENTRE|wx.ST_NO_AUTORESIZE)
 		self.title.SetFont(wx.local.normalFont)
-		self.top.AddWindow( self.title, 1, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1)
+		self.top.Add( self.title, 1, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1)
 
 		# The number of uses
 		self.used = wx.StaticText( panel, -1, "0000", size=(-1,wx.local.buttonSize[1]), style=wx.ALIGN_RIGHT|wx.ST_NO_AUTORESIZE)
 		self.used.SetFont(wx.local.normalFont)
-		self.top.AddWindow( self.used, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
+		self.top.Add( self.used, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
 
 		self.middle = wx.BoxSizer( wx.VERTICAL )
 		
 		# The categories this component is in
 		self.categories = wx.StaticText( panel, -1, "", size=(-1,wx.local.buttonSize[1]), style=wx.ALIGN_CENTRE|wx.ST_NO_AUTORESIZE)
 		self.categories.SetFont(wx.local.normalFont)
-		self.middle.AddWindow( self.categories, 0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 0 )
+		self.middle.Add( self.categories, 0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 0 )
 		
 		# The currently selected plan
 		self.plan = wx.ListCtrl( panel, -1, wx.DefaultPosition, wx.DefaultSize, wx.LC_REPORT|wx.SUNKEN_BORDER|wx.LC_EDIT_LABELS )
@@ -68,41 +68,41 @@ class winDesign(winBase):
 		self.plan.InsertColumn(1, "Component")
 		self.plan.SetFont(wx.local.normalFont)
 		
-		self.middle.AddWindow(self.plan, 2, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
+		self.middle.Add(self.plan, 2, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
 	
 		# The description...
 		self.desc = wx.TextCtrl( panel, -1, " ", style=wx.TE_RIGHT|wx.TE_MULTILINE|wx.TE_PROCESS_ENTER)
 		self.desc.SetFont(wx.local.normalFont)
-		self.middle.AddWindow( self.desc, 1, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
+		self.middle.Add( self.desc, 1, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
 		
 		# The buttons
 		self.buttons = wx.BoxSizer( wx.HORIZONTAL )
-		self.middle.AddSizer(self.buttons, 0, wx.ALIGN_RIGHT|wx.ALL, 1 )
+		self.middle.Add(self.buttons, 0, wx.ALIGN_RIGHT|wx.ALL, 1 )
 
 		# The edit button
 		self.edit = wx.Button( panel, -1, _("Edit"), size=wx.local.buttonSize)
 		self.edit.SetFont(wx.local.normalFont)
-		self.buttons.AddWindow( self.edit, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
+		self.buttons.Add( self.edit, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
 		
 		# The duplicate button
 		self.duplicate = wx.Button( panel, -1, _("Duplicate"), size=wx.local.buttonSize)
 		self.duplicate.SetFont(wx.local.normalFont)
-		self.buttons.AddWindow( self.duplicate, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
+		self.buttons.Add( self.duplicate, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
 		
 		# The delete button
 		self.delete = wx.Button( panel, -1, _("Delete"), size=wx.local.buttonSize)
 		self.delete.SetFont(wx.local.normalFont)
-		self.buttons.AddWindow( self.delete, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
+		self.buttons.Add( self.delete, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
 
 		# The revert button
 		self.revert = wx.Button( panel, -1, _("Revert"), size=wx.local.buttonSize)
 		self.revert.SetFont(wx.local.normalFont)
-		self.buttons.AddWindow( self.revert, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
+		self.buttons.Add( self.revert, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
 
 		# The save button
 		self.save = wx.Button( panel, -1, _("Save"), size=wx.local.buttonSize)
 		self.save.SetFont(wx.local.normalFont)
-		self.buttons.AddWindow( self.save, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
+		self.buttons.Add( self.save, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
 		
 		# The components
 		self.partscat = wx.Choice( panel, -1, choices=[], size=(-1,wx.local.buttonSize[1]))
@@ -111,12 +111,12 @@ class winDesign(winBase):
 		self.parts = wx.ListCtrl( panel, -1, wx.DefaultPosition, wx.DefaultSize, wx.LC_LIST|wx.LC_NO_HEADER|wx.SUNKEN_BORDER|wx.LC_SINGLE_SEL )
 		self.parts.SetFont(wx.local.normalFont)
 
-		self.grid.AddWindow(self.hullscat, 	0, wx.ALIGN_CENTRE|wx.ALL, 1 )
-		self.grid.AddSizer(self.top, 		0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
-		self.grid.AddWindow(self.partscat,	0, wx.ALIGN_CENTRE|wx.ALL, 1 )
-		self.grid.AddWindow(self.hulls, 	0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
-		self.grid.AddSizer(self.middle, 	0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
-		self.grid.AddWindow(self.parts, 	0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
+		self.grid.Add(self.hullscat, 	0, wx.ALIGN_CENTRE|wx.ALL, 1 )
+		self.grid.Add(self.top, 		0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
+		self.grid.Add(self.partscat,	0, wx.ALIGN_CENTRE|wx.ALL, 1 )
+		self.grid.Add(self.hulls, 	0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
+		self.grid.Add(self.middle, 	0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
+		self.grid.Add(self.parts, 	0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
 
 		panel.SetAutoLayout( True )
 		panel.SetSizer( self.grid )

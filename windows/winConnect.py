@@ -63,7 +63,7 @@ class winConnect(wx.Frame, winBaseMixIn):
 
 		# The fill in text areas
 		sizer_top = wx.BoxSizer( wx.HORIZONTAL )
-		sizer_top.AddWindow( text_top, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
+		sizer_top.Add( text_top, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
 
 		text_host = wx.StaticText( panel, -1, _("Host"), wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.host = wx.ComboBox( panel, -1, "", wx.DefaultPosition, wx.Size(200,-1), defaultServers, wx.CB_DROPDOWN )
@@ -75,12 +75,12 @@ class winConnect(wx.Frame, winBaseMixIn):
 		self.password = wx.TextCtrl( panel, -1, "", wx.DefaultPosition, wx.Size(200,-1), wx.TE_PASSWORD )
 
 		grid = wx.FlexGridSizer( 0, 2, 0, 0 )
-		grid.AddWindow( text_host, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
-		grid.AddWindow( self.host, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
-		grid.AddWindow( text_username, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
-		grid.AddWindow( self.username, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
-		grid.AddWindow( text_password, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
-		grid.AddWindow( self.password, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
+		grid.Add( text_host, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
+		grid.Add( self.host, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
+		grid.Add( text_username, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
+		grid.Add( self.username, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
+		grid.Add( text_password, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
+		grid.Add( self.password, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
 
 		# The buttons
 		button_ok = wx.Button( panel, ID_OK, _("OK"), wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -88,14 +88,14 @@ class winConnect(wx.Frame, winBaseMixIn):
 		button_ok.SetDefault()
 
 		buttons = wx.BoxSizer( wx.HORIZONTAL )
-		buttons.AddWindow( button_ok, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
-		buttons.AddWindow( button_cancel, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
+		buttons.Add( button_ok, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
+		buttons.Add( button_cancel, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
 
 		# The main sizer
 		sizer = wx.BoxSizer( wx.VERTICAL )
-		sizer.AddSizer( sizer_top, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
-		sizer.AddSizer( grid, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
-		sizer.AddSizer( buttons, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
+		sizer.Add( sizer_top, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
+		sizer.Add( grid, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
+		sizer.Add( buttons, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
 
 		# Join the panel and the base sizer
 		panel.SetAutoLayout( True )

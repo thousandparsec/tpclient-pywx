@@ -50,17 +50,17 @@ class winMessage(winBase):
 
 		self.filter = wx.CheckBox( panel, MESSAGE_FILTER, _("Filter"), wx.DefaultPosition, wx.local.buttonSize, 0 )
 		self.filter.SetFont(wx.local.normalFont)
-		item1.AddWindow( self.filter, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 1 )
+		item1.Add( self.filter, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 1 )
 
 		self.title = wx.StaticText( panel, MESSAGE_TITLE, _("Title"), wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_CENTRE|wx.ST_NO_AUTORESIZE )
 		self.title.SetFont(wx.local.normalFont)
-		item1.AddWindow( self.title, 0, wx.GROW|wx.ALIGN_CENTRE_HORIZONTAL|wx.ALL, 1 )
+		item1.Add( self.title, 0, wx.GROW|wx.ALIGN_CENTRE_HORIZONTAL|wx.ALL, 1 )
 
 		self.counter = wx.StaticText( panel, MESSAGE_ID, _("# of #"), wx.DefaultPosition, wx.local.buttonSize, 0 )
 		self.counter.SetFont(wx.local.normalFont)
-		item1.AddWindow( self.counter, 0, wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 1 )
+		item1.Add( self.counter, 0, wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 1 )
 
-		item0.AddSizer( item1, 0, wx.GROW|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 1 )
+		item0.Add( item1, 0, wx.GROW|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 1 )
 
 		item5 = wx.FlexGridSizer( 0, 2, 0, 0 )
 		item5.AddGrowableCol( 0 )
@@ -68,7 +68,7 @@ class winMessage(winBase):
 
 		# This is the main HTML display!
 		item6 = wx.html.HtmlWindow(panel, MESSAGE_HTML, wx.DefaultPosition, wx.Size(200,10))
-		item5.AddWindow( item6, 0, wx.GROW|wx.ALIGN_CENTER_HORIZONTAL|wx.ALL, 1 )
+		item5.Add( item6, 0, wx.GROW|wx.ALIGN_CENTER_HORIZONTAL|wx.ALL, 1 )
 
 		self.html = item6
 		if wx.Platform == "__WXMAC__":
@@ -81,35 +81,35 @@ class winMessage(winBase):
 
 		prev = wx.Button( panel, -1, _("Prev"), wx.DefaultPosition, wx.local.buttonSize)
 		prev.SetFont(wx.local.normalFont)
-		item7.AddWindow( prev, 0, wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 1 )
+		item7.Add( prev, 0, wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 1 )
 		self.Bind(wx.EVT_BUTTON, self.MessagePrev, prev)
 
 		goto = wx.Button( panel, -1, _("Goto"), wx.DefaultPosition, wx.local.buttonSize)
 		goto.SetFont(wx.local.normalFont)
-		item7.AddWindow( goto, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
+		item7.Add( goto, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
 
 		next = wx.Button( panel, -1, _("Next"), wx.DefaultPosition, wx.local.buttonSize)
 		next.SetFont(wx.local.normalFont)
-		item7.AddWindow( next, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
+		item7.Add( next, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
 		self.Bind(wx.EVT_BUTTON, self.MessageNext, next)
 
 		item11 = wx.StaticLine( panel, MESSAGE_LINE, wx.DefaultPosition, wx.Size(20,-1), wx.LI_HORIZONTAL )
 		item11.Enable(False)
-		item7.AddWindow( item11, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
+		item7.Add( item11, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
 
 		new = wx.Button( panel, -1, _("New"), wx.DefaultPosition, wx.local.buttonSize)
 		new.SetFont(wx.local.normalFont)
-		item7.AddWindow( new, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
+		item7.Add( new, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
 		self.Bind(wx.EVT_BUTTON, self.MessageNew, new)
 
 		delete = wx.Button( panel, -1, _("Delete"), wx.DefaultPosition, wx.local.buttonSize)
 		delete.SetFont(wx.local.normalFont)
-		item7.AddWindow( delete, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
+		item7.Add( delete, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
 		self.Bind(wx.EVT_BUTTON, self.MessageDelete, delete)
 
-		item5.AddSizer( item7, 0, wx.GROW|wx.ALIGN_RIGHT|wx.ALL, 1 )
+		item5.Add( item7, 0, wx.GROW|wx.ALIGN_RIGHT|wx.ALL, 1 )
 
-		item0.AddSizer( item5, 0, wx.GROW|wx.ALIGN_CENTER_HORIZONTAL|wx.ALL, 1 )
+		item0.Add( item5, 0, wx.GROW|wx.ALIGN_CENTER_HORIZONTAL|wx.ALL, 1 )
 
 		panel.SetAutoLayout(True)
 		panel.SetSizer( item0 )

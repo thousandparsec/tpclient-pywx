@@ -80,10 +80,10 @@ class winOrder(winBase):
 		delete_button = wx.Button( base_panel, -1, _("Delete"), size=wx.local.buttonSize)
 		delete_button.SetFont(wx.local.normalFont)
 		
-		button_sizer.AddWindow( type_list,     0, wx.ALIGN_CENTRE, 1 )
-		button_sizer.AddWindow( new_button,    0, wx.ALIGN_CENTRE, 1 )
-		button_sizer.AddWindow( line_vert,     0, wx.ALIGN_CENTRE, 1 )
-		button_sizer.AddWindow( delete_button, 0, wx.ALIGN_CENTRE, 1 )
+		button_sizer.Add( type_list,     0, wx.ALIGN_CENTRE, 1 )
+		button_sizer.Add( new_button,    0, wx.ALIGN_CENTRE, 1 )
+		button_sizer.Add( line_vert,     0, wx.ALIGN_CENTRE, 1 )
+		button_sizer.Add( delete_button, 0, wx.ALIGN_CENTRE, 1 )
 		
 		# Order arguments
 		argument_sizer = wx.FlexGridSizer( 0, 1, 0, 0)
@@ -94,11 +94,11 @@ class winOrder(winBase):
 		argument_panel.SetAutoLayout( True )
 
 		# Put them all on the sizer
-		base_sizer.AddWindow( order_list, 1, wx.GROW|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 1 )
-		base_sizer.AddWindow( line_horiz1, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
-		base_sizer.AddSizer ( button_sizer, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
-		base_sizer.AddWindow( line_horiz2, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
-		base_sizer.AddWindow( argument_panel, 0, wx.GROW|wx.ALIGN_CENTER|wx.ALL, 1 )
+		base_sizer.Add( order_list, 1, wx.GROW|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 1 )
+		base_sizer.Add( line_horiz1, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
+		base_sizer.Add( button_sizer, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
+		base_sizer.Add( line_horiz2, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
+		base_sizer.Add( argument_panel, 0, wx.GROW|wx.ALIGN_CENTER|wx.ALL, 1 )
 
 		self.oid = 0
 		self.app = application
@@ -501,7 +501,7 @@ class winOrder(winBase):
 				name_text = wx.StaticText( self.argument_panel, -1, name.title().replace("_","") )
 				name_text.SetFont(wx.local.normalFont)
 
-				self.argument_sizer.AddWindow( name_text, 0, wx.ALIGN_CENTER|wx.RIGHT, 4 )
+				self.argument_sizer.Add( name_text, 0, wx.ALIGN_CENTER|wx.RIGHT, 4 )
 
 				# Add the arguments bit
 				if type == constants.ARG_ABS_COORD:
@@ -522,7 +522,7 @@ class winOrder(winBase):
 				subpanel.SetFont(wx.local.normalFont)
 				self.argument_subpanels.append( subpanel )
 				
-				self.argument_sizer.AddWindow( subpanel, 0, wx.GROW|wx.ALIGN_CENTER)
+				self.argument_sizer.Add( subpanel, 0, wx.GROW|wx.ALIGN_CENTER)
 				self.argument_sizer.AddGrowableRow( len(self.argument_subpanels) - 1 )
 
 			button_sizer = wx.FlexGridSizer( 1, 0, 0, 0 )
@@ -534,21 +534,21 @@ class winOrder(winBase):
 			revert_button.SetFont(wx.local.normalFont)
 			self.Bind(wx.EVT_BUTTON, self.OnOrderSelect, revert_button)
 			
-			button_sizer.AddWindow( save_button, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
-			button_sizer.AddWindow( revert_button, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
+			button_sizer.Add( save_button, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
+			button_sizer.Add( revert_button, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
 	
-			self.argument_sizer.AddSizer( wx.BoxSizer( wx.HORIZONTAL ) )
-			self.argument_sizer.AddSizer( button_sizer, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
+			self.argument_sizer.Add( wx.BoxSizer( wx.HORIZONTAL ) )
+			self.argument_sizer.Add( button_sizer, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
 			
 		else:
 			# Display message
 			msg = wx.StaticText( self.argument_panel, -1, str(order), wx.DefaultPosition, wx.DefaultSize, 0)
 			msg.SetFont(wx.local.normalFont)
 			
-			self.argument_sizer.AddWindow( msg, 0, wx.ALIGN_CENTER|wx.ALL, 5)
+			self.argument_sizer.Add( msg, 0, wx.ALIGN_CENTER|wx.ALL, 5)
 		
 		self.argument_sizer.Fit(self.argument_panel)
-		self.base_sizer.AddWindow( self.argument_panel, 0, wx.GROW|wx.ALIGN_CENTER|wx.ALL, 5 )
+		self.base_sizer.Add( self.argument_panel, 0, wx.GROW|wx.ALIGN_CENTER|wx.ALL, 5 )
 		self.base_sizer.Layout()
 
 	def FromPanel(self, order):
@@ -593,7 +593,7 @@ def argNotImplimentedPanel(parent, parent_panel, args):
 	
 	item1 = wx.StaticText( panel, -1, _("Not implimented."))
 	item1.SetFont(wx.local.normalFont)
-	item0.AddWindow( item1, 0, wx.ALIGN_CENTRE|wx.LEFT, 0 )
+	item0.Add( item1, 0, wx.ALIGN_CENTRE|wx.LEFT, 0 )
 
 	return panel
 
@@ -606,7 +606,7 @@ def argStringPanel(parent, parent_panel, args):
 
 	item1 = wx.TextCtrl( panel, -1, args[1], size=(wx.local.spinSize[0]*2, wx.local.spinSize[1]))
 	item1.SetFont(wx.local.tinyFont)
-	item0.AddWindow( item1, 0, wx.ALIGN_CENTRE|wx.LEFT, 1 )
+	item0.Add( item1, 0, wx.ALIGN_CENTRE|wx.LEFT, 1 )
 	
 	return panel
 	
@@ -636,7 +636,7 @@ def argObjectPanel(parent, parent_panel, args, cache):
 	item1.OnSelection(None)
 
 	item1.SetFont(wx.local.tinyFont)
-	item0.AddWindow( item1, 0, wx.ALIGN_CENTRE|wx.LEFT, 1 )
+	item0.Add( item1, 0, wx.ALIGN_CENTRE|wx.LEFT, 1 )
 	
 	return panel
 
@@ -688,13 +688,13 @@ def argListPanel(parent, parent_panel, args):
 	delete.SetFont(wx.local.normalFont)
 
 	box_add = wx.BoxSizer(wx.HORIZONTAL)
-	box_add.AddWindow( type_list, 0, wx.ALIGN_CENTRE|wx.LEFT, 1 )
-	box_add.AddWindow( number, 0, wx.ALIGN_CENTRE|wx.LEFT, 1 )
-	box_add.AddWindow( add, 0, wx.ALIGN_CENTRE|wx.LEFT, 1 )
-	box_add.AddWindow( delete, 0, wx.ALIGN_CENTRE|wx.LEFT, 1 )
+	box_add.Add( type_list, 0, wx.ALIGN_CENTRE|wx.LEFT, 1 )
+	box_add.Add( number, 0, wx.ALIGN_CENTRE|wx.LEFT, 1 )
+	box_add.Add( add, 0, wx.ALIGN_CENTRE|wx.LEFT, 1 )
+	box_add.Add( delete, 0, wx.ALIGN_CENTRE|wx.LEFT, 1 )
 
-	base.AddSizer( selected, 1, wx.EXPAND|wx.ALIGN_CENTRE|wx.ALL, 1 )
-	base.AddSizer( box_add, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
+	base.Add( selected, 1, wx.EXPAND|wx.ALIGN_CENTRE|wx.ALL, 1 )
+	base.Add( box_add, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
 
 	base.Fit(panel)
 
@@ -815,7 +815,7 @@ def argTimePanel(parent, parent_panel, args):
 	
 	item1 = wx.SpinCtrl( panel, -1, str(args), min=min, max=max, size=(wx.local.spinSize[0]*2, wx.local.spinSize[1]) )
 	item1.SetFont(wx.local.tinyFont)
-	item0.AddWindow( item1, 0, wx.ALIGN_CENTRE|wx.LEFT, 1 )
+	item0.Add( item1, 0, wx.ALIGN_CENTRE|wx.LEFT, 1 )
 	
 	return panel
 	
@@ -833,31 +833,31 @@ def argCoordPanel(parent, parent_panel, args):
 	
 	item1 = wx.StaticText( panel, -1, "X")
 	item1.SetFont(wx.local.normalFont)
-	item0.AddWindow( item1, 0, wx.ALIGN_CENTRE|wx.LEFT, 0 )
+	item0.Add( item1, 0, wx.ALIGN_CENTRE|wx.LEFT, 0 )
 
 	item2 = wx.TextCtrl( panel, -1, str(args[X]), size=wx.local.spinSize, validator=wx.SimpleValidator(wx.DIGIT_ONLY) )
 	item2.SetFont(wx.local.tinyFont)
-	item0.AddWindow( item2, 0, wx.ALIGN_CENTRE|wx.LEFT, 1 )
+	item0.Add( item2, 0, wx.ALIGN_CENTRE|wx.LEFT, 1 )
 
 	item3 = wx.StaticText( panel, -1, "Y")
 	item3.SetFont(wx.local.normalFont)
-	item0.AddWindow( item3, 0, wx.ALIGN_CENTRE|wx.LEFT, 3 )
+	item0.Add( item3, 0, wx.ALIGN_CENTRE|wx.LEFT, 3 )
 
 	item4 = wx.TextCtrl( panel, -1, str(args[Y]), size=wx.local.spinSize, validator=wx.SimpleValidator(wx.DIGIT_ONLY) )
 	item4.SetFont(wx.local.tinyFont)
-	item0.AddWindow( item4, 0, wx.ALIGN_CENTRE|wx.LEFT, 1 )
+	item0.Add( item4, 0, wx.ALIGN_CENTRE|wx.LEFT, 1 )
 
 	item5 = wx.StaticText( panel, -1, "Z")
 	item5.SetFont(wx.local.normalFont)
-	item0.AddWindow( item5, 0, wx.ALIGN_CENTRE|wx.LEFT, 3 )
+	item0.Add( item5, 0, wx.ALIGN_CENTRE|wx.LEFT, 3 )
 
 	item6 = wx.TextCtrl( panel, -1, str(args[Z]), size=wx.local.spinSize, validator=wx.SimpleValidator(wx.DIGIT_ONLY) )
 	item6.SetFont(wx.local.tinyFont)
-	item0.AddWindow( item6, 0, wx.ALIGN_CENTRE|wx.LEFT, 1 )
+	item0.Add( item6, 0, wx.ALIGN_CENTRE|wx.LEFT, 1 )
 
 	item7 = wx.Button( panel, -1, _("P"), size=wx.local.smallSize )
 	item7.SetFont(wx.local.normalFont)
-	item0.AddWindow( item7, 0, wx.ALIGN_CENTRE|wx.LEFT, 3 )
+	item0.Add( item7, 0, wx.ALIGN_CENTRE|wx.LEFT, 3 )
 
 	def OnSelectPosition(evt, x=item2, y=item4, z=item6, p=parent):
 		p.ignore = True
