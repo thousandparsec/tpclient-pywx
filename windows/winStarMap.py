@@ -225,25 +225,25 @@ class winStarMap(winBase):
 		# Draw Background
 		#########################
 
-		max = (self.maxWidth, self.maxHeight)
-		size = (self.graphics['background'].GetWidth(), self.graphics['background'].GetHeight())
+		#max = (self.maxWidth, self.maxHeight)
+		#size = (self.graphics['background'].GetWidth(), self.graphics['background'].GetHeight())
 
-		background = self.graphics['background']
+		#background = self.graphics['background']
 
-		startpos = startpos[0] - size[0], startpos[1] - size[1]
-		endpos = endpos[0] + size[0], endpos[1] + size[1]
+		#startpos = startpos[0] - size[0], startpos[1] - size[1]
+		#endpos = endpos[0] + size[0], endpos[1] + size[1]
 
 		#print startpos, size, endpos, (endpos[0]-startpos[0], endpos[1]-startpos[1])
 
-		x = size[0] * (startpos[0] / size[0])
-		while x < endpos[0]:
-			y = size[1] * (startpos[1] / size[1])
-			while y < endpos[1]:
-				if x >= startpos[0] and y >= startpos[1]:
-					#print (x,y)
-					dc.DrawBitmap(background, x, y, TRUE)
-				y += size[1]
-			x += size[0]
+		#x = size[0] * (startpos[0] / size[0])
+		#while x < endpos[0]:
+		#	y = size[1] * (startpos[1] / size[1])
+		#	while y < endpos[1]:
+		#		if x >= startpos[0] and y >= startpos[1]:
+		#			#print (x,y)
+		#			dc.DrawBitmap(background, x, y, TRUE)
+		#		y += size[1]
+		#	x += size[0]
 
 		#######################
 		# Draw the systems
@@ -270,13 +270,45 @@ class winStarMap(winBase):
 		#
 
 		dc.SetFont(wxFont(8, wxSWISS, wxNORMAL, wxNORMAL))
-		dc.SetTextForeground(wxWHITE)
 
 		zoom = self.config['Zoom']
 		
 		for object in self.app.game.universe.Objects():
 
-			if isinstance(object, objects.Actual):
+			pos = [ object.pos[X]/zoom + 1500, object.pos[Y]/zoom + 1500 ]
+
+			if isinstance(object, objects.StarSystem):
+				dc.SetTextForeground(wxWHITE)
+			
+				if self.config['DrawNames']:
+					tw, th = dc.GetTextExtent(object.name) 
+					dc.DrawText(object.name, pos[X]-tw/2+POINT/2, pos[Y]+POINT+1)
+					
+					dc.SetBrush(wxBrush(wxWHITE, wxSOLID))
+					dc.SetPen(wxPen(wxWHITE, 0, wxSOLID))
+					dc.DrawEllipse(pos[X], pos[Y], POINT, POINT)
+
+			elif isinstance(object, objects.Planet):
+				pass
+				
+			elif isinstance(object, objects.Fleet):
+				pass
+
+			elif isinstance(object, objects.Unknown):
+				dc.SetTextForeground(wxRed)
+
+				tw, th = dc.GetTextExtent('?') 
+				dc.DrawText('?', pos[X] -(tw+POINT)/2, pos[Y] -(th+POINT)/2)
+
+				if self.config['DrawNames']:
+					tw, th = dc.GetTextExtent(object.name) 
+					dc.DrawText(object.name, pos[X]-tw/2+POINT/2, pos[Y]+POINT+1)
+				
+			else:
+				dc.SetBrush(wxBrush(wxRED, wxSOLID))
+				dc.SetPen(wxPen(wxRED, 0, wxSOLID))
+				dc.DrawEllipse(pos[X], pos[Y], POINT, POINT)
+				
 
 #				if self.config['Scanner']:
 #					scanner = object.GetScanner()
@@ -298,25 +330,13 @@ class winStarMap(winBase):
 #						dc.DrawEllipse(object.pos[X]/zoom-p/2.0/zoom+POINT/2, object.pos[Y]/zoom-p/2.0/zoom+POINT/2, p/zoom, p/zoom)
 #
 #						#dc.SetLogicalFunction(wxSET)
-
-				pos = [ object.pos[X]/zoom + 1500, object.pos[Y]/zoom + 1500 ]
-
-				if self.config['DrawNames']:
-					tw, th = dc.GetTextExtent(object.name) 
-					dc.DrawText(object.name, pos[X]-tw/2+POINT/2, pos[Y]+POINT+1)
-
-				if self.config['System'] == sysOWNER:
-					pass
-
-				elif self.config['System'] == sysPLAIN:
-					dc.SetBrush(wxBrush(wxWHITE, wxSOLID))
-					dc.DrawEllipse(pos[X], pos[Y], POINT, POINT)
-
-				if self.config['Ships']:
-					# Draw an orbit circle if the ship exists
-					dc.SetPen(wxPen(wxWHITE, 1, wxSOLID))
-					dc.SetBrush(wxTRANSPARENT_BRUSH)
-					dc.DrawEllipse(pos[X]+POINT/2-POINT, pos[Y]+POINT/2-POINT, POINT*2, POINT*2)
+#
+#				if self.config['Ships']:
+#					# Draw an orbit circle if the ship exists
+#					dc.SetPen(wxPen(wxWHITE, 1, wxSOLID))
+#					dc.SetBrush(wxTRANSPARENT_BRUSH)
+#					dc.DrawEllipse(pos[X]+POINT/2-POINT, pos[Y]+POINT/2-POINT, POINT*2, POINT*2)
+			
 
 		if self.dragging:
 			self.RenderDrag(dc)

@@ -39,11 +39,11 @@ class winSystem(winBase):
 				wxRemotelyScrolledTreeCtrl.__init__(self, parent, ID, pos, size, style)
 
 				self.icons = {}
-				self.icons['System'] = wxImage("graphics/system-icon.png").ConvertToBitmap()
-				self.icons['Ship'] = wxImage("graphics/ship-icon.png").ConvertToBitmap()
-				self.icons['Starbase'] = wxImage("graphics/starbase-icon.png").ConvertToBitmap()
+				self.icons['Container'] = wxImage("graphics/link-icon.png").ConvertToBitmap()
+				self.icons['StarSystem'] = wxImage("graphics/system-icon.png").ConvertToBitmap()
+				self.icons['Fleet'] = wxImage("graphics/ship-icon.png").ConvertToBitmap()
 				self.icons['Planet'] = wxImage("graphics/planet-icon.png").ConvertToBitmap()
-				self.icons['Link'] = wxImage("graphics/link-icon.png").ConvertToBitmap()
+				self.icons['Unknown'] = wxImage("graphics/starbase-icon.png").ConvertToBitmap()
 
 				# make an image list
 				self.il = wxImageList(16, 16)
@@ -126,24 +126,22 @@ class winSystem(winBase):
 		selected = None
 		new_root = None
 		
-		if isinstance(object, objects.Actual):
-			new_root = self.tree.AppendItem(root, object.name, self.tree.icons['Planet'])
+		if root == None:
+			new_root = self.tree.AddRoot("Known Universe")
+		else:
+			if object != None:
+				if self.tree.icons.has_key(object.__class__.__name__):
+					new_root = self.tree.AppendItem(root, object.name, self.tree.icons[object.__class__.__name__])
+				else:
+					new_root = self.tree.AppendItem(root, object.name, self.tree.icons['Unknown'])
 		
-		elif isinstance(object, objects.Container):
-			if root == None:
-				new_root = self.tree.AddRoot("Known Universe")
-			else:
-				new_root = self.tree.AppendItem(root, object.name, self.tree.icons['System'])
-			
+		if isinstance(object, objects.Container):
 			for id in object.contains:
 				new = self.app.game.universe.Object(id)
 				temp = self.Add(new_root, new, selected_id)
 
 				if temp:
 					selected = temp
-
-		else:
-			self.tree.AppendItem(root, "Unknown", self.tree.icons['Ship'])
 		
 		if new_root:
 			self.tree.SetPyData(new_root, object.id)

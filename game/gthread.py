@@ -23,6 +23,8 @@ from objects import *
 # Program imports
 from extra.wxPostEvent import *
 
+typemap = (Container, Container, StarSystem, Planet, Fleet)
+
 class GameThread(BaseThread):
 	def __init__(self):
 		BaseThread.__init__(self)
@@ -81,12 +83,10 @@ class GameThread(BaseThread):
 			# Okay, lets get a copy and then mutate this object into a UniverseObject
 			new = copy.deepcopy(evt.value)
 
-			if new.type == 1 or new.type == 0:
-				new.__class__ = Container
-			elif new.type == 2:
-				new.__class__ = Actual
+			if new.type < len(typemap):
+				new.__class__ = typemap[new.type]
 			else:
-				raise UnknownObject("Unknown object recieved %r\n%s" % (e.value, e.value))
+				new.__class__ = Unknown
 
 			self.universe.Add(new)
 
@@ -106,12 +106,16 @@ class GameThread(BaseThread):
 							nevt = GameObjectGetEvent(id, "")
 							wxPostEvent(window, nevt)
 					
+						debug(DEBUG_GAME, "Getting object %i" % id)
 						g = protocol.ObjectGet(id=id)
-						evt.network.Send(g)
+						nevt = NetworkSendEvent(g)
+						wxPostEvent(nevt)
 			
 			for id in new.orders_valid:
+				debug(DEBUG_GAME, "Getting order desc for %i" % id)
 				g = protocol.OrderDescGet(id=id)
-				evt.network.Send(g)
+				nevt = NetworkSendEvent(g)
+				wxPostEvent(nevt)
 		
 		elif isinstance(evt.value, protocol.OrderDesc):
 			debug(DEBUG_GAME, "Got an order description packet")

@@ -75,6 +75,7 @@ class DescHolder:
 			return None
 
 	def OrderDescAdd(self, object):
+		print object.id
 		self.o[object.id] = object
 
 	def __del__(self):
@@ -104,11 +105,31 @@ class Container(UniverseObject):
 	"""\
 	A universe object which contains other objects.
 	"""
-	pass
+	pass	
 
 class Actual(UniverseObject):
 	"""\
-	A real universe object - this object cannot contain other objects.
+	An actual physicial object.
+	"""
+	pass
+	
+class StarSystem(Container):
+	"""\
+	"""
+	pass
+
+class Planet(Container, Actual):
+	"""\
+	"""
+	pass
+
+class Fleet(Actual):
+	"""\
+	"""
+	pass
+
+class Unknown(Container, Actual):
+	"""\
 	"""
 	pass
 

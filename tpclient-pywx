@@ -142,7 +142,12 @@ class AppTP(wxApp):
 			evt.Next()
 
 	def Exit(self):
+		for key,data in self.game.universe.map.items():
+			print key,data
+			print data.contains
 		pprint.pprint(self.game.universe.map)
+		pprint.pprint(self.game.descs.o)
+		
 		sys.exit(1)
 
 if __name__ == '__main__':
