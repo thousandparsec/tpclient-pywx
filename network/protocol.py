@@ -149,14 +149,22 @@ def connect(address, port):
 		return None
 
 if __name__ == "__main__":
-	s = connect("203.96.149.160", 6923)
-	if not socket:
+	
+	if sys.argv[1] == "Default":
+		host, port = ("code-bear.dyndns.org", 6923)
+	else:
+		host, port = string.split(sys.argv[1], ':', 1)
+		port = int(port)
+	
+	s = connect(host, port)
+	
+	if not s:
 		sys.exit("Could not connect! Please try again later.")
 	else:
 		print "We connected okay, constructing a login packet"
 
-	username=sys.argv[1]
-	password=sys.argv[2]
+	username=sys.argv[2]
+	password=sys.argv[3]
 	l = Login(username=username, password=password)
 	pprint.pprint(l)
 	pprint.pprint(str(l))
