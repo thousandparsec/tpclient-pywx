@@ -85,6 +85,7 @@ class winConnect(wx.Frame, winBaseMixIn):
 		# The buttons
 		button_ok = wx.Button( panel, ID_OK, _("OK"), wx.DefaultPosition, wx.DefaultSize, 0 )
 		button_cancel = wx.Button( panel, ID_CANCEL, _("Cancel"), wx.DefaultPosition, wx.DefaultSize, 0 )
+		button_ok.SetDefault()
 
 		buttons = wx.BoxSizer( wx.HORIZONTAL )
 		buttons.AddWindow( button_ok, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
