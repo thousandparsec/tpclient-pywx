@@ -29,7 +29,7 @@ ID_HELP = 10057
 
 # Shows messages from the game system to the player.
 class winMain(winBase):
-	title = "Thousand Parsecs"
+	title = "Thousand Parsec"
 	
 	def __init__(self, application, pos=wxDefaultPosition, size=wxDefaultSize, style=wxDEFAULT_FRAME_STYLE):
 		winBase.__init__(self, application, None, pos, size, style)

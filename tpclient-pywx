@@ -65,32 +65,38 @@ class MainControl:
 
 	def ConfigSave(self):
 		config = self.config
-		config.main.pos = self.main.GetPosition()
-		config.main.size = self.main.GetSize()
-		config.message.pos = self.message.GetPosition()
-		config.message.size = self.message.GetSize()
-		config.starmap.pos = self.starmap.GetPosition()
-		config.starmap.size = self.starmap.GetSize()
-		config.system.pos = self.system.GetPosition()
-		config.system.size = self.system.GetSize()
+		config.main.pos = self.main.GetPositionTuple()
+		config.main.size = self.main.GetSizeTuple()
+		config.main.show = self.main.IsShown()
+		config.message.pos = self.message.GetPositionTuple()
+		config.message.size = self.message.GetSizeTuple()
+		config.message.show = self.main.IsShown()
+		config.starmap.pos = self.starmap.GetPositionTuple()
+		config.starmap.size = self.starmap.GetSizeTuple()
+		config.starmap.show = self.main.IsShown()
+		config.system.pos = self.system.GetPositionTuple()
+		config.system.size = self.system.GetSizeTuple()
+		config.system.show = self.main.IsShown()
 
 		save_data("windows", config)
 
-	def ConfigActivate(self):
+	def ConfigActivate(self, show=TRUE):
 		config = self.config
 
 		self.main.SetPosition(config.main.pos)
 		self.main.SetSize(config.main.size)
-		self.main.Show(config.main.show)
 		self.message.SetPosition(config.message.pos)
 		self.message.SetSize(config.message.size)
-		self.message.Show(config.message.show)
 		self.starmap.SetPosition(config.starmap.pos)
 		self.starmap.SetSize(config.starmap.size)
-		self.starmap.Show(config.starmap.show)
 		self.system.SetPosition(config.system.pos)
 		self.system.SetSize(config.system.size)
-		self.system.Show(config.system.show)
+		
+		if show:
+			self.main.Show(config.main.show)
+			self.message.Show(config.message.show)
+			self.starmap.Show(config.starmap.show)
+			self.system.Show(config.system.show)
 
 	def __init__(self, app):
 
@@ -119,6 +125,8 @@ class MainControl:
 		self.starmap = winStarMap(app, self.main, config.starmap.pos, config.starmap.size)
 		self.system = winSystem(app, self.main, config.system.pos, config.system.size)
 
+		self.ConfigActivate(FALSE)
+
 	def Raise(self):
 		"""\
 			Raise all the windows.
@@ -140,6 +148,9 @@ class MainControl:
 		self.message.Show(config.message.show)
 		self.starmap.Show(config.starmap.show)
 		self.system.Show(config.system.show)
+
+		# Move everything to there home positions
+		self.ConfigActivate()
 
 	def Hide(self):
 		"""\

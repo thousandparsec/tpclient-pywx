@@ -226,7 +226,7 @@ class panelConfigWindows(wxPanel):
 		item15 = wxStaticText( self, ID_TEXT, "Y Position", wxDefaultPosition, wxDefaultSize, 0 )
 		item12.AddWindow( item15, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxALL, 5 )
 
-		item16 = wxSpinCtrl( self, ID_YPOS, "0", wxDefaultPosition, wxSize(50,-1), 0, 0, 1000, 0 )
+		item16 = wxSpinCtrl( self, ID_YPOS, "0", wxDefaultPosition, wxSize(50,-1), 0, 0, 10000, 0 )
 		item12.AddWindow( item16, 0, wxALIGN_CENTRE|wxALL, 5 )
 		self.obj['ypos'] = item16
 		EVT_SPINCTRL(self, ID_YPOS, self.OnYPos)
@@ -234,7 +234,7 @@ class panelConfigWindows(wxPanel):
 		item17 = wxStaticText( self, ID_TEXT, "Width", wxDefaultPosition, wxDefaultSize, 0 )
 		item12.AddWindow( item17, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxALL, 5 )
 
-		item18 = wxSpinCtrl( self, ID_WIDTH, "0", wxDefaultPosition, wxSize(50,-1), 0, 0, 100, 0 )
+		item18 = wxSpinCtrl( self, ID_WIDTH, "0", wxDefaultPosition, wxSize(50,-1), 0, 0, 10000, 0 )
 		item12.AddWindow( item18, 0, wxALIGN_CENTRE|wxALL, 5 )
 		self.obj['width'] = item18
 		EVT_SPINCTRL(self, ID_WIDTH, self.OnWidth)
@@ -242,7 +242,7 @@ class panelConfigWindows(wxPanel):
 		item19 = wxStaticText( self, ID_TEXT, "Height", wxDefaultPosition, wxDefaultSize, 0 )
 		item12.AddWindow( item19, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxALL, 5 )
 
-		item20 = wxSpinCtrl( self, ID_HEIGHT, "0", wxDefaultPosition, wxSize(50,-1), 0, 0, 100, 0 )
+		item20 = wxSpinCtrl( self, ID_HEIGHT, "0", wxDefaultPosition, wxSize(50,-1), 0, 0, 10000, 0 )
 		item12.AddWindow( item20, 0, wxALIGN_CENTRE|wxALL, 5 )
 		self.obj['height'] = item20
 		EVT_SPINCTRL(self, ID_HEIGHT, self.OnHeight)
@@ -270,6 +270,12 @@ class panelConfigWindows(wxPanel):
 		
 		item0.Fit( self )
 		item0.SetSizeHints( self )
+		
+		EVT_SET_FOCUS(parent, self.OnFocus) 
+
+	def OnFocus(self, evt):
+		print "FOCUS!"
+		self.OnWindowSelection(None)
 
 	def OnShowMessage(self, evt):
 		self.application.windows.config.message.show = not evt.Checked()
@@ -317,9 +323,11 @@ class panelConfigWindows(wxPanel):
 	def OnSave(self, evt):
 		self.application.windows.ConfigSave()
 		self.frame.Show(FALSE)
+		self.application.windows.Raise()
 
 	def OnRevert(self, evt):
-		self.application.windows.ConfigLoad()
+#		self.application.config = self.application.windows.ConfigLoad()
 		self.application.windows.ConfigActivate()
 		self.frame.Show(FALSE)
+		self.application.windows.Raise()
 

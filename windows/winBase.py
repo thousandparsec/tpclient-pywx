@@ -27,8 +27,9 @@ class winBase(wxFrame):
 			# Make sure we are going to do bad stuff on windows.
 			if wxPlatform != '__WXMSW__':
 				self.application.windows.Raise()
-		elif self.application.windows.config.raise_ == "All on Main" and self.title == "Main":
-			self.application.windows.Raise()
+		elif self.application.windows.config.raise_ == "All on Main":
+			if self.title == "Thousand Parsec":
+				self.application.windows.Raise()
 		else:
 			print "Unknown raise method:", self.application.windows.config.raise_
 
