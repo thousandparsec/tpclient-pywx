@@ -1,0 +1,27 @@
+
+TODO
+=======================================================
+Short Term
+
+	* Add more Order Argument panel types
+		* ARG_ABS_COORD (DONE)
+			* Get the P button to work
+		* ARG_TIME
+		* ARG_RANGE
+
+	* Get order save to work :)
+
+	* Add ships to the StarMap
+
+	* Put up screenshots on www.thousandparsec.net
+
+Longer Term
+	* Add a info panel
+	* Add ship "path" to StarMap
+	
+	* Check time till end of turn
+		* Pop-up message when getting close
+		* Reload the Universe cache after turn
+
+Longest Term
+	* Check what it looks like under windows / MacOSX

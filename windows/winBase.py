@@ -25,6 +25,10 @@ class SelectOrderEvent(wx.PyEvent):
 		self.slot = slot
 wx.local.SelectOrderEvent = SelectOrderEvent
 
+wx.local.smallSize  = wx.Size(15,15)
+wx.local.buttonSize = wx.Size(50,20)
+wx.local.spinSize   = wx.Size(40,15)
+
 wx.local.normalFont = wx.Font(8,  wx.DEFAULT, wx.NORMAL, wx.NORMAL)
 wx.local.tinyFont   = wx.Font(6,  wx.DEFAULT, wx.LIGHT, wx.NORMAL)
 wx.local.largeFont  = wx.Font(12, wx.DEFAULT, wx.NORMAL, wx.NORMAL)

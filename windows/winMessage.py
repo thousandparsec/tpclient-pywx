@@ -87,17 +87,16 @@ class winMessage(winBase):
 
 		item7 = wx.BoxSizer( wx.VERTICAL )
 
-		button_size = wx.Size(50,20)
 
-		item8 = wx.Button( panel, MESSAGE_PREV, "Prev", wx.DefaultPosition, button_size, 0 )
+		item8 = wx.Button( panel, MESSAGE_PREV, "Prev", wx.DefaultPosition, wx.local.buttonSize, 0 )
 		item8.SetFont(wx.local.normalFont)
 		item7.AddWindow( item8, 0, wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 1 )
 
-		item9 = wx.Button( panel, MESSAGE_GOTO, "Goto", wx.DefaultPosition, button_size, 0 )
+		item9 = wx.Button( panel, MESSAGE_GOTO, "Goto", wx.DefaultPosition, wx.local.buttonSize, 0 )
 		item9.SetFont(wx.local.normalFont)
 		item7.AddWindow( item9, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
 
-		item10 = wx.Button( panel, MESSAGE_NEXT, "Next", wx.DefaultPosition, button_size, 0 )
+		item10 = wx.Button( panel, MESSAGE_NEXT, "Next", wx.DefaultPosition, wx.local.buttonSize, 0 )
 		item10.SetFont(wx.local.normalFont)
 		item7.AddWindow( item10, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
 
@@ -105,11 +104,11 @@ class winMessage(winBase):
 		item11.Enable(False)
 		item7.AddWindow( item11, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
 
-		item12 = wx.Button( panel, MESSAGE_NEW, "New", wx.DefaultPosition, button_size, 0 )
+		item12 = wx.Button( panel, MESSAGE_NEW, "New", wx.DefaultPosition, wx.local.buttonSize, 0 )
 		item12.SetFont(wx.local.normalFont)
 		item7.AddWindow( item12, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
 
-		item13 = wx.Button( panel, MESSAGE_DEL, "Delete", wx.DefaultPosition, button_size, 0 )
+		item13 = wx.Button( panel, MESSAGE_DEL, "Delete", wx.DefaultPosition, wx.local.buttonSize, 0 )
 		item13.SetFont(wx.local.normalFont)
 		item7.AddWindow( item13, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
 
