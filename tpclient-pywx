@@ -110,10 +110,15 @@ class AppTP(wx.App):
 			pass
 		
 		self.cache = Blank()
+		self.cache.boards = {}
+		self.cache.categories = {}
+		self.cache.components = {}
 		self.cache.objects = {}
 		self.cache.orders = {}
-		self.cache.boards = {}
+		self.cache.orders_probe = {}
 		self.cache.messages = {}
+		self.cache.players = {}
+		self.cache.resources = {}
 
 		# Download objects
 		objects = self.connection.get_objects(0)
@@ -146,6 +151,11 @@ class AppTP(wx.App):
 						break
 					self.cache.orders[object.id].append(order)
 
+			# Download the orders probes
+			self.cache.orders[object.id] = []
+			for type in object.order_types:
+				pass
+
 			progress.Update(len(self.cache.objects.keys()))
 
 		# Download any order descriptions not already downloaded
@@ -159,9 +169,10 @@ class AppTP(wx.App):
 				break
 
 		# Download message boards
-		board = self.connection.get_boards(0)[0]
-		if not failed(board):
-			print "Downloading messages for the board", board.id, board.number
+		for board in self.connection.get_boards([]):
+			if failed(board):
+				continue
+
 			# Download the messages from this board
 			if board.number == 0:
 				messages = []
@@ -173,9 +184,22 @@ class AppTP(wx.App):
 					messages = list(messages)
 			else:
 				messages = self.connection.get_messages(board.id, range(0, board.number))
+
 			self.cache.messages[board.id] = list(messages)
-		else:
-			self.cache.messages[0] = []
+
+		# Download the categories
+		for category in self.connection.get_categories([]):
+			if failed(category):
+				continue
+
+			self.cache.categories[category.id] = category
+
+		# Download the components
+		for component in self.connection.get_components([]):
+			if failed(component):
+				continue
+
+			self.cache.components[component.id] = component
 
 		progress.Update(100)
 		self.windows.Post(wx.local.CacheUpdateEvent())

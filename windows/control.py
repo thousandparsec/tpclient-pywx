@@ -152,7 +152,7 @@ class MainControl:
 			self.starmap.Show(config.starmap.show)
 			self.system.Show(config.system.show)
 
-		self.windesign.Show(True)
+		self.design.Show(True)
 
 	def __init__(self, application):
 
@@ -170,17 +170,17 @@ class MainControl:
 		from windows.winMain    import winMain, create_menu
 		self.main = winMain(application, config.main.pos, config.main.size)
 
-		from windows.winInfo    import winInfo
-		self.info = winInfo(application, self.main, config.info.pos, config.info.size)
-
 		from windows.winConfig  import winConfig
 		self.winconfig = winConfig(application, self.main)
 		self.winconfig.Show(False)
 
 		from windows.winDesign  import winDesign
-		self.windesign = winDesign(application, self.main)
-		self.windesign.Show(False)
+		self.design = winDesign(application, self.main)
+		self.design.Show(False)
 		
+		from windows.winInfo    import winInfo
+		self.info = winInfo(application, self.main, config.info.pos, config.info.size)
+
 		from windows.winMessage import winMessage
 		self.message = winMessage(application, self.main, config.message.pos, config.message.size)
 
@@ -254,7 +254,7 @@ class MainControl:
 	def _Post(self, event):
 		print "Posting", event.__class__.__name__[:-5]
 		func = 'On' + event.__class__.__name__[:-5]
-		for window in [self.main, self.info, self.message, self.order, self.starmap, self.system]:
+		for window in [self.main, self.design, self.info, self.message, self.order, self.starmap, self.system, self.winconfig]:
 			if hasattr(window, func):
 				getattr(window, func)(event)
 		
