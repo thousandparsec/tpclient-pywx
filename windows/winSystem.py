@@ -83,7 +83,7 @@ class winSystem(winBase):
 		self.value = systemValueWindow(splitter, -1, style=wxNO_BORDER)
 
 		# SET THE SPLITTER HERE!!! -> It's the last value
-		splitter.SplitVertically(self.tree, self.value, 150)
+		splitter.SplitVertically(self.tree, self.value, 250)
 		scroller.SetTargetWindow(self.tree)
 		scroller.EnableScrolling(FALSE, FALSE)
 
