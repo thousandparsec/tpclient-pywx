@@ -134,22 +134,27 @@ class winConnect(wxFrame):
 				do_traceback()
 
 	def OnConnection(self, event):
-		eventManager.DeregisterListener(self.OnConnection)
+		self.parent.network.lock()
+		try:
+			eventManager.DeregisterListener(self.OnConnection)
 
-		if event != None and isinstance(event.value, protocol.Ok):
-			eventManager.Register(self.OnLogin, EVT_NETWORK_PACKET, self)
-			self.progress.Update(2)
-		else:
-			# Oh no! we didn't connect!
-			self.progress.Update(5)
+			if event != None and isinstance(event.value, protocol.Ok):
+				eventManager.Register(self.OnLogin, EVT_NETWORK_PACKET, self)
+				self.progress.Update(2)
+			else:
+				print "OnConnect!"
+				# Oh no! we didn't connect!
+				self.progress.Update(5)
 
-			dlg = wxMessageDialog(self, 'The connection failed, this could be because,\n' +
-										'the server could be busy,\n' +
-										'the server doesn\'t exist.\n' +
-										'Please try again later.',
-										'TP: Connection Failed',
-			   						wxOK | wxICON_INFORMATION)
-			dlg.Show(TRUE)
+				dlg = wxMessageDialog(self, 'The connection failed, this could be because,\n' +
+											'the server could be busy,\n' +
+											'the server doesn\'t exist.\n' +
+											'Please try again later.',
+											'TP: Connection Failed',
+				   						wxOK | wxICON_INFORMATION)
+				dlg.Show(TRUE)
+		finally:
+			self.parent.network.unlock()
 
 	def OnLogin(self, event):
 		self.progress.Update(3)
