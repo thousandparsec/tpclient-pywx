@@ -11,13 +11,17 @@ CONNECT=0
 OK=1
 LOGIN=2
 FAIL=3
-GET_OBJECT=4
-OBJECT=5
+GETOBJ=4
+OBJ=5
+
+X = 0
+Y = 1
+Z = 2
 
 
 class Header:
 	size=4+4+4
-	struct="!4sII"
+	struct="!4sLL"
 
 	def __init__(self, s=None):
 		if s:
@@ -45,10 +49,10 @@ class Header:
 			self.__class__ = Login
 		elif self.type == FAIL:
 			self.__class__ = Fail
-		elif self.type == GET_OBJECT:
+		elif self.type == GETOBJ:
 			self.__class__ = GetObject
-		elif self.type == OBJECT:
-			pass
+		elif self.type == OBJ:
+			self.__class__ = Object
 
 	def __str__(self):
 		output = pack(Header.struct, self.protocol, self.type, self.length)
@@ -66,6 +70,108 @@ class Ok(Processed):
 
 class Fail(Processed):
 	type = FAIL
+
+class GetObject(Processed):
+	type = GETOBJ
+	struct="!L"
+
+	def __init__(self, s=None, id=None):
+		if s != None:
+			if id != None:
+				raise Exception("ID cannot be set when you have given me a string!")
+			
+			Header.__init__(self, s[:Header.size])
+			set_data(self, s[Header.size:])
+		else:
+			if id == None:
+				raise Exception("ID must be set if you don't set a string")
+			Header.__init__(self, None)
+			self.length = 4
+		
+		self.id = id
+
+	def __str__(self):
+		output = Processed.__str__(self)
+		output += pack(GetObject.struct, self.id)
+		return output
+	
+	def set_data(self, data):
+		self.id = unpack(GetObject.struct)
+
+class Object(Processed):
+	type = OBJ
+
+# int32 object ID, int32 object type, string name, unsigned int64 size (diameter), 3 by signed int64 position, 3 by signed int64 velocity, 3 by signed int64 acceleration, and a list of int32 object IDs of objects contained in the current object, prefixed by the int32 of the number of items in the list
+
+	def __init__(self, s=None, id=None, type=None, name=None, size=None, 
+					pos=None, vel=None, accel=None, contains = None):
+		if s != None:
+			if id != None:
+				raise Exception("ID cannot be set when you have given me a string!")
+			
+			Header.__init__(self, s[:Header.size])
+			set_data(self, s[Header.size:])
+		else:
+			if id == None or type == None or type(name) == StringType or type(size) == LongType or \
+				type(pos) == TupleType or len(pos) == 3 or \
+				type(vel) == TupleType or len(vel) == 3 or \
+				type(accel) == TupleType or len(accel) == 3 or \
+				type(contains) == ListType:
+				raise Exception("All information must be set if you don't set a string")
+			Header.__init__(self, None)
+		
+		self.id = id
+		self.type = type
+		self.name = name
+		self.size = size
+		self.pos = pos
+		self.vel = vel
+		self.accel = accel
+		self.contains = contains
+
+	struct1="!LL"
+	struct2="!Q 3q 3q 3q L"
+	struct3="!L"
+
+	def __str__(self):
+		output = Processed.__str__(self)
+		output += pack(Object.struct1, self.id, self.type)
+		output += prep_string(self.name)
+		output += pack(Object.struct2, self.size, 
+						self.pos[X], self.pos[Y], self.pos[Z],
+						self.vel[X], self.vel[Y], self.vel[Z],
+						self.accel[X], self.accel[Y], self.accel[Z],
+						len(self.contains))
+		for id in self.contains:
+			output += pack(Object.struct3, id)
+
+		return output
+
+	def set_data(self, data):
+		# First bit
+		struct1_data = data[0:calcsize(Object.struct1)]
+		self.id, self.type = unpack(Object.struct1, struct1_data)
+		data = data[calcsize(Object.struct1):]
+		
+		# Extra the name
+		self.name, data = unprep_string(data)
+		
+		# Second bit
+		struct2_data = data[0:calcsize(Object.struct2)]
+		s, px, py, pz, vx, vy, vz, ax, ay, az, lc = unpack(Object.struct2, struct2_data)
+		self.size = s
+		self.pos = (px, py, pz)
+		self.vel = (vx, vy, vz)
+		self.accel = (ax, ay, az)
+		data = data[calcsize(Object.struct2):]
+		
+		# Contains ID's
+		struct3_size = calcsize(Object.struct3)
+		contains = []
+		for i in range(0, lc*struct3_size, struct3_size):
+			contains.append(unpack(Object.struct3, data[i:i+struct3_size])[0])
+		self.contains = contains
+
 
 class Login(Processed):
 	type = LOGIN
@@ -160,6 +266,10 @@ def connect(address, port):
 		socket.close()
 		return None
 
+def sprint(data):
+	for i in range(0, len(data), 4):
+		pprint.pprint(data[i:i+4])
+
 if __name__ == "__main__":
 	
 	if sys.argv[1] == "Default":
@@ -167,7 +277,8 @@ if __name__ == "__main__":
 	else:
 		host, port = string.split(sys.argv[1], ':', 1)
 		port = int(port)
-	
+
+	print "Connection to", host, port
 	s = connect(host, port)
 	
 	if not s:
@@ -181,6 +292,14 @@ if __name__ == "__main__":
 	pprint.pprint(l)
 	pprint.pprint(str(l))
 	s.send(str(l))
+	r = readpacket(s)
+	pprint.pprint(r)
+	pprint.pprint(str(r))
+
+	g = GetObject(id=0)
+	pprint.pprint(g)
+	pprint.pprint(str(g))
+	s.send(str(g))
 	r = readpacket(s)
 	pprint.pprint(r)
 	pprint.pprint(str(r))
