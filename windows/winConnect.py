@@ -162,10 +162,12 @@ class winConnect(wxFrame):
 				   						wxOK | wxICON_INFORMATION)
 				dlg.ShowModal()
 				dlg.Destroy()
+
 		finally:
-			do_traceback()
-			if hasattr(self.parent, "network") and self.parent.network.locked():
-				self.parent.network.next()
+			print "Connection Finishing"
+			print evt
+			if evt:
+				evt.next()
 
 	def OnLogin(self, evt):
 		try:
@@ -199,4 +201,7 @@ class winConnect(wxFrame):
 				self.obj['host'].Enable(FALSE)
 
 		finally:
-			self.parent.network.next()
+			print "Login Finishing"
+			print evt
+			if evt:
+				evt.next()

@@ -14,8 +14,13 @@ def UNEVT_NETWORK_PACKET(win, func):
 	win.Disconnect(-1, wxEVT_NETWORK_PACKET, -1)
 
 class NetworkPacketEvent(wxPyEvent):
-    def __init__(self, packet):
-        wxPyEvent.__init__(self)
-        self.SetEventType(wxEVT_NETWORK_PACKET)
-        self.value = packet
+	def __init__(self, packet, network):
+		wxPyEvent.__init__(self)
+		self.SetEventType(wxEVT_NETWORK_PACKET)
+		
+		self.value = packet
+		self.network = network
+	
+	def next(self):
+		self.network.next()
 

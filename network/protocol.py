@@ -22,7 +22,6 @@ X = 0
 Y = 1
 Z = 2
 
-
 class Header:
 	size=4+4+4
 	struct="!4sLL"
@@ -238,18 +237,25 @@ def pad(s):
 		s += "\0" * (4 - (len(s) % 4))
 	return s
 
-def readpacket(s):
+def read_packet(s):
 	string = s.recv(Header.size)
 	h = Header(string)
 	h.process()
-
+	
 	if h.length > 0:
 		h.set_data(s.recv(h.length))
 
 	return h
 
+class debug_socket(socket.socket):
+	def send(self, string):
+		print "OUTGOING ->>>>>>:",
+		pprint.pprint(string)
+		socket.socket.send(self, string)
+
 def create_socket(address, port):
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+#	s = debug_socket(socket.AF_INET, socket.SOCK_STREAM)
 	try:
 		s.connect((address, port))
 		return s
@@ -277,8 +283,8 @@ def sprint(data):
 
 if __name__ == "__main__":
 	
-	if sys.argv[1] == "Default":
-		host, port = ("code-bear.dyndns.org", 6923)
+	if sys.argv[1].lower() == "default":
+		host, port = ("127.0.0.1", 6923)
 	else:
 		host, port = string.split(sys.argv[1], ':', 1)
 		port = int(port)

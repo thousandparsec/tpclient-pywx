@@ -10,6 +10,7 @@ from events import *
 
 import pprint
 import time
+import sys
 
 from thread import allocate_lock
 
@@ -23,7 +24,8 @@ class network_thread:
 		self.windows.append(window)
 
 	def next(self):
-		self.lock.release()
+		if self.locked():
+			self.lock.release()
 
 	def locked(self):
 		return self.lock.locked()
@@ -31,16 +33,15 @@ class network_thread:
 	def __call__(self, socket):
 
 		while TRUE:
-			packet = readpacket(socket)
+			print "Waiting on packet"
+			packet = read_packet(socket)
 
 			print "Got Packet"
-			print "----------------------"
-			pprint.pprint(packet)
-			pprint.pprint(str(packet))
 		
-			evt = NetworkPacketEvent(packet)
+			evt = NetworkPacketEvent(packet, self)
 
 			for window in self.windows:
+				print "Waiting for lock"
 				self.lock.acquire()
 				print "Sending to window", window
 				wxPostEvent(window, evt)
