@@ -179,6 +179,11 @@ class winStarMap(winBase):
 
 	def SetMode(self, mode):
 		if mode in ("Normal", "Position"):
+			if mode == "Position":
+				self.Canvas.Canvas.SetCursor(wx.StockCursor(wx.CURSOR_CROSS))
+			else:
+				self.Canvas.Canvas.SetCursor(wx.StockCursor(wx.CURSOR_DEFAULT))
+			
 			self.mode = mode
 
 	####################################################
