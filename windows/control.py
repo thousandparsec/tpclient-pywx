@@ -49,27 +49,27 @@ class MainControl:
 				config.raise_ = "Individual" 
 				
 			elif wx.Platform == '__WXMAC__':
-				config.main.pos = (0,0)
+				config.main.pos = (0,38)
 				config.main.size = (1024, 768)
 				config.main.show = False
 			
-				config.info.pos = (0,0)
-				config.info.size = (425, 175)
+				config.info.pos = (3,38)
+				config.info.size = (423, 173)
 				config.info.show = True
 				
-				config.order.pos = (0, 176)
-				config.order.size = (213, 327)
+				config.order.pos = (62, 229)
+				config.order.size = (363, 367)
 				config.order.show = True
 
-				config.message.pos = (0, 504)
+				config.message.pos = (1032, 38)
 				config.message.size = (396, 163)
 				config.message.show = True
 
-				config.starmap.pos = (426, 0)
+				config.starmap.pos = (426, 38)
 				config.starmap.size = (600, 523)
 				config.starmap.show = True
 
-				config.system.pos = (769, 523)
+				config.system.pos = (1032, 218)
 				config.system.size = (257, 218)
 				config.system.show = True
 			
