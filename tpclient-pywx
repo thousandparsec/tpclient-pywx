@@ -197,10 +197,8 @@ class AppTP(wx.App):
 		# Download the components
 		for component in self.connection.get_components([]):
 			if failed(component):
-				print "Failed", component.id
 				continue
 			
-			print component.id
 			self.cache.components[component.id] = component
 		print self.cache.components.keys()
 
