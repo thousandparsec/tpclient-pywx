@@ -182,12 +182,14 @@ class winStarMap(winBase):
 		
 			if evt.save:
 				# Need to update the grey line as well
-				if points:
+				if self.cache.has_key(evt.id) and self.cache[evt.id].has_key("path"):
 					self.Canvas.RemoveObject(self.cache[evt.id]["path"])
+				if points:
 					self.Create(object, Line(scale(points), LineColor="Grey"), as="path")
 
-				self.Canvas.RemoveObject(self.cache[evt.id]["icon"])
-				self.Canvas.AddObject(self.cache[evt.id]["icon"])
+				if self.cache.has_key(evt.id) and self.cache[evt.id].has_key("icon"):
+					self.Canvas.RemoveObject(self.cache[evt.id]["icon"])
+					self.Canvas.AddObject(self.cache[evt.id]["icon"])
 
 		self.Canvas.Draw(evt.save and isinstance(object, Fleet))
 
