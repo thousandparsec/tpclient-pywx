@@ -1,5 +1,6 @@
 
 from wxPython.wx import *
+from winBase import winBase
 
 ID_MENU = 10042
 ID_OPEN = 10043
@@ -22,22 +23,19 @@ ID_WIN_HELP = 1105
 
 ID_HELP = 10057
 
-import sys
-
 # Shows messages from the game system to the player.
-class winMain(wxFrame):
-	def __init__(self, parent, ID, title=None, pos=wxDefaultPosition, size=wxDefaultSize, style=wxDEFAULT_FRAME_STYLE, message_list=[]):
-		wxFrame.__init__(self, None, ID, 'TP: Thousand Parsecs', pos, size, style)
-
-		self.parent = parent
-		print parent
+class winMain(winBase):
+	title = "Thousand Parsecs"
+	
+	def __init__(self, application, pos=wxDefaultPosition, size=wxDefaultSize, style=wxDEFAULT_FRAME_STYLE):
+		winBase.__init__(self, application, None, pos, size, style)
 
 		item0 = wxMenuBar()
 
 		item1 = wxMenu() # wxMENU_TEAROFF )
 
 		item1.Append( ID_OPEN,   "Connect to Game\tCtrl-O", "Connect to a diffrent Game" )
-		#EVT_MENU(self, ID_OPEN, parent.app.connect)
+		EVT_MENU(self, ID_OPEN, self.OnConnect)
 		item1.AppendSeparator()
 		item1.Append( ID_REVERT, "Revert Game", "Forget non-saved changes" )
 		item1.AppendSeparator()
@@ -56,13 +54,13 @@ class winMain(wxFrame):
 		item0.Append( item3, "Statistics" )
 
 		item4 = wxMenu()
-		item4.Append(  ID_WIN_STARMAP,  "TP: Starmap", "", TRUE )
-		#EVT_MENU(self, ID_WIN_STARMAP,   self.changeWin)
-		item4.Append(  ID_WIN_MESSAGES, "TP: Messages", "", TRUE )
-		#EVT_MENU(self, ID_WIN_MESSAGES,  self.changeWin)
-		item4.Append(  ID_WIN_SYSTEM,   "TP: Current System", "", TRUE )
-		#EVT_MENU(self, ID_WIN_SYSTEM,    self.changeWin)
-		item4.Append(  ID_WIN_ORDERS,   "TP: Orders", "", TRUE )
+		item4.Append(  ID_WIN_STARMAP,  "Hide Starmap", "", TRUE )
+		EVT_MENU(self, ID_WIN_STARMAP,   self.OnStarMap)
+		item4.Append(  ID_WIN_MESSAGES, "Hide Messages", "", TRUE )
+		EVT_MENU(self, ID_WIN_MESSAGES,  self.OnMessages)
+		item4.Append(  ID_WIN_SYSTEM,   "Hide System", "", TRUE )
+		EVT_MENU(self, ID_WIN_SYSTEM,    self.OnSystem)
+		item4.Append(  ID_WIN_ORDERS,   "Hide Orders", "", TRUE )
 		#EVT_MENU(self, ID_WIN_ORDERS,    self.changeWin)
 		item4.AppendSeparator()
 		item4.Append(  ID_WIN_TECH, "Tech Browser", "", TRUE)
@@ -77,12 +75,19 @@ class winMain(wxFrame):
 		self.SetMenuBar(item0)
 		self.CreateStatusBar(1, wxST_SIZEGRIP)
 
-		EVT_ACTIVATE(self, self.OnRaise)
-		EVT_CLOSE(self, self.OnProgramExit)
+	def OnConnect(self, evt):
+		# FIXME: Should popup a do you want to connect message.
+		self.application.windows.hide()
+		self.application.windows.connect.Show(TRUE)
+
+	def OnStarMap(self, evt):
+		self.application.windows.map.Show(not evt.Checked())
+
+	def OnMessages(self, evt):
+		self.application.windows.message.Show(not evt.Checked())
+
+	def OnSystem(self, evt):
+		self.application.windows.system.Show(not evt.Checked())
 
 	def OnProgramExit(self, evt):
-		self.parent.Exit()
-	
-	def OnRaise(self, evt):
-		print "Raising!"
-		self.parent.windows.raise_()
+		self.application.Exit()

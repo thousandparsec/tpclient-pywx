@@ -1,11 +1,15 @@
 
+from winBase import winBase
+
 from wxPython.wx import *
 from wxPython.gizmos import *
 
 # Show the currently selected system
-class winSystem(wxFrame):
-	def __init__(self, parent, ID, title=None, pos=wxDefaultPosition, size=wxDefaultSize, style=wxDEFAULT_FRAME_STYLE, message_list=[]):
-		wxFrame.__init__(self, parent, ID, 'TP: System', pos, size, style)
+class winSystem(winBase):
+	title = "System"
+	
+	def __init__(self, application, parent, pos=wxDefaultPosition, size=wxDefaultSize, style=wxDEFAULT_FRAME_STYLE):
+		winBase.__init__(self, application, parent, pos, size, style)
 		
 		class systemTree(wxRemotelyScrolledTreeCtrl):
 			def __init__(self, parent, ID, pos=wxDefaultPosition, size=wxDefaultSize, style=wxTR_HAS_BUTTONS):
@@ -78,12 +82,11 @@ class winSystem(wxFrame):
 		
 		self.value = systemValueWindow(splitter, -1, style=wxNO_BORDER)
 
-		splitter.SplitVertically(self.tree, self.value)
-		#splitter.SetSashPosition(150)
+		# SET THE SPLITTER HERE!!! -> It's the last value
+		splitter.SplitVertically(self.tree, self.value, 150)
 		scroller.SetTargetWindow(self.tree)
 		scroller.EnableScrolling(FALSE, FALSE)
 
 		self.value.SetTreeCtrl(self.tree)
 		self.tree.SetCompanionWindow(self.value)
 		
-		splitter.SetSashPosition(150)

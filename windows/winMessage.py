@@ -1,6 +1,8 @@
 
 from copy import deepcopy
 
+from winBase import winBase
+
 from wxPython.wx import *
 from wxPython.html import *
 
@@ -27,9 +29,11 @@ MESSAGE_NEW = 10008
 MESSAGE_DEL = 10009
 
 # Shows messages from the game system to the player.
-class winMessage(wxFrame):
-	def __init__(self, parent, ID, title=None, pos=wxDefaultPosition, size=wxDefaultSize, style=wxDEFAULT_FRAME_STYLE, message_list=[]):
-		wxFrame.__init__(self, parent, ID, 'TP: Messages', pos, size, style)
+class winMessage(winBase):
+	title = "Messages"
+	
+	def __init__(self, application, parent, pos=wxDefaultPosition, size=wxDefaultSize, style=wxDEFAULT_FRAME_STYLE, message_list=[]):	
+		winBase.__init__(self, application, parent, pos, size, style)
 
 		self.obj = {}
 
@@ -98,6 +102,9 @@ class winMessage(wxFrame):
 		self.SetSizer( item0 )
 		item0.Fit( self )
 		item0.SetSizeHints( self )
+		
+		self.SetSize(size)
+		self.SetPosition(pos)
 
 		# Contains the messages
 		self.messages = []
@@ -106,7 +113,8 @@ class winMessage(wxFrame):
 		# Contains the message types to be filtered
 		self.filter = []
 
-		self.messageSet([])
+		self.MessageSet([])
+
 
 	filtered = """\
 	<html>
@@ -199,7 +207,7 @@ class winMessage(wxFrame):
 	</html>
 	"""
 
-	def messageSet(self, list):
+	def MessageSet(self, list):
 
 		# Updates the bits and pieces
 		self.messages = deepcopy(list)
@@ -226,7 +234,7 @@ class winMessage(wxFrame):
 		self.html.SetPage(self.allfiltered)
 		return
 
-	def messageNext(self):
+	def MessageNext(self):
 		# Check we arn't at the last message
 		if self.current >= len(self.messages):
 			self.current = len(self.messages)-1
@@ -242,7 +250,7 @@ class winMessage(wxFrame):
 				return
 			count += 1
 		
-	def messagePrev(self):
+	def MessagePrev(self):
 		# Check we arn't at the last message
 		if self.current <= 0:
 			self.current = len(self.messages)-1
@@ -258,8 +266,7 @@ class winMessage(wxFrame):
 				return
 			count -= 1
 		
-
-	def messageGoto(self, no):
+	def MessageGoto(self, no):
 		if no > len(self.messages) or no < 0:
 			return
 
@@ -272,5 +279,5 @@ class winMessage(wxFrame):
 		self.obj['counter'].SetLabel("%i of %i" % (self.current, len(self.messages)))
 		self.html.SetPage(html % self.messages[no].render())
 
-	def messageFilter(self):
+	def MessageFilter(self):
 		pass

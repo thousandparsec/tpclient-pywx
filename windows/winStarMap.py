@@ -2,6 +2,8 @@
 import os
 from math import *
 
+from winBase import winBase
+
 from wxPython.wx import *
 from wxPython.lib.floatbar import *
 
@@ -18,9 +20,11 @@ sysMIN = 4
 systems = []
 
 # Shows the main map of the universe.
-class winStarMap(wxFrame):
-	def __init__(self, parent, ID, title=None, pos=wxDefaultPosition, size=wxDefaultSize, style=wxDEFAULT_FRAME_STYLE):
-		wxFrame.__init__(self, parent, ID, 'TP: StarMAP, The Know Universe', pos, size, style)
+class winStarMap(winBase):
+	title = "StarMAP, The Known Universe"
+
+	def __init__(self, application, parent, pos=wxDefaultPosition, size=wxDefaultSize, style=wxDEFAULT_FRAME_STYLE):
+		winBase.__init__(self, application, parent, pos, size, style)
 
 		self.config = {}
 		self.config['System'] = sysPLAIN
@@ -90,6 +94,9 @@ class winStarMap(wxFrame):
 
 				self.parent = parent
 
+				self.parent.start = [0,0]
+				self.parent.end = [0,0]
+
 				self.maxWidth  = 10000/self.parent.config['Zoom']
 				self.maxHeight = 10000/self.parent.config['Zoom']
 				
@@ -127,9 +134,9 @@ class winStarMap(wxFrame):
 
 					self.parent.RenderDrag(dc)
 
-					start = self.start
+					start = self.parent.start
 					end = self.ConvertEventCoords(event)
-					self.end = end
+					self.parent.end = end
 ##					x,y = self.GetViewStart()
 ##					h,w = self.GetClientSize()
 ##					px, py = self.GetScrollPixelsPerUnit()
@@ -144,8 +151,8 @@ class winStarMap(wxFrame):
 				"""called when the left mouse button is pressed"""
 				#print event.GetX(), event.GetY()
 				#print self.ConvertEventCoords(event)
-				self.start = self.ConvertEventCoords(event)
-				self.end = self.start
+				self.parent.start = self.ConvertEventCoords(event)
+				self.end = self.parent.start
 				self.CaptureMouse()
 				self.parent.dragging = 1
 
@@ -189,9 +196,6 @@ class winStarMap(wxFrame):
 	def RenderMap(self, startpos, endpos, dc=None):
 
 		print "rendering", dc
-
-#		if dc == None:
-#			dc = self.canvas
 
 		dc.BeginDrawing()
 		dc.SetBackground(wxBrush(wxBLACK, wxSOLID))

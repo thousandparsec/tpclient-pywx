@@ -78,11 +78,11 @@ if __name__ == '__main__':
 	
 			self.connect = winConnect(app, -1, None)
 			
-			self.main    = winMain(app, -1, None, (0,0), (middle,50))
-			self.message = winMessage(self.main, -1, None, (0,map_height-100), (middle,100))
+			self.main    = winMain(app, (0,0), (middle,50))
+			self.message = winMessage(app, self.main, (0,map_height-padding*4), (middle,200))
 			
-			self.map     = winStarMap(self.main, -1, None, (middle+padding,0), (map_width-padding, map_height-padding*2))
-			self.system  = winSystem(self.main, -1, None, (middle+padding,map_height), (map_width-padding, 200))
+			self.map     = winStarMap(app, self.main, (middle+padding,0), (map_width-padding, map_height-padding*2))
+			self.system  = winSystem(app, self.main, (middle+padding,map_height), (map_width-padding, 200))
 
 		def raise_(self):
 			"""\
