@@ -144,10 +144,10 @@ class winOrder(winBase):
 			self.order_list.InsertStringItem(slot, "")
 			self.order_list.SetStringItem(slot, TURNS_COL, str(order.turns))
 			self.order_list.SetStringItem(slot, ORDERS_COL, order.__class__.__name__)
-			self.order_list.SetItemPyData(slot, order)
 
 			if slot == oslot:
 				self.order_list.Select(slot)
+				self.BuildPanel(order)
 			
 		# Set which orders can be added to this object
 		self.type_list.Clear()
@@ -157,17 +157,13 @@ class winOrder(winBase):
 			else:
 				self.type_list.Append("Wait on (%i)" % type, type)
 
-		if oslot != wx.NOT_FOUND:
-			order = self.order_list.GetItemPyData(slot)
-			self.BuildPanel(order)
-
 	def OnOrderSelect(self, evt):
 		slot = self.order_list.GetNextItem(-1, wx.LIST_NEXT_ALL, wx.LIST_STATE_SELECTED)
 		if slot == wx.NOT_FOUND:
 			debug(DEBUG_WINDOWS, "No order selected")
 			return
 
-		order = self.order_list.GetItemPyData(slot)
+		order = self.application.cache.orders[self.oid][slot]
 		self.BuildPanel(order)
 
 	def OnOrderNew(self, evt):
@@ -234,7 +230,7 @@ class winOrder(winBase):
 		self.application.cache.objects[self.oid].order_number -= 1
 
 		self.OnSelectObject(wx.local.SelectObjectEvent(self.oid))
-		
+
 	def OnOrderSave(self, evt):
 		slot = self.order_list.GetNextItem(-1, wx.LIST_NEXT_ALL, wx.LIST_STATE_SELECTED)
 		if slot == wx.NOT_FOUND:
@@ -242,7 +238,7 @@ class winOrder(winBase):
 			return
 
 		try:
-			order = self.order_list.GetItemPyData(slot)
+			order = self.application.cache.orders[self.oid][slot]
 		except:
 			debug(DEBUG_WINDOWS, "OrderSave: Could not get order")
 			return
@@ -287,6 +283,7 @@ class winOrder(winBase):
 		del self.application.cache.orders[self.oid][slot+1]
 
 		self.OnSelectObject(wx.local.SelectObjectEvent(self.oid))
+		self.application.windows.Post(wx.local.SelectOrderEvent(self.oid, slot, True))
 
 	def BuildPanel(self, order):
 		"""\
@@ -325,11 +322,11 @@ class winOrder(winBase):
 
 					# Add the arguments bit
 					if type == constants.ARG_ABS_COORD:
-						subpanel = argCoordPanel( self.argument_panel, getattr(order, name) )
+						subpanel = argCoordPanel( self, self.argument_panel, getattr(order, name) )
 					elif type == constants.ARG_TIME:
-						subpanel = argTimePanel( self.argument_panel, getattr(order, name) )
+						subpanel = argTimePanel( self, self.argument_panel, getattr(order, name) )
 					else:
-						subpanel = argNotImplimentedPanel( self.argument_panel, None )
+						subpanel = argNotImplimentedPanel( self, self.argument_panel, None )
 					
 					subpanel.SetFont(wx.local.normalFont)
 					self.argument_subpanels.append( subpanel )
@@ -378,7 +375,7 @@ Z = 2
 max = 2**31-1
 min = -1*max
 
-def argNotImplimentedPanel(parent_panel, args):
+def argNotImplimentedPanel(parent, parent_panel, args):
 	panel = wx.Panel(parent_panel, -1)
 	item0 = wx.BoxSizer( wx.HORIZONTAL )
 
@@ -391,7 +388,7 @@ def argNotImplimentedPanel(parent_panel, args):
 
 	return panel
 						
-def argTimePanel(parent_panel, args):
+def argTimePanel(parent, parent_panel, args):
 	panel = wx.Panel(parent_panel, -1)
 	item0 = wx.BoxSizer( wx.HORIZONTAL )
 
@@ -408,8 +405,7 @@ def argTimeGet(panel):
 	windows = panel.GetChildren()
 	return windows[0].GetValue()
 
-def argCoordPanel(parent_panel, args):
-	print args
+def argCoordPanel(parent, parent_panel, args):
 
 	panel = wx.Panel(parent_panel, -1)
 	item0 = wx.BoxSizer( wx.HORIZONTAL )

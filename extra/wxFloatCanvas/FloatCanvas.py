@@ -1,6 +1,9 @@
 #!/usr/bin/env python2.3
 
-from Numeric import array,asarray,Float,cos,pi,sum,minimum,maximum,Int32,zeros
+try:
+    from Numeric import array,asarray,Float,cos,pi,sum,minimum,maximum,Int32,zeros
+except ImportError:
+    from numarray import array, asarray, Float, cos, pi, sum, minimum, maximum, Int32, zeros
 
 from time import clock, sleep
 
@@ -102,63 +105,64 @@ class MouseEvent(wx.PyCommandEvent):
         #return eval(self.NativeEvent.__getattr__(name) )
         return getattr(self._NativeEvent, name)
 
-class ColorGenerator:
+#### ColorGEnerator class is now obsolete. I'm using a python generator function instead.
+##class ColorGenerator:
 
-    """
+##    """
 
-    An instance of this class generates a unique color each time
-    GetNextColor() is called. Someday I will use a proper Python
-    generator for this class.
+##    An instance of this class generates a unique color each time
+##    GetNextColor() is called. Someday I will use a proper Python
+##    generator for this class.
 
-    The point of this generator is for the hit-test bitmap, each object
-    needs to be a unique color. Also, each system can be running a
-    different number of colors, and it doesn't appear to be possible to
-    have a wxMemDC with a different colordepth as the screen so this
-    generates colors far enough apart that they can be distinguished on
-    a 16bit screen. Anything less than 16bits won't work. It could, but
-    I havn't written the code that way. You also wouldn't get many
-    distict colors
+##    The point of this generator is for the hit-test bitmap, each object
+##    needs to be a unique color. Also, each system can be running a
+##    different number of colors, and it doesn't appear to be possible to
+##    have a wxMemDC with a different colordepth as the screen so this
+##    generates colors far enough apart that they can be distinguished on
+##    a 16bit screen. Anything less than 16bits won't work. It could, but
+##    I havn't written the code that way. You also wouldn't get many
+##    distict colors
     
-    """
+##    """
 
-    def __init__(self):
-        import sys
-        ## figure out the color depth of the screen
-        ## for some bizare reason, thisdoesn't work on OS-X
-        if sys.platform == 'darwin':
-            depth = 24
-        else:
-            b = wx.EmptyBitmap(1,1)
-            depth = b.GetDepth()
-        self.r = 0
-        self.g = 0
-        self.b = 0
-        if depth == 16:
-            self.step = 8
-        elif depth >= 24:
-            self.step = 1
-        else:
-            raise FloatCanvasException("ColorGenerator does not work with depth = %s"%depth )
+##    def __init__(self):
+##        import sys
+##        ## figure out the color depth of the screen
+##        ## for some bizare reason, thisdoesn't work on OS-X
+##        if sys.platform == 'darwin':
+##            depth = 24
+##        else:
+##            b = wx.EmptyBitmap(1,1)
+##            depth = b.GetDepth()
+##        self.r = 0
+##        self.g = 0
+##        self.b = 0
+##        if depth == 16:
+##            self.step = 8
+##        elif depth >= 24:
+##            self.step = 1
+##        else:
+##            raise FloatCanvasException("ColorGenerator does not work with depth = %s"%depth )
 
-    def GetNextColor(self):
-        step = self.step
-        ##r,g,b = self.r,self.g,self.b
-        self.r += step
-        if self.r > 255:
-            self.r = step
-            self.g += step
-            if self.g > 255:
-                self.g = step
-                self.b += step
-                if self.b > 255:
-                    ## fixme: this should be a derived exception
-                    raise FloatCanvasException("Too many objects in colorgenerator for HitTest")
-        return (self.r,self.g,self.b)
+##    def GetNextColor(self):
+##        step = self.step
+##        ##r,g,b = self.r,self.g,self.b
+##        self.r += step
+##        if self.r > 255:
+##            self.r = step
+##            self.g += step
+##            if self.g > 255:
+##                self.g = step
+##                self.b += step
+##                if self.b > 255:
+##                    ## fixme: this should be a derived exception
+##                    raise FloatCanvasException("Too many objects in colorgenerator for HitTest")
+##        return (self.r,self.g,self.b)
 
-    def Reset(self):
-        self.r = 0
-        self.g = 0
-        self.b = 0
+##    def Reset(self):
+##        self.r = 0
+##        self.g = 0
+##        self.b = 0
 
 def cycleidxs(indexcount, maxvalue, step):
     if indexcount == 0:
@@ -182,6 +186,7 @@ def colorGenerator():
     else:
         raise "ColorGenerator does not work with depth = %s" % depth
     return cycleidxs(indexcount=3, maxvalue=256, step=step)
+
 
 #### I don't know if the Set objects are useful, beyond the pointset object
 #### The problem is that when zoomed in, the BB is checked to see whether to draw the object.
@@ -323,6 +328,7 @@ class DrawObject:
         if not self.HitColor:
             if not self._Canvas.HitColorGenerator:
                 self._Canvas.HitColorGenerator = colorGenerator()
+                self._Canvas.HitColorGenerator.next() # first call to prevent the background color from being used.
             self.HitColor = self._Canvas.HitColorGenerator.next()
             self.SetHitPen(self.HitColor,self.HitLineWidth)
             self.SetHitBrush(self.HitColor)
@@ -393,14 +399,14 @@ class XYObjectMixin:
     def Move(self, Delta ):
         """
 
-        Move(Delta): moves the object by delta, where delta is an (dx,
-        dy) pair. Ideally a Numpy array or shape (2,)
+        Move(Delta): moves the object by delta, where delta is a
+        (dx,dy) pair. Ideally a Numpy array of shape (2,)
 
         """
         
-        Delta = array(Delta, Float)
+        Delta = asarray(Delta, Float)
         self.XY += Delta
-        self.BoundingBox = self.BoundingBox + Delta##array((self.XY, (self.XY + self.WH)), Float)
+        self.BoundingBox = self.BoundingBox + Delta
         if self._Canvas:
             self._Canvas.BoundingBoxDirty = True      
 
@@ -412,6 +418,7 @@ class PointsObjectMixin:
 
     """
 
+## This is code for the XYMixin object, it needs to be adapeted and tested.
 ##    def Move(self, Delta ):
 ##        """
 
@@ -888,11 +895,12 @@ class Text(DrawObject, TextObjectMixin):
         self.XY = ( x,y )
 
 	# use a memDC --  ScreenDC doesn't work with 2.5.1 and GTK2
-        dc = wx.MemoryDC()
-        bitmap = wx.EmptyBitmap(1, 1)
-        dc.SelectObject(bitmap)  		
-        dc.SetFont(self.Font)
-        (self.TextWidth, self.TextHeight) = dc.GetTextExtent(self.String)
+        #dc = wx.MemoryDC()
+        #bitmap = wx.EmptyBitmap(1, 1)
+        #dc.SelectObject(bitmap)  		
+        #dc.SetFont(self.Font)
+        #(self.TextWidth, self.TextHeight) = dc.GetTextExtent(self.String)
+        (self.TextWidth, self.TextHeight) = (None, None)
         self.ShiftFun = self.ShiftFunDict[Position]
 
     def SetXY(self, x, y):
@@ -910,6 +918,8 @@ class Text(DrawObject, TextObjectMixin):
             dc.SetTextBackground(self.BackgroundColor)
         else:
             dc.SetBackgroundMode(wx.TRANSPARENT)
+        if self.TextWidth is None or self.TextHeight is None:
+            (self.TextWidth, self.TextHeight) = dc.GetTextExtent(self.String)
         XY = self.ShiftFun(XY[0], XY[1], self.TextWidth, self.TextHeight)
         dc.DrawTextPoint(self.String, XY)
         if HTdc and self.HitAble:
@@ -1391,7 +1401,7 @@ class FloatCanvas(wx.Panel):
             self.ReleaseMouse()
         if self.GUIMode:
             if self.GUIMode == "ZoomIn":
-                if event.LeftUp() and self.StartRBBox :
+                if event.LeftUp() and not self.StartRBBox is None:
                     self.PrevRBBox = None
                     EndRBBox = event.GetPosition()
                     StartRBBox = self.StartRBBox
@@ -1410,7 +1420,7 @@ class FloatCanvas(wx.Panel):
                         self.Zoom(1.5,Center)
                     self.StartRBBox = None
             elif self.GUIMode == "Move":
-                if self.StartMove:
+                if not self.StartMove is None:
                     StartMove = self.StartMove
                     EndMove = array((event.GetX(),event.GetY()))
                     if sum((StartMove-EndMove)**2) > 16:
@@ -1426,7 +1436,7 @@ class FloatCanvas(wx.Panel):
     def MotionEvent(self,event):
         if self.GUIMode:
             if self.GUIMode == "ZoomIn":
-                if event.Dragging() and event.LeftIsDown() and self.StartRBBox:
+                if event.Dragging() and event.LeftIsDown() and not (self.StartRBBox is None):
                     xy0 = self.StartRBBox
                     xy1 = array( event.GetPosition() )
                     wh  = abs(xy1 - xy0)
@@ -1444,7 +1454,7 @@ class FloatCanvas(wx.Panel):
                     dc.DrawRectanglePointSize( *self.PrevRBBox )
                     dc.EndDrawing()
             elif self.GUIMode == "Move":
-                if event.Dragging() and event.LeftIsDown() and self.StartMove:
+                if event.Dragging() and event.LeftIsDown() and not self.StartMove is None:
                     xy1 = array( event.GetPosition() )
                     wh = self.PanelSize
                     xy_tl = xy1 - self.StartMove
@@ -1577,7 +1587,7 @@ class FloatCanvas(wx.Panel):
         else:
             dc.DrawBitmap(self._Buffer,0,0)
 
-    def Draw(self):
+    def Draw(self, Force=False):
         """
         There is a main buffer set up to double buffer the screen, so
         you can get quick re-draws when the window gets uncovered.
@@ -1601,7 +1611,7 @@ class FloatCanvas(wx.Panel):
                               maximum.reduce(ViewPortWorld) ) )
         dc = wx.MemoryDC()
         dc.SelectObject(self._Buffer)
-        if self._BackgroundDirty:
+        if self._BackgroundDirty or Force:
             #print "Background is Dirty"
             dc.SetBackground(self.BackgroundBrush)
             dc.Clear()
@@ -1723,7 +1733,7 @@ class FloatCanvas(wx.Panel):
         
         """
         self.Scale = self.Scale*factor
-        if center:
+        if not center is None:
             self.ViewPortCenter = array(center,Float)
         self.MapProjectionVector = self.ProjectionFun(self.ViewPortCenter)
         self.TransformVector = array((self.Scale,-self.Scale),Float) * self.MapProjectionVector
@@ -1739,13 +1749,13 @@ class FloatCanvas(wx.Panel):
 
         """
         
-        if NewBB:
+        if not  NewBB is None:
             BoundingBox = NewBB
         else:
             if self.BoundingBoxDirty:
                 self._ResetBoundingBox()
             BoundingBox = self.BoundingBox
-        if BoundingBox:
+        if not BoundingBox is None:
             self.ViewPortCenter = array(((BoundingBox[0,0]+BoundingBox[1,0])/2,
                                          (BoundingBox[0,1]+BoundingBox[1,1])/2 ),Float)
             self.MapProjectionVector = self.ProjectionFun(self.ViewPortCenter)

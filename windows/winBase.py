@@ -20,9 +20,10 @@ class SelectObjectEvent(wx.PyEvent):
 wx.local.SelectObjectEvent = SelectObjectEvent
 
 class SelectOrderEvent(wx.PyEvent):
-	def __init__(self, id, slot):
+	def __init__(self, id, slot, save=False):
 		self.id = id
 		self.slot = slot
+		self.save = save
 wx.local.SelectOrderEvent = SelectOrderEvent
 
 wx.local.smallSize  = wx.Size(15,15)

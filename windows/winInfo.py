@@ -26,7 +26,7 @@ class winInfo(winBase):
 		self.application = application
 
 		self.title = wx.StaticText(self, -1, "No Object Selected.")
-		self.picture = wx.StaticBitmap(self, -1, wx.EmptyBitmap(128, 128))
+		self.picture = wx.StaticBitmap(self, -1, wx.BitmapFromImage(wx.EmptyImage(128, 128)))
 
 		top = wx.BoxSizer(wx.VERTICAL)
 		top.Add(self.title, 0, wx.BOTTOM|wx.TOP|wx.ALIGN_CENTER, 3)
@@ -55,13 +55,10 @@ class winInfo(winBase):
 			debug(DEBUG_WINDOWS, "SelectObject: No such object.")
 			return
 
-		print object
-
 		self.title.SetLabel(object.name)
 
 		# Figure out the right graphic
 		path = os.path.join(".", "graphics", "media")
-		bitmap = wx.EmptyBitmap(128, 128)
 		if isinstance(object, StarSystem):
 			path = os.path.join(path, "star-small")
 
@@ -76,8 +73,8 @@ class winInfo(winBase):
 			path = os.path.join(path, planets[object.id % len(planets)])
 
 			bitmap = wx.BitmapFromImage(wx.Image(path))
+		else:
+			bitmap = wx.BitmapFromImage(wx.EmptyImage(128, 128))
 
 		self.picture.SetBitmap(bitmap)
-		print self.picture.GetBitmap()
-		
 

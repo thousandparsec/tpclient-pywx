@@ -10,16 +10,18 @@ Short Term
 		* ARG_RANGE
 
 	* Get order save to work :) (DONE)
-	* Add ships to the StarMap
-		(DONE) - Need to make sure i don't draw orbiting starships
+	* Add ships to the StarMap (DONE)
+		* Need to make sure i don't draw orbiting starships
 
 	* Put up screenshots on www.thousandparsec.net (DONE)
 
 Longer Term
 	* Add a info panel (DONE)
 		* Add data to the info panel
-	* Add ship "path" to StarMap
-	
+	* Add ship "path" to StarMap (DONE)
+		* Maybe see if we can get antialias lines
+		* Realtime changes?
+
 	* Check time till end of turn
 		* Pop-up message when getting close
 		* Reload the Universe cache after turn
