@@ -3,9 +3,10 @@ This module contains the code and objects for working with
 the Thousand Parsec protocol.
 """
 
-from struct import *
+from xstruct import *
 from cStringIO import StringIO
 
+import pprint
 import string
 import socket
 import sys
@@ -14,15 +15,20 @@ CONNECT=0
 OK=1
 LOGIN=2
 FAIL=3
-GETOBJ=4
+OBJ_GET=4
 OBJ=5
-GETORD=5
-ORD=6
-ADDORD=6
-RMORD=7
-GETOUT=8
-OUT=9
-
+ORD_GET=6
+ORD=7
+ORD_ADD=8
+ORD_RM=9
+ORD_DESCGET=10
+ORD_DESC=11
+OUT_GET=12
+OUT=13
+RSTL_GET=14
+RSTL=15
+TIME_GET=16
+TIME=17
 
 X = 0
 Y = 1
@@ -36,7 +42,7 @@ class Header:
 	"""
 	
 	size=4+4+4
-	struct="!4sLL"
+	struct="4sLL"
 
 	def __init__(self, s=None):
 		"""\
@@ -45,7 +51,8 @@ class Header:
 		It takes a string which contains the "header" data.
 		"""
 		if s:
-			self.protocol, self.type, self.length = unpack(Header.struct, s)
+			output, trash = unxpack(Header.struct, s)
+			self.protocol, self.type, self.length = output 
 			if self.protocol != ("TP01"):
 				raise Exception("Invalid creation string")
 		else:
@@ -77,16 +84,36 @@ class Header:
 			self.__class__ = Login
 		elif self.type == FAIL:
 			self.__class__ = Fail
-		elif self.type == GETOBJ:
-			self.__class__ = GetObject
+		elif self.type == OBJ_GET:
+			self.__class__ = ObjectGet
 		elif self.type == OBJ:
 			self.__class__ = Object
+		elif self.type == ORD_GET:
+			self.__class__ = OrderGet
+		elif self.type == ORD:
+			self.__class__ = Order
+		elif self.type == ORD_ADD:
+			self.__class__ = OrderAdd
+		elif self.type == ORD_RM:
+			self.__class__ = OrderRemove
+		elif self.type == ORD_DESCGET:
+			self.__class__ = OrderDescGet
+		elif self.type == ORD_DESC:
+			self.__class__ = OrderDesc
+		elif self.type == RSTL_GET:
+			self.__class__ = ResultGet
+		elif self.type == RSTL:
+			self.__class__ = Result
+		elif self.type == TIME_GET:
+			self.__class__ = TimeRemainGet
+		elif self.type == TIME:
+			self.__class__ = TimeRemain
 
 	def __str__(self):
 		"""\
 		Produce a string suitable to be send over the wire.
 		"""
-		output = pack(Header.struct, self.protocol, self.type, self.length)
+		output = xpack(Header.struct, self.protocol, self.type, self.length)
 		return output
 
 class Processed(Header):
@@ -113,129 +140,13 @@ class Ok(Processed):
 	Something succeded..
 	"""
 	type = OK
-
-class Fail(Processed):
-	"""\
-	Something failed....
-	"""
-	type = FAIL
-
-class GetObject(Processed):
-	"""\
-	Request an object from the server.
-	"""
-	type = GETOBJ
-	struct="!L"
-
-	def __init__(self, s=None, id=None):
-		if s != None:
-			if id != None:
-				raise Exception("ID cannot be set when you have given me a string!")
-			
-			Header.__init__(self, s[:Header.size])
-			SetData(self, s[Header.size:])
-		else:
-			if id == None:
-				raise Exception("ID must be set if you don't set a string")
-			Header.__init__(self, None)
-			self.length = 4
-		
-		self.id = long(id)
-
-	def __str__(self):
-		output = Processed.__str__(self)
-		output += pack(GetObject.struct, self.id)
-		return output
 	
-	def SetData(self, data):
-		self.id = unpack(GetObject.struct)
-
-class Object(Processed):
-	"""\
-	An object returned by the server.
-	"""
-	type = OBJ
-
-	def __init__(self, s=None, id=None, type=None, name=None, size=None, 
-					pos=None, vel=None, accel=None, contains = None):
-		if s != None:
-			if id != None:
-				raise Exception("ID cannot be set when you have given me a string!")
-			
-			Header.__init__(self, s[:Header.size])
-			SetData(self, s[Header.size:])
-		else:
-			if id == None or type == None or type(name) == StringType or type(size) == LongType or \
-				type(pos) == TupleType or len(pos) == 3 or \
-				type(vel) == TupleType or len(vel) == 3 or \
-				type(accel) == TupleType or len(accel) == 3 or \
-				type(contains) == ListType:
-				raise Exception("All information must be set if you don't set a string")
-			Header.__init__(self, None)
-		
-		self.id = long(id)
-		self.type = type
-		self.name = name
-		self.size = size
-		self.pos = pos
-		self.vel = vel
-		self.accel = accel
-		self.contains = contains
-
-	struct1="!LL"
-	struct2="!Q 3q 3q 3q"
-	struct3="!L"
-
-	def __str__(self):
-		output = Processed.__str__(self)
-		output += pack(Object.struct1, self.id, self.type)
-		output += pack_string(self.name)
-		output += pack(Object.struct2, self.size, 
-						self.pos[X], self.pos[Y], self.pos[Z],
-						self.vel[X], self.vel[Y], self.vel[Z],
-						self.accel[X], self.accel[Y], self.accel[Z])
-
-		output += pack_idlist(self.contains)
-		output += pack_idlist(self.valid_orders)
-		
-		return output
-
-	def SetData(self, data):
-		# First bit
-		struct1_data = data[0:calcsize(Object.struct1)]
-		self.id, self.type = unpack(Object.struct1, struct1_data)
-		data = data[calcsize(Object.struct1):]
-		
-		# Extra the name
-		self.name, data = unpack_string(data)
-		
-		# Second bit
-		struct2_data = data[0:calcsize(Object.struct2)]
-		s, px, py, pz, vx, vy, vz, ax, ay, az = unpack(Object.struct2, struct2_data)
-		self.size = s
-		self.pos = (px, py, pz)
-		self.vel = (vx, vy, vz)
-		self.accel = (ax, ay, az)
-		data = data[calcsize(Object.struct2):]
-		
-		# Contains ID's
-		self.contains, data = unpack_idlist(data)
-
-		# Valid orders
-		self.valid_orders, data = unpack_idlist(data)
-
-		self.num_orders = unpack(Object.struct3, data[0:calcsize(Object.struct3)])
-		data = data[0:calcsize(Object.struct3)]
-
-		# Check to see if we have any data left, if so we have stuffed up
-#		if len(data) > 0:
-#			raise "Leftover data was found, something went wrong!"
-			
-
 class Login(Processed):
 	"""\
 	A login packet.
 	"""
+	
+	struct = "SS"
 
 	type = LOGIN
 	
@@ -254,90 +165,207 @@ class Login(Processed):
 		self.password = password
 
 	def __str__(self):
-		temp = pack_string(self.username) + pack_string(self.password)
+		# Set length of packet
+		temp = xpack(Login.struct, self.username, self.password)
 		self.length = len(temp)
+		
 		output = Processed.__str__(self)
 		output += temp
 		
 		return output
 
 	def SetData(self, data):
-		username, data = unpack_string(data)
-		password, data = unpack_string(data)
+		username, password, data = xpack(Login.struct, data)
 
-
-
-def pack_idlist(list):
+class Fail(Processed):
 	"""\
-	Packs the id list so it can be send.
+	Something failed....
+	"""
+	type = FAIL
+
+class ObjectGet(Processed):
+	"""\
+	Request an object from the server.
 	"""
 
-	# The length
-	output = pack("!L", len(list))
+	type = OBJ_GET
+	
+	struct="L"
 
-	# The list
-	for id in list:
-		output += pack("!L", id)
+	def __init__(self, s=None, id=None):
+		if s != None:
+			if id != None:
+				raise Exception("ID cannot be set when you have given me a string!")
+			
+			Header.__init__(self, s[:Header.size])
+			SetData(self, s[Header.size:])
+		else:
+			if id == None:
+				raise Exception("ID must be set if you don't set a string")
+			Header.__init__(self, None)
+			self.length = calcsize(ObjectGet.struct)
 		
-	return output
+		self.id = id
 
-def unpack_idlist(s):
-	"""\
-	Returns the first string from the input data and any remaining data
-	"""
-
-	size = calcsize("!L")
-
-	length = unpack("!L", s[0:size])[0]
-	s = s[size:]
+	def __str__(self):
+		output = Processed.__str__(self)
+		output += xpack(ObjectGet.struct, self.id)
+		return output
 	
-	list = []
-	for i in range(0, length*size, size):
-		list.append(unpack("!L", s[i:i+size])[0])
-	s = s[length*size:]
+	def SetData(self, data):
+		self.id, data = xunpack(ObjectGet.struct)
+
+class Object(Processed):
+	"""\
+	An object returned by the server.
+	"""
+	type = OBJ
+	struct="LLSQ qqq qqq qqq [L] [L] I"
+
+	def __init__(self, s=None, id=None, 
+					type=None, name=None, size=None, 
+					pos=[None,None,None], vel=[None,None,None], accel=[None,None,None], 
+					contains=None, orders_valid=None, orders_no=None
+				):
+		if s != None:
+			if id != None:
+				raise Exception("ID cannot be set when you have given me a string!")
+			
+			Header.__init__(self, s[:Header.size])
+			SetData(self, s[Header.size:])
+		else:
+			if id == None or type == None or type(name) == StringType or type(size) == LongType or \
+				type(pos) != TupleType or len(pos) != 3 or \
+				type(vel) != TupleType or len(vel) != 3 or \
+				type(accel) != TupleType or len(accel) != 3 or \
+				type(contains) != ListType or type(orders_valid) != ListType or \
+				orders_no != None:
+				raise Exception("All information must be set if you don't set a string")
+			Header.__init__(self, None)
+		
+		self.id = long(id)
+		self.type = type
+		self.name = name
+		self.size = size
+		self.pos = pos
+		self.vel = vel
+		self.accel = accel
+		self.contains = contains
+		self.orders_valid = orders_valid
+		self.orders_no = orders_no
+
+	def __str__(self):
+		output = Processed.__str__(self)
+		output += xpack(Object.struct,
+							self.id,
+							self.type,
+							self.name,
+							self.size,
+							self.pos[X], self.pos[Y], self.pos[Z],
+							self.vel[X], self.vel[Y], self.vel[Z],
+							self.accel[X], self.accel[Y], self.accel[Z],
+							self.contains,
+							self.orders_valid,
+							self.orders_no)
+		return output
+
+	def SetData(self, data):
+		# First bit
+		self.pos = [None, None, None]
+		self.vel = [None, None, None]
+		self.accel = [None, None, None]
+
+		output, trash = unxpack(Object.struct, data)
+		self.id, \
+		self.type, \
+		self.name, \
+		self.size, \
+		self.pos[X], self.pos[Y], self.pos[Z], \
+		self.vel[X], self.vel[Y], self.vel[Z], \
+		self.accel[X], self.accel[Y], self.accel[Z], \
+		self.contains, \
+		self.orders_valid, \
+		self.orders_no = output
+		
+		# Check to see if we have any data left, if so we have stuffed up
+		if len(trash) > 0:
+			pprint.pprint("Leftover: (" + trash + ")")
+			raise "Leftover data was found, something went wrong!"
+			
+class OrderDescGet(Processed):
+	"""\
+	A get order desc packet.
+	"""
+
+	type = ORD_DESCGET
+
+	struct="L"
+
+	def __init__(self, s=None, id=None):
+		if s != None:
+			if id != None:
+				raise Exception("ID cannot be set when you have given me a string!")
+			
+			Header.__init__(self, s[:Header.size])
+			SetData(self, s[Header.size:])
+		else:
+			if id == None:
+				raise Exception("ID must be set if you don't set a string")
+			Header.__init__(self, None)
+			self.length = calcsize(ObjectGet.struct)
+		
+		self.id = long(id)
+
+	def __str__(self):
+		output = Processed.__str__(self)
+		output += xpack(OrderDescGet.struct, self.id)
+		return output
 	
-	return list, s
+	def SetData(self, data):
+		self.id = unxpack(OrderDescGet.struct)
 
-def unpack_string(s):
+class OrderDesc(Processed):
 	"""\
-	Returns the first string from the input data and any remaining data
+	A order description packet.
 	"""
-	# Remove the length
-	l = int(unpack("!I", s[0:4])[0])
-	if l > 0:
-		s = s[4:]
-		# Get the string, (we don't need the null terminator so nuke it)
-		output = s[:l-1]
-		s = s[l:]
-		# Remove anyremaining null terminators
-		s = s[4 - (l % 4):]
-		return string.strip(output), s
-	else:
-		return "", s
 
-def pack_string(s):
-	"""\
-	Prepares a string to be send out on a wire.
+	type = ORD_DESC
 	
-	It appends the string length to the beginning, adds a 
-	null terminator and padds the string to a 32 bit boundry.
-	"""
-	temp = s + "\0"
-	return pad(pack("!I", len(temp)) + temp)
+	struct="L SS [SIS]"
 
-def pad(s):
-	"""\
-	Pads a string with null characters untill it gets to a
-	32 bit boundry
-	"""
-	if len(s) % 4 != 0:
-		s += "\0" * (4 - (len(s) % 4))
-	return s
+	COORD = 0
+	TIME = 1
+	OBJECT = 2
+	PLAYER = 3
 
+	def __init__(self, s=None, id=None):
+		if s != None:
+			if id != None:
+				raise Exception("ID cannot be set when you have given me a string!")
+			
+			Header.__init__(self, s[:Header.size])
+			SetData(self, s[Header.size:])
+		else:
+			if id == None:
+				raise Exception("ID must be set if you don't set a string")
+			Header.__init__(self, None)
+			self.length = 4
+		
+		self.id = long(id)
 
-
-
-
+	def __str__(self):
+		output = Processed.__str__(self)
+		output += xpack(OrderDesc.struct,
+							self.type,
+							self.name,
+							self.desc,
+							self.parameters)
+		return output
+	
+	def SetData(self, data):
+		# Type
+		output, trash = unxpack(OrderDesc.struct, data)
+		self.type, self.name, self.desc, self.parameters = output
 
 
 def read_packet(s):
@@ -385,57 +413,4 @@ def connect(address, port):
 	else:
 		socket.close()
 		return None
-
-def get_contains(r):
-	import pprint
-
-	for i in r.contains:	
-		g = GetObject(id=i)
-		pprint.pprint(g)
-		pprint.pprint(str(g))
-		s.send(str(g))
-		r = read_packet(s)
-		pprint.pprint(r)
-		print "Contains:", r.contains
-		print "Valid orders:", r.valid_orders
-		pprint.pprint(str(r))
-		
-		get_contains(r)
-		
-if __name__ == "__main__":
-	import pprint
-
-	if sys.argv[1].lower() == "default":
-		host, port = ("127.0.0.1", 6923)
-	else:
-		host, port = string.split(sys.argv[1], ':', 1)
-		port = int(port)
-
-	print "Connection to", host, port
-	s = connect(host, port)
-	
-	if not s:
-		sys.exit("Could not connect! Please try again later.")
-	else:
-		print "We connected okay, constructing a login packet"
-
-	username=sys.argv[2]
-	password=sys.argv[3]
-	l = Login(username=username, password=password)
-	pprint.pprint(l)
-	pprint.pprint(str(l))
-	s.send(str(l))
-	r = read_packet(s)
-	pprint.pprint(r)
-	pprint.pprint(str(r))
-
-	g = GetObject(id=0)
-	pprint.pprint(g)
-	pprint.pprint(str(g))
-	s.send(str(g))
-	r = read_packet(s)
-	pprint.pprint(r)
-	pprint.pprint(str(r))
-
-	get_contains(r)
 
