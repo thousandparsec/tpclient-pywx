@@ -31,8 +31,7 @@ ID_WIN_HELP = 1105
 
 ID_HELP = 10057
 
-
-def create_menu():
+def create_menu(source, target):
 
 	# File Menu
 	file = wx.Menu()
@@ -70,6 +69,16 @@ def create_menu():
 	bar.Append( win,  "Windows" )
 	bar.Append( help, "Help" )
 
+	wx.EVT_MENU(source, ID_OPEN,	target.OnConnect)
+	wx.EVT_MENU(source, ID_CONFIG,	target.OnConfig)
+	wx.EVT_MENU(source, ID_EXIT,	target.OnProgramExit)
+
+	wx.EVT_MENU(source, ID_WIN_MESSAGES,	target.OnMessages)
+#	wx.EVT_MENU(source, ID_WIN_ORDERS,		target.OnOrders)
+	wx.EVT_MENU(source, ID_WIN_STARMAP,		target.OnStarMap)
+	wx.EVT_MENU(source, ID_WIN_SYSTEM,		target.OnSystem)
+#	wx.EVT_MENU(source, ID_WIN_TECH,		target.changeWin)
+#	wx.EVT_MENU(source, ID_WIN_HELP,		target.OnHelp)
 	return bar
 
 class winMain(winMainBase):
@@ -78,18 +87,7 @@ class winMain(winMainBase):
 	def __init__(self, application, pos=wx.DefaultPosition, size=wx.DefaultSize, style=wx.DEFAULT_FRAME_STYLE):
 		winMainBase.__init__(self, application, None, pos, size, style)
 
-		wx.EVT_MENU(self, ID_OPEN, self.OnConnect)
-		wx.EVT_MENU(self, ID_CONFIG, self.OnConfig)
-		wx.EVT_MENU(self, ID_EXIT, self.OnProgramExit)
-
-		wx.EVT_MENU(self, ID_WIN_MESSAGES,  self.OnMessages)
-#		wx.EVT_MENU(self, ID_WIN_ORDERS,    self.OnOrders)
-		wx.EVT_MENU(self, ID_WIN_STARMAP,   self.OnStarMap)
-		wx.EVT_MENU(self, ID_WIN_SYSTEM,    self.OnSystem)
-#		wx.EVT_MENU(self, ID_WIN_TECH,  self.changeWin)
-#		wx.EVT_MENU(self, ID_WIN_HELP,  self.OnHelp)
-
-		bar = create_menu()
+		bar = create_menu(self, self)
 		self.SetMenuBar(bar)
 		self.CreateStatusBar(1, wx.ST_SIZEGRIP)
 

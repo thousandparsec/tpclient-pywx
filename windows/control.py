@@ -191,7 +191,7 @@ class MainControl:
 		if wx.Platform == "__WXMAC__":
 			for value in self.__dict__.values():
 				if hasattr(value, "SetMenuBar"):
-					value.SetMenuBar(create_menu())
+					value.SetMenuBar(create_menu(value, self.main))
 
 		self.ConfigActivate(False)
 
