@@ -61,28 +61,20 @@ class NavCanvas(wx.Panel):
         box.Fit(self)
         self.SetSizer(box)
 
-        #FloatCanvas.EVT_LEFT_DOWN(self.Canvas, self.OnLeftDown )
-        #FloatCanvas.EVT_RIGHT_DOWN(self.Canvas, self.OnRightDown )
-        #FloatCanvas.EVT_MOTION(self.Canvas, self.OnMove )
-
         # default to Mouse mode
         self.ToolBar.ToggleTool(ID_POINTER_BUTTON,1)
         self.Canvas.SetMode("Mouse")
         
         return None
 
-##    def OnLeftDown(self, event):
-##        print "In OnLeftDown in NavCanvas"
-##        print "Left Button has been clicked in DrawFrame"
-##        print "coords are: %s"%(event.Coords,)
-##        print "pixel coords are: %s"%(event.GetPosition(),)
-
     def __getattr__(self, name):
         """
         Delegate all extra methods to the Canvas
         """
-        #print "about to delgate: ", name
-        return getattr(self.Canvas, name)
+        attrib = getattr(self.Canvas, name)
+        ## add the attribute to this module's dict for future calls
+        self.__dict__[name] = attrib
+        return attrib
 
     def BuildToolbar(self):
         tb = wx.ToolBar(self,-1)
@@ -129,12 +121,4 @@ class NavCanvas(wx.Panel):
 
     def ZoomToFit(self,Event):
         self.Canvas.ZoomToBB()
-
-
-
-
-
-
-
-
 
