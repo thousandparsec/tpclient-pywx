@@ -117,13 +117,6 @@ password = "%(password)s"
 		while len(objects) > 0:
 			object = objects.pop(0)
 			
-#			# Download the orders on this object
-#			if object.order_number > 0:
-#				object.orders = self.connection.get_orders(range(0, object.order_number))
-#			else:
-#				object.orders = []
-#			print "Orders", object.orders
-			
 			self.cache[object.id] = object
 			
 			# Download the objects inside this object

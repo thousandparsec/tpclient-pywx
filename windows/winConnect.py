@@ -135,7 +135,7 @@ class winConnect(wx.Frame):
 			self.Hide()
 			application.CacheUpdate()
 			application.windows.Show()
+			self.Hide()
 		else:
 			dlg.ShowModal()
 			dlg.Destroy()
-		return
