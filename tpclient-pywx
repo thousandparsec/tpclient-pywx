@@ -67,12 +67,12 @@ if __name__ == '__main__':
 			from windows.winMain    import winMain
 			from windows.winStarMap import winStarMap
 			from windows.winMessage import winMessage
-			#from windows.winSystem  import winSystem
+			from windows.winSystem  import winSystem
 			
 			self.windows.main = winMain(self, -1, None, (0,0), (1024-600-5,50))
 			self.windows.map = winStarMap(self.windows.main, -1, None, (1024-600,0), (600-5,500))
 			self.windows.message = winMessage(self.windows.main, -1, None, (0,476), (1024-600-5,200))
-			#self.windows.system = winSystem(self.windows.main, -1, None, (1024-600,523), (600-5,187))
+			self.windows.system = winSystem(self.windows.main, -1, None, (1024-600,523), (600-5,187))
 
 			##########
 			# Show the main window
@@ -80,7 +80,7 @@ if __name__ == '__main__':
 			self.windows.main.Show(TRUE)
 			self.windows.map.Show(TRUE)
 			self.windows.message.Show(TRUE)
-			#self.windows.system.Show(TRUE)
+			self.windows.system.Show(TRUE)
 			
 			return TRUE
 
