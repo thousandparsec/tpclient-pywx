@@ -44,39 +44,62 @@ class GameThread(BaseThread):
 		wxPostEvent(nevt)
 
 	def OnOrderInsert(self, evt):
-		debug(DEBUG_GAME, "Got a request for insert on %i of type %i at %i" % (evt.oid, evt.type, evt.slot))
+		args = None
 
-		args = [None, evt.oid, evt.type, evt.slot]
-		desc = self.descs.OrderDesc(evt.type)
-		if desc:
-			for name, type, string in desc.parameters:
-				if type == protocol.OrderDesc.ARG_COORD:
-					args += [10,10,10]
-				elif type == protocol.OrderDesc.ARG_TIME:
-					args += [10]
-				elif type == protocol.OrderDesc.ARG_OBJECT:
-					args += [3]
-				elif type == protocol.OrderDesc.ARG_PLAYER:
-					args += [1]
-					
+		if evt.order:
+			debug(DEBUG_GAME, "Got a request for insert (built) on %i of type %i at %i" % (evt.order.oid, evt.order.otype, evt.order.slot))
+			
+			# They have given us an order
+			args = [None, evt.order.oid, evt.order.otype, evt.order.slot]
+
+			for i in evt.order.args:
+				args.append(i)
+
+		else:
+			debug(DEBUG_GAME, "Got a request for insert (unbuilt) on %i of type %i at %i" % (evt.oid, evt.type, evt.slot))
+			args = [None, evt.oid, evt.type, evt.slot]
+			desc = self.descs.OrderDesc(evt.type)
+			if desc:
+				for name, type, string in desc.parameters:
+					if type == protocol.OrderDesc.ARG_COORD:
+						args += [10,10,10]
+					elif type == protocol.OrderDesc.ARG_TIME:
+						args += [10]
+					elif type == protocol.OrderDesc.ARG_OBJECT:
+						args += [3]
+					elif type == protocol.OrderDesc.ARG_PLAYER:
+						args += [1]
+			
+			else:
+				debug(DEBUG_GAME, "Tried to insert an order of type %i before we had the description" % evt.type)
+				
+		if args:
 			packet = apply(protocol.OrderAdd, args)
 			nevt = NetworkSendEvent(packet)
 			wxPostEvent(nevt)
+		
+	def OnOrderRemove(self, evt):
+		if evt.order:
+			debug(DEBUG_GAME, "Got a prebuilt order")
+			oid=evt.order.oid
+			slot=evt.order.slot
 		else:
-			debug(DEBUG_GAME, "Tried to insert an order of type %i before we had the description" % evt.type)
+			debug(DEBUG_GAME, "Have to build an order")
+			oid=evt.oid
+			slot=evt.slot
+		
+		debug(DEBUG_GAME, "Got a request to remove an order at %i on %i" % (slot, oid))
+		
+		packet = protocol.OrderRemove(oid=oid, slot=slot)
+		nevt = NetworkSendEvent(packet)
+		wxPostEvent(nevt)
 
 	def OnOrderGet(self, evt):
 		debug(DEBUG_GAME, "Got a request for an order at %i on %i" % (evt.slot, evt.oid))
 		packet = protocol.OrderGet(oid=evt.oid, slot=evt.slot)
 		nevt = NetworkSendEvent(packet)
 		wxPostEvent(nevt)
-		
-	def OnOrderRemove(self, evt):
-		debug(DEBUG_GAME, "Got a request to remove an order at %i on %i" % (evt.slot, evt.oid))
-		packet = protocol.OrderRemove(oid=evt.oid, slot=evt.slot)
-		nevt = NetworkSendEvent(packet)
-		wxPostEvent(nevt)
-		
+
 	def OnPacket(self, evt):	
 		if isinstance(evt.value, protocol.Object):
 			debug(DEBUG_GAME, "Got an object packet")
@@ -126,7 +149,9 @@ class GameThread(BaseThread):
 			debug(DEBUG_GAME, "Got an order packet")
 			new = copy.deepcopy(evt.value)
 			new.__class__ = Order
-			
+		
+			print "Test:", new.args
+		
 			# Publish an object getting event
 			for window in self.windows:
 				nevt = GameOrderArriveEvent(new)

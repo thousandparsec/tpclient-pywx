@@ -75,13 +75,14 @@ class GameObjectGetEvent(wxPyEvent):
 		self.name = name
 		
 class GameOrderInsertEvent(wxPyEvent):
-	def __init__(self, oid, type, slot):
+	def __init__(self, oid=None, type=None, slot=None, order=None):
 		wxPyEvent.__init__(self)
 		self.SetEventType(wxEVT_GAME_ORDER_INS)
 		
 		self.oid = oid
 		self.type = type
 		self.slot = slot
+		self.order = order
 		
 class GameOrderGetEvent(wxPyEvent):
 	def __init__(self, oid, slot):
@@ -92,10 +93,11 @@ class GameOrderGetEvent(wxPyEvent):
 		self.slot = slot
 
 class GameOrderRemoveEvent(wxPyEvent):
-	def __init__(self, oid, slot):
+	def __init__(self, oid=None, slot=None, order=None):
 		wxPyEvent.__init__(self)
 		self.SetEventType(wxEVT_GAME_ORDER_RM)
 		
 		self.oid = oid
 		self.slot = slot
+		self.order = order
 

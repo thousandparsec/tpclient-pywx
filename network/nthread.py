@@ -97,7 +97,7 @@ class NetworkThread(BaseThread):
 		For sending packets when you don't have an event to go
 		with it.
 		"""
-		debug(DEBUG_NETWORK, "Got a packet to send")
+		debug(DEBUG_NETWORK, "Got a packet to send %r" % evt.value)
 		self.Send(evt.value)
 
 	def __call__(self):
@@ -117,7 +117,7 @@ class NetworkThread(BaseThread):
 				debug(DEBUG_NETWORK, "Waiting on packet")
 				packet = read_packet(s)
 
-				debug(DEBUG_NETWORK, "Got Packet")
+				debug(DEBUG_NETWORK, "Got Packet %r" % packet)
 		
 				evt = NetworkPacketEvent(packet, self)
 
