@@ -78,7 +78,35 @@ def save_data(file, data):
 
 	cache[file] = data
 
+config = None
+def load_config():
+	"""\
+	Loads the config file.
+	"""
+	global config
+	
+	if not config:
+		class Config:
+			pass
+		
+		config = Config()
+		
+		try:
+			f = open(os.path.join(configpath(), "pywx_config"), "r")
+			
+			for line in f.readline():
+				if line[0] == '#':
+					continue
+				
+				else:
+					pass
+
+		except IOError:
+			return None
+		
+	return config
+
 __all__ = [
-	'Blank', 'save_data', 'load_data', # Config functions
+	'Blank', 'save_data', 'load_data', 'configpath', # Config functions
 	'debug', 'do_traceback', 'DEBUG_NETWORK', 'DEBUG_MAIN', 'DEBUG_WINDOWS', 'DEBUG_GAME', # Debugging functions
 	]

@@ -267,6 +267,7 @@ class winDesign(winBase):
 			self.edit.Disable()
 			self.delete.Disable()
 
+			print component.language
 			if len(component.language) > 0:
 				self.duplicate.Enable()
 				self.duplicate.SetDefault()

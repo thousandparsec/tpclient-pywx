@@ -140,7 +140,7 @@ class winConnect(wx.Frame, winBaseMixIn):
 
 		dlg = None
 		try:
-			application.connection.setup(host=host, port=port, debug=False)
+			application.connection.setup(host=host, port=port, debug=True)
 			progress.Update(1)
 			
 			print "Connect...",

@@ -200,7 +200,10 @@ class winMessage(winBase):
 
 	def BoardSet(self, id):
 		self.bid = id
-		messages = self.application.cache.messages[self.bid]
+		if self.application.cache.messages.has_key(self.bid):
+			messages = self.application.cache.messages[self.bid]
+		else:
+			messages = []
 
 		# Figure out the first non-filter message
 		slot = -1
@@ -216,7 +219,10 @@ class winMessage(winBase):
 		self.MessageSet(slot)
 	
 	def MessageSet(self, slot):
-		messages = self.application.cache.messages[self.bid]
+		if self.application.cache.messages.has_key(self.bid):
+			messages = self.application.cache.messages[self.bid]
+		else:
+			messages = []
 
 		if slot >= len(messages) or slot < 0:
 			self.slot = -1
