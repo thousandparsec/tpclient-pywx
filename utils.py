@@ -13,15 +13,16 @@ def do_traceback():
 	sys.stderr.write(string.join(traceback.format_exception(type, val, tb), ''))
 	lasts = (type, val, tb)
 
-DEBUG_NETWORK = 0
-DEBUG_MAIN = 1
-DEBUG_WINDOWS = 2
+DEBUG_NETWORK = "NETWORK:"
+DEBUG_MAIN = "MAIN:"
+DEBUG_WINDOWS = "WINDOWS:"
+DEBUG_GAME = "GAME:"
 
 DEBUGGING = [DEBUG_NETWORK, DEBUG_MAIN, DEBUG_WINDOWS]
 
 def debug(id, string):
 
 	if id in DEBUGGING:
-		print string
+		print id, string
 
 

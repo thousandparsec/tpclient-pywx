@@ -297,20 +297,11 @@ def read_packet(s):
 
 	return h
 
-class debug_socket(socket.socket):
-	"""\
-	Special socket which will print out every packet
-	sent over it.
-	"""
-	def send(self, string):
-		socket.socket.send(self, string)
-
 def create_socket(address, port):
 	"""\
 	Creates a socket, just a convience function.
 	"""
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-#	s = debug_socket(socket.AF_INET, socket.SOCK_STREAM)
 	try:
 		s.connect((address, port))
 		return s

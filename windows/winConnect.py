@@ -24,13 +24,13 @@ ID_CANCEL = 10044
 
 # Shows messages from the game system to the player.
 class winConnect(wxFrame):
-	def __init__(self, parent, ID, title=None, pos=wxDefaultPosition, size=wxDefaultSize, style=wxDEFAULT_FRAME_STYLE, message_list=[]):
+	def __init__(self, app, ID, title=None, pos=wxDefaultPosition, size=wxDefaultSize, style=wxDEFAULT_FRAME_STYLE, message_list=[]):
 		wxFrame.__init__(self, None, ID, 'TP: Connect', pos, size, style|wxTAB_TRAVERSAL)
 
 
 		panel = wxPanel(self, -1)
 
-		self.parent = parent
+		self.app = app
 		self.obj = {}
 
 		item0 = wxBoxSizer( wxVERTICAL )
@@ -103,11 +103,11 @@ class winConnect(wxFrame):
 	def OnExit(self, evt):
 		# Check if the server is connected
 		self.Show(FALSE)
-		if self.parent.logined:
-			self.parent.windows.Show()
+		if self.app.logined:
+			self.app.windows.Show()
 		else:
 			# Exit then
-			self.parent.Exit()
+			self.app.Exit()
 			
 	def OnOkay(self, evt):
 		host = self.obj['host'].GetValue()
@@ -126,7 +126,7 @@ class winConnect(wxFrame):
 					host, port = temp
 					port = int(port)
 
-				self.parent.app.network.win_connect(self)
+				self.app.network.win_connect(self)
 				eventManager.Register(self.OnConnection, EVT_NETWORK_PACKET, self)
 				
 				self.progress = wxProgressDialog("TP: Connecting to Server",
@@ -135,7 +135,7 @@ class winConnect(wxFrame):
 												self,
 												wxPD_APP_MODAL | wxPD_AUTO_HIDE)
 												
-				self.parent.ConnectTo(host, port, username, password)
+				self.app.ConnectTo(host, port, username, password)
 				self.progress.Update(1)
 				
 			except:
@@ -147,11 +147,11 @@ class winConnect(wxFrame):
 			eventManager.DeregisterListener(self.OnConnection)
 
 			if evt != None and isinstance(evt.value, protocol.Ok):
-				print "Connect Worked!"
+				debug(DEBUG_WINDOWS, "Connect Worked!")
 				eventManager.Register(self.OnLogin, EVT_NETWORK_PACKET, self)
 				self.progress.Update(2)
 			else:
-				print "Connect Failed!"
+				debug(DEBUG_WINDOWS, "Connect Failed!")
 				# Oh no! we didn't connect!
 				self.progress.Update(5)
 				#self.progress.Destroy()
@@ -166,8 +166,8 @@ class winConnect(wxFrame):
 				dlg.Destroy()
 
 		finally:
-			print "Connection Finishing"
-			print evt
+			debug(DEBUG_WINDOWS, "Connection Finishing")
+			debug(DEBUG_WINDOWS, evt)
 			if evt:
 				evt.next()
 
@@ -176,9 +176,9 @@ class winConnect(wxFrame):
 			self.progress.Update(3)
 		
 			if isinstance(evt.value, protocol.Ok):
-				print "Login Worked!"
+				debug(DEBUG_WINDOWS, "Login Worked!")
 				eventManager.DeregisterListener(self.OnLogin)
-				self.parent.app.network.win_disconnect(self)
+				self.app.network.win_disconnect(self)
 			
 				self.progress.Update(4)
 			
@@ -188,7 +188,7 @@ class winConnect(wxFrame):
 
 			elif isinstance(evt.value, protocol.Fail):
 				# Show a message box
-				print "Login Failed!"
+				debug(DEBUG_WINDOWS, "Login Failed!")
 				self.progress.Update(5)
 				
 				dlg = wxMessageDialog(self, 'Failed to connect, this could be because,\n' +
@@ -205,7 +205,7 @@ class winConnect(wxFrame):
 				self.obj['host'].Enable(FALSE)
 
 		finally:
-			print "Login Finishing"
-			print evt
+			debug(DEBUG_WINDOWS, "Login Finishing")
+			debug(DEBUG_WINDOWS, evt)
 			if evt:
 				evt.next()

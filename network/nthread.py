@@ -9,7 +9,10 @@ from thread import allocate_lock
 # wxWindows imports
 from wxPython.wx import * 
 
-# local imports
+# Game imports
+from utils import *
+
+# Local imports
 from protocol import *
 from events import *
 from extra.evtmgr import eventManager
@@ -21,17 +24,17 @@ class NetworkThread:
 		self.socket = None
 		self.lock = allocate_lock()
 
-	def win_connect(self, window, function, types=events):
+	def win_connect(self, window):
 		"""\
 		Starts a window recieving the events from the network thread.
 		"""
 		self.windows.append(window)
 
-	def win_disconnect(self, window, function):
+	def win_disconnect(self, window):
 		"""\
 		Stops a window from recieving events from the network thread.
 		"""
-		self.windows.remote(window)
+		self.windows.remove(window)
 
 	def connect(self, host, port):
 		"""\
@@ -42,6 +45,7 @@ class NetworkThread:
 
 		This function does block until the socket is created.
 		"""
+		debug(DEBUG_NETWORK, "Connecting to %s:%s" % (host, port))
 		self.socket = create_socket(host, port)
 
 		# Need to issue a EVT_NETWORK_CONNECT here
@@ -58,6 +62,7 @@ class NetworkThread:
 
 		This function does block until the socket is destroyed.
 		"""
+		debug(DEBUG_NETWORK, "Disconnection")
 		# Need to issue a EVT_NETWORK_DISCONNECT here
 		
 		self.socket = None
@@ -71,7 +76,8 @@ class NetworkThread:
 		This function currently block until the data has been sent. This
 		may not be the case always however.
 		"""
-		if isinstance(object, protocol.Header):
+		debug(DEBUG_NETWORK, "Trying to send an %s of %s" % (repr(object), type(object)))
+		if isinstance(object, Header):
 			self.socket.send(str(object))
 		else:
 			raise IOError("Trying to send an invalid object")

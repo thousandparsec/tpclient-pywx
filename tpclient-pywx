@@ -16,8 +16,8 @@ from network import protocol
 from network.nthread import NetworkThread
 from network.events import *
 
-from game.game import Game
 from game.gthread import GameThread
+from game.events import *
 
 from utils import *
 from config import *
@@ -46,15 +46,15 @@ class AppTP(wxApp):
 
 		# Startup the Game
 		try:
-			self.game = Game(self)
-			thread.start_new_thread(self.game)
+			self.game = GameThread()
+			thread.start_new_thread(self.game, ())
 		except:
 			do_traceback()
 
 		# Startup the Network
 		try:
-			self.network = NetworkThread(self)
-			thread.start_new_thread(self.network)
+			self.network = NetworkThread()
+			thread.start_new_thread(self.network, ())
 
 			self.network.win_connect(self)
 		except:
@@ -73,37 +73,38 @@ class AppTP(wxApp):
 		return TRUE
 		
 	def ConnectTo(self, host, port, username, password):
-	
+		debug(DEBUG_MAIN, "Trying to connect to %s:%s" % (host, port))
+
 		self.username = username
 		self.password = password
 		
-		if not self.connected or self.host != host or self.port == port:
+		if not self.connected or self.host != host or self.port != port:
 			self.host = host
 			self.port = port
 
-			self.network.connect(self.host, self.port)
-			if not self.socket:
+			if not self.network.connect(self.host, self.port):
 				self.windows.connect.OnConnection(None)
 				return
 
 			EVT_NETWORK_PACKET(self, self.OnPacket)
 
-			c = protocol.Connect()
-			self.network.send(c)
+			self.network.send(protocol.Connect())
 		
 		else:
 			# Just resend the username/password
+			debug(DEBUG_MAIN, "Already connected, just login")
 			self.Login()
 
 	def Login(self):
 		l = protocol.Login(username=self.username, password=self.password)
-		self.socket.send(str(l))
+		self.network.send(l)
 
 	def OnPacket(self, evt):
 		try:
 			if not self.connected:
 				# Check to see if this is our success packet
 				if isinstance(evt.value, protocol.Ok):
+					debug(DEBUG_MAIN, "Connected Okay")
 					# Yay we connected okay!
 					self.connected = TRUE
 				
@@ -111,6 +112,7 @@ class AppTP(wxApp):
 					self.Login()
 				
 				elif isinstance(evt.value, protocol.Fail):
+					debug(DEBUG_MAIN, "Didn't Connect")
 					# Ekk the server is busy
 					pass
 				else:
@@ -118,6 +120,7 @@ class AppTP(wxApp):
 
 			elif not self.logined:
 				if isinstance(evt.value, protocol.Ok):
+					debug(DEBUG_MAIN, "Login went okay!")
 					# Yay we connected okay!
 					self.logined = TRUE
 					
@@ -125,10 +128,11 @@ class AppTP(wxApp):
 
 					# Okay now try to get the universe
 					g = protocol.GetObject(id=0)
-					evt.network.socket.send(str(g))
+					evt.network.send(g)
 					
 				else:
 					# We failed to login :( username/password is most proberly bad.
+					debug(DEBUG_MAIN, "Login failed :(")
 					pass
 			else:
 				# Now we are logged in okay just pass everything on to the game engine
