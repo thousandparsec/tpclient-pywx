@@ -4,6 +4,7 @@ at this current location and "quick" details about them.
 """
 
 # Python imports
+import random
 
 # wxPython imports
 from wxPython.wx import *
@@ -13,9 +14,35 @@ from wxPython.gizmos import wxTreeListCtrl
 from utils import *
 
 # Local imports
-from winBase import winBase
+from winBase import *
 
 # Program imports
+
+NAME = 0
+DESC = 1
+
+class wxTreeListCtrl(wxTreeListCtrl):
+	"""\
+	Modified object which includes the ability to get an object by the pyData
+	"""
+	def FindItemByData(self, pyData, item=None):
+		if item == None:
+			item = self.GetRootItem()
+
+		if self.GetPyData(item) == pyData:
+			return item
+		else:
+			if self.ItemHasChildren(item):
+				child, cookie = self.GetFirstChild(item)
+
+				while child != None:
+					r = self.FindItemByData(pyData, child)
+					if r:
+						return r
+					
+					child, cookie = self.GetNextChild(item, cookie)
+
+		return None
 
 # Show the universe
 class winSystem(winBase):
@@ -47,20 +74,22 @@ class winSystem(winBase):
 		self.tree.AddColumn("Object")
 		self.tree.AddColumn("Details")
 		self.tree.SetMainColumn(0)
-		self.tree.SetColumnWidth(0, 175)
+		self.tree.SetColumnWidth(0, 250)
 
-		EVT_ACTIVATE(self, self.OnFocus)
-		EVT_TREE_SEL_CHANGED(self.tree, -1, self.OnSelectItem)
+		EVT_TREE_SEL_CHANGED(self.tree, -1, self.SelectItem)
 
-	def OnFocus(self, evt):
-		self.Update()
+		EVT_CACHE_UPDATE(self.application, self.Rebuild)
+		EVT_SELECT_OBJECT(self.application, self.OnSelectObject)
 
-	def Update(self):
+	def Rebuild(self, evt):
+		"""\
+		Rebuilds the list of objects.
+		"""
 		selected_id = self.tree.GetPyData(self.tree.GetSelection())
 		if not selected_id:
 			selected_id = -1
 			
-		debug(DEBUG_WINDOWS, "Currently selected object... %i" % selected_id)
+		debug(DEBUG_WINDOWS, "Selecting object... %i" % selected_id)
 		
 		# Remove all the current items
 		self.tree.DeleteAllItems()
@@ -69,13 +98,14 @@ class winSystem(winBase):
 		selected = self.Add(None, universe, selected_id)
 	
 		if selected:
-			debug(DEBUG_WINDOWS, "Trying to reselect an object... %s" % self.tree.GetPyData(selected))
+			debug(DEBUG_WINDOWS, "Trying select object... %i" % self.tree.GetPyData(selected))
 			self.tree.SelectItem(selected)
 			self.tree.EnsureVisible(selected)
-#			new_evt = WindowsObjSelect(self.tree.GetPyData(selected))
-#			wxPostEvent(new_evt)
 		
 	def Add(self, root, object, selected_id=-1):
+		"""\
+		Recursive method which builds the object list.
+		"""
 		selected = None
 		new_root = None
 		
@@ -103,36 +133,25 @@ class winSystem(winBase):
 				return new_root
 			elif selected:
 				return selected
-				
 		return
 
-	def OnGameArriveObj(self, evt):
-		self.Update()
+	def OnSelectObject(self, evt):
+		"""\
+		When somebody selects an object.
+		"""
+		debug(DEBUG_WINDOWS, "Selecting object... %i" % evt.id)
+		item = self.tree.FindItemByData(evt.id)
+		if item:
+			self.tree.SelectItem(item)
+			self.tree.EnsureVisible(item)
 
-#		g = self.application.game
-#		selected = self.tree.GetSelection()
-#		
-#		object = g.universe.Object(evt.id)
-#		parent = g.universe.Object(object.parent)
-#
-#		# Find the parent of this object
-#		root = self.tree.GetItem()
-#		new_root = self.tree.AppendItem(root, object.name, self.tree.icons['System'])
-#
-#		self.tree.SetSelection(selected)
-#		self.tree.EnsureVisible(selected)
-#		if self.tree.GetPyData(selected) == evt.id:
-#			# Okay we need to post an event now
-#			new_evt = WindowsObjSelect(evt.id)
-#			wxPostEvent(new_evt)
-	
-	def OnSelectItem(self, evt):
+	def SelectItem(self, evt):
+		"""\
+		When somebody selects an item on the list.
+		"""
 		# Figure out which item it is
 		id = self.tree.GetPyData(evt.GetItem())
 		
 		# Okay we need to post an event now
-		#new_evt = WindowsObjSelect(id)
-		#wxPostEvent(new_evt)
-
-
+		wxPostEvent(self.application, SelectObjectEvent(id))
 

@@ -65,9 +65,9 @@ class MainControl:
 		config.message.pos = self.message.GetPositionTuple()
 		config.message.size = self.message.GetSizeTuple()
 		config.message.show = self.message.IsShown()
-#		config.order.pos = self.order.GetPositionTuple()
-#		config.order.size = self.order.GetSizeTuple()
-#		config.order.show = self.order.IsShown()
+		config.order.pos = self.order.GetPositionTuple()
+		config.order.size = self.order.GetSizeTuple()
+		config.order.show = self.order.IsShown()
 		config.starmap.pos = self.starmap.GetPositionTuple()
 		config.starmap.size = self.starmap.GetSizeTuple()
 		config.starmap.show = self.starmap.IsShown()
@@ -84,8 +84,8 @@ class MainControl:
 		self.main.SetSize(config.main.size)
 		self.message.SetPosition(config.message.pos)
 		self.message.SetSize(config.message.size)
-#		self.order.SetPosition(config.order.pos)
-#		self.order.SetSize(config.order.size)
+		self.order.SetPosition(config.order.pos)
+		self.order.SetSize(config.order.size)
 		self.starmap.SetPosition(config.starmap.pos)
 		self.starmap.SetSize(config.starmap.size)
 		self.system.SetPosition(config.system.pos)
@@ -94,7 +94,7 @@ class MainControl:
 		if show:
 			self.main.Show(config.main.show)
 			self.message.Show(config.message.show)
-#			self.order.Show(config.order.show)
+			self.order.Show(config.order.show)
 			self.starmap.Show(config.starmap.show)
 			self.system.Show(config.system.show)
 
@@ -120,8 +120,8 @@ class MainControl:
 		from windows.winMessage import winMessage
 		self.message = winMessage(application, self.main, config.message.pos, config.message.size)
 
-#		from windows.winOrder   import winOrder
-#		self.order = winOrder(application, self.main, config.order.pos, config.order.size)
+		from windows.winOrder   import winOrder
+		self.order = winOrder(application, self.main, config.order.pos, config.order.size)
 
 		from windows.winStarMap import winStarMap
 		self.starmap = winStarMap(application, self.main, config.starmap.pos, config.starmap.size)
@@ -139,7 +139,7 @@ class MainControl:
 
 		self.system.Raise()
 		self.message.Raise()
-#		self.order.Raise()
+		self.order.Raise()
 		self.starmap.Raise()
 		self.main.Raise()
 
@@ -156,7 +156,7 @@ class MainControl:
 
 		self.main.Show(config.main.show)
 		self.message.Show(config.message.show)
-#		self.order.Show(config.order.show)
+		self.order.Show(config.order.show)
 		self.starmap.Show(config.starmap.show)
 		self.system.Show(config.system.show)
 
@@ -168,7 +168,7 @@ class MainControl:
 
 		self.main.Show(FALSE)
 		self.message.Show(FALSE)
-#		self.order.Show(FALSE)
+		self.order.Show(FALSE)
 		self.starmap.Show(FALSE)
 		self.system.Show(FALSE)
 

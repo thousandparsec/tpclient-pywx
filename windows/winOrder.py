@@ -10,10 +10,10 @@ from wxPython.wx import *
 from wxPython.lib.anchors import LayoutAnchors
 
 # Local imports
-from winBase import winBase
+from winBase import *
 
-from extra.wxListCtrl import wxListCtrl
-from extra.wxPostEvent import *
+#from extra.wxListCtrl import wxListCtrl
+#from extra.wxPostEvent import *
 
 from utils import *
 
@@ -30,17 +30,13 @@ ORDER_REVERT = 10018
 TURNS_COL = 0
 ORDERS_COL = 1
 
-
-wxDp = wxDefaultPosition
-
 class winOrder(winBase):
 	title = "Orders"
 	
 	def __init__(self, application, parent, pos=wxDefaultPosition, size=wxDefaultSize, style=wxDEFAULT_FRAME_STYLE):
 		winBase.__init__(self, application, parent, pos, size, style)
 
-		# Setup to recieve game events
-		application.game.WinConnect(self)
+		self.application = application
 
 		# Create a base panel
 		base_panel = wxPanel(self, -1)
@@ -63,21 +59,29 @@ class winOrder(winBase):
 		order_list.SetColumnWidth(TURNS_COL, 75)
 		order_list.InsertColumn(ORDERS_COL, "Order Information")
 		order_list.SetColumnWidth(ORDERS_COL, wxLIST_AUTOSIZE)
+		order_list.SetFont(winFont)
 
 		# A horizontal line
 		line_horiz = wxStaticLine( base_panel, -1, wxDefaultPosition, wxSize(20,-1), wxLI_HORIZONTAL)
 
 		# Buttons to add/delete orders
 		button_sizer = wxFlexGridSizer( 1, 0, 0, 0 )
-		new_button = wxButton( base_panel, ORDER_NEW, "New Order", wxDefaultPosition, wxDefaultSize, 0 )
-		new_type_list = wxChoice( base_panel, ORDER_TYPE, wxDefaultPosition, wxSize(140,-1), [] , 0 )
-		line_vert = wxStaticLine( base_panel, ORDER_LINE, wxDefaultPosition, wxSize(-1,20), wxLI_VERTICAL )
-		delete_button = wxButton( base_panel, ORDER_DELETE, "Delete Order",	wxDefaultPosition, wxDefaultSize, 0 )
 		
-		button_sizer.AddWindow( new_button, 0, wxALIGN_CENTRE|wxALL, 5 )
-		button_sizer.AddWindow( new_type_list, 0, wxALIGN_CENTRE|wxALL, 5 )
-		button_sizer.AddWindow( line_vert, 0, wxALIGN_CENTRE|wxALL, 5 )
-		button_sizer.AddWindow( delete_button, 0, wxALIGN_CENTRE|wxALL, 5 )
+		new_button = wxButton( base_panel, ORDER_NEW, "New Order", wxDefaultPosition, wxDefaultSize, 0 )
+		new_button.SetFont(winFont)
+		
+		new_type_list = wxChoice( base_panel, ORDER_TYPE, wxDefaultPosition, wxSize(140,-1), [] , 0 )
+		new_type_list.SetFont(winFont)
+		
+		line_vert = wxStaticLine( base_panel, ORDER_LINE, wxDefaultPosition, wxSize(-1,20), wxLI_VERTICAL )
+
+		delete_button = wxButton( base_panel, ORDER_DELETE, "Delete Order",	wxDefaultPosition, wxDefaultSize, 0 )
+		delete_button.SetFont(winFont)
+		
+		button_sizer.AddWindow( new_button, 0, wxALIGN_CENTRE|wxALL, 1 )
+		button_sizer.AddWindow( new_type_list, 0, wxALIGN_CENTRE|wxALL, 1 )
+		button_sizer.AddWindow( line_vert, 0, wxALIGN_CENTRE|wxALL, 1 )
+		button_sizer.AddWindow( delete_button, 0, wxALIGN_CENTRE|wxALL, 1 )
 		
 		# Order arguments
 		argument_sizer = wxFlexGridSizer( 0, 1, 0, 0)
@@ -88,13 +92,13 @@ class winOrder(winBase):
 		argument_panel.SetAutoLayout( true )
 
 		# Put them all on the sizer
-		base_sizer.AddWindow( order_list, 0, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 5 )
+		base_sizer.AddWindow( order_list, 0, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 1 )
 		base_sizer.AddGrowableRow( 0 )
-		base_sizer.AddWindow( line_horiz, 0, wxALIGN_CENTRE|wxALL, 5 )
-		base_sizer.AddSizer ( button_sizer,	0, wxALIGN_CENTRE|wxALL, 5 )
-		base_sizer.AddWindow( line_horiz, 0, wxALIGN_CENTRE|wxALL, 5 )
+		base_sizer.AddWindow( line_horiz, 0, wxALIGN_CENTRE|wxALL, 1 )
+		base_sizer.AddSizer ( button_sizer,	0, wxALIGN_CENTRE|wxALL, 1 )
+		base_sizer.AddWindow( line_horiz, 0, wxALIGN_CENTRE|wxALL, 1 )
 		base_sizer.AddGrowableRow( 4 )
-		base_sizer.AddWindow( argument_panel, 0, wxGROW|wxALIGN_CENTER|wxALL, 5 )
+		base_sizer.AddWindow( argument_panel, 0, wxGROW|wxALIGN_CENTER|wxALL, 1 )
 
 		self.oid = -1
 		self.app = application
@@ -110,8 +114,8 @@ class winOrder(winBase):
 		
 		EVT_LIST_ITEM_SELECTED(self, ORDER_LIST, self.OnOrderSelect)
 		
-		EVT_WINDOWS_OBJ_SELECT(self, self.OnSelect)
-		EVT_GAME_ORDER_ARRIVE(self,  self.OnOrder)
+		EVT_SELECT_OBJECT(self, self.OnSelect)
+		EVT_SELECT_ORDER(self,  self.OnOrder)
 
 		self.SetSize(size)
 		self.SetPosition(pos)
@@ -144,8 +148,8 @@ class winOrder(winBase):
 				self.order_list.SetItemData(slot, None)
 				
 				# Request the order be gotten
-				nevt = GameOrderGetEvent(object.id, slot)
-				wxPostEvent(nevt)
+#				nevt = GameOrderGetEvent(object.id, slot)
+#				wxPostEvent(nevt)
 
 			self.BuildPanel(None)
 
@@ -199,15 +203,15 @@ class winOrder(winBase):
 				#self.order_list.SetSelection(slot)
 
 				# Now send an insert event
-				nevt = GameOrderInsertEvent(oid, orderdesc_id, slot)
-				wxPostEvent(nevt)
+#				nevt = GameOrderInsertEvent(oid, orderdesc_id, slot)
+#				wxPostEvent(nevt)
 
 				# FIXME: EVIL HACK
 				time.sleep(1)
 				
 				# Reload the object
-				nevt = GameObjectGetEvent(oid)
-				wxPostEvent(nevt)
+#				nevt = GameObjectGetEvent(oid)
+#				wxPostEvent(nevt)
 			
 			else:
 				# Need to raise some type of error here.
@@ -224,15 +228,15 @@ class winOrder(winBase):
 		slot = self.order_list.GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED)
 		if slot != wxNOT_FOUND:
 
-			nevt = GameOrderRemoveEvent(oid, slot)
-			wxPostEvent(nevt)
+#			nevt = GameOrderRemoveEvent(oid, slot)
+#			wxPostEvent(nevt)
 			
 			# FIXME: EVIL HACK
 			time.sleep(1)
 
 			# Reload the object
-			nevt = GameObjectGetEvent(oid)
-			wxPostEvent(nevt)
+#			nevt = GameObjectGetEvent(oid)
+#			wxPostEvent(nevt)
 
 			# Update the Panel
 			self.BuildPanel(None)
@@ -267,15 +271,15 @@ class winOrder(winBase):
 			order.args = args
 
 			# Send a remove order for that slot
-			nevt = GameOrderRemoveEvent(order=order)
-			wxPostEvent(nevt)
+#			nevt = GameOrderRemoveEvent(order=order)
+#			wxPostEvent(nevt)
 		
 			# FIXME: Evil hack
 			time.sleep(1)
 			
 			# Send an add order for that slot
-			nevt = GameOrderInsertEvent(order=order)
-			wxPostEvent(nevt)
+#			nevt = GameOrderInsertEvent(order=order)
+#			wxPostEvent(nevt)
 
 	def OnOrderSelect(self, evt):
 		g = self.app.game

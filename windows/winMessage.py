@@ -7,7 +7,7 @@ Messages are displayed using basic HTML.
 
 from copy import deepcopy
 
-from winBase import winBase
+from winBase import winBase, winFont
 
 from wxPython.wx import *
 from wxPython.lib.anchors import LayoutAnchors
@@ -39,10 +39,8 @@ MESSAGE_DEL = 10009
 class winMessage(winBase):
 	title = "Messages"
 	
-	def __init__(self, application, parent, pos=wxDefaultPosition, size=wxDefaultSize, style=wxDEFAULT_FRAME_STYLE, message_list=[]):	
+	def __init__(self, application, parent, pos=wxDefaultPosition, size=wxDefaultSize, style=wxDEFAULT_FRAME_STYLE, message_list=[]):
 		winBase.__init__(self, application, parent, pos, size, style|wxTAB_TRAVERSAL)
-
-		font = wxFont(8, wxDEFAULT, wxNORMAL, wxNORMAL)
 
 		panel = wxPanel(self, -1)
 		panel.SetConstraints(LayoutAnchors(self, 1, 1, 1, 1))
@@ -58,17 +56,17 @@ class winMessage(winBase):
 		item1.AddGrowableCol( 2 )
 
 		item2 = wxCheckBox( panel, MESSAGE_FILTER, "Filter", wxDefaultPosition, wxDefaultSize, 0 )
-		item2.SetFont(font)
+		item2.SetFont(winFont)
 		item1.AddWindow( item2, 0, wxALIGN_CENTER_VERTICAL|wxALL, 1 )
 
 		item3 = wxStaticText( panel, MESSAGE_TITLE, "Title", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE )
-		item3.SetFont(font)
+		item3.SetFont(winFont)
 		item1.AddWindow( item3, 0, wxGROW|wxALIGN_CENTRE|wxALL, 1 )
 
 		self.obj['title'] = item3
 
 		item4 = wxStaticText( panel, MESSAGE_ID, "# of #", wxDefaultPosition, wxDefaultSize, 0 )
-		item4.SetFont(font)
+		item4.SetFont(winFont)
 		item1.AddWindow( item4, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxALL, 1 )
 
 		self.obj['counter'] = item4
@@ -90,15 +88,15 @@ class winMessage(winBase):
 		item7 = wxBoxSizer( wxVERTICAL )
 
 		item8 = wxButton( panel, MESSAGE_PREV, "Prev", wxDefaultPosition, wxDefaultSize, 0 )
-		item8.SetFont(font)
+		item8.SetFont(winFont)
 		item7.AddWindow( item8, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxALL, 1 )
 
 		item9 = wxButton( panel, MESSAGE_GOTO, "Goto", wxDefaultPosition, wxDefaultSize, 0 )
-		item9.SetFont(font)
+		item9.SetFont(winFont)
 		item7.AddWindow( item9, 0, wxALIGN_CENTRE|wxALL, 1 )
 
 		item10 = wxButton( panel, MESSAGE_NEXT, "Next", wxDefaultPosition, wxDefaultSize, 0 )
-		item10.SetFont(font)
+		item10.SetFont(winFont)
 		item7.AddWindow( item10, 0, wxALIGN_CENTRE|wxALL, 1 )
 
 		item11 = wxStaticLine( panel, MESSAGE_LINE, wxDefaultPosition, wxSize(20,-1), wxLI_HORIZONTAL )
@@ -106,11 +104,11 @@ class winMessage(winBase):
 		item7.AddWindow( item11, 0, wxALIGN_CENTRE|wxALL, 1 )
 
 		item12 = wxButton( panel, MESSAGE_NEW, "New", wxDefaultPosition, wxDefaultSize, 0 )
-		item12.SetFont(font)
+		item12.SetFont(winFont)
 		item7.AddWindow( item12, 0, wxALIGN_CENTRE|wxALL, 1 )
 
 		item13 = wxButton( panel, MESSAGE_DEL, "Delete", wxDefaultPosition, wxDefaultSize, 0 )
-		item13.SetFont(font)
+		item13.SetFont(winFont)
 		item7.AddWindow( item13, 0, wxALIGN_CENTRE|wxALL, 1 )
 
 		item5.AddSizer( item7, 0, wxGROW|wxALIGN_RIGHT|wxALL, 1 )
@@ -136,95 +134,92 @@ class winMessage(winBase):
 		self.MessageSet([])
 
 	filtered = """\
-	<html>
-	<body>
-	<center>
-	   <table COLS=1 WIDTH="100%" BACKGROUND="./graphics/filtered.png">
+<html>
+<body>
+<center>
+	<table COLS=1 WIDTH="100%" BACKGROUND="./graphics/filtered.png">
 		<tr>
-		  <td><b>From:</b> %s</td>
+			<td><b>From:</b> %s</td>
 		</tr>
 		<tr>
-		  <td><b>Subject:</b> %s</td>
+			<td><b>Subject:</b> %s</td>
 		</tr>
 		<tr>
-		  <td>Related: %s</td>
+			<td>Related: %s</td>
 		</tr>
 		<tr>
-		  <td>%s</td>
+			<td>%s</td>
 		</tr>
-	   </table>
-	</center>
-	</body>
-	</html>
-	"""
+	</table>
+</center>
+</body>
+</html>"""
 
 	message = """\
-	<html>
-	<body>
-	<center>
-	   <table COLS=1 WIDTH="100%">
+<html>
+<body>
+<center>
+	<table COLS=1 WIDTH="100%">
 		<tr>
-		  <td><b>From:</b> %s</td>
+			<td><b>From:</b> %s</td>
 		</tr>
 		<tr>
-		  <td><b>Subject:</b> %s</td>
+			<td><b>Subject:</b> %s</td>
 		</tr>
 		<tr>
-		  <td>Related: %s</td>
+			<td>Related: %s</td>
 		</tr>
 		<tr>
-		  <td>%s</td>
+			<td>%s</td>
 		</tr>
-	   </table>
-	</center>
-	</body>
-	</html>
-	"""
+	</table>
+</center>
+</body>
+</html>"""
 
 	nomessage = """\
-	<html>
-	<body>
-	<center>
-		<table COLS=1 WIDTH="100%">
-		  <tr>
+<html>
+<body>
+<center>
+	<table COLS=1 WIDTH="100%">
+		<tr>
 			<td><b>From:</b> SYSTEM</td>
-		  </tr>
-		  <tr>
+		</tr>
+		<tr>
 			<td><b>Subject:</b> You are unloved!
-		  </tr>
-		  <tr>
-			<td>You have recived no messages this turn!<br><br>
+		</tr>
+		<tr>
+			<td>
+			You have recived no messages this turn!<br><br>
 			Actually if you didn't recive any messages it most proberly
 			means that your results file is missing so your client
 			couldn't load it. Check that you have a results file and
 			reload/restart the client.
 			</td>
-		  </tr>
-		 </table>
-	</center>
-	</body>
-	</html>
-	"""
+		</tr>
+	 </table>
+</center>
+</body>
+</html>"""
 
 	allfiltered = """\
-	<html>
-	<body>
-	<center>
-		<table COLS=1 WIDTH="100%">
-		  <tr>
+<html>
+<body>
+<center>
+	<table COLS=1 WIDTH="100%">
+		<tr>
 			<td><b>From:</b> SYSTEM</td>
-		  </tr>
-		  <tr>
+		</tr>
+		<tr>
 			<td><b>Subject:</b> All messages filtered
-		  </tr>
-		  <tr>
+		</tr>
+		<tr>
 			<td>All messages you have recived this turn have been filtered.</td>
-		  </tr>
-		 </table>
-	</center>
-	</body>
-	</html>
-	"""
+		</tr>
+	</table>
+</center>
+</body>
+</html>"""
 
 	def MessageSet(self, list):
 

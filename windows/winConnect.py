@@ -4,7 +4,8 @@ person enter the server/username/password.
 """
 
 from wxPython.wx import *
-from wxPython.lib.anchors import LayoutAnchors
+
+from winBase import CacheUpdateEvent
 
 from utils import *
 
@@ -149,6 +150,7 @@ class winConnect(wxFrame):
 			progress.Update(100)
 		
 			self.Hide()
+			wxPostEvent(application, CacheUpdateEvent())
 			application.windows.Show()
 		else:
 			dlg.ShowModal()
