@@ -1,4 +1,6 @@
 
+import sys
+
 # wxPython imports
 from wxPython.wx import *
 
@@ -10,49 +12,11 @@ import string
 import pprint
 import thread
 
-# setup the path for the common stuff
-import sys
-sys.path.append("..")
-
 from network import protocol
 from network.nthread import network_thread
 from network.events import *
 
 from utils import *
-
-from UserDict import UserDict
-class NameMap(UserDict):
-	def __init__(self, dict=None):
-		self.data = {}
-		if dict is not None:
-			self.update(dict)
-
-	def saveconfig(self, file, overwrite=1):
-		if os.path.exists(file) and overwrite:
-			os.remove(file)
-		elif os.path.exists(file):
-			raise IOError, "Mapping file (%s) already exists" % file
-		
-		f = open(file, 'w+')
-		for ID in self.data.keys():
-			f.write("%s %s\n" % (str(ID), self.data[i]) )
-
-	def loadconfig(self, file):
-		if not os.path.exists(file):
-			raise IOError, "Mapping file (%s) doesn't exist" % file
-		f = open(file)
-		input = f.read()
-		for line in string.split(input, '\n'):
-			key = string.split(line[0])[0]
-			self.data[key] = line[len(key):]
-
-	def getName(self, name):
-		if name in self.data.items():
-			for i in self.data.keys():
-				if self.data[i] == name:
-					return i
-		else:
-			raise KeyError, "No such name in this mapping"
 
 class mainControl:
 	def __init__(self, app):
@@ -153,7 +117,7 @@ class appTP(wxApp):
 			self.network = network_thread([self, self.windows.connect])
 			args = tuple([self.socket])
 			thread.start_new_thread(self.network, args)
-		
+
 			EVT_NETWORK_PACKET(self, self.OnPacket)
 
 			c = protocol.Connect()
@@ -187,12 +151,20 @@ class appTP(wxApp):
 				if isinstance(event.value, protocol.Ok):
 					# Yay we connected okay!
 					self.logined = TRUE
+					
+					# Setup and register the universe
+
+					# Okay now try to get the universe
+					g = protocol.GetObject(id=0)
+					self.socket.send(str(g))
+					
 				else:
 					# We failed to login :( username/password is most proberly bad.
 					pass
 			else:
-				# Hrm do nothing for now..
+				# Okay we are connected now, we don't need to do anything now
 				pass
+		
 		finally:
 			self.network.next()
 
