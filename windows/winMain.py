@@ -32,6 +32,7 @@ ID_WIN_MESSAGES = 11001
 ID_WIN_SYSTEM = 11002
 ID_WIN_ORDERS = 11003
 ID_WIN_TECH = 11004
+ID_WIN_TIPS = 11005
 ID_WIN_HELP = 1105
 
 ID_HELP = 10057
@@ -63,6 +64,7 @@ def create_menu(source, target):
 	win.Append(  ID_WIN_STARMAP,  _("Hide Starmap"), _(""), True )
 	win.Append(  ID_WIN_SYSTEM,   _("Hide System"), _(""), True )
 	win.AppendSeparator()
+	win.Append(  ID_WIN_TIPS, _("Show Tips"), _(""), True )
 	win.Append(  ID_WIN_TECH, _("Tech Browser"), _(""), True)
 	win.Append(  ID_WIN_HELP, _("Help"), _(""), True)
 
@@ -82,6 +84,7 @@ def create_menu(source, target):
 #	wx.EVT_MENU(source, ID_WIN_ORDERS,		target.OnOrders)
 	wx.EVT_MENU(source, ID_WIN_STARMAP,		target.OnStarMap)
 	wx.EVT_MENU(source, ID_WIN_SYSTEM,		target.OnSystem)
+	wx.EVT_MENU(source, ID_WIN_TIPS,		target.ShowTips)
 #	wx.EVT_MENU(source, ID_WIN_TECH,		target.changeWin)
 #	wx.EVT_MENU(source, ID_WIN_HELP,		target.OnHelp)
 	return bar
@@ -149,12 +152,12 @@ class winMain(winMainBase):
 	def OnProgramExit(self, evt):
 		self.application.Exit()
 
-	def ShowTips(self):
+	def ShowTips(self, override=None):
 		config = load_data("pywx_tips")
 		if not config:
 			config = [True, 0]
 		
-		if config[0]:
+		if config[0] or override != None:
 			tp = wx.CreateFileTipProvider(os.path.join("doc", "tips.txt"), config[1])
 			config[0] = wx.ShowTip(None, tp)
 			config[1] = tp.GetCurrentTip()
