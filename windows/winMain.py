@@ -12,7 +12,7 @@ from utils import *
 from game.events import *
 
 # Local imports
-from winBase import winBase
+from winBase import winMainBase
 
 ID_MENU = 10042
 ID_OPEN = 10043
@@ -36,12 +36,11 @@ ID_WIN_HELP = 1105
 
 ID_HELP = 10057
 
-# Shows messages from the game system to the player.
-class winMain(winBase):
+class winMain(winMainBase):
 	title = "Thousand Parsec"
 	
 	def __init__(self, application, pos=wxDefaultPosition, size=wxDefaultSize, style=wxDEFAULT_FRAME_STYLE):
-		winBase.__init__(self, application, None, pos, size, style)
+		winMainBase.__init__(self, application, None, pos, size, style)
 
 		# Setup to recieve game events
 		application.game.WinConnect(self)

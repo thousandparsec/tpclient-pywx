@@ -112,7 +112,7 @@ class MainControl:
 		from windows.winConnect import winConnect
 		from windows.winMain    import winMain
 		from windows.winMessage import winMessage
-		from windows.winOrder	import winOrder
+		from windows.winOrder   import winOrder
 		from windows.winStarMap import winStarMap
 		from windows.winSystem  import winSystem
 

@@ -8,12 +8,11 @@ from wxPython.wx import *
 
 from extra.wxPostEvent import *
 
-class winBase(wxFrame):
+class winRealBase:
 	def __init__(self, application, parent, 
 			pos=wxDefaultPosition, 
 			size=wxDefaultSize, 
 			style=wxDEFAULT_FRAME_STYLE):
-		wxFrame.__init__(self, parent, -1, 'TP: ' + self.title, pos, size, style)
 		wxHandler(self)
 
 		self.application = application
@@ -26,15 +25,43 @@ class winBase(wxFrame):
 		evt.Veto(true)
 
 	def OnRaise(self, evt):
-		if self.application.windows.config.raise_ == "All on All":
-			# Make sure we are going to do bad stuff on windows.
-			if wxPlatform != '__WXMSW__':
+		if wxPlatform != '__WXMSW__':
+			if self.application.windows.config.raise_ == "All on All":
 				self.application.windows.Raise()
-		elif self.application.windows.config.raise_ == "All on Main":
-			if self.title == "Thousand Parsec":
-				self.application.windows.Raise()
-		elif self.application.windows.config.raise_ == "Individual":
-			pass
-		else:
-			print "Unknown raise method:", self.application.windows.config.raise_
+			elif self.application.windows.config.raise_ == "All on Main":
+				if self.title == "Thousand Parsec":
+					self.application.windows.Raise()
+			elif self.application.windows.config.raise_ == "Individual":
+				pass
+			else:
+				print "Unknown raise method:", self.application.windows.config.raise_
 
+class winMainBase(wxMDIParentFrame, winRealBase):
+	def __init__(self, application, parent, 
+			pos=wxDefaultPosition, 
+			size=wxDefaultSize, 
+			style=wxDEFAULT_FRAME_STYLE):
+		wxMDIParentFrame.__init__(self, None, -1, 'TP: ' + self.title, pos, size, style)
+		winRealBase.__init__(self, application, parent, pos, size, style)
+
+class winNormalBase(wxFrame, winRealBase):
+	def __init__(self, application, parent, 
+			pos=wxDefaultPosition, 
+			size=wxDefaultSize, 
+			style=wxDEFAULT_FRAME_STYLE):
+		wxFrame.__init__(self, parent, -1, 'TP: ' + self.title, pos, size, style)
+		winRealBase.__init__(self, application, parent, pos, size, style)
+    
+class winSubBase(wxMDIChildFrame, winRealBase):
+	def __init__(self, application, parent, 
+			pos=wxDefaultPosition, 
+			size=wxDefaultSize, 
+			style=wxDEFAULT_FRAME_STYLE):
+		wxMDIChildFrame.__init__(self, parent, -1, 'TP: ' + self.title, pos, size, style)
+		winRealBase.__init__(self, application, parent, pos, size, style)
+
+if wxPlatform == '__WXMSW__':
+	winBase = winSubBase
+else:
+	winMainBase = winNormalBase
+	winBase = winNormalBase
