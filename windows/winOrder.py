@@ -180,10 +180,10 @@ class winOrder(winBase):
 			menu.Append(-1, _("Copy"))
 
 			if self.clipboard != None:
-				menu.Append(-1, _("Paste After"))
-				menu.Enable(menu.FindItem(_("Paste After")), nopaste)
 				menu.Append(-1, _("Paste Before"))
 				menu.Enable(menu.FindItem(_("Paste Before")), nopaste)
+				menu.Append(-1, _("Paste After"))
+				menu.Enable(menu.FindItem(_("Paste After")), nopaste)
 		else:
 			new = wx.Menu()
 			new.SetTitle(_("New"))
@@ -204,9 +204,7 @@ class winOrder(winBase):
 		t = item.GetText()
 		if t == _("Delete"):
 			self.OnOrderDelete(None)
-		elif t == _("Cut"):
-			print "Cutting items..."
-		elif t == _("Copy"):
+		elif t in (_("Copy"), _("Cut")):
 			slots = self.order_list.GetSelected()
 
 			if len(slots) < 1:
@@ -217,7 +215,11 @@ class winOrder(winBase):
 			for slot in slots:
 				order = self.application.cache.orders[self.oid][slot]
 				self.clipboard.append(order)
-			
+		
+			if t == _("Cut"):
+				print "Cutting items..."
+				self.OnOrderDelete(None)
+				
 		elif t.startswith(_("Paste")):
 			if self.CheckClipBoard() == False:
 				print "Cant paste because the orders arn't valid on this object."

@@ -1,2 +1,6 @@
-Test Tip 1
-Test Tip 2
+Welcome to pywx-client. This client is written in python using wxPython and should allow to connect to any Thousand Parsec server.
+You can save your favorite window positions in the config dialog.
+You can click on the star map to select objects!
+You can use a wheel mouse to zoom in and out the star map.
+You can right click on the orders windows to access a bunch of quick functions including cut, copy and paste!
+If the paste menu option is grayed out, the orders you are trying to paste are not valid on that object.
