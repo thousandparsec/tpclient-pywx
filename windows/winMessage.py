@@ -71,7 +71,10 @@ class winMessage(winBase):
 		item5.AddWindow( item6, 0, wx.GROW|wx.ALIGN_CENTER_HORIZONTAL|wx.ALL, 1 )
 
 		self.html = item6
-		self.html.SetFonts("Swiss", "Courier", [4, 6, 8, 10, 12, 14, 16])
+		if wx.Platform == "__WXMAC__":
+			self.html.SetFonts("Swiss", "Courier", [10, 12, 14, 16, 20, 24])
+		else:
+			self.html.SetFonts("Swiss", "Courier", [4, 6, 8, 10, 12, 14, 16])
 		self.html.SetPage("")
 
 		item7 = wx.BoxSizer( wx.VERTICAL )
