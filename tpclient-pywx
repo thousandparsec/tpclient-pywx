@@ -128,7 +128,9 @@ class AppTP(wx.App):
 			# Download the objects inside this object
 			if len(object.contains) > 0:
 				# Set the parent relationship
-				for nobject in self.connection.get_objects(object.contains):
+				nobjects = self.connection.get_objects(object.contains)
+				print "nobjects:", str(nobjects)
+				for nobject in nobjects:
 					if failed(nobject):
 						print nobject
 						continue
