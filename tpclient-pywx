@@ -17,8 +17,81 @@ from network.nthread import network_thread
 from network.events import *
 
 from utils import *
+from config import *
 
-class mainControl:
+class MainControl:
+
+	def ConfigLoad(self):
+		config = load_data("windows")
+
+		if not config:
+
+			# Create some default positioning, good for 1024x768 on linux
+			config = Blank()
+			config.main = Blank()
+			config.message = Blank()
+			config.starmap = Blank()
+			config.system = Blank()
+
+			sc_width = 1024
+			sc_height = 768
+
+			map_width = 600
+			map_height = 500
+
+			padding = 5
+
+			middle = sc_width-map_width-padding
+
+			config.main.pos = (0,0)
+			config.main.size = (middle, 50)
+			config.main.show = TRUE
+			
+			config.message.pos = (0, map_height-padding*4)
+			config.message.size = (middle, 200)
+			config.message.show = TRUE
+
+			config.starmap.pos = (middle+padding, 0)
+			config.starmap.size = (map_width-padding, map_height-padding*2)
+			config.starmap.show = TRUE
+
+			config.system.pos = (middle+padding, map_height)
+			config.system.size = (map_width-padding, 200)
+			config.system.show = TRUE
+		
+			config.raise_ = "All on All" 
+	
+		return config
+
+	def ConfigSave(self):
+		config = self.config
+		config.main.pos = self.main.GetPosition()
+		config.main.size = self.main.GetSize()
+		config.message.pos = self.message.GetPosition()
+		config.message.size = self.message.GetSize()
+		config.starmap.pos = self.starmap.GetPosition()
+		config.starmap.size = self.starmap.GetSize()
+		config.system.pos = self.system.GetPosition()
+		config.system.size = self.system.GetSize()
+
+		save_data("windows", config)
+
+	def ConfigActivate(self):
+		config = self.config
+
+		self.main.SetPosition(config.main.pos)
+		self.main.SetSize(config.main.size)
+		self.main.Show(config.main.show)
+		self.message.SetPosition(config.message.pos)
+		self.message.SetSize(config.message.size)
+		self.message.Show(config.message.show)
+		self.starmap.SetPosition(config.starmap.pos)
+		self.starmap.SetSize(config.starmap.size)
+		self.starmap.Show(config.starmap.show)
+		self.system.SetPosition(config.system.pos)
+		self.system.SetSize(config.system.size)
+		self.system.Show(config.system.show)
+
 	def __init__(self, app):
 
 		self.app = app
@@ -26,63 +99,71 @@ class mainControl:
 		##########
 		# Load the windows
 		##########
+		from windows.winConfig  import winConfig
 		from windows.winConnect import winConnect
 		from windows.winMain    import winMain
-		from windows.winStarMap import winStarMap
 		from windows.winMessage import winMessage
+		from windows.winStarMap import winStarMap
 		from windows.winSystem  import winSystem
 
-		sc_width = 1024
-		sc_height = 768
+		config = self.ConfigLoad()
+		self.config = config
 
-		map_width = 600
-		map_height = 500
+		self.main = winMain(app, config.main.pos, config.main.size)
 
-		padding = 5
-
-		middle = sc_width-map_width-padding
-
+		self.winconfig = winConfig(app, self.main)
 		self.connect = winConnect(app, -1, None)
 		
-		self.main    = winMain(app, (0,0), (middle,50))
-		self.message = winMessage(app, self.main, (0,map_height-padding*4), (middle,200))
+		self.message = winMessage(app, self.main, config.message.pos, config.message.size)
 		
-		self.map     = winStarMap(app, self.main, (middle+padding,0), (map_width-padding, map_height-padding*2))
-		self.system  = winSystem(app, self.main, (middle+padding,map_height), (map_width-padding, 200))
+		self.starmap = winStarMap(app, self.main, config.starmap.pos, config.starmap.size)
+		self.system = winSystem(app, self.main, config.system.pos, config.system.size)
 
-	def raise_(self):
+	def Raise(self):
 		"""\
 			Raise all the windows.
 		"""
 		self.system.Raise()
 		self.message.Raise()
-		self.map.Raise()
+		self.starmap.Raise()
 		self.main.Raise()
 
-	def show(self):
+		self.winconfig.Raise()
+		self.connect.Raise()
+
+	def Show(self):
 		"""\
 			Show the main window
 		"""
-		self.main.Show(TRUE)
-		self.map.Show(TRUE)
-		self.message.Show(TRUE)
-		self.system.Show(TRUE)
+		config = self.config
+		self.main.Show(config.main.show)
+		self.message.Show(config.message.show)
+		self.starmap.Show(config.starmap.show)
+		self.system.Show(config.system.show)
 
-	def hide(self):
+	def Hide(self):
 		"""\
 			Show the main window
 		"""
 		self.main.Show(FALSE)
-		self.map.Show(FALSE)
 		self.message.Show(FALSE)
+		self.starmap.Show(FALSE)
 		self.system.Show(FALSE)
 
-class appTP(wxApp):
+class AppTP(wxApp):
+	def ConfigLoad(self):
+		config = load_data("windows")
+
+		if not config:
+
+			# Create some default positioning, good for 1024x768 on linux
+			config = Blank()
+	
 	def OnInit(self):
 		wxInitAllImageHandlers()
 
 		try:
-			self.windows = mainControl(self)
+			self.windows = MainControl(self)
 		except:
 			do_traceback()
 		self.connected = FALSE
@@ -173,7 +254,7 @@ class appTP(wxApp):
 
 if __name__ == '__main__':
 	try:
-		app = appTP()
+		app = AppTP()
 		app.MainLoop()
 	finally:
 		do_traceback()

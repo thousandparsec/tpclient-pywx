@@ -1,3 +1,7 @@
+"""\
+This module contains the "connect" window which lets a
+person enter the server/username/password.
+"""
 
 from wxPython.wx import *
 from wxPython.lib.anchors import LayoutAnchors
@@ -8,20 +12,6 @@ from utils import *
 
 from extra.wxProgressDialog import wxProgressDialog
 from extra.evtmgr import eventManager
-
-#if wxVERSION_NUMBER <= 2302:
-#	class wxProgressDialog:
-#		def __init__(self, *kw, **args):
-#			print "Your version of wxPython doesn't have working Progress dialogs."
-#			print "If you want progress dialogs please upgrade to a newer version."
-#
-#		def Update(self, no):
-#			pass
-#
-#try:
-#	from wxPython.lib.evtmgr import eventManager
-#except ImportError:
-#	from extra.evtmgr import eventManager
 
 defaultServers = ["127.0.0.1:6923","code-bear.dyndns.org:6923","mithro.dyndns.org:6923"] 
 
@@ -106,19 +96,19 @@ class winConnect(wxFrame):
 		EVT_BUTTON(self, ID_CANCEL, self.OnCancel)
 		EVT_CLOSE(self, self.OnExit)
 
-	def OnCancel(self, event):
-		self.OnExit(event)
+	def OnCancel(self, evt):
+		self.OnExit(evt)
 
-	def OnExit(self, event):
+	def OnExit(self, evt):
 		# Check if the server is connected
 		self.Show(FALSE)
 		if self.parent.logined:
-			self.parent.windows.show()
+			self.parent.windows.Show()
 		else:
 			# Exit then
 			self.parent.Exit()
 			
-	def OnOkay(self, event):
+	def OnOkay(self, evt):
 		host = self.obj['host'].GetValue()
 		username = self.obj['username'].GetValue()
 		password = self.obj['password'].GetValue()
@@ -150,11 +140,11 @@ class winConnect(wxFrame):
 				# Pop-up a dialog telling us why it didn't succed.
 				do_traceback()
 
-	def OnConnection(self, event):
+	def OnConnection(self, evt):
 		try:
 			eventManager.DeregisterListener(self.OnConnection)
 
-			if event != None and isinstance(event.value, protocol.Ok):
+			if evt != None and isinstance(evt.value, protocol.Ok):
 				print "Connect Worked!"
 				eventManager.Register(self.OnLogin, EVT_NETWORK_PACKET, self)
 				self.progress.Update(2)
@@ -162,7 +152,7 @@ class winConnect(wxFrame):
 				print "Connect Failed!"
 				# Oh no! we didn't connect!
 				self.progress.Update(5)
-				self.progress.Destroy()
+				#self.progress.Destroy()
 
 				dlg = wxMessageDialog(self, 'The connection failed, this could be because,\n' +
 											'the server could be busy,\n' +
@@ -177,11 +167,11 @@ class winConnect(wxFrame):
 			if hasattr(self.parent, "network") and self.parent.network.locked():
 				self.parent.network.next()
 
-	def OnLogin(self, event):
+	def OnLogin(self, evt):
 		try:
 			self.progress.Update(3)
 		
-			if isinstance(event.value, protocol.Ok):
+			if isinstance(evt.value, protocol.Ok):
 				print "Login Worked!"
 				eventManager.DeregisterListener(self.OnLogin)
 			
@@ -190,7 +180,7 @@ class winConnect(wxFrame):
 				self.OnExit(None)
 			
 				self.progress.Update(5)
-			elif isinstance(event.value, protocol.Fail):
+			elif isinstance(evt.value, protocol.Fail):
 				# Show a message box
 				print "Login Failed!"
 				self.progress.Update(5)

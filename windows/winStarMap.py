@@ -1,3 +1,7 @@
+"""\
+This module contains the StarMap window. This window displays a view of the
+universe.
+"""
 
 import os
 from math import *
@@ -111,7 +115,7 @@ class winStarMap(winBase):
 				EVT_RIGHT_UP(self, self.OnRightUp)
 				EVT_MOTION(self, self.OnMotion)
 
-			def OnPaint(self, event):
+			def OnPaint(self, evt):
 				#print "On paint!"
 				dst = wxPaintDC(self)
 				self.PrepareDC(dst)
@@ -122,20 +126,20 @@ class winStarMap(winBase):
 				self.parent.RenderMap((x*px, y*py), (x*px+w, y*py+h), dst)
 
 
-			def OnMotion(self, event):
+			def OnMotion(self, evt):
 				"""
 				Called when the mouse is in motion.  If the left button is
 				dragging then draw a line from the last event position to the
 				current one.  Save the coordinants for redraws.
 				"""
-				if event.Dragging() and event.LeftIsDown():
+				if evt.Dragging() and evt.LeftIsDown():
 					dc = wxClientDC(self)
 					self.PrepareDC(dc)
 
 					self.parent.RenderDrag(dc)
 
 					start = self.parent.start
-					end = self.ConvertEventCoords(event)
+					end = self.ConvertEventCoords(evt)
 					self.parent.end = end
 ##					x,y = self.GetViewStart()
 ##					h,w = self.GetClientSize()
@@ -145,13 +149,13 @@ class winStarMap(winBase):
 					
 					self.parent.RenderDrag(dc)
 				
-				self.parent.SetStatusText("X: %i, Y: %i, Z: 0" % self.ConvertEventCoords(event), 2)
+				self.parent.SetStatusText("X: %i, Y: %i, Z: 0" % self.ConvertEventCoords(evt), 2)
 
-			def OnLeftDown(self, event):
+			def OnLeftDown(self, evt):
 				"""called when the left mouse button is pressed"""
-				#print event.GetX(), event.GetY()
-				#print self.ConvertEventCoords(event)
-				self.parent.start = self.ConvertEventCoords(event)
+				#print evt.GetX(), evt.GetY()
+				#print self.ConvertEventCoords(evt)
+				self.parent.start = self.ConvertEventCoords(evt)
 				self.end = self.parent.start
 				self.CaptureMouse()
 				self.parent.dragging = 1
@@ -160,7 +164,7 @@ class winStarMap(winBase):
 				self.PrepareDC(dc)
 				self.parent.RenderDrag(dc)
 
-			def OnLeftUp(self, event):
+			def OnLeftUp(self, evt):
 				"""called when the left mouse button is released"""
 				dc = wxClientDC(self)
 				self.PrepareDC(dc)
@@ -172,13 +176,13 @@ class winStarMap(winBase):
 				# Call the approiate call
 				
 
-			def OnRightUp(self, event):
+			def OnRightUp(self, evt):
 				pass
 
-			def ConvertEventCoords(self, event):
+			def ConvertEventCoords(self, evt):
 				xView, yView = self.GetViewStart()
 				xDelta, yDelta = self.GetScrollPixelsPerUnit()
-				return (event.GetX() + (xView * xDelta), event.GetY() + (yView * yDelta))
+				return (evt.GetX() + (xView * xDelta), evt.GetY() + (yView * yDelta))
 	
 
 		self.windowScroll = starCanvas(self)
@@ -190,12 +194,12 @@ class winStarMap(winBase):
 		self.graphics = {}
 		self.graphics['background'] = wxImage(os.path.join("graphics", "space_back.gif")).ConvertToBitmap()
 
-	def OnPaint(self, event):
-		print "On pain! main"
+	def OnPaint(self, evt):
+		print "On paint! main"
 
 	def RenderMap(self, startpos, endpos, dc=None):
 
-		print "rendering", dc
+		#print "rendering", dc
 
 		dc.BeginDrawing()
 		dc.SetBackground(wxBrush(wxBLACK, wxSOLID))

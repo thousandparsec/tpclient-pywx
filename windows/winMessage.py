@@ -1,3 +1,9 @@
+"""\
+This module contains the message window, it displays all the ingame messages and
+lets the player filter out unimportant messages.
+
+Messages are displayed using basic HTML.
+"""
 
 from copy import deepcopy
 

@@ -1,0 +1,17 @@
+
+The pywx-client for Thousand Parsec (TP)
+============================================
+
+Requirements:
+	python 2.2
+	wxPython 2.3 (recommended 2.4)
+
+How to use
+============================================
+
+Install python
+Install wxPython
+
+In windows, double click on main.py
+In linux, change to the pywx-client directory and run "python main.py"
+

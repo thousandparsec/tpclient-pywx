@@ -435,29 +435,225 @@ def panelConnect( parent, call_fit = true, set_sizer = true ):
     
     return item0
 
+ID_NOTEBOOK = 10045
+
+def panelConfig( parent, call_fit = true, set_sizer = true ):
+    item0 = wxBoxSizer( wxHORIZONTAL )
+    
+    item2 = wxNotebook( parent, ID_NOTEBOOK, wxDefaultPosition, wxDefaultSize, 0 )
+    item1 = wxNotebookSizer( item2 )
+
+    item3 = wxPanel( item2, -1 )
+    panelConfigStartup( item3, false )
+    item2.AddPage( item3, "Startup" )
+
+    item4 = wxPanel( item2, -1 )
+    panelConfigWindows( item4, false )
+    item2.AddPage( item4, "Windows" )
+
+    item0.AddSizer( item1, 0, wxGROW|wxALIGN_CENTER_HORIZONTAL|wxALL, 0 )
+
+    if set_sizer == true:
+        parent.SetAutoLayout( true )
+        parent.SetSizer( item0 )
+        if call_fit == true:
+            item0.Fit( parent )
+            item0.SetSizeHints( parent )
+    
+    return item0
+
+ID_SPLASH = 10046
+ID_AUTOCONNECT = 10047
+ID_TIPS = 10048
+ID_AUTOSERVER = 10049
+ID_AUTOUSERNAME = 10050
+ID_AUTOPASSWORD = 10051
+ID_SAVE = 10052
+ID_REVERT = 10053
+
+def panelConfigStartup( parent, call_fit = true, set_sizer = true ):
+    item0 = wxBoxSizer( wxVERTICAL )
+    
+    item1 = wxBoxSizer( wxHORIZONTAL )
+    
+    item2 = wxBoxSizer( wxVERTICAL )
+    
+    item3 = wxCheckBox( parent, ID_SPLASH, "Show Splash Screen", wxDefaultPosition, wxDefaultSize, 0 )
+    item2.AddWindow( item3, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 )
+
+    item4 = wxCheckBox( parent, ID_AUTOCONNECT, "Connect on Startup", wxDefaultPosition, wxDefaultSize, 0 )
+    item2.AddWindow( item4, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 )
+
+    item5 = wxCheckBox( parent, ID_TIPS, "Show Welcome Tips", wxDefaultPosition, wxDefaultSize, 0 )
+    item2.AddWindow( item5, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 )
+
+    item1.AddSizer( item2, 0, wxALIGN_CENTRE|wxALL, 5 )
+
+    item6 = wxGridSizer( 0, 2, 0, 0 )
+    
+    item7 = wxStaticText( parent, ID_TEXT, "Startup Server", wxDefaultPosition, wxDefaultSize, 0 )
+    item6.AddWindow( item7, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxALL, 5 )
+
+    item8 = wxComboBox( parent, ID_AUTOSERVER, "", wxDefaultPosition, wxSize(100,-1), [], wxCB_DROPDOWN )
+    item8.SetToolTip( wxToolTip("The server to connect to on autoconnect.") )
+    item8.Enable(false)
+    item6.AddWindow( item8, 0, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 5 )
+
+    item9 = wxStaticText( parent, ID_TEXT, "Username", wxDefaultPosition, wxDefaultSize, 0 )
+    item6.AddWindow( item9, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxALL, 5 )
+
+    item10 = wxComboBox( parent, ID_AUTOUSERNAME, "", wxDefaultPosition, wxSize(100,-1), [], wxCB_DROPDOWN )
+    item10.SetToolTip( wxToolTip("The username to use on autoconnect.") )
+    item10.Enable(false)
+    item6.AddWindow( item10, 0, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 5 )
+
+    item11 = wxStaticText( parent, ID_TEXT, "Password", wxDefaultPosition, wxDefaultSize, 0 )
+    item6.AddWindow( item11, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxALL, 5 )
+
+    item12 = wxTextCtrl( parent, ID_AUTOPASSWORD, "", wxDefaultPosition, wxSize(80,-1), wxTE_PASSWORD )
+    item12.Enable(false)
+    item6.AddWindow( item12, 0, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 5 )
+
+    item1.AddSizer( item6, 0, wxALIGN_CENTRE|wxALL, 5 )
+
+    item0.AddSizer( item1, 0, wxALIGN_CENTRE|wxALL, 5 )
+
+    item13 = wxBoxSizer( wxHORIZONTAL )
+    
+    item14 = wxButton( parent, ID_SAVE, "Save", wxDefaultPosition, wxDefaultSize, 0 )
+    item14.SetDefault()
+    item13.AddWindow( item14, 0, wxALIGN_CENTRE|wxALL, 5 )
+
+    item15 = wxButton( parent, ID_REVERT, "Revert", wxDefaultPosition, wxDefaultSize, 0 )
+    item13.AddWindow( item15, 0, wxALIGN_CENTRE|wxALL, 5 )
+
+    item0.AddSizer( item13, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxALL, 5 )
+
+    if set_sizer == true:
+        parent.SetAutoLayout( true )
+        parent.SetSizer( item0 )
+        if call_fit == true:
+            item0.Fit( parent )
+            item0.SetSizeHints( parent )
+    
+    return item0
+
+ID_MESSAGE = 10054
+ID_CHECKBOX = 10055
+ID_RAISE = 10056
+ID_RADIOBOX = 10057
+ID_XPOS = 10058
+ID_YPOS = 10059
+ID_WIDTH = 10060
+ID_HEIGHT = 10061
+
+def panelConfigWindows( parent, call_fit = true, set_sizer = true ):
+    item0 = wxBoxSizer( wxVERTICAL )
+    
+    item1 = wxBoxSizer( wxHORIZONTAL )
+    
+    item3 = wxStaticBox( parent, -1, "Show Windows" )
+    item2 = wxStaticBoxSizer( item3, wxVERTICAL )
+    
+    item4 = wxCheckBox( parent, ID_MESSAGE, "Message", wxDefaultPosition, wxDefaultSize, 0 )
+    item2.AddWindow( item4, 0, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 5 )
+
+    item5 = wxCheckBox( parent, ID_CHECKBOX, "Order", wxDefaultPosition, wxDefaultSize, 0 )
+    item2.AddWindow( item5, 0, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 5 )
+
+    item6 = wxCheckBox( parent, ID_CHECKBOX, "StarMap", wxDefaultPosition, wxDefaultSize, 0 )
+    item2.AddWindow( item6, 0, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 5 )
+
+    item7 = wxCheckBox( parent, ID_CHECKBOX, "System", wxDefaultPosition, wxDefaultSize, 0 )
+    item2.AddWindow( item7, 0, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 5 )
+
+    item1.AddSizer( item2, 0, wxGROW|wxALIGN_CENTER_HORIZONTAL|wxALL, 5 )
+
+    item8 = wxRadioBox( parent, ID_RAISE, "Raise", wxDefaultPosition, wxDefaultSize, 
+        ["Individual","All on Main","All on All"] , 1, wxRA_SPECIFY_COLS )
+    item8.SetToolTip( wxToolTip("Choose a method for raising the windows.") )
+    item1.AddWindow( item8, 0, wxGROW|wxALIGN_CENTER_HORIZONTAL|wxALL, 5 )
+
+    item9 = wxRadioBox( parent, ID_RADIOBOX, "Window", wxDefaultPosition, wxDefaultSize, 
+        ["Message","Order","StarMap","System"] , 1, wxRA_SPECIFY_COLS )
+    item1.AddWindow( item9, 0, wxGROW|wxALIGN_CENTER_HORIZONTAL|wxALL, 5 )
+
+    item11 = wxStaticBox( parent, -1, "Attributes" )
+    item10 = wxStaticBoxSizer( item11, wxVERTICAL )
+    
+    item12 = wxFlexGridSizer( 0, 2, 0, 0 )
+    item12.AddGrowableCol( 1 )
+    
+    item13 = wxStaticText( parent, ID_TEXT, "X Position", wxDefaultPosition, wxDefaultSize, 0 )
+    item12.AddWindow( item13, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxALL, 5 )
+
+    item14 = wxSpinCtrl( parent, ID_XPOS, "0", wxDefaultPosition, wxSize(50,-1), 0, 0, 10000, 0 )
+    item12.AddWindow( item14, 0, wxALIGN_CENTRE|wxALL, 5 )
+
+    item15 = wxStaticText( parent, ID_TEXT, "Y Position", wxDefaultPosition, wxDefaultSize, 0 )
+    item12.AddWindow( item15, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxALL, 5 )
+
+    item16 = wxSpinCtrl( parent, ID_YPOS, "0", wxDefaultPosition, wxSize(50,-1), 0, 0, 1000, 0 )
+    item12.AddWindow( item16, 0, wxALIGN_CENTRE|wxALL, 5 )
+
+    item17 = wxStaticText( parent, ID_TEXT, "Width", wxDefaultPosition, wxDefaultSize, 0 )
+    item12.AddWindow( item17, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxALL, 5 )
+
+    item18 = wxSpinCtrl( parent, ID_WIDTH, "0", wxDefaultPosition, wxSize(50,-1), 0, 0, 100, 0 )
+    item12.AddWindow( item18, 0, wxALIGN_CENTRE|wxALL, 5 )
+
+    item19 = wxStaticText( parent, ID_TEXT, "Height", wxDefaultPosition, wxDefaultSize, 0 )
+    item12.AddWindow( item19, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxALL, 5 )
+
+    item20 = wxSpinCtrl( parent, ID_HEIGHT, "0", wxDefaultPosition, wxSize(50,-1), 0, 0, 100, 0 )
+    item12.AddWindow( item20, 0, wxALIGN_CENTRE|wxALL, 5 )
+
+    item10.AddSizer( item12, 0, wxALIGN_CENTRE|wxALL, 5 )
+
+    item1.AddSizer( item10, 0, wxGROW|wxALIGN_CENTER_HORIZONTAL|wxALL, 5 )
+
+    item0.AddSizer( item1, 0, wxALIGN_CENTRE|wxALL, 5 )
+
+    item21 = wxBoxSizer( wxHORIZONTAL )
+    
+    item22 = wxButton( parent, ID_SAVE, "Save", wxDefaultPosition, wxDefaultSize, 0 )
+    item21.AddWindow( item22, 0, wxALIGN_CENTRE|wxALL, 5 )
+
+    item23 = wxButton( parent, ID_REVERT, "Revert", wxDefaultPosition, wxDefaultSize, 0 )
+    item21.AddWindow( item23, 0, wxALIGN_CENTRE|wxALL, 5 )
+
+    item0.AddSizer( item21, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxALL, 5 )
+
+    if set_sizer == true:
+        parent.SetAutoLayout( true )
+        parent.SetSizer( item0 )
+        if call_fit == true:
+            item0.Fit( parent )
+            item0.SetSizeHints( parent )
+    
+    return item0
+
 # Menubar functions
 
-ID_NEW_GAME = 10045
-ID_NEW_RACE = 10046
-ID_NEW = 10047
-ID_MENU = 10048
-ID_OPEN = 10049
-ID_SAVE = 10050
-ID_CLOSE = 10051
-ID_REVERT = 10052
-ID_LOADTURN = 10053
-ID_GENTURN = 10054
-ID_EXIT = 10055
-ID_FILE = 10056
-ID_STAT_EAAG = 10057
-ID_STAT_SYSTEM = 10058
-ID_STAT_PLANET = 10059
-ID_STAT_FLEET = 10060
-ID_STAT_BATTLE = 10061
-ID_STATS = 10062
-ID_WIN_STARMAP = 10063
-ID_WIN = 10064
-ID_HELP = 10065
+ID_NEW_GAME = 10062
+ID_NEW_RACE = 10063
+ID_NEW = 10064
+ID_MENU = 10065
+ID_OPEN = 10066
+ID_CLOSE = 10067
+ID_LOADTURN = 10068
+ID_GENTURN = 10069
+ID_EXIT = 10070
+ID_FILE = 10071
+ID_STAT_EAAG = 10072
+ID_STAT_SYSTEM = 10073
+ID_STAT_PLANET = 10074
+ID_STAT_FLEET = 10075
+ID_STAT_BATTLE = 10076
+ID_STATS = 10077
+ID_WIN_STARMAP = 10078
+ID_WIN = 10079
+ID_HELP = 10080
 
 def MainMenu():
     item0 = wxMenuBar()

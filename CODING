@@ -1,0 +1,11 @@
+
+
+
+doc 		- Documentation of the client goes here
+extra 		- Compatibility stuff goes here, from example the evtmgr which is only in wxPython 2.4
+game 		- Game stuff like the objects (ships/planets/etc), map, etc
+graphics 	- Graphics used by the client directly. NOT in-game graphics.
+network 	- All the network related stuff
+windows 	- All the graphics "windows" stuff
+wxDesigner 	- Contains wxDesigner project files used as a base for the windows.
+var			- Contains all the user data, etc...

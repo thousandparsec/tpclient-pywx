@@ -1,3 +1,7 @@
+"""\
+This module contains the wxPython event definitions for
+network events.
+"""
 
 from wxPython.wx import *
 

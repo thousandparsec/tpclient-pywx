@@ -1,3 +1,8 @@
+"""\
+This module contains the "base" for all main windows. It does things
+like prepending "TP:" to the title, vetoing closing of the window
+and raising all the other windows when one is clicked.
+"""
 
 from wxPython.wx import *
 
@@ -18,6 +23,12 @@ class winBase(wxFrame):
 		evt.Veto(true)
 
 	def OnRaise(self, evt):
-		if wxPlatform != '__WXMSW__':
-			self.application.windows.raise_()
-		
+		if self.application.windows.config.raise_ == "All on All":
+			# Make sure we are going to do bad stuff on windows.
+			if wxPlatform != '__WXMSW__':
+				self.application.windows.Raise()
+		elif self.application.windows.config.raise_ == "All on Main" and self.title == "Main":
+			self.application.windows.Raise()
+		else:
+			print "Unknown raise method:", self.application.windows.config.raise_
+

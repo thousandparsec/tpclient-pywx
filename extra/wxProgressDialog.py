@@ -1,3 +1,7 @@
+"""\
+This module creates a fake progress bar for older versions of wxPython 
+where it is broken and won't close properly.
+"""
 
 from wxPython.wx import wxVERSION_NUMBER
 

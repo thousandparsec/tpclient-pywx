@@ -1,3 +1,7 @@
+"""\
+This module contains the System window. The System window displays all objects
+at this current location and "quick" details about them.
+"""
 
 from winBase import winBase
 

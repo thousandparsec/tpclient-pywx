@@ -1,0 +1,12 @@
+
+# Show the splash screen on startup
+splash = TRUE
+
+# Show the "tips" on startup
+tips = TRUE
+
+# On startup connect to the default server
+autoconnect = FALSE
+
+# 
+

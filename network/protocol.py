@@ -1,3 +1,7 @@
+"""\
+This module contains the code and objects for working with
+the Thousand Parsec protocol.
+"""
 
 from struct import *
 from cStringIO import StringIO

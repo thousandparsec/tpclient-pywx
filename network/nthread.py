@@ -1,3 +1,7 @@
+"""\
+This module contains the code for the network thread which
+dispatchs events for incoming packets.
+"""
 
 from wxPython.wx import * 
 
