@@ -55,7 +55,7 @@ class winBaseMixIn:
 		self.Bind(wx.EVT_CLOSE, self.OnProgramExit)
 
 	def OnProgramExit(self, evt):
-		evt.Veto(true)
+		evt.Veto(True)
 
 	def OnRaise(self, evt):
 		if wx.Platform != '__WXMSW__':
@@ -114,9 +114,6 @@ class winNormalSubBase(wx.MiniFrame, winBaseMixIn):
 if wx.Platform == '__WXMSW__':
 	winMainBase = winMDIBase
 	winBase = winMDISubBase
-elif wx.Platform == ' __WXMAC__':
-	winMainBase = winNormalBase
-	winBase = winNormalBase
 else:
 	winMainBase = winNormalBase
 	winBase = winNormalSubBase

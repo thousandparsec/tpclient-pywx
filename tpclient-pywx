@@ -69,7 +69,7 @@ class AppTP(wx.App):
 	def __init__(self):
 		wx.App.__init__(self)
 
-		if wx.Platform == '__WXMSW__':
+		if wx.Platform in ('__WXMSW__', '__WXMAC__'):
 			class Null(object):
 				def write(self, *args, **kw):
 					pass

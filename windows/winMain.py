@@ -87,6 +87,13 @@ class winMain(winMainBase):
 		self.SetMenuBar(bar)
 		self.CreateStatusBar(1, wx.ST_SIZEGRIP)
 
+		if wx.Platform == "__WXMAC__":
+			for value in self.appliaction.windows.__dict__.values():
+				if hasattr(value, "SetMenuBar"):
+					value.SetMenuBar(bar)
+
+			self.Show(False)
+
 	def OnConnect(self, evt):
 		self.application.windows.Hide()
 		self.application.windows.connect.Show(True)

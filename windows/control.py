@@ -49,6 +49,33 @@ class MainControl:
 			
 				config.raise_ = "Individual" 
 				
+			elif wx.Platform == '__WXMAC__':
+				config.main.pos = (0,0)
+				config.main.size = (1024, 768)
+				config.main.show = False
+			
+				config.info.pos = (0,0)
+				config.info.size = (425, 175)
+				config.info.show = True
+				
+				config.order.pos = (0, 176)
+				config.order.size = (213, 327)
+				config.order.show = True
+
+				config.message.pos = (0, 504)
+				config.message.size = (396, 163)
+				config.message.show = True
+
+				config.starmap.pos = (426, 0)
+				config.starmap.size = (600, 523)
+				config.starmap.show = True
+
+				config.system.pos = (769, 523)
+				config.system.size = (257, 218)
+				config.system.show = True
+			
+				config.raise_ = "All on All" 
+
 			else:
 				# Create some default positioning, good for 1024x768 on linux
 				config.main.pos = (0,0)
