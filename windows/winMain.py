@@ -16,6 +16,7 @@ from utils import *
 
 ID_MENU = 10042
 ID_OPEN = 10043
+ID_UNIV = 10044
 ID_REVERT = 10046
 ID_CONFIG = 10047
 ID_EXIT = 10049
@@ -42,6 +43,7 @@ def create_menu(source, target):
 	# File Menu
 	file = wx.Menu()
 	file.Append( ID_OPEN, _("Connect to Game\tCtrl-O"), _("Connect to a diffrent Game") )
+	file.Append( ID_UNIV, _("Download the Universe\tCtrl-U"), _("Download the Universe") )
 	file.AppendSeparator()
 	file.Append( ID_CONFIG, _("Config"), _("Configure the Client") )
 	file.AppendSeparator()
@@ -77,6 +79,7 @@ def create_menu(source, target):
 	bar.Append( help, _("&Help") )
 
 	wx.EVT_MENU(source, ID_OPEN,	target.OnConnect)
+	wx.EVT_MENU(source, ID_UNIV,	target.UpdateCache)
 	wx.EVT_MENU(source, ID_CONFIG,	target.OnConfig)
 	wx.EVT_MENU(source, ID_EXIT,	target.OnProgramExit)
 
@@ -163,4 +166,9 @@ class winMain(winMainBase):
 			config[1] = tp.GetCurrentTip()
 
 			save_data("pywx_tips", config)
+
+	def UpdateCache(self, evt=None):
+		self.application.windows.Hide()
+		self.application.CacheUpdate()
+		self.application.windows.Show()
 
