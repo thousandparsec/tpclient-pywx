@@ -23,28 +23,32 @@ from tp.netlib.objects.OrderExtra.Move import Move
 from winBase import *
 from utils import *
 
-#wxRED = wxColor()
-wxYELLOW = wx.Color(0xD6, 0xDC, 0x2A)
+MOVE_TYPE = 1
 
-POINT = 4
-
-sysPLAIN = 1
-sysOWNER = 2
-sysHAB = 3
-sysMIN = 4
-
-def getpath(application, object):
+def getpath(application, object, overrides={}):
+	"""\
+	Returns a set of points which show the path of the object.
+	"""
 	orders = application.cache.orders[object.id]
 	points = [object.pos[0:2]]
-	for order in orders:
-		if order.type == 1:
+
+	for slot in range(0, len(orders)):
+		if not overrides.has_key(slot):
+			order = orders[slot]
+		else:
+			order = overrides[slot]
+
+		if order.type == MOVE_TYPE:
 			points += [order.pos[0:2]]
-					
+	
 	if len(points) > 1:
 		return points
 	return None
 
 def scale(value):
+	"""\
+	Scales the positions to a better size.
+	"""
 	if hasattr(value, "__getitem__"):
 		r = []
 		for i in value:
@@ -69,9 +73,6 @@ class winStarMap(winBase):
 		self.path = None
 
 		self.mode = "Normal"
-
-	def OnCacheUpdate(self, evt):
-		self.Rebuild()
 
 	def Rebuild(self):
 		try:
@@ -98,7 +99,7 @@ class winStarMap(winBase):
 				if isinstance(object, Fleet):
 					points = getpath(application, object)
 					if points:
-						C(object, Line(scale(points), LineColor="Grey"), as="path")
+						C(object, Line(scale(points), LineColor="Grey", InForeground=True), as="path")
 
 					parent = application.cache.objects[object.parent]
 					if parent.pos == object.pos:
@@ -160,25 +161,39 @@ class winStarMap(winBase):
 		
 		ac(self.application.cache.objects, menu, obj)
 
-		self.Bind(wx.EVT_MENU, self.OnOrderMenu)
+		self.Bind(wx.EVT_MENU, self.OnContextMenu)
 		self.PopupMenu(menu, evt.GetPosition())
 
-	def OnOrderMenu(self, evt):
+	def OnContextMenu(self, evt):
 		menu = evt.GetEventObject()
 		item = menu.FindItemById(evt.GetId())
 
-		self.application.windows.Post(wx.local.SelectObjectEvent(evt.GetId()))
-		
 		if self.mode == "Position":
+			pos = self.application.cache.objects[evt.GetId()].pos
+			self.application.windows.Post(wx.local.SelectPositionEvent(pos))
+			
 			self.SetMode("Normal")
+		else:
+			self.application.windows.Post(wx.local.SelectObjectEvent(evt.GetId()))
 
 	def SetMode(self, mode):
 		if mode in ("Normal", "Position"):
 			self.mode = mode
 
+	####################################################
+	# Remote Event Handlers
+	####################################################
+	def OnCacheUpdate(self, evt):
+		"""\
+		Called when the cache has been updated.
+		"""
+		self.Rebuild()
+
 	def OnSelectObject(self, evt):
+		"""\
+		Called when an object is selected.
+		"""
 		object = self.application.cache.objects[evt.id]
-		print "Selecting object", evt.id
 
 		self.arrow.Move(scale(object.pos))
 		if self.path:
@@ -192,29 +207,57 @@ class winStarMap(winBase):
 	
 		self.Canvas.Draw()
 
-	def OnSelectOrder(self, evt):
+	def OnUpdateOrder(self, evt):
+		"""\
+		Called when an order is updated.
+		"""
 		object = self.application.cache.objects[evt.id]
-		
+
+		dirty = False
+
 		if self.path:
 			self.Canvas.RemoveObject(self.path)
 			self.path = None
-
+			dirty = True
+			
 		if isinstance(object, Fleet):
 			points = getpath(self.application, object)
+
+			if self.cache.has_key(evt.id) and self.cache[evt.id].has_key("path"):
+				self.Canvas.RemoveObject(self.cache[evt.id]["path"])
+
+			# Update the lines
 			if points:
+				self.Create(object, Line(scale(points), LineColor="Grey", InForeground=True), as="path")
 				self.path = self.Create(object, Line(scale(points), LineColor="Blue", InForeground=True))
 		
-			if evt.save:
-				# Need to update the grey line as well
-				if self.cache.has_key(evt.id) and self.cache[evt.id].has_key("path"):
-					self.Canvas.RemoveObject(self.cache[evt.id]["path"])
-				if points:
-					self.Create(object, Line(scale(points), LineColor="Grey"), as="path")
+			# Put the Icon ontop
+			if self.cache.has_key(evt.id) and self.cache[evt.id].has_key("icon"):
+				self.Canvas.RemoveObject(self.cache[evt.id]["icon"])
+				self.Canvas.AddObject(self.cache[evt.id]["icon"])
 
-				if self.cache.has_key(evt.id) and self.cache[evt.id].has_key("icon"):
-					self.Canvas.RemoveObject(self.cache[evt.id]["icon"])
-					self.Canvas.AddObject(self.cache[evt.id]["icon"])
+			dirty = True
 
-		self.Canvas.Draw(evt.save and isinstance(object, Fleet))
+		if dirty:
+			self.Canvas.Draw()
 
+	def OnDirtyOrder(self, evt):
+		"""\
+		Called when the order has been updated but not yet saved.
+		"""
+		object = self.application.cache.objects[evt.id]
+		order = self.application.cache.orders[evt.id][evt.slot]
+		
+		if self.path == None:
+			return
 
+		if isinstance(object, Fleet) and order.type == MOVE_TYPE:
+			points = getpath(self.application, object, {evt.slot: evt.order})
+			if not points:
+				return
+			
+			self.Canvas.RemoveObject(self.path)
+			self.path = self.Create(object, Line(scale(points), LineColor="Blue", InForeground=True))
+		
+			self.Canvas.Draw()
+			

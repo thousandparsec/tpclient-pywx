@@ -17,49 +17,6 @@ from utils import *
 NAME = 0
 DESC = 1
 
-class TreeListCtrl(wx.gizmos.TreeListCtrl):
-	"""\
-	Modified object which includes the ability to get an object by the pyData
-	"""
-	def FindItemByData(self, pyData, item=None):
-		if item == None:
-			item = self.GetRootItem()
-
-		if self.GetPyData(item) == pyData:
-			return item
-		else:
-			if self.ItemHasChildren(item):
-				cookieo = -1
-				child, cookie = self.GetFirstChild(item)
-
-				while cookieo != cookie:
-					r = self.FindItemByData(pyData, child)
-					if r:
-						return r
-					
-					cookieo = cookie
-					child, cookie = self.GetNextChild(item, cookie)
-
-		return None
-
-	def CollapseAll(self, item=None):
-		if item == None:
-			item = self.GetRootItem()
-
-		if self.ItemHasChildren(item):
-			cookieo = -1
-			child, cookie = self.GetFirstChild(item)
-
-			while cookieo != cookie:
-				self.CollapseAll(child)
-			
-				cookieo = cookie
-				child, cookie = self.GetNextChild(item, cookie)
-
-		self.Collapse(item)
-
-wx.gizmos.TreeListCtrl = TreeListCtrl
-
 # Show the universe
 class winSystem(winBase):
 	title = _("System")
@@ -167,6 +124,9 @@ class winSystem(winBase):
 		# Okay we need to post an event now
 		self.application.windows.Post(wx.local.SelectObjectEvent(id))
 
+	####################################################
+	# Remote Event Handlers
+	####################################################
 	def OnCacheUpdate(self, evt):
 		self.Rebuild()
 
@@ -174,7 +134,9 @@ class winSystem(winBase):
 		"""\
 		When somebody selects an object.
 		"""
-		debug(DEBUG_WINDOWS, "Selecting object... %i" % evt.id)
+		id = self.tree.GetPyData(self.tree.GetSelection())
+		if id == evt.id:
+			return
 		
 		item = self.tree.FindItemByData(evt.id)
 		if item:
@@ -183,3 +145,4 @@ class winSystem(winBase):
 			if not self.tree.IsVisible(item):
 				self.tree.EnsureVisible(item)
 			self.tree.Expand(item)			# Expand the Item
+	

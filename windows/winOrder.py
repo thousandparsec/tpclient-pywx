@@ -23,8 +23,14 @@ ORDERS_COL = 1
 
 buttonSize = (wx.local.buttonSize[0], wx.local.buttonSize[1]+2)
 
-class OrderDataObject(wx.PyDataObjectSimple):
-	pass
+defaults = {
+	constants.ARG_ABS_COORD: [0,0,0],
+	constants.ARG_TIME: [0],
+	constants.ARG_OBJECT: [0],
+	constants.ARG_PLAYER: [0,0],
+	constants.ARG_LIST: [[], []],
+	constants.ARG_STRING: [0, ""],
+}
 
 class winOrder(winBase):
 	title = _("Orders")
@@ -34,6 +40,7 @@ class winOrder(winBase):
 
 		self.application = application
 		self.clipboard = None
+		self.ignore = False
 
 		# Create a base panel
 		base_panel = wx.Panel(self, -1)
@@ -93,7 +100,7 @@ class winOrder(winBase):
 		base_sizer.AddWindow( line_horiz2, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
 		base_sizer.AddWindow( argument_panel, 0, wx.GROW|wx.ALIGN_CENTER|wx.ALL, 1 )
 
-		self.oid = -1
+		self.oid = 0
 		self.app = application
 		self.base_panel = base_panel
 		self.base_sizer = base_sizer
@@ -113,11 +120,7 @@ class winOrder(winBase):
 		self.SetPosition(pos)
 
 	def BuildMenu(self, menu):
-		try:
-			object = self.application.cache.objects[self.oid]
-		except KeyError:
-			debug(DEBUG_WINDOWS, "BuildMenu: No such object.")
-			return
+		object = self.application.cache.objects[self.oid]
 		
 		for type in object.order_types:
 			if not objects.OrderDescs().has_key(type):
@@ -269,19 +272,22 @@ class winOrder(winBase):
 			else:
 				self.OnOrderNew(None)
 
-	def OnSelectType(self, evt):
-		print "Selecting!"
-
+	####################################################
+	# Remote Event Handlers
+	####################################################
 	def OnSelectObject(self, evt):
-		oslot = self.order_list.GetNextItem(-1, wx.LIST_NEXT_ALL, wx.LIST_STATE_SELECTED)
-
-		self.oid = evt.id
-		try:
-			object = self.application.cache.objects[self.oid]
-		except KeyError:
-			debug(DEBUG_WINDOWS, "SelectObject: No such object.")
+		"""\
+		Called when an object is selected.
+		"""
+		if not self.application.cache.objects.has_key(self.oid):
 			return
-			
+
+		if self.oid == evt.id:
+			return
+		else:
+			self.oid = evt.id
+
+		object = self.application.cache.objects[self.oid]
 		self.order_list.SetToolTipDefault(_("Current orders on %s.") % object.name)
 		
 		self.order_list.DeleteAllItems()
@@ -293,10 +299,6 @@ class winOrder(winBase):
 			self.order_list.SetStringItem(slot, ORDERS_COL, order.name)
 			self.order_list.SetToolTipItem(slot, _("Tip %s") % slot)
 
-			if slot == oslot:
-				self.order_list.Select(slot)
-				self.BuildPanel(order)
-			
 		# Set which orders can be added to this object
 		self.type_list.Clear()
 		self.type_list.SetToolTipDefault(_("Order type to create"))
@@ -314,9 +316,13 @@ class winOrder(winBase):
 			desc = desc.strip()
 			self.type_list.SetToolTipItem(self.type_list.GetCount()-1, desc)
 
-		self.OnOrderSelect(None)
-
+	####################################################
+	# Local Event Handlers
+	####################################################
 	def OnOrderSelect(self, evt):
+		"""\
+		Called when somebody selects an order.
+		"""
 		slots = self.order_list.GetSelected()
 		if len(slots) > 1:
 			order = _("Multiple orders selected.")
@@ -326,11 +332,14 @@ class winOrder(winBase):
 			order = self.application.cache.orders[self.oid][slots[0]]
 
 		self.BuildPanel(order)
+		self.application.windows.Post(wx.local.SelectOrderEvent(self.oid, slots))
 
 	def OnOrderNew(self, evt, after=True):
+		"""\
+		Called to add a new order.
+		"""
 		type = self.type_list.GetSelection()
 		if type == wx.NOT_FOUND:
-			debug(DEBUG_WINDOWS, "OrderNew: No order type selected for new.")
 			return
 			
 		type = self.type_list.GetClientData(type)
@@ -345,30 +354,12 @@ class winOrder(winBase):
 		if slot > self.order_list.GetItemCount():
 			slot = -1
 		
-		try:
-			orderdesc = objects.OrderDescs()[type]
-		except KeyError:
-			debug(DEBUG_WINDOWS, "OrderNew: Have not got OrderDesc yet (%i)" % type)
-			return
+		orderdesc = objects.OrderDescs()[type]
 			
 		args = []
 		for name, type in orderdesc.names:
-			if type == constants.ARG_ABS_COORD:
-				args += [0,0,0]
-			elif type == constants.ARG_TIME:
-				args += [0]
-			elif type == constants.ARG_OBJECT:
-				args += [0]
-			elif type == constants.ARG_PLAYER:
-				args += [0,0]
-			elif type == constants.ARG_REL_COORD:
-				args += [0,0,0,0]
-			elif type == constants.ARG_RANGE:
-				args += [0,0,0,0]
-			elif type == constants.ARG_LIST:
-				args += [[],[]]
-			elif type == constants.ARG_STRING:
-				args += [0,""]
+			args += defaults[type]
+
 
 		r = self.application.connection.insert_order(self.oid, slot, orderdesc.subtype, *args)
 		if failed(r):
@@ -387,9 +378,12 @@ class winOrder(winBase):
 		self.application.cache.objects[self.oid].order_number += 1
 
 		self.OnSelectObject(wx.local.SelectObjectEvent(self.oid))
-		self.application.windows.Post(wx.local.SelectOrderEvent(self.oid, slot, True))
+		self.application.windows.Post(wx.local.UpdateOrderEvent(self.oid, slot))
 
 	def OnOrderDelete(self, evt):
+		"""\
+		Called to delete the selected orders.
+		"""
 		for slot in self.order_list.GetSelected():
 			r = self.application.connection.remove_orders(self.oid, slot)
 			if failed(r[0]):
@@ -400,9 +394,12 @@ class winOrder(winBase):
 			self.application.cache.objects[self.oid].order_number -= 1
 
 		self.OnSelectObject(wx.local.SelectObjectEvent(self.oid))
-		self.application.windows.Post(wx.local.SelectOrderEvent(self.oid, -1, True))
+		self.application.windows.Post(wx.local.SelectOrderEvent(self.oid, -1))
 
 	def OnOrderSave(self, evt):
+		"""\
+		Called to save the current selected orders.
+		"""
 		slots = self.order_list.GetSelected()
 		if len(slots) != 1:
 			debug(DEBUG_WINDOWS, "OrderSave: No order selected for save. (%s)" % str(slots))
@@ -410,42 +407,10 @@ class winOrder(winBase):
 		
 		slot = slots[0]
 		
-		try:
-			order = self.application.cache.orders[self.oid][slot]
-		except KeyError:
-			debug(DEBUG_WINDOWS, "OrderSave: Could not get order (%s)" % slot)
-			return
+		order = self.application.cache.orders[self.oid][slot]
 		
-		try:
-			orderdesc = objects.OrderDescs()[order.type]
-		except KeyError:
-			debug(DEBUG_WINDOWS, "OrderSave: No order description. (%s)" % order.type)
-			return
-
-		args = [order.sequence, order.id, slot, order.type, 0, []]
-
-		subpanels = copy.copy(self.argument_subpanels)
-		for name, type in orderdesc.names:
-			panel = subpanels.pop(0)
-				
-			if type == constants.ARG_ABS_COORD:
-				args += argCoordGet( panel )
-			elif type == constants.ARG_TIME:
-				args += argTimeGet( panel )
-			elif type == constants.ARG_OBJECT:
-				args += argObjectGet( panel )
-			elif type == constants.ARG_PLAYER:
-				debug(DEBUG_WINDOWS, "Argument type (ARG_PLAYER) not implimented yet.")
-			elif type == constants.ARG_RANGE:
-				debug(DEBUG_WINDOWS, "Argument type (ARG_RANGE) not implimented yet.")
-			elif type == constants.ARG_LIST:
-				args += argListGet( panel )
-			elif type == constants.ARG_STRING:
-				args += argStringGet( panel )
-
-		print args
-		order = apply(objects.Order, args)
-		print order
+		order.slot = slot
+		order = self.FromPanel(order)
 		
 		debug(DEBUG_WINDOWS, "OrderSave: Inserting.")
 		r = self.application.connection.insert_order(self.oid, slot, order)
@@ -472,8 +437,31 @@ class winOrder(winBase):
 		# Update the turns field
 		self.order_list.SetStringItem(slot, TURNS_COL, str(self.application.cache.orders[self.oid][slot].turns))
 
-		self.application.windows.Post(wx.local.SelectOrderEvent(self.oid, slot, True))
+		self.application.windows.Post(wx.local.UpdateOrderEvent(self.oid, slot))
 
+	def OnOrderUpdate(self, evt):
+		"""\
+		Called when an order is updated.
+		"""
+		if self.ignore:
+			return
+
+		slots = self.order_list.GetSelected()
+		if len(slots) != 1:
+			debug(DEBUG_WINDOWS, "OrderSave: No order selected for save. (%s)" % str(slots))
+			return
+		else:
+			slot = slots[0]
+
+		order = self.application.cache.orders[self.oid][slot]
+		order.slot = slot
+		order = self.FromPanel(order)
+
+		self.application.windows.Post(wx.local.DirtyOrderEvent(order))
+		
+	####################################################
+	# Panel Functions
+	####################################################
 	def BuildPanel(self, order):
 		"""\
 		Builds a panel for the entering of orders arguments.
@@ -552,6 +540,31 @@ class winOrder(winBase):
 		self.argument_sizer.Fit(self.argument_panel)
 		self.base_sizer.AddWindow( self.argument_panel, 0, wx.GROW|wx.ALIGN_CENTER|wx.ALL, 5 )
 		self.base_sizer.Layout()
+
+	def FromPanel(self, order):
+		orderdesc = objects.OrderDescs()[order.type]
+		
+		args = [order.sequence, order.id, order.slot, order.type, 0, []]
+		subpanels = copy.copy(self.argument_subpanels)
+		for name, type in orderdesc.names:
+			panel = subpanels.pop(0)
+				
+			if type == constants.ARG_ABS_COORD:
+				args += argCoordGet( panel )
+			elif type == constants.ARG_TIME:
+				args += argTimeGet( panel )
+			elif type == constants.ARG_OBJECT:
+				args += argObjectGet( panel )
+			elif type == constants.ARG_PLAYER:
+				debug(DEBUG_WINDOWS, "Argument type (ARG_PLAYER) not implimented yet.")
+			elif type == constants.ARG_RANGE:
+				debug(DEBUG_WINDOWS, "Argument type (ARG_RANGE) not implimented yet.")
+			elif type == constants.ARG_LIST:
+				args += argListGet( panel )
+			elif type == constants.ARG_STRING:
+				args += argStringGet( panel )
+
+		return apply(objects.Order, args)
 
 # The display for an ARG_COORD
 X = 0
@@ -836,19 +849,29 @@ def argCoordPanel(parent, parent_panel, args):
 	item7.SetFont(wx.local.normalFont)
 	item0.AddWindow( item7, 0, wx.ALIGN_CENTRE|wx.LEFT, 3 )
 
-	def OnSelectPosition(evt, x=item2, y=item4, z=item6):
+	def OnSelectPosition(evt, x=item2, y=item4, z=item6, p=parent):
+		p.ignore = True
 		x.SetValue(str(evt.x))
 		y.SetValue(str(evt.y))
 		z.SetValue(str(evt.z))
+		p.ignore = False
+
+		p.OnOrderUpdate(None)
+
 	parent.OnSelectPosition = OnSelectPosition
 
 	def p(evt, starmap=parent.application.windows.starmap):
 		starmap.SetMode("Position")
 	parent.Bind(wx.EVT_BUTTON, p, item7)
-	
+
+	parent.Bind(wx.EVT_TEXT, parent.OnOrderUpdate, item2)
+	parent.Bind(wx.EVT_TEXT, parent.OnOrderUpdate, item4)
+	parent.Bind(wx.EVT_TEXT, parent.OnOrderUpdate, item6)
+
 	return panel
 
 def argCoordGet(panel):
 	windows = panel.GetChildren()
+	print [windows[1].GetValue(), windows[3].GetValue(), windows[5].GetValue()]
 	return [int(windows[1].GetValue()), int(windows[3].GetValue()), int(windows[5].GetValue())]
 	

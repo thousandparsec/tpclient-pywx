@@ -1,5 +1,7 @@
 
+import string
 import wx
+import wx.gizmos
 import wx.lib.mixins.listctrl
 
 class ToolTipItemMixIn:
@@ -150,6 +152,54 @@ class wxComboBox(wx.ComboBox, ToolTipItemMixIn):
 		slot = self.GetSelection()
 		self.SetToolTipCurrent(slot)
 
+wx.gizmos.TreeListCtrlOrig = wx.gizmos.TreeListCtrl
+class wxTreeListCtrl(wx.gizmos.TreeListCtrlOrig):
+	"""\
+	Modified object which includes the ability to get an object by the pyData
+	"""
+	def FindItemByData(self, pyData, item=None):
+		if item == None:
+			item = self.GetRootItem()
+
+		if self.GetPyData(item) == pyData:
+			return item
+		else:
+			if self.ItemHasChildren(item):
+				cookieo = -1
+				child, cookie = self.GetFirstChild(item)
+
+				while cookieo != cookie:
+					r = self.FindItemByData(pyData, child)
+					if r:
+						return r
+					
+					cookieo = cookie
+					child, cookie = self.GetNextChild(item, cookie)
+
+		return None
+
+	def GetPyData(self, item):
+		try:
+			return wx.gizmos.TreeListCtrlOrig.GetPyData(self, item)
+		except:
+			return None
+
+	def CollapseAll(self, item=None):
+		if item == None:
+			item = self.GetRootItem()
+
+		if self.ItemHasChildren(item):
+			cookieo = -1
+			child, cookie = self.GetFirstChild(item)
+
+			while cookieo != cookie:
+				self.CollapseAll(child)
+			
+				cookieo = cookie
+				child, cookie = self.GetNextChild(item, cookie)
+
+		self.Collapse(item)
+
 wx.DIGIT_ONLY = 1
 wx.ALPHA_ONLY = 2
 class wxSimpleValidator(wx.PyValidator):
@@ -159,7 +209,7 @@ class wxSimpleValidator(wx.PyValidator):
 		self.Bind(wx.EVT_CHAR, self.OnChar)
 
 	def Clone(self):
-		return MyValidator(self.flag)
+		return wxSimpleValidator(self.flag)
 
 	def Validate(self, win):
 		tc = self.GetWindow()
@@ -193,9 +243,10 @@ class wxSimpleValidator(wx.PyValidator):
 		# Returning without calling even.Skip eats the event before it
 		# gets to the text control
 		return
-
-wx.SimpleValidator = wxSimpleValidator
+	
 wx.ListCtrl = wxListCtrl
 wx.Choice = wxChoice
 wx.ComboBox = wxComboBox
+wx.gizmos.TreeListCtrl = wxTreeListCtrl
+wx.SimpleValidator = wxSimpleValidator
 

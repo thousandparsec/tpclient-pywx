@@ -11,26 +11,7 @@ class Blank:
 	pass
 wx.local = Blank()
 
-class CacheUpdateEvent:
-	pass
-wx.local.CacheUpdateEvent = CacheUpdateEvent
-
-class SelectObjectEvent(wx.PyEvent):
-	def __init__(self, id):
-		self.id = id
-wx.local.SelectObjectEvent = SelectObjectEvent
-
-class SelectPositionEvent(wx.PyEvent):
-	def __init__(self, pos):
-		self.x, self.y, self.z = pos
-wx.local.SelectPositionEvent = SelectPositionEvent
-
-class SelectOrderEvent(wx.PyEvent):
-	def __init__(self, id, slot, save=False):
-		self.id = id
-		self.slot = slot
-		self.save = save
-wx.local.SelectOrderEvent = SelectOrderEvent
+import events
 
 if wx.Platform == "__WXMAC__":
 	wx.local.smallSize  = wx.Size(25,25)
