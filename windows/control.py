@@ -12,7 +12,6 @@ class MainControl:
 		config = load_data("windows")
 
 		if not config:
-			# Create some default positioning, good for 1024x768 on linux
 			config = Blank()
 			config.info = Blank()
 			config.main = Blank()
@@ -21,31 +20,60 @@ class MainControl:
 			config.starmap = Blank()
 			config.system = Blank()
 
-			config.main.pos = (0,0)
-			config.main.size = (419, 51)
-			config.main.show = True
+			if wx.Platform == '__WXMSW__':
+				config.main.pos = (0,0)
+				config.main.size = (1024, 768)
+				config.main.show = True
+				
+				config.info.pos = (1,75)
+				config.info.size = (425, 176)
+				config.info.show = True
+				
+				config.message.pos = (1, 578)
+				config.message.size = (396, 163)
+				config.message.show = True
+
+				config.order.pos = (1, 251)
+				config.order.size = (213, 327)
+				config.order.show = True
+
+				config.starmap.pos = (426, 0)
+				config.starmap.size = (600, 523)
+				config.starmap.show = True
+
+				config.system.pos = (769, 523)
+				config.system.size = (257, 218)
+				config.system.show = True
 			
-			config.info.pos = (1,75)
-			config.info.size = (425, 176)
-			config.info.show = True
+				config.raise_ = "All on All" 
+				
+			else:
+				# Create some default positioning, good for 1024x768 on linux
+				config.main.pos = (0,0)
+				config.main.size = (419, 51)
+				config.main.show = True
+				
+				config.info.pos = (1,75)
+				config.info.size = (425, 176)
+				config.info.show = True
+				
+				config.message.pos = (1, 578)
+				config.message.size = (396, 163)
+				config.message.show = True
+
+				config.order.pos = (1, 251)
+				config.order.size = (213, 327)
+				config.order.show = True
+
+				config.starmap.pos = (426, 0)
+				config.starmap.size = (600, 523)
+				config.starmap.show = True
+
+				config.system.pos = (769, 523)
+				config.system.size = (257, 218)
+				config.system.show = True
 			
-			config.message.pos = (1, 578)
-			config.message.size = (396, 163)
-			config.message.show = True
-
-			config.order.pos = (1, 251)
-			config.order.size = (213, 327)
-			config.order.show = True
-
-			config.starmap.pos = (426, 0)
-			config.starmap.size = (600, 523)
-			config.starmap.show = True
-
-			config.system.pos = (769, 523)
-			config.system.size = (257, 218)
-			config.system.show = True
-		
-			config.raise_ = "All on All" 
+				config.raise_ = "All on All" 
 	
 		return config
 

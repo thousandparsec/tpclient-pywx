@@ -71,6 +71,8 @@ class winMDIBase(wx.MDIParentFrame, winBaseMixIn):
 		wx.MDIParentFrame.__init__(self, None, -1, 'TP: ' + self.title, pos, size, style)
 		winBaseMixIn.__init__(self, application, parent, pos, size, style)
 
+		
+
 class winMDISubBase(wx.MDIChildFrame, winBaseMixIn):
 	def __init__(self, application, parent, 
 			pos=wx.DefaultPosition, size=wx.DefaultSize, style=wx.DEFAULT_FRAME_STYLE):
