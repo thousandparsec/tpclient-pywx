@@ -95,7 +95,7 @@ class winConnect(wxFrame):
 	def OnExit(self, event):
 		# Check if the server is connected
 		self.Show(FALSE)
-		if self.parent.connected:
+		if self.parent.logined:
 			self.parent.windows.show()
 		else:
 			# Exit then
