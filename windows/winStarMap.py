@@ -66,7 +66,7 @@ class winStarMap(winBase):
 			application = self.application
 			C = self.Create
 			
-			for object in application.cache.values():
+			for object in application.cache.objects.values():
 				if isinstance(object, StarSystem):
 					s = scale(object.size)
 					x = scale(object.pos[0])
@@ -84,8 +84,13 @@ class winStarMap(winBase):
 					C(object, Text(object.name,x,y-100,Position="tc",Color="White",Size=8))
 
 				if isinstance(object, Fleet):
+					ship = PolyNoSize([(0,0), (3,0), (0,4), (0,2), (-3,0)], LineWidth=1,LineColor="Blue",FillColor="Blue")
+					ship.Move(scale(object.pos))
+
+					C(object, ship)
 					if object.vel != (0, 0, 0):
 						# We need to draw in a vector
+						velocity = 0
 						pass
 					pass
 
@@ -110,7 +115,7 @@ class winStarMap(winBase):
 		self.application.windows.Post(wx.local.SelectObjectEvent(evt.data))
 
 	def OnSelectObject(self, evt):
-		object = self.application.cache[evt.id]
+		object = self.application.cache.objects[evt.id]
 		print "Selecting object", evt.id
 
 		self.arrow.Move(scale(object.pos))

@@ -125,123 +125,41 @@ class winOrder(winBase):
 		self.SetSize(size)
 		self.SetPosition(pos)
 
-	# Update the display for the new object
 	def OnSelectObject(self, evt):
+		oslot = self.order_list.GetNextItem(-1, wx.LIST_NEXT_ALL, wx.LIST_STATE_SELECTED)
+
 		self.oid = evt.id
 
-		# The object that was selected and set it as the currently selected one
-		object = self.application.cache[self.oid]
-		if object:
-			# Add a whole bunch of place holders until we get the order
-			self.order_list.DeleteAllItems()
-			
-			for slot in range(0, object.order_number):
-				order = self.application.connection.get_orders(object.id, slot)
-				self.order_list.InsertStringItem(slot, "")
-				self.order_list.SetStringItem(slot, TURNS_COL, str(order.turns))
-				self.order_list.SetStringItem(slot, ORDERS_COL, "Order %s" % slot)
-				self.order_list.SetItemPyData(slot, order)
-				
-			# Set which orders can be added to this object
-			self.type_list.Clear()
-			for type in object.order_types:
-
-				if OrderDescs().has_key(type):
-					self.type_list.Append(OrderDescs()[type].name, type)
-				else:
-					self.type_list.Append("Waiting on description for (%i)" % type, type)
-
-			self.BuildPanel(None)
-
-	def OnOrderNew(self, evt):
-		oid = self.oid
-
-		# Check that something is selected in the "type" box
-		type = self.type_list.GetSelection()
-		if type != wx.NOT_FOUND:
-			type = self.type_list.GetClientData(type)
-			
-			# Append a new order to the list below the currently selected one
-			slot = self.order_list.GetNextItem(-1, wx.LIST_NEXT_ALL, wx.LIST_STATE_SELECTED)
-			if slot == wx.NOT_FOUND:
-				debug(DEBUG_WINDOWS, "No orders in the order list")
-				slot = 0
-			else:
-				slot += 1
-			
-			debug(DEBUG_WINDOWS, "Inserting new order to slot %i" % slot)
-
-			orderdesc = OrderDescs()[type]
-			if orderdesc:
-				
-				args = []
-				for name, type in orderdesc.names:
-					if type == constants.ARG_ABS_COORD:
-						args += [0,0,0]
-					elif type == constants.ARG_TIME:
-						args += [0]
-					elif type == constants.ARG_OBJECT:
-						args += [0]
-					elif type == constants.ARG_PLAYER:
-						args += [0]
-
-				if not failed(self.application.connection.insert_order(self.oid, slot, orderdesc.subtype, *args)):
-					self.application.cache[self.oid].order_number += 1
-
-					self.OnSelectObject(wx.local.SelectObjectEvent(self.oid))
-
-			else:
-				debug(DEBUG_WINDOWS, "Have not got the orderdesc yet (%i) :(" % type)
-		else:
-			debug(DEBUG_WINDOWS, "No order type selected for new!")
-
-	def OnOrderDelete(self, evt):
-		oid = self.oid
-
-		# Check that something is selected in the "type" box
-		slot = self.order_list.GetNextItem(-1, wx.LIST_NEXT_ALL, wx.LIST_STATE_SELECTED)
-		if slot != wx.NOT_FOUND:
-			
-			print "Saving", slot
-			
-			# Remove the order
-			if not failed(self.application.connection.remove_orders(self.oid, slot)):
-				self.application.cache[self.oid].order_number -= 1
-
-				self.OnSelectObject(wx.local.SelectObjectEvent(self.oid))
-		
-				# Update the Panel
-				self.BuildPanel(None)
-
-	def OnOrderSave(self, evt):
-		slot = self.order_list.GetNextItem(-1, wx.LIST_NEXT_ALL, wx.LIST_STATE_SELECTED)
-		print "Saving", slot
-		if slot == wx.NOT_FOUND:
+		try:
+			object = self.application.cache.objects[self.oid]
+		except:
+			debug(DEBUG_WINDOWS, "SelectObject: No such object.")
 			return
-
-		order = self.order_list.GetItemPyData(slot)
-		if order:
-			orderdesc = OrderDescs()[order.type]
 			
-			if orderdesc:
-				subpanels = copy.copy(self.argument_subpanels)
-				for name, type in orderdesc.names:
-					panel = subpanels.pop()
-				
-					if type == constants.ARG_ABS_COORD:
-						args = argCoordGet( panel )
-					elif type == constants.ARG_TIME:
-						args = argTimeGet( panel )
-					elif type == constants.ARG_OBJECT:
-						debug(DEBUG_WINDOWS, "Argument type (ARG_OBJECT) not implimented yet.")
-					elif type == constants.ARG_PLAYER:
-						debug(DEBUG_WINDOWS, "Argument type (ARG_PLAYER) not implimented yet.")
+		# Add a whole bunch of place holders until we get the order
+		self.order_list.DeleteAllItems()
+		for slot in range(0, object.order_number):
+			order = self.application.cache.orders[self.oid][slot]
 
-					if args:
-						setattr(order, name, args)
-					
-				if not failed(self.application.connection.insert_order(self.oid, slot, order)):
-					self.application.connection.remove_orders(self.oid, slot+1)
+			self.order_list.InsertStringItem(slot, "")
+			self.order_list.SetStringItem(slot, TURNS_COL, str(order.turns))
+			self.order_list.SetStringItem(slot, ORDERS_COL, order.__class__.__name__)
+			self.order_list.SetItemPyData(slot, order)
+
+			if slot == oslot:
+				self.order_list.Select(slot)
+			
+		# Set which orders can be added to this object
+		self.type_list.Clear()
+		for type in object.order_types:
+			if OrderDescs().has_key(type):
+				self.type_list.Append(OrderDescs()[type].name, type)
+			else:
+				self.type_list.Append("Wait on (%i)" % type, type)
+
+		if oslot != wx.NOT_FOUND:
+			order = self.order_list.GetItemPyData(slot)
+			self.BuildPanel(order)
 
 	def OnOrderSelect(self, evt):
 		slot = self.order_list.GetNextItem(-1, wx.LIST_NEXT_ALL, wx.LIST_STATE_SELECTED)
@@ -251,6 +169,124 @@ class winOrder(winBase):
 
 		order = self.order_list.GetItemPyData(slot)
 		self.BuildPanel(order)
+
+	def OnOrderNew(self, evt):
+		type = self.type_list.GetSelection()
+		if type == wx.NOT_FOUND:
+			debug(DEBUG_WINDOWS, "OrderNew: No order type selected for new.")
+			return
+			
+		type = self.type_list.GetClientData(type)
+			
+		# Append a new order to the list below the currently selected one
+		slot = self.order_list.GetNextItem(-1, wx.LIST_NEXT_ALL, wx.LIST_STATE_SELECTED)
+		if slot == wx.NOT_FOUND:
+			debug(DEBUG_WINDOWS, "OrderNew: No orders in the order list.")
+			slot = 0
+		else:
+			slot += 1
+			
+		try:
+			orderdesc = OrderDescs()[type]
+		except:
+			debug(DEBUG_WINDOWS, "OrderNew: Have not got OrderDesc yet (%i)" % type)
+			return
+			
+		args = []
+		for name, type in orderdesc.names:
+			if type == constants.ARG_ABS_COORD:
+				args += [0,0,0]
+			elif type == constants.ARG_TIME:
+				args += [0]
+			elif type == constants.ARG_OBJECT:
+				args += [0]
+			elif type == constants.ARG_PLAYER:
+				args += [0]
+
+		r = self.application.connection.insert_order(self.oid, slot, orderdesc.subtype, *args)
+		if failed(r):
+			debug(DEBUG_WINDOWS, "OrderNew: Insert failed")
+			return
+					
+		order = self.application.connection.get_orders(self.oid, slot)
+		if failed(order):
+			debug(DEBUG_WINDOWS, "OrderNew: Get failed")
+			return
+
+		self.application.cache.orders[self.oid].insert(slot, order)
+		self.application.cache.objects[self.oid].order_number += 1
+
+		self.OnSelectObject(wx.local.SelectObjectEvent(self.oid))
+
+	def OnOrderDelete(self, evt):
+		slot = self.order_list.GetNextItem(-1, wx.LIST_NEXT_ALL, wx.LIST_STATE_SELECTED)
+		if slot == wx.NOT_FOUND:
+			debug(DEBUG_WINDOWS, "OrderDelete: No order selected for delete.")
+			return
+			
+		# Remove the order
+		r = self.application.connection.remove_orders(self.oid, slot)
+		if failed(r):
+			debug(DEBUG_WINDOWS, "OrderDelete: Remove failed!")
+			return
+
+		del self.application.cache.orders[self.oid][slot]
+		self.application.cache.objects[self.oid].order_number -= 1
+
+		self.OnSelectObject(wx.local.SelectObjectEvent(self.oid))
+		
+	def OnOrderSave(self, evt):
+		slot = self.order_list.GetNextItem(-1, wx.LIST_NEXT_ALL, wx.LIST_STATE_SELECTED)
+		if slot == wx.NOT_FOUND:
+			debug(DEBUG_WINDOWS, "OrderSave: No order selected for save.")
+			return
+
+		try:
+			order = self.order_list.GetItemPyData(slot)
+		except:
+			debug(DEBUG_WINDOWS, "OrderSave: Could not get order")
+			return
+		
+		try:
+			orderdesc = OrderDescs()[order.type]
+		except:
+			debug(DEBUG_WINDOWS, "OrderSave: No order description.")
+			return
+			
+		subpanels = copy.copy(self.argument_subpanels)
+		for name, type in orderdesc.names:
+			panel = subpanels.pop()
+				
+			if type == constants.ARG_ABS_COORD:
+				args = argCoordGet( panel )
+			elif type == constants.ARG_TIME:
+				args = argTimeGet( panel )
+			elif type == constants.ARG_OBJECT:
+				debug(DEBUG_WINDOWS, "Argument type (ARG_OBJECT) not implimented yet.")
+			elif type == constants.ARG_PLAYER:
+				debug(DEBUG_WINDOWS, "Argument type (ARG_PLAYER) not implimented yet.")
+
+			if args:
+				setattr(order, name, args)
+					
+		order = self.application.connection.insert_order(self.oid, slot, order)
+		if failed(order):
+			debug(DEBUG_WINDOWS, "OrderSave: Insert failed.")
+			return
+		
+		order = self.application.connection.get_orders(self.oid, slot)
+		if failed(order):
+			debug(DEBUG_WINDOWS, "OrderSave: Get failed.")
+			return
+		self.application.cache.orders[self.oid].insert(slot, order)
+
+		r = self.application.connection.remove_orders(self.oid, slot+1)
+		if failed(r):
+			debug(DEBUG_WINDOWS, "OrderSave: Remove failed.")
+			return
+		del self.application.cache.orders[self.oid][slot+1]
+
+		self.OnSelectObject(wx.local.SelectObjectEvent(self.oid))
 
 	def BuildPanel(self, order):
 		"""\

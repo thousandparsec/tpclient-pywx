@@ -46,9 +46,6 @@ class AppTP(wx.App):
 			
 			self.config = self.ConfigLoad()
 			
-			print "AppTp.OnInit.cache"
-			self.cache = {}
-
 			print "AppTp.OnInit.windows"
 			self.windows = MainControl(self)
 
@@ -110,20 +107,29 @@ password = "%(password)s"
 	def CacheUpdate(self):
 		progress = wx.ProgressDialog("TP: Downloading Universe", "pywx-client is now downloading the Universe.", \
 			100, self.windows.connect, wx.PD_APP_MODAL | wx.PD_AUTO_HIDE | wx.PD_ELAPSED_TIME | wx.PD_REMAINING_TIME)
+
+		class Blank:
+			pass
 		
-		self.cache = {}
-		
+		self.cache = Blank()
+		self.cache.objects = {}
+		self.cache.orders = {}
+
 		objects = self.connection.get_objects(0)
 		while len(objects) > 0:
 			object = objects.pop(0)
 			
-			self.cache[object.id] = object
+			self.cache.objects[object.id] = object
 			
 			# Download the objects inside this object
 			if len(object.contains) > 0:
 				objects += self.connection.get_objects(object.contains)
-		
-			progress.Update(len(self.cache.keys()))
+
+			# Download the orders from this object
+			orders = self.connection.get_orders(object.id, range(0, object.order_number))
+			self.cache.orders[object.id] = list(orders)
+
+			progress.Update(len(self.cache.objects.keys()))
 		
 		progress.Update(100)
 		self.windows.Post(wx.local.CacheUpdateEvent())

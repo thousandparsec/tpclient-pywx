@@ -109,7 +109,7 @@ class winSystem(winBase):
 		# Remove all the current items
 		self.tree.DeleteAllItems()
 
-		universe = self.application.cache[0]
+		universe = self.application.cache.objects[0]
 		selected = self.Add(None, universe, selected_id)
 	
 		if selected:
@@ -135,7 +135,7 @@ class winSystem(winBase):
 		
 		if hasattr(object, "contains"):
 			for id in object.contains:
-				new = self.application.cache[id]
+				new = self.application.cache.objects[id]
 				temp = self.Add(new_root, new, selected_id)
 
 				if temp:
