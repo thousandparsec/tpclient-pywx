@@ -161,10 +161,11 @@ class AppTP(wx.App):
 		# Download message boards
 		board = self.connection.get_boards(0)[0]
 		if not failed(board):
+			print "Downloading messages for the board", board.id, board.number
 			# Download the messages from this board
 			if board.number == 0:
 				messages = []
-			if board.number == 1:
+			elif board.number == 1:
 				messages = self.connection.get_messages(board.id, range(0, board.number))
 				if not hasattr(messages, "__getitem__"):
 					messages = [messages]
