@@ -10,6 +10,7 @@ from math import *
 from wxPython.wx import *
 from wxPython.lib.floatbar import *
 from extra.wxFloatCanvas.NavCanvas import NavCanvas
+from extra.wxFloatCanvas.Dot import Dot
 
 from netlib.objects.ObjectExtra.StarSystem import StarSystem
 from netlib.objects.ObjectExtra.Fleet import Fleet
@@ -55,18 +56,17 @@ class winStarMap(winBase):
 
 				# Draw an orbit
 				if len(object.contains) > 0:
-					so = round(s * 1.5)
-					self.Canvas.AddCircle(x,y,10,LineWidth=2,LineColor="White",FillColor="Black")
+					so = round(s * 1.25)
+					self.Canvas.AddCircleNoSmall(x,y,so,10,LineWidth=1,LineColor="White",FillColor="Black")
 					
-				self.Canvas.AddCircle(x,y,4,LineWidth=1,LineColor="Yellow",FillColor="Yellow")
-				self.Canvas.AddText(object.name,x,y-15,Position="tc",Color="White",Size=8)
+				self.Canvas.AddCircleNoSmall(x,y,s,4,LineWidth=1,LineColor="Yellow",FillColor="Yellow")
+				self.Canvas.AddText(object.name,x,y-100,Position="tc",Color="White",Size=8)
 
 			if isinstance(object, Fleet):
 				if object.vel != (0, 0, 0):
 					# We need to draw in a vector
 					pass
 				pass
-
 				
 #		# Tool bar to select what is shown on the starmap
 #		self.barTool = wxFloatBar(self, -1)

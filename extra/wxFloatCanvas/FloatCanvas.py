@@ -617,7 +617,9 @@ class PointSet(DrawObject):
                 radius = int(round(self.Diameter/2))
                 for (x,y) in Points:
                     HTdc.DrawEllipse((x - radius), (y - radius), self.Diameter, self.Diameter)
-            
+
+
+
 #### Does anyone need this?                    
 ##class Dot(DrawObject):
 ##    """
@@ -696,6 +698,7 @@ class RectEllipse(DrawObject, XYObjectMixin):
             self._Canvas.BoundingBoxDirty = True
 
 
+
 class Rectangle(RectEllipse):
     def __init__(*args, **kwargs):
         RectEllipse.__init__(*args, **kwargs)
@@ -729,13 +732,52 @@ class Ellipse(RectEllipse):
 
 class Circle(Ellipse):
     def __init__(self, x ,y, Diameter, **kwargs):
-        RectEllipse.__init__(self ,
+        RectEllipse.__init__(self,
                              x-Diameter/2.,
                              y-Diameter/2.,
                              Diameter,
                              Diameter,
                              **kwargs)
-        
+
+class CircleNoSmall(RectEllipse):
+    def __init__(self, x ,y, Diameter, MinDiameter, **kwargs):
+        RectEllipse.__init__(self, x, y, Diameter, Diameter, **kwargs)
+        self.Diameter = Diameter
+        self.MinDiameter = MinDiameter
+    
+    def _Draw(self, dc, WorldToPixel, ScaleWorldToPixel, HTdc=None):
+        dc.SetPen(self.Pen)
+        dc.SetBrush(self.Brush)
+
+        (X,Y) = WorldToPixel(self.XY)
+
+        D = ScaleWorldToPixel((self.Diameter, 0))[0]
+
+        if D < self.MinDiameter:
+            D = self.MinDiameter
+
+        R = int(round(D/2))
+
+        dc.DrawEllipse(X-R,Y-R,D,D)
+        if HTdc and self.HitAble:
+            HTdc.DrawEllipse(X-R,Y-R,self.D,self.D)
+
+class Dot(RectEllipse):
+    def __init__(self, x ,y, Diameter, **kwargs):
+        RectEllipse.__init__(self, x, y, Diameter, Diameter, **kwargs)
+        self.Diameter = Diameter
+
+    def _Draw(self, dc, WorldToPixel, ScaleWorldToPixel, HTdc=None):
+        dc.SetPen(self.Pen)
+        dc.SetBrush(self.Brush)
+
+        radius = int(round(self.Diameter/2))
+        (X,Y) = WorldToPixel(self.XY)
+
+        dc.DrawEllipse(X-radius,Y-radius,self.Diameter,self.Diameter)
+        if HTdc and self.HitAble:
+            HTdc.DrawEllipse(X-radius,Y-radius,self.Diameter,self.Diameter)
+
 class TextObjectMixin:
     """
 
