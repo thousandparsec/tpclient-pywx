@@ -7,20 +7,22 @@ import os
 from math import *
 
 # wxPython imports
-from wxPython.wx import *
+import wx
 from extra.wxFloatCanvas.NavCanvas import NavCanvas
 from extra.wxFloatCanvas.FloatCanvas import EVT_FC_ENTER_OBJECT, EVT_FC_LEAVE_OBJECT
 from extra.wxFloatCanvas.FloatCanvas import Text
 from extra.wxFloatCanvas.CircleNoSmall import CircleNoSmall
 
+# Network imports
 from netlib.objects.ObjectExtra.StarSystem import StarSystem
 from netlib.objects.ObjectExtra.Fleet import Fleet
 
+# Local imports
 from winBase import *
 from utils import *
 
 #wxRED = wxColor()
-wxYELLOW = wxColor(0xD6, 0xDC, 0x2A)
+wxYELLOW = wx.Color(0xD6, 0xDC, 0x2A)
 
 POINT = 4
 
@@ -33,7 +35,7 @@ sysMIN = 4
 class winStarMap(winBase):
 	title = "StarMAP, The Known Universe"
 
-	def __init__(self, application, parent, pos=wxDefaultPosition, size=wxDefaultSize, style=wxDEFAULT_FRAME_STYLE):
+	def __init__(self, application, parent, pos=wx.DefaultPosition, size=wx.DefaultSize, style=wx.DEFAULT_FRAME_STYLE):
 		winBase.__init__(self, application, parent, pos, size, style)
 
 		self.application = application
@@ -41,12 +43,13 @@ class winStarMap(winBase):
 		self.CreateStatusBar()
 		self.SetStatusText("")
 
-		self.Canvas = NavCanvas(self, size=wxSize(500,500), Debug = 1, BackgroundColor = "BLACK")
+		self.Canvas = NavCanvas(self, size=wx.Size(500,500), Debug = 1, BackgroundColor = "BLACK")
 		self.Canvas.ZoomToBB()
 
-		EVT_CACHE_UPDATE(self, self.Update)
+	def OnCacheUpdate(self, evt):
+		self.Rebuild()
 
-	def Update(self, evt):
+	def Rebuild(self):
 		try:
 			application = self.application
 			C = self.Create
@@ -74,6 +77,8 @@ class winStarMap(winBase):
 						pass
 					pass
 
+			self.Canvas.ZoomToBB()
+
 		except Exception, e:
 			do_traceback()
 
@@ -86,10 +91,15 @@ class winStarMap(winBase):
 		drawable.Bind(EVT_FC_LEAVE_OBJECT, self.OnLeave)
 
 	def OnEnter(self, evt):
+		self.cid = evt.oid
+		
+		print "Enter ", evt.oid
+		
 		object = self.application.cache[evt.oid]
-		print "Enter:", object
+		self.SetStatusText(object.name)
 
 	def OnLeave(self, evt):
-		object = self.application.cache[evt.oid]
-		print "Leave:", object
+		print "Leave ", evt.oid
 		
+		self.cid = None
+		self.SetStatusText("")	

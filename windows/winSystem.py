@@ -7,21 +7,17 @@ at this current location and "quick" details about them.
 import random
 
 # wxPython imports
-from wxPython.wx import *
-from wxPython.gizmos import wxTreeListCtrl
-
-# Game imports
-from utils import *
+import wx
+import wx.gizmos
 
 # Local imports
 from winBase import *
-
-# Program imports
+from utils import *
 
 NAME = 0
 DESC = 1
 
-class wxTreeListCtrl(wxTreeListCtrl):
+class TreeListCtrl(wx.gizmos.TreeListCtrl):
 	"""\
 	Modified object which includes the ability to get an object by the pyData
 	"""
@@ -44,28 +40,30 @@ class wxTreeListCtrl(wxTreeListCtrl):
 
 		return None
 
+wx.gizmos.TreeListCtrl = TreeListCtrl
+
 # Show the universe
 class winSystem(winBase):
 	title = "System"
 	
-	def __init__(self, application, parent, pos=wxDefaultPosition, size=wxDefaultSize, style=wxDEFAULT_FRAME_STYLE):
+	def __init__(self, application, parent, pos=wx.DefaultPosition, size=wx.DefaultSize, style=wx.DEFAULT_FRAME_STYLE):
 		winBase.__init__(self, application, parent, pos, size, style)
 
 		# Setup to recieve game events
 		self.application = application
 
-		self.tree = wxTreeListCtrl(self, -1, style = wxTR_DEFAULT_STYLE)
+		self.tree = wx.gizmos.TreeListCtrl(self, -1, style=wx.TR_DEFAULT_STYLE)
 
 		self.icons = {}
-		self.icons['Blank'] = wxImage("graphics/blank-icon.png").ConvertToBitmap()
-		self.icons['Container'] = wxImage("graphics/link-icon.png").ConvertToBitmap()
-		self.icons['StarSystem'] = wxImage("graphics/system-icon.png").ConvertToBitmap()
-		self.icons['Fleet'] = wxImage("graphics/ship-icon.png").ConvertToBitmap()
-		self.icons['Planet'] = wxImage("graphics/planet-icon.png").ConvertToBitmap()
-		self.icons['Unknown'] = wxImage("graphics/starbase-icon.png").ConvertToBitmap()
+		self.icons['Blank'] = wx.Image("graphics/blank-icon.png").ConvertToBitmap()
+		self.icons['Container'] = wx.Image("graphics/link-icon.png").ConvertToBitmap()
+		self.icons['StarSystem'] = wx.Image("graphics/system-icon.png").ConvertToBitmap()
+		self.icons['Fleet'] = wx.Image("graphics/ship-icon.png").ConvertToBitmap()
+		self.icons['Planet'] = wx.Image("graphics/planet-icon.png").ConvertToBitmap()
+		self.icons['Unknown'] = wx.Image("graphics/starbase-icon.png").ConvertToBitmap()
 
-		self.il = wxImageList(16, 16)
-		self.il.Add(wxImage("graphics/blank.png").ConvertToBitmap())
+		self.il = wx.ImageList(16, 16)
+		self.il.Add(wx.Image("graphics/blank.png").ConvertToBitmap())
 		for i in self.icons.keys():
 			self.icons[i] = self.il.Add(self.icons[i])
 		self.tree.SetImageList(self.il)
@@ -76,12 +74,7 @@ class winSystem(winBase):
 		self.tree.SetMainColumn(0)
 		self.tree.SetColumnWidth(0, 250)
 
-		EVT_TREE_SEL_CHANGED(self.tree, -1, self.SelectItem)
-
-		EVT_CACHE_UPDATE(self.application, self.Rebuild)
-		EVT_SELECT_OBJECT(self.application, self.OnSelectObject)
-
-	def Rebuild(self, evt):
+	def Rebuild(self):
 		"""\
 		Rebuilds the list of objects.
 		"""
@@ -135,6 +128,9 @@ class winSystem(winBase):
 				return selected
 		return
 
+	def OnCacheUpdate(self, evt):
+		self.Rebuild()
+
 	def OnSelectObject(self, evt):
 		"""\
 		When somebody selects an object.
@@ -153,5 +149,5 @@ class winSystem(winBase):
 		id = self.tree.GetPyData(evt.GetItem())
 		
 		# Okay we need to post an event now
-		wxPostEvent(self.application, SelectObjectEvent(id))
+		self.application.Post(wx.local.SelectObjectEvent(id))
 

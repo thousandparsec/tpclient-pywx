@@ -4,63 +4,48 @@ like prepending "TP:" to the title, vetoing closing of the window
 and raising all the other windows when one is clicked.
 """
 
-from wxPython.wx import *
+import wx
 
-wxEVT_CACHE_UPDATE = wxNewEventType()
+class Blank:
+	pass
+wx.local = Blank()
 
-# Selection events
-wxEVT_SELECT_OBJECT = wxNewEventType()
-wxEVT_SELECT_ORDER  = wxNewEventType()
+class CacheUpdateEvent:
+	pass
+wx.local.CacheUpdateEvent = CacheUpdateEvent
 
-
-def EVT_CACHE_UPDATE(win, func):
-	win.Connect(-1, -1, wxEVT_CACHE_UPDATE, func)
-
-def EVT_SELECT_OBJECT(win, func):
-	win.Connect(-1, -1, wxEVT_SELECT_OBJECT, func)
-
-def EVT_SELECT_ORDER(win, func):
-	win.Connect(-1, -1, wxEVT_SELECT_ORDER, func)
-
-class CacheUpdateEvent(wxPyEvent):
-	def __init__(self):
-		wxPyEvent.__init__(self)
-		self.SetEventType(wxEVT_CACHE_UPDATE)
-		
-class SelectObjectEvent(wxPyEvent):
+class SelectObjectEvent(wx.PyEvent):
 	def __init__(self, id):
-		wxPyEvent.__init__(self)
-		self.SetEventType(wxEVT_SELECT_OBJECT)
-		
 		self.id = id
+wx.local.SelectObjectEvent = SelectObjectEvent
 
-class SelectOrderEvent(wxPyEvent):
+class SelectOrderEvent(wx.PyEvent):
 	def __init__(self, id, slot):
-		wxPyEvent.__init__(self)
-		self.SetEventType(wxEVT_SELECT_ORDER)
-		
 		self.id = id
 		self.slot = slot
+wx.local.SelectOrderEvent = SelectOrderEvent
 
+wx.local.normalFont = wx.Font(8,  wx.DEFAULT, wx.NORMAL, wx.NORMAL)
+wx.local.tinyFont   = wx.Font(4,  wx.DEFAULT, wx.NORMAL, wx.NORMAL)
+wx.local.largeFont  = wx.Font(12, wx.DEFAULT, wx.NORMAL, wx.NORMAL)
 
-class winRealBase:
+class winBaseMixIn:
 	def __init__(self, application, parent, 
-			pos=wxDefaultPosition, 
-			size=wxDefaultSize, 
-			style=wxDEFAULT_FRAME_STYLE):
-#		wxHandler(self)
+			pos=wx.DefaultPosition, 
+			size=wx.DefaultSize, 
+			style=wx.DEFAULT_FRAME_STYLE):
 
 		self.application = application
 		self.parent = parent
 
-		EVT_ACTIVATE(self, self.OnRaise)
-		EVT_CLOSE(self, self.OnProgramExit)
-		
+		self.Bind(wx.EVT_ACTIVATE, self.OnRaise)
+		self.Bind(wx.EVT_CLOSE, self.OnProgramExit)
+
 	def OnProgramExit(self, evt):
 		evt.Veto(true)
 
 	def OnRaise(self, evt):
-		if wxPlatform != '__WXMSW__':
+		if wx.Platform != '__WXMSW__':
 			if self.application.windows.config.raise_ == "All on All":
 				self.application.windows.Raise()
 			elif self.application.windows.config.raise_ == "All on Main":
@@ -71,34 +56,39 @@ class winRealBase:
 			else:
 				print "Unknown raise method:", self.application.windows.config.raise_
 
-class winMainBase(wxMDIParentFrame, winRealBase):
+# These give a MDI interface under windows
+class winMDIBase(wx.MDIParentFrame, winBaseMixIn):
 	def __init__(self, application, parent, 
-			pos=wxDefaultPosition, 
-			size=wxDefaultSize, 
-			style=wxDEFAULT_FRAME_STYLE):
-		wxMDIParentFrame.__init__(self, None, -1, 'TP: ' + self.title, pos, size, style)
-		winRealBase.__init__(self, application, parent, pos, size, style)
+			pos=wx.DefaultPosition, 
+			size=wx.DefaultSize, 
+			style=wx.DEFAULT_FRAME_STYLE):
+		wx.MDIParentFrame.__init__(self, None, -1, 'TP: ' + self.title, pos, size, style)
+		winBaseMixIn.__init__(self, application, parent, pos, size, style)
 
-class winNormalBase(wxFrame, winRealBase):
+class winMDISubBase(wx.MDIChildFrame, winBaseMixIn):
 	def __init__(self, application, parent, 
-			pos=wxDefaultPosition, 
-			size=wxDefaultSize, 
-			style=wxDEFAULT_FRAME_STYLE):
-		wxFrame.__init__(self, parent, -1, 'TP: ' + self.title, pos, size, style)
-		winRealBase.__init__(self, application, parent, pos, size, style)
-    
-class winSubBase(wxMDIChildFrame, winRealBase):
+			pos=wx.DefaultPosition, 
+			size=wx.DefaultSize, 
+			style=wx.DEFAULT_FRAME_STYLE):
+		wx.MDIChildFrame.__init__(self, parent, -1, 'TP: ' + self.title, pos, size, style)
+		winBaseMixIn.__init__(self, application, parent, pos, size, style)
+
+# These give a non-MDI interface under other operating systems
+class winNormalBase(wx.Frame, winBaseMixIn):
 	def __init__(self, application, parent, 
-			pos=wxDefaultPosition, 
-			size=wxDefaultSize, 
-			style=wxDEFAULT_FRAME_STYLE):
-		wxMDIChildFrame.__init__(self, parent, -1, 'TP: ' + self.title, pos, size, style)
-		winRealBase.__init__(self, application, parent, pos, size, style)
+			pos=wx.DefaultPosition, 
+			size=wx.DefaultSize, 
+			style=wx.DEFAULT_FRAME_STYLE):
+		wx.Frame.__init__(self, parent, -1, 'TP: ' + self.title, pos, size, style)
+		winBaseMixIn.__init__(self, application, parent, pos, size, style)
 
-winFont = wxFont(8, wxDEFAULT, wxNORMAL, wxNORMAL)
+winNormalSubBase = winNormalBase
 
-if wxPlatform == '__WXMSW__':
-	winBase = winSubBase
+if wx.Platform == '__WXMSW__':
+	winMainBase = winMDIBase
+	winBase = winMDISubBase
 else:
 	winMainBase = winNormalBase
-	winBase = winNormalBase
+	winBase = winNormalSubBase
+
+__all__ = ['winMainBase', 'winBase', '__all__']

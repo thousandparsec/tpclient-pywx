@@ -1,9 +1,9 @@
 
 import sys
 
-# wxPython imports
-from wxPython.wx import *
-from extra import fixdc
+# wx.Python imports
+import wx
+import extra.fixdc
 
 # Python Imports
 from math import *
@@ -23,19 +23,44 @@ from config import *
 
 from windows.control import MainControl
 
-class Splash(wxSplashScreen):
+class Splash(wx.SplashScreen):
 	def __init__(self, application):
-		image = wxImage("graphics/splash.png").ConvertToBitmap()
-		wxSplashScreen.__init__(self, image, wxSPLASH_CENTRE_ON_SCREEN | wxSPLASH_TIMEOUT, 3000, None, -1)
-		self.Bind(EVT_CLOSE, self.OnClose)
+		image = wx.Image("graphics/splash.png").ConvertToBitmap()
+		wx.SplashScreen.__init__(self, image, wx.SPLASH_CENTRE_ON_SCREEN | wx.SPLASH_TIMEOUT, 3000, None, -1)
 
 		self.application = application
+		
+		self.Bind(wx.EVT_CLOSE, self.OnClose)
 
 	def OnClose(self, evt):
 		self.Hide()
-		self.application.windows.connect.Show(TRUE)
+		self.application.windows.connect.Show(True)
 
-class AppTP(wxApp):
+class AppTP(wx.App):
+	def __init__(self):
+		wx.App.__init__(self)
+
+		try:
+			print "AppTp.OnInit.AllImageHandlers"
+			wx.InitAllImageHandlers()
+			
+			self.config = self.ConfigLoad()
+			
+			print "AppTp.OnInit.cache"
+			self.cache = {}
+
+			print "AppTp.OnInit.windows"
+			self.windows = MainControl(self)
+
+			print "AppTp.OnInit.connection"
+			self.connection = Connection()
+		
+			splash = Splash(self)
+			splash.Show()
+
+		except:
+			do_traceback()
+
 	def ConfigLoad(self):
 		print "AppTp.ConfigLoad"
 
@@ -76,30 +101,6 @@ password = "%(password)s"
 """ % self.config.__dict__
 		open(os.path.join("var", "config"), "w+").write(data)
 
-	def OnInit(self):
-		try:
-			print "AppTp.OnInit.AllImageHandlers"
-			wxInitAllImageHandlers()
-			
-			self.config = self.ConfigLoad()
-			
-			print "AppTp.OnInit.cache"
-			self.cache = {}
-
-			print "AppTp.OnInit.windows"
-			self.windows = MainControl(self)
-
-			print "AppTp.OnInit.connection"
-			self.connection = Connection()
-		
-			splash = Splash(self)
-			splash.Show()
-			
-		except:
-			do_traceback()
-
-		return TRUE
-		
 	def Exit(self):
 		print "AppTp.exit"
 		sys.exit(1)

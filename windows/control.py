@@ -3,10 +3,7 @@ All the windows are controlled by this class
 
 """
 
-# wxPython imports
-from wxPython.wx import *
-
-# Python Imports
+# Local Imports
 from utils import *
 from config import *
 
@@ -35,23 +32,23 @@ class MainControl:
 
 			config.main.pos = (0,0)
 			config.main.size = (middle, 50)
-			config.main.show = TRUE
+			config.main.show = True
 			
 			config.message.pos = (0, map_height-padding*4)
 			config.message.size = (middle, 200)
-			config.message.show = TRUE
+			config.message.show = True
 
 			config.order.pos = (0, 55)
 			config.order.size = (middle, map_height-55-padding*4)
-			config.order.show = TRUE
+			config.order.show = True
 
 			config.starmap.pos = (middle+padding, 0)
 			config.starmap.size = (map_width-padding, map_height-padding*2)
-			config.starmap.show = TRUE
+			config.starmap.show = True
 
 			config.system.pos = (middle+padding, map_height)
 			config.system.size = (map_width-padding, 200)
-			config.system.show = TRUE
+			config.system.show = True
 		
 			config.raise_ = "All on All" 
 	
@@ -77,7 +74,7 @@ class MainControl:
 
 		save_data("windows", config)
 
-	def ConfigActivate(self, show=TRUE):
+	def ConfigActivate(self, show=True):
 		config = self.config
 
 		self.main.SetPosition(config.main.pos)
@@ -129,7 +126,7 @@ class MainControl:
 		from windows.winSystem  import winSystem
 		self.system = winSystem(application, self.main, config.system.pos, config.system.size)
 
-		self.ConfigActivate(FALSE)
+		self.ConfigActivate(False)
 
 	def Raise(self):
 		"""\
@@ -164,11 +161,15 @@ class MainControl:
 		"""\
 			Show the main window
 		"""
-		pass
-
-		self.main.Show(FALSE)
-		self.message.Show(FALSE)
-		self.order.Show(FALSE)
-		self.starmap.Show(FALSE)
-		self.system.Show(FALSE)
-
+		self.main.Show(False)
+		self.message.Show(False)
+		self.order.Show(False)
+		self.starmap.Show(False)
+		self.system.Show(False)
+	
+	def Post(self, event):
+		func = 'On' + event.__class__.__name__[:-5]
+		for window in [self.main, self.message, self.order, self.starmap, self.system]:
+			if hasattr(window, func):
+				getattr(window, func)(event)
+		

@@ -2,16 +2,12 @@
 This module contains the main menu window.
 """
 
-# Python imports
-
 # wxPython imports
-from wxPython.wx import *
-
-# Game imports
-from utils import *
+import wx
 
 # Local imports
-from winBase import winMainBase
+from winBase import *
+from utils import *
 
 ID_MENU = 10042
 ID_OPEN = 10043
@@ -38,64 +34,65 @@ ID_HELP = 10057
 class winMain(winMainBase):
 	title = "Thousand Parsec"
 	
-	def __init__(self, application, pos=wxDefaultPosition, size=wxDefaultSize, style=wxDEFAULT_FRAME_STYLE):
+	def __init__(self, application, pos=wx.DefaultPosition, size=wx.DefaultSize, style=wx.DEFAULT_FRAME_STYLE):
 		winMainBase.__init__(self, application, None, pos, size, style)
 
 		# File Menu
-		file = wxMenu()
+		file = wx.Menu()
 		file.Append( ID_OPEN, "Connect to Game\tCtrl-O", "Connect to a diffrent Game" )
 		file.AppendSeparator()
 		file.Append( ID_CONFIG, "Config", "Configure the Client" )
 		file.AppendSeparator()
 		file.Append( ID_EXIT, "Exit", "Exit" )
-		EVT_MENU(self, ID_OPEN, self.OnConnect)
-		EVT_MENU(self, ID_CONFIG, self.OnConfig)
-		EVT_MENU(self, ID_EXIT, self.OnProgramExit)
+
+		wx.EVT_MENU(self, ID_OPEN, self.OnConnect)
+		wx.EVT_MENU(self, ID_CONFIG, self.OnConfig)
+		wx.EVT_MENU(self, ID_EXIT, self.OnProgramExit)
 
 		# Statistics Menu
-		stat = wxMenu()
+		stat = wx.Menu()
 		stat.Append( ID_STAT_EAAG, "Empire at a Glance", "" )
 		stat.AppendSeparator()
 		stat.Append( ID_STAT_SYSTEM, "Systems", "" )
 		stat.Append( ID_STAT_PLANET, "Planets", "" )
-		stat.Append( ID_STAT_FLEET, "Fleets", "" )
+		stat.Append( ID_STAT_FLEET,  "Fleets", "" )
 		stat.AppendSeparator()
 		stat.Append( ID_STAT_BATTLE, "Battles", "" )
 
 		# Windows Menu
-		win = wxMenu()
-		win.Append(  ID_WIN_MESSAGES, "Hide Messages", "", TRUE )
-		win.Append(  ID_WIN_ORDERS,   "Hide Orders", "", TRUE )
-		win.Append(  ID_WIN_STARMAP,  "Hide Starmap", "", TRUE )
-		win.Append(  ID_WIN_SYSTEM,   "Hide System", "", TRUE )
+		win = wx.Menu()
+		win.Append(  ID_WIN_MESSAGES, "Hide Messages", "", True )
+		win.Append(  ID_WIN_ORDERS,   "Hide Orders", "", True )
+		win.Append(  ID_WIN_STARMAP,  "Hide Starmap", "", True )
+		win.Append(  ID_WIN_SYSTEM,   "Hide System", "", True )
 		win.AppendSeparator()
-		win.Append(  ID_WIN_TECH, "Tech Browser", "", TRUE)
-		win.Append(  ID_WIN_HELP, "Help", "", TRUE)
+		win.Append(  ID_WIN_TECH, "Tech Browser", "", True)
+		win.Append(  ID_WIN_HELP, "Help", "", True)
 
-		EVT_MENU(self, ID_WIN_MESSAGES,  self.OnMessages)
-#		EVT_MENU(self, ID_WIN_ORDERS,    self.OnOrders)
-		EVT_MENU(self, ID_WIN_STARMAP,   self.OnStarMap)
-		EVT_MENU(self, ID_WIN_SYSTEM,    self.OnSystem)
-		#EVT_MENU(self, ID_WIN_TECH,  self.changeWin)
-#		EVT_MENU(self, ID_WIN_HELP,  self.OnHelp)
+		wx.EVT_MENU(self, ID_WIN_MESSAGES,  self.OnMessages)
+#		wx.EVT_MENU(self, ID_WIN_ORDERS,    self.OnOrders)
+		wx.EVT_MENU(self, ID_WIN_STARMAP,   self.OnStarMap)
+		wx.EVT_MENU(self, ID_WIN_SYSTEM,    self.OnSystem)
+#		wx.EVT_MENU(self, ID_WIN_TECH,  self.changeWin)
+#		wx.EVT_MENU(self, ID_WIN_HELP,  self.OnHelp)
 
-		help = wxMenu()
+		help = wx.Menu()
 		
-		bar = wxMenuBar()
+		bar = wx.MenuBar()
 		bar.Append( file, "File" )
 		bar.Append( stat, "Statistics" )
 		bar.Append( win,  "Windows" )
 		bar.Append( help, "Help" )
 		
 		self.SetMenuBar(bar)
-		self.CreateStatusBar(1, wxST_SIZEGRIP)
+		self.CreateStatusBar(1, wx.ST_SIZEGRIP)
 
 	def OnConnect(self, evt):
 		self.application.windows.Hide()
-		self.application.windows.connect.Show(TRUE)
+		self.application.windows.connect.Show(True)
 
 	def OnConfig(self, evt):
-		self.application.windows.winconfig.Show(TRUE)
+		self.application.windows.winconfig.Show(True)
 
 	def OnStarMap(self, evt):
 		self.application.windows.starmap.Show(not evt.Checked())

@@ -3,7 +3,8 @@ The pywx-client for Thousand Parsec (TP)
 
 Requirements:
 	python 2.2
-	wxPython 2.3 (recommended 2.4)
+	wxPython 2.5.1
+	py-netlib 0.0.6
 
 How to use
 ============================================
