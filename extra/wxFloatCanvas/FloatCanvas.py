@@ -1237,6 +1237,15 @@ class FloatCanvas(wx.Panel):
     def SetMode(self,Mode):
         if Mode in ["ZoomIn","ZoomOut","Move","Mouse",None]:
             self.GUIMode = Mode
+
+            # Change the cursor
+            cursors = { "ZoomIn": wx.CURSOR_MAGNIFIER,
+                        "ZoomOut": wx.CURSOR_MAGNIFIER,
+                        "Move": wx.CURSOR_HAND,
+                        "Mouse": wx.CURSOR_ARROW,
+                        None: wx.CURSOR_ARROW }
+
+            self.SetCursor(wx.StockCursor(cursors[Mode]))
         else:
             raise FloatCanvasException('"%s" is Not a valid Mode'%Mode)
 

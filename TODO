@@ -33,6 +33,10 @@ Short Term
 	* Add starting tips
 	* Allow starting tips to be disabled in the config
 
+	* Stop annoying flicker on save
+
+	* Fixup and cleanup the Config dialog..
+
 Longer Term
 	* Add a info panel (DONE)
 		* Add data to the info panel (DONE)

@@ -24,6 +24,7 @@ import sys
 
 # wx.Python imports
 import wx
+import extra
 import extra.fixdc
 
 # Python Imports

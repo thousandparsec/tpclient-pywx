@@ -8,8 +8,6 @@ import copy
 
 # wxPython Imports
 import wx
-import wx.lib.anchors
-import wx.lib.mixins.listctrl
 
 # Local Imports
 from winBase import *
@@ -23,102 +21,6 @@ from netlib.objects import OrderDescs, constants
 TURNS_COL = 0
 ORDERS_COL = 1
 
-wx.ListCtrlOrig = wx.ListCtrl
-class wxListCtrl(wx.ListCtrlOrig, wx.lib.mixins.listctrl.ListCtrlAutoWidthMixin):
-	def __init__(self, parent, ID, pos=wx.DefaultPosition, size=wx.DefaultSize, style=0):
-		wx.ListCtrlOrig.__init__(self, parent, ID, pos, size, style)
-		wx.lib.mixins.listctrl.ListCtrlAutoWidthMixin.__init__(self)
-
-		self.tooltips = {}
-		self.objects = {}
-
-		self.Bind(wx.EVT_MOTION, self.OnMouseMotion)
-
-	def SetItemPyData(self, slot, data):
-		self.objects[slot] = data
-
-	def GetItemPyData(self, slot):
-		try:
-			return self.objects[slot]
-		except:
-			return None
-
-	def FindItemByPyData(self, data):
-		slot = -1
-		while True:
-			slot = self.GetNextItem(slot, wx.LIST_NEXT_ALL, wx.LIST_STATE_DONTCARE);
-			if slot == wx.NOT_FOUND:
-				return wx.NOT_FOUND
-				
-			if self.GetItemPyData(slot) == data:
-				return slot
-
-	def GetStringItem(self, slot, col):
-		item = self.GetItem(slot, col)
-		if item == wx.NOT_FOUND:
-			return wx.NOT_FOUND
-		else:
-			return item.GetText()
-
-	def SetToolTip(self, tooltip):
-		if isinstance(tooltip, wx.ToolTip):
-			tooltip = tooltip.GetTip()
-		self.tooltips[-1] = tooltip
-		wx.ListCtrlOrig.SetToolTip(self, wx.ToolTip(tooltip))
-
-	def SetToolTipItem(self, slot, text):
-		self.tooltips[slot] = text
-	
-	def GetToolTipItem(self, slot):
-		if self.tooltips.has_key(slot):
-			return self.tooltips[slot]
-		else:
-			return None
-	
-	def OnMouseMotion(self, evt):
-		slot = self.HitTest(evt.GetPosition())[0]
-		
-		if self.tooltips.has_key(slot):
-			if self.GetToolTip() == None:
-				wx.ListCtrlOrig.SetToolTip(self, wx.ToolTip(self.tooltips[slot]))
-			elif self.GetToolTip().GetTip() != self.tooltips[slot]:
-				self.GetToolTip().SetTip(self.tooltips[slot])
-
-wx.ListCtrl = wxListCtrl
-
-wx.ChoiceOrig = wx.Choice
-class wxChoice(wx.Choice):
-	def __init__(self, *arg, **kw):
-		wx.ChoiceOrig.__init__(self, *arg, **kw)
-
-		self.tooltips = {}
-		self.Bind(wx.EVT_CHOICE, self.OnSelection)
-
-	def SetToolTip(self, tooltip):
-		if isinstance(tooltip, wx.ToolTip):
-			tooltip = tooltip.GetTip()
-		self.tooltips[-1] = tooltip
-		wx.ChoiceOrig.SetToolTip(self, wx.ToolTip(tooltip))
-
-	def SetToolTipItem(self, slot, text):
-		self.tooltips[slot] = text
-	
-	def GetToolTipItem(self, slot):
-		if self.tooltips.has_key(slot):
-			return self.tooltips[slot]
-		else:
-			return None
-	
-	def OnSelection(self, evt):
-		slot = self.GetSelection()
-		
-		if self.tooltips.has_key(slot):
-			if self.GetToolTip() == None:
-				wx.ChoiceOrig.SetToolTip(self, wx.ToolTip(self.tooltips[slot]))
-			elif self.GetToolTip().GetTip() != self.tooltips[slot]:
-				self.GetToolTip().SetTip(self.tooltips[slot])
-
-wx.Choice = wxChoice
 buttonSize = (wx.local.buttonSize[0], wx.local.buttonSize[1]+2)
 
 class winOrder(winBase):
@@ -142,7 +44,7 @@ class winOrder(winBase):
 		base_panel.SetSizer( base_sizer )
 		
 		# List of current orders
-		order_list = wx.ListCtrl( base_panel, -1, wx.DefaultPosition, wx.Size(160,80), wx.LC_REPORT|wx.LC_SINGLE_SEL|wx.SUNKEN_BORDER )
+		order_list = wx.ListCtrl( base_panel, -1, wx.DefaultPosition, wx.Size(160,80), wx.LC_REPORT|wx.SUNKEN_BORDER )
 		order_list.InsertColumn(TURNS_COL, "Turns")
 		order_list.SetColumnWidth(TURNS_COL, 40)
 		order_list.InsertColumn(ORDERS_COL, "Order Information")
@@ -156,19 +58,19 @@ class winOrder(winBase):
 		# Buttons to add/delete orders
 		button_sizer = wx.FlexGridSizer( 1, 0, 0, 0 )
 		
-		new_button = wx.Button( base_panel, -1, "New", size=wx.local.buttonSize)
-		new_button.SetFont(wx.local.normalFont)
-		
 		type_list = wx.Choice( base_panel, -1, choices=[], size=wx.local.buttonSize)
 		type_list.SetFont(wx.local.tinyFont)
+		
+		new_button = wx.Button( base_panel, -1, "New", size=wx.local.buttonSize)
+		new_button.SetFont(wx.local.normalFont)
 		
 		line_vert = wx.StaticLine( base_panel, -1, wx.DefaultPosition, wx.Size(-1,10), wx.LI_VERTICAL )
 
 		delete_button = wx.Button( base_panel, -1, "Delete", size=wx.local.buttonSize)
 		delete_button.SetFont(wx.local.normalFont)
 		
-		button_sizer.AddWindow( new_button,    0, wx.ALIGN_CENTRE, 1 )
 		button_sizer.AddWindow( type_list,     0, wx.ALIGN_CENTRE, 1 )
+		button_sizer.AddWindow( new_button,    0, wx.ALIGN_CENTRE, 1 )
 		button_sizer.AddWindow( line_vert,     0, wx.ALIGN_CENTRE, 1 )
 		button_sizer.AddWindow( delete_button, 0, wx.ALIGN_CENTRE, 1 )
 		
@@ -200,6 +102,7 @@ class winOrder(winBase):
 		self.Bind(wx.EVT_BUTTON, self.OnOrderDelete, delete_button)
 		
 		self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.OnOrderSelect, order_list)
+		self.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.OnOrderSelect, order_list)
 
 		self.SetSize(size)
 		self.SetPosition(pos)
@@ -211,14 +114,13 @@ class winOrder(winBase):
 		oslot = self.order_list.GetNextItem(-1, wx.LIST_NEXT_ALL, wx.LIST_STATE_SELECTED)
 
 		self.oid = evt.id
-
 		try:
 			object = self.application.cache.objects[self.oid]
-		except:
+		except IndexError:
 			debug(DEBUG_WINDOWS, "SelectObject: No such object.")
 			return
 			
-		self.order_list.SetToolTip("Current orders on %s." % object.name)
+		self.order_list.SetToolTipDefault("Current orders on %s." % object.name)
 		
 		self.order_list.DeleteAllItems()
 		for slot in range(0, object.order_number):
@@ -235,7 +137,7 @@ class winOrder(winBase):
 			
 		# Set which orders can be added to this object
 		self.type_list.Clear()
-		self.type_list.SetToolTip("Order type to create")
+		self.type_list.SetToolTipDefault("Order type to create")
 		for type in object.order_types:
 			if not OrderDescs().has_key(type):
 				continue
@@ -253,11 +155,13 @@ class winOrder(winBase):
 		self.OnOrderSelect(None)
 
 	def OnOrderSelect(self, evt):
-		slot = self.order_list.GetNextItem(-1, wx.LIST_NEXT_ALL, wx.LIST_STATE_SELECTED)
-		if slot == wx.NOT_FOUND:
-			order = None
+		slots = self.order_list.GetSelected()
+		if len(slots) > 1:
+			order = "Multiple orders selected."
+		elif len(slots) < 1:
+			order = "No orders selected."
 		else:
-			order = self.application.cache.orders[self.oid][slot]
+			order = self.application.cache.orders[self.oid][slots[0]]
 
 		self.BuildPanel(order)
 
@@ -270,16 +174,15 @@ class winOrder(winBase):
 		type = self.type_list.GetClientData(type)
 			
 		# Append a new order to the list below the currently selected one
-		slot = self.order_list.GetNextItem(-1, wx.LIST_NEXT_ALL, wx.LIST_STATE_SELECTED)
-		if slot == wx.NOT_FOUND:
-			debug(DEBUG_WINDOWS, "OrderNew: No orders in the order list.")
-			slot = 0
+		slots = self.order_list.GetSelected()
+		if len(slots) != 0:
+			slot = slots[0] + 1
 		else:
-			slot += 1
+			slot = 0
 			
 		try:
 			orderdesc = OrderDescs()[type]
-		except:
+		except IndexError:
 			debug(DEBUG_WINDOWS, "OrderNew: Have not got OrderDesc yet (%i)" % type)
 			return
 			
@@ -318,41 +221,38 @@ class winOrder(winBase):
 		self.OnSelectObject(wx.local.SelectObjectEvent(self.oid))
 
 	def OnOrderDelete(self, evt):
-		slot = self.order_list.GetNextItem(-1, wx.LIST_NEXT_ALL, wx.LIST_STATE_SELECTED)
-		if slot == wx.NOT_FOUND:
-			debug(DEBUG_WINDOWS, "OrderDelete: No order selected for delete.")
-			return
-			
-		# Remove the order
-		r = self.application.connection.remove_orders(self.oid, slot)
-		if failed(r):
-			debug(DEBUG_WINDOWS, "OrderDelete: Remove failed!")
-			return
+		for slot in self.order_list.GetSelected():
+			r = self.application.connection.remove_orders(self.oid, slot)
+			if failed(r):
+				debug(DEBUG_WINDOWS, "OrderDelete: Remove %s failed!" % slot)
+				continue
 
-		del self.application.cache.orders[self.oid][slot]
-		self.application.cache.objects[self.oid].order_number -= 1
+			del self.application.cache.orders[self.oid][slot]
+			self.application.cache.objects[self.oid].order_number -= 1
 
 		self.OnSelectObject(wx.local.SelectObjectEvent(self.oid))
 
 	def OnOrderSave(self, evt):
-		slot = self.order_list.GetNextItem(-1, wx.LIST_NEXT_ALL, wx.LIST_STATE_SELECTED)
-		if slot == wx.NOT_FOUND:
-			debug(DEBUG_WINDOWS, "OrderSave: No order selected for save.")
+		slots = self.order_list.GetSelected()
+		if len(slots) != 1:
+			debug(DEBUG_WINDOWS, "OrderSave: No order selected for save. (%s)" % str(slots))
 			return
-
+		
+		slot = slots[0]
+		
 		try:
 			order = self.application.cache.orders[self.oid][slot]
-		except:
-			debug(DEBUG_WINDOWS, "OrderSave: Could not get order")
+		except IndexError:
+			debug(DEBUG_WINDOWS, "OrderSave: Could not get order (%s)" % slot)
 			return
 		
 		try:
 			orderdesc = OrderDescs()[order.type]
-		except:
-			debug(DEBUG_WINDOWS, "OrderSave: No order description.")
+		except IndexError:
+			debug(DEBUG_WINDOWS, "OrderSave: No order description. (%s)" % order.type)
 			return
 
-		args = [order.sequence, order.id, order.slot, order.type, 0, []]
+		args = [order.sequence, order.id, slot, order.type, 0, []]
 
 		subpanels = copy.copy(self.argument_subpanels)
 		for name, type in orderdesc.names:
@@ -376,13 +276,13 @@ class winOrder(winBase):
 		print args
 		order = apply(objects.Order, args)
 		print order
-
+		
 		debug(DEBUG_WINDOWS, "OrderSave: Inserting.")
-		order = self.application.connection.insert_order(self.oid, slot, order)
-		if failed(order):
+		r = self.application.connection.insert_order(self.oid, slot, order)
+		if failed(r):
 			debug(DEBUG_WINDOWS, "OrderSave: Insert failed.")
 			return
-		
+	
 		debug(DEBUG_WINDOWS, "OrderSave: Getting.")
 		order = self.application.connection.get_orders(self.oid, slot)[0]
 		if failed(order):
@@ -394,10 +294,14 @@ class winOrder(winBase):
 		r = self.application.connection.remove_orders(self.oid, slot+1)
 		if failed(r):
 			debug(DEBUG_WINDOWS, "OrderSave: Remove failed.")
+			self.application.cache.objects[self.oid].order_number += 1
+			self.OnSelectObject(wx.local.SelectObjectEvent(self.oid))
 			return
 		del self.application.cache.orders[self.oid][slot+1]
 
-		self.OnSelectObject(wx.local.SelectObjectEvent(self.oid))
+		# Update the turns field
+		self.order_list.SetStringItem(slot, TURNS_COL, str(self.application.cache.orders[self.oid][slot].turns))
+
 		self.application.windows.Post(wx.local.SelectOrderEvent(self.oid, slot, True))
 
 	def BuildPanel(self, order):
@@ -418,7 +322,7 @@ class winOrder(winBase):
 		self.argument_sizer.AddGrowableCol( 1 )
 
 		# Do we actually have an order
-		if order:
+		if isinstance(order, objects.Order):
 			orderdesc = OrderDescs()[order.type]
 			
 			# List for the argument subpanels
@@ -470,8 +374,7 @@ class winOrder(winBase):
 			
 		else:
 			# Display message
-			text = "No order selected."
-			msg = wx.StaticText( self.argument_panel, -1, text, wx.DefaultPosition, wx.DefaultSize, 0)
+			msg = wx.StaticText( self.argument_panel, -1, str(order), wx.DefaultPosition, wx.DefaultSize, 0)
 			msg.SetFont(wx.local.normalFont)
 			
 			self.argument_sizer.AddWindow( msg, 0, wx.ALIGN_CENTER|wx.ALL, 5)
@@ -507,7 +410,7 @@ def argStringPanel(parent, parent_panel, args):
 
 	panel.SetSizer(item0)
 	panel.SetAutoLayout( True )
-	
+
 	item1 = wx.TextCtrl( panel, -1, args[1], size=(wx.local.spinSize[0]*2, wx.local.spinSize[1]))
 	item1.SetFont(wx.local.tinyFont)
 	item0.AddWindow( item1, 0, wx.ALIGN_CENTRE|wx.LEFT, 1 )
@@ -525,23 +428,28 @@ def argObjectPanel(parent, parent_panel, args, cache):
 	panel.SetSizer(item0)
 	panel.SetAutoLayout( True )
 
-	if args == -1:
-		args = "None selected..."
-	else:
-		args = str(args)
+	item1 = wx.ComboBox( panel, -1, "", choices=(), style=wx.CB_READONLY, \
+				size=(wx.local.spinSize[0]*4, wx.local.spinSize[1]))
 
-	item1 = wx.TextCtrl( panel, -1, args, size=(wx.local.spinSize[0]*2, wx.local.spinSize[1]))
+	item1.Append("No object", -1)
+	item1.SetSelection(0)
+	for id, object in cache.objects.items():
+		item1.Append(object.name + " (%s)" % object.id, object.id)
+		if hasattr(object, "parent"):
+			item1.SetToolTipItem(item1.GetCount()-1, "At " + cache.objects[object.parent].name)
+
+		if object.id == args:
+			item1.SetSelection(item1.GetCount()-1)
+	item1.OnSelection(None)
+
 	item1.SetFont(wx.local.tinyFont)
 	item0.AddWindow( item1, 0, wx.ALIGN_CENTRE|wx.LEFT, 1 )
 	
 	return panel
 
 def argObjectGet(panel):
-	windows = panel.GetChildren()
-	try:
-		return [int(windows[0].GetValue())]
-	except:
-		return [-1]
+	window = panel.GetChildren()[0]
+	return [window.GetClientData(window.GetSelection())]
 	
 def argListPanel(parent, parent_panel, args):
 	panel = wx.Panel(parent_panel, -1)
@@ -571,25 +479,25 @@ def argListPanel(parent, parent_panel, args):
 		selected.SetStringItem(slot, 1, types[type][0])
 		selected.SetItemPyData(slot, type)
 		
-	add = wx.Button( panel, -1, "Add", size=wx.local.buttonSize )
-	add.SetFont(wx.local.normalFont)
-	
-	number = wx.SpinCtrl( panel, -1, "", min=0, max=100, size=wx.local.spinSize )
-	number.SetFont(wx.local.tinyFont)
-
 	type_list = wx.Choice( panel, -1, choices=[], size=wx.local.buttonSize)
 	type_list.SetFont(wx.local.tinyFont)
 
 	for type, item in types.items():
 		type_list.Append(item[0], type)
 
+	number = wx.SpinCtrl( panel, -1, "", min=0, max=100, size=wx.local.spinSize )
+	number.SetFont(wx.local.tinyFont)
+
+	add = wx.Button( panel, -1, "Add", size=wx.local.buttonSize )
+	add.SetFont(wx.local.normalFont)
+	
 	delete = wx.Button( panel, -1, "D", size=(wx.local.smallSize[0],wx.local.buttonSize[1]) )
 	delete.SetFont(wx.local.normalFont)
 
 	box_add = wx.BoxSizer(wx.HORIZONTAL)
-	box_add.AddWindow( add, 0, wx.ALIGN_CENTRE|wx.LEFT, 1 )
-	box_add.AddWindow( number, 0, wx.ALIGN_CENTRE|wx.LEFT, 1 )
 	box_add.AddWindow( type_list, 0, wx.ALIGN_CENTRE|wx.LEFT, 1 )
+	box_add.AddWindow( number, 0, wx.ALIGN_CENTRE|wx.LEFT, 1 )
+	box_add.AddWindow( add, 0, wx.ALIGN_CENTRE|wx.LEFT, 1 )
 	box_add.AddWindow( delete, 0, wx.ALIGN_CENTRE|wx.LEFT, 1 )
 
 	base.AddSizer( selected, 1, wx.EXPAND|wx.ALIGN_CENTRE|wx.ALL, 1 )

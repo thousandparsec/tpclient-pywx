@@ -37,7 +37,6 @@ def getpath(application, object):
 	orders = application.cache.orders[object.id]
 	points = [object.pos[0:2]]
 	for order in orders:
-		print order
 		if order.type == 1:
 			points += [order.pos[0:2]]
 					
@@ -68,7 +67,7 @@ class winStarMap(winBase):
 
 		self.cache = {}
 		self.path = None
-
+	
 	def OnCacheUpdate(self, evt):
 		self.Rebuild()
 
@@ -142,7 +141,14 @@ class winStarMap(winBase):
 		self.application.windows.Post(wx.local.SelectObjectEvent(evt.data))
 
 	def OnRightClick(self, evt):
-		print "Right click on", evt.data
+		if self.mode == "Normal":
+			# Check if there are any other objects at this position 
+	
+			# If so display a pop-up menu with the objects to choose from...
+			print "Right click on", evt.data
+		elif self.mode == "Select":
+			# Cancel the mode
+			self.SetMode("Normal")
 
 	def OnSelectObject(self, evt):
 		object = self.application.cache.objects[evt.id]
@@ -182,4 +188,5 @@ class winStarMap(winBase):
 				self.Canvas.AddObject(self.cache[evt.id]["icon"])
 
 		self.Canvas.Draw(evt.save and isinstance(object, Fleet))
+
 
