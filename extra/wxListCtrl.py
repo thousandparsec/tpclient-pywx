@@ -1,6 +1,6 @@
 
 from wxPython.wx import wxListCtrl as _wxListCtrl
-from wxPython.lib.mixins.listctrl import wxListCtrlAutoWidthMixin
+from listctrl import wxListCtrlAutoWidthMixin
 
 import random
 
