@@ -121,6 +121,39 @@ class winOrder(winBase):
 		self.SetSize(size)
 		self.SetPosition(pos)
 
+	# Update the display for the new object
+	def OnSelect(self, evt):
+		g = self.app.game
+		oid = evt.value
+
+		# The object that was selected and set it as the currently selected one
+		object = g.universe.Object(oid)
+		self.oid = oid
+
+		if object:
+			# Set which orders can be added to this object
+			self.new_type_list.Clear()
+			for type in object.orders_valid:
+				orderdesc = g.descs.OrderDesc(type)
+				if orderdesc:
+					self.new_type_list.Append(orderdesc.name, type)
+				else:
+					self.new_type_list.Append("Waiting on description for (%i)" % type, type)
+
+			# Add a whole bunch of place holders until we get the order
+			self.order_list.DeleteAllItems()
+			for slot in range(0, object.orders_no):
+				self.order_list.InsertStringItem(slot, "")
+				self.order_list.SetStringItem(slot, TURNS_COL, "Unknown")
+				self.order_list.SetStringItem(slot, ORDERS_COL, "Waiting on order (%i) information" % slot)
+				self.order_list.SetItemData(slot, None)
+				
+				# Request the order be gotten
+				nevt = GameOrderGetEvent(object.id, slot)
+				wxPostEvent(nevt)
+
+			self.BuildPanel(None)
+
 	def OnOrder(self, evt):
 		g = self.app.game
 		
@@ -209,6 +242,46 @@ class winOrder(winBase):
 			# Update the Panel
 			self.BuildPanel(None)
 
+	def OnOrderSave(self, evt):
+		g = self.app.game
+	
+		slot = self.order_list.GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED)
+		if slot == wxNOT_FOUND:
+			return
+
+		order = self.order_list.GetItemData(slot)
+		if order:
+			orderdesc = g.descs.OrderDesc(order.otype)
+			
+			if orderdesc:
+				args = []
+
+				subpanels = copy.copy(self.argument_subpanels)
+				for name, type, desc in orderdesc.parameters:
+					panel = subpanels.pop()
+					
+					if type == protocol.OrderDesc.ARG_COORD:
+						argCoordGet( args, panel )
+					elif type == protocol.OrderDesc.ARG_TIME:
+						debug(DEBUG_WINDOWS, "Argument type (ARG_TIME) not implimented yet.")
+					elif type == protocol.OrderDesc.ARG_OBJECT:
+						debug(DEBUG_WINDOWS, "Argument type (ARG_OBJECT) not implimented yet.")
+					elif type == protocol.OrderDesc.ARG_PLAYER:
+						debug(DEBUG_WINDOWS, "Argument type (ARG_PLAYER) not implimented yet.")
+
+			order.args = args
+
+			# Send a remove order for that slot
+			nevt = GameOrderRemoveEvent(order=order)
+			wxPostEvent(nevt)
+		
+			# FIXME: Evil hack
+			time.sleep(1)
+			
+			# Send an add order for that slot
+			nevt = GameOrderInsertEvent(order=order)
+			wxPostEvent(nevt)
+
 	def OnOrderSelect(self, evt):
 		g = self.app.game
 
@@ -219,39 +292,6 @@ class winOrder(winBase):
 
 		order = self.order_list.GetItemData(slot)
 		self.BuildPanel(order)
-		
-	# Update the display for the new object
-	def OnSelect(self, evt):
-		g = self.app.game
-		oid = evt.value
-
-		# The object that was selected and set it as the currently selected one
-		object = g.universe.Object(oid)
-		self.oid = oid
-
-		if object:
-			# Set which orders can be added to this object
-			self.new_type_list.Clear()
-			for type in object.orders_valid:
-				orderdesc = g.descs.OrderDesc(type)
-				if orderdesc:
-					self.new_type_list.Append(orderdesc.name, type)
-				else:
-					self.new_type_list.Append("Waiting on description for (%i)" % type, type)
-
-			# Add a whole bunch of place holders until we get the order
-			self.order_list.DeleteAllItems()
-			for slot in range(0, object.orders_no):
-				self.order_list.InsertStringItem(slot, "")
-				self.order_list.SetStringItem(slot, TURNS_COL, "Unknown")
-				self.order_list.SetStringItem(slot, ORDERS_COL, "Waiting on order (%i) information" % slot)
-				self.order_list.SetItemData(slot, None)
-				
-				# Request the order be gotten
-				nevt = GameOrderGetEvent(object.id, slot)
-				wxPostEvent(nevt)
-
-			self.BuildPanel(None)
 
 	def BuildPanel(self, order):
 		"""\
@@ -330,46 +370,6 @@ class winOrder(winBase):
 			self.argument_sizer.AddWindow( msg, 0, wxALIGN_CENTER|wxALL, 5)
 		
 		self.base_sizer.Layout()
-
-	def OnOrderSave(self, evt):
-		g = self.app.game
-	
-		slot = self.order_list.GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED)
-		if slot == wxNOT_FOUND:
-			return
-
-		order = self.order_list.GetItemData(slot)
-		if order:
-			orderdesc = g.descs.OrderDesc(order.otype)
-			
-			if orderdesc:
-				args = []
-
-				subpanels = copy.copy(self.argument_subpanels)
-				for name, type, desc in orderdesc.parameters:
-					panel = subpanels.pop()
-					
-					if type == protocol.OrderDesc.ARG_COORD:
-						argCoordGet( args, panel )
-					elif type == protocol.OrderDesc.ARG_TIME:
-						debug(DEBUG_WINDOWS, "Argument type (ARG_TIME) not implimented yet.")
-					elif type == protocol.OrderDesc.ARG_OBJECT:
-						debug(DEBUG_WINDOWS, "Argument type (ARG_OBJECT) not implimented yet.")
-					elif type == protocol.OrderDesc.ARG_PLAYER:
-						debug(DEBUG_WINDOWS, "Argument type (ARG_PLAYER) not implimented yet.")
-
-			order.args = args
-
-			# Send a remove order for that slot
-			nevt = GameOrderRemoveEvent(order=order)
-			wxPostEvent(nevt)
-		
-			# FIXME: Evil hack
-			time.sleep(1)
-			
-			# Send an add order for that slot
-			nevt = GameOrderInsertEvent(order=order)
-			wxPostEvent(nevt)
 
 # The display for an ARG_COORD
 ID_X = 10062
