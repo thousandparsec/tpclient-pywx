@@ -31,43 +31,56 @@ ID_WIN_HELP = 1105
 
 ID_HELP = 10057
 
+
+def create_menu():
+
+	# File Menu
+	file = wx.Menu()
+	file.Append( ID_OPEN, "Connect to Game\tCtrl-O", "Connect to a diffrent Game" )
+	file.AppendSeparator()
+	file.Append( ID_CONFIG, "Config", "Configure the Client" )
+	file.AppendSeparator()
+	file.Append( ID_EXIT, "Exit", "Exit" )
+
+	# Statistics Menu
+	stat = wx.Menu()
+	stat.Append( ID_STAT_EAAG, "Empire at a Glance", "" )
+	stat.AppendSeparator()
+	stat.Append( ID_STAT_SYSTEM, "Systems", "" )
+	stat.Append( ID_STAT_PLANET, "Planets", "" )
+	stat.Append( ID_STAT_FLEET,  "Fleets", "" )
+	stat.AppendSeparator()
+	stat.Append( ID_STAT_BATTLE, "Battles", "" )
+
+	# Windows Menu
+	win = wx.Menu()
+	win.Append(  ID_WIN_MESSAGES, "Hide Messages", "", True )
+	win.Append(  ID_WIN_ORDERS,   "Hide Orders", "", True )
+	win.Append(  ID_WIN_STARMAP,  "Hide Starmap", "", True )
+	win.Append(  ID_WIN_SYSTEM,   "Hide System", "", True )
+	win.AppendSeparator()
+	win.Append(  ID_WIN_TECH, "Tech Browser", "", True)
+	win.Append(  ID_WIN_HELP, "Help", "", True)
+
+	help = wx.Menu()
+	
+	bar = wx.MenuBar()
+	bar.Append( file, "File" )
+	bar.Append( stat, "Statistics" )
+	bar.Append( win,  "Windows" )
+	bar.Append( help, "Help" )
+
+	return bar
+
 class winMain(winMainBase):
 	title = "Thousand Parsec"
 	
 	def __init__(self, application, pos=wx.DefaultPosition, size=wx.DefaultSize, style=wx.DEFAULT_FRAME_STYLE):
 		winMainBase.__init__(self, application, None, pos, size, style)
 
-		# File Menu
-		file = wx.Menu()
-		file.Append( ID_OPEN, "Connect to Game\tCtrl-O", "Connect to a diffrent Game" )
-		file.AppendSeparator()
-		file.Append( ID_CONFIG, "Config", "Configure the Client" )
-		file.AppendSeparator()
-		file.Append( ID_EXIT, "Exit", "Exit" )
-
 		wx.EVT_MENU(self, ID_OPEN, self.OnConnect)
 		wx.EVT_MENU(self, ID_CONFIG, self.OnConfig)
 		wx.EVT_MENU(self, ID_EXIT, self.OnProgramExit)
-
-		# Statistics Menu
-		stat = wx.Menu()
-		stat.Append( ID_STAT_EAAG, "Empire at a Glance", "" )
-		stat.AppendSeparator()
-		stat.Append( ID_STAT_SYSTEM, "Systems", "" )
-		stat.Append( ID_STAT_PLANET, "Planets", "" )
-		stat.Append( ID_STAT_FLEET,  "Fleets", "" )
-		stat.AppendSeparator()
-		stat.Append( ID_STAT_BATTLE, "Battles", "" )
-
-		# Windows Menu
-		win = wx.Menu()
-		win.Append(  ID_WIN_MESSAGES, "Hide Messages", "", True )
-		win.Append(  ID_WIN_ORDERS,   "Hide Orders", "", True )
-		win.Append(  ID_WIN_STARMAP,  "Hide Starmap", "", True )
-		win.Append(  ID_WIN_SYSTEM,   "Hide System", "", True )
-		win.AppendSeparator()
-		win.Append(  ID_WIN_TECH, "Tech Browser", "", True)
-		win.Append(  ID_WIN_HELP, "Help", "", True)
 
 		wx.EVT_MENU(self, ID_WIN_MESSAGES,  self.OnMessages)
 #		wx.EVT_MENU(self, ID_WIN_ORDERS,    self.OnOrders)
@@ -76,16 +89,7 @@ class winMain(winMainBase):
 #		wx.EVT_MENU(self, ID_WIN_TECH,  self.changeWin)
 #		wx.EVT_MENU(self, ID_WIN_HELP,  self.OnHelp)
 
-		help = wx.Menu()
-		
-		bar = wx.MenuBar()
-		bar.Append( file, "File" )
-		bar.Append( stat, "Statistics" )
-		bar.Append( win,  "Windows" )
-		bar.Append( help, "Help" )
-
-		self.bar = bar
-
+		bar = create_menu()
 		self.SetMenuBar(bar)
 		self.CreateStatusBar(1, wx.ST_SIZEGRIP)
 

@@ -166,7 +166,7 @@ class MainControl:
 		from windows.winConnect import winConnect
 		self.connect = winConnect(application)
 
-		from windows.winMain    import winMain
+		from windows.winMain    import winMain, create_menu
 		self.main = winMain(application, config.main.pos, config.main.size)
 
 		from windows.winInfo    import winInfo
@@ -191,7 +191,7 @@ class MainControl:
 		if wx.Platform == "__WXMAC__":
 			for value in self.__dict__.values():
 				if hasattr(value, "SetMenuBar"):
-					value.SetMenuBar(self.main.bar)
+					value.SetMenuBar(create_menu())
 
 		self.ConfigActivate(False)
 
