@@ -114,6 +114,9 @@ class winNormalSubBase(wx.MiniFrame, winBaseMixIn):
 if wx.Platform == '__WXMSW__':
 	winMainBase = winMDIBase
 	winBase = winMDISubBase
+elif wx.Platform == ' __WXMAC__':
+	winMainBase = winNormalBase
+	winBase = winNormalBase
 else:
 	winMainBase = winNormalBase
 	winBase = winNormalSubBase
