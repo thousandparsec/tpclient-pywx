@@ -62,7 +62,7 @@ class AppTP(wxApp):
 		# If autoconnect
 		if FALSE:
 			try:
-				self.Connect(host, username, password)
+				self.NetConnect(host, username, password)
 			except:
 				# Pop-up a dialog saying connected failed.
 				pass
@@ -81,7 +81,7 @@ class AppTP(wxApp):
 			self.host = host
 			self.port = port
 
-			if not self.network.Connect(self.host, self.port):
+			if not self.network.NetConnect(self.host, self.port):
 				self.windows.connect.OnConnection(None)
 				return
 
@@ -135,7 +135,7 @@ class AppTP(wxApp):
 					pass
 			else:
 				# Now we are logged in okay just pass everything on to the game engine
-				print "Pushing evt", evt
+				debug(DEBUG_MAIN, "Pushing evt %s containing %s"  % (str(evt), repr(evt.value)) )
 				self.game.OnPacket(evt)
 		
 		finally:

@@ -94,6 +94,12 @@ class UniverseObject:
 		self.velocity = velocity
 		self.acceleration = acceleration
 
+	def GetOrder(self, slot):
+		pass
+
+	def AddOrder(self, slot, order):
+		pass
+
 class Container(UniverseObject):
 	"""\
 	A universe object which contains other objects.
@@ -103,6 +109,12 @@ class Container(UniverseObject):
 class Actual(UniverseObject):
 	"""\
 	A real universe object - this object cannot contain other objects.
+	"""
+	pass
+
+class Order:
+	"""\
+	A real order for an object.
 	"""
 	pass
 

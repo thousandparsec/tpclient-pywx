@@ -45,8 +45,8 @@ class winMain(winBase):
 
 		# Setup to recieve game events
 		application.game.WinConnect(self)
-		EVT_GAME_GETOBJ(self, self.OnGameGetObj)
-		EVT_GAME_ARRIVEOBJ(self, self.OnGameArriveObj)
+		EVT_GAME_OBJ_GET(self, self.OnGameGetObj)
+		EVT_GAME_OBJ_ARRIVE(self, self.OnGameArriveObj)
 		self.status = {}
 
 		item0 = wxMenuBar()

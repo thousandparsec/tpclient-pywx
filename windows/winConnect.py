@@ -27,7 +27,6 @@ class winConnect(wxFrame):
 	def __init__(self, app, ID, title=None, pos=wxDefaultPosition, size=wxDefaultSize, style=wxDEFAULT_FRAME_STYLE, message_list=[]):
 		wxFrame.__init__(self, None, ID, 'TP: Connect', pos, size, style|wxTAB_TRAVERSAL)
 
-
 		panel = wxPanel(self, -1)
 
 		self.app = app

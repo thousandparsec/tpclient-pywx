@@ -5,6 +5,7 @@ network events.
 
 from wxPython.wx import *
 
+# Outgoing events
 wxEVT_NETWORK_PACKET = wxNewEventType()
 wxEVT_NETWORK_CONNECT = wxNewEventType()
 wxEVT_NETWORK_DISCONNECT = wxNewEventType()
@@ -32,3 +33,23 @@ class NetworkPacketEvent(wxPyEvent):
 	def Next(self):
 		self.network.Next()
 
+# Incoming events
+wxEVT_NETWORK_SEND = wxNewEventType()
+
+def EVT_NETWORK_SEND(win, func):
+	win.Connect(-1, -1, wxEVT_NETWORK_SEND, func)
+
+def UNEVT_NETWORK_SEND(win, func):
+	win.Disconnect(-1, wxEVT_NETWORK_SEND, -1)
+
+class NetworkSendEvent(wxPyEvent):
+	"""\
+	A packet needs to be send accross the wire.
+
+	evt.value is the packet
+	"""
+	def __init__(self, packet):
+		wxPyEvent.__init__(self)
+		self.SetEventType(wxEVT_NETWORK_SEND)
+		
+		self.value = packet

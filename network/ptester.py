@@ -1,3 +1,4 @@
+#! /usr/bin/python
 
 from protocol import *
 import pprint
@@ -76,7 +77,7 @@ def get_contains(s, r):
 
 		# Get the orders
 		for slot in range(0, r.orders_no):
-			gl = OrderGet(id=i, slot=slot)
+			gl = OrderGet(oid=i, slot=slot)
 			send(s, gl)
 			rl = recv(s)
 
@@ -84,7 +85,7 @@ def get_contains(s, r):
 		l = range(0, r.orders_no)
 		l.reverse()
 		for slot in l:
-			gl = OrderRemove(id=i, slot=slot)
+			gl = OrderRemove(oid=i, slot=slot)
 			send(s, gl)
 			rl = recv(s)
 
@@ -97,12 +98,22 @@ def get_contains(s, r):
 
 		get_contains(s, r)
 
+import curses
+
+def main(stdsrc):
+	print "Peanut"
+
 if __name__ == "__main__":
-	if sys.argv[1].lower() == "default":
-		host, port = ("127.0.0.1", 6923)
-	else:
-		host, port = string.split(sys.argv[1], ':', 1)
-		port = int(port)
+#	if sys.argv[1].lower() == "default":
+#		host, port = ("127.0.0.1", 6923)
+#	else:
+#		host, port = string.split(sys.argv[1], ':', 1)
+#		port = int(port)
+
+	curses.wrapper(main)
+
+
+def testall(self, host, port):
 
 	print "Connection to", host, port
 	s = connect(host, port)
@@ -123,4 +134,3 @@ if __name__ == "__main__":
 	send(s, g)
 	r = recv(s)
 	get_contains(s, r)
-

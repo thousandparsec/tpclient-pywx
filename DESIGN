@@ -1,0 +1,36 @@
+
+Design
+=============================================
+
+This program is designd with 3 main parts
+
+
+                           Client
+                             |
++------------------------------------------------------------+
+|                                                            |
+     Network        |        Game        |        GUI        
+ -------------------|--------------------|-------------------
+   Network          |  Game State        |  Screen
+
+ ------------------------------------------------------------
+          Common Code - Events, Utils, Debugging
+
+
+Each section requests actions be taken the using the Event sytem. An event is
+posted and sections which want to deal with it can. No action should ever be
+requested directly.  Sections can however query other then sections about state.
+Each section defines it's own sets of events. The events are made unique by
+prefixing the event with the section name. This allows a file to import all
+events into it's namespace. These events should have a well defined API, so that
+changes in diffrent sections don't effect other sections.
+
+
+Implimentation
+=============================================
+
+Currently the event system is implimented using the wxWindow's event system.
+However this will be replaced at a later stage to remove the client's dependance
+on wxPython. (Which will lead the way for other GUI such as QTe and pygame and
+ncurses). Both Network and Game sections have their own thread with wxPython
+taking care of the thread for the GUI.

@@ -396,9 +396,6 @@ class OrderDesc(Processed):
 
 		return struct
 
-class OrderGet(Processed):
-	pass
-
 class Order(Processed):
 	"""\
 	An order object.
@@ -451,29 +448,29 @@ class OrderGet(Processed):
 
 	struct="II"
 
-	def __init__(self, s=None, id=None, slot=None):
+	def __init__(self, s=None, oid=None, slot=None):
 		if s != None:
-			if id != None and slot != None:
+			if oid != None and slot != None:
 				raise Exception("Stuff cannot be set when you have given me a string!")
 			
 			Header.__init__(self, s[:Header.size])
 			SetData(self, s[Header.size:])
 		else:
-			if id == None or slot == None:
+			if oid == None or slot == None:
 				raise Exception("Stuff must be set if you don't set a string")
 			Header.__init__(self, None)
 			self.length = calcsize(OrderGet.struct)
 		
-			self.id = id
+			self.oid = oid
 			self.slot = slot
 
 	def __str__(self):
 		output = Processed.__str__(self)
-		output += xpack(OrderGet.struct, self.id, self.slot)
+		output += xpack(OrderGet.struct, self.oid, self.slot)
 		return output
 	
 	def SetData(self, data):
-		(self.id, self.slot), output = unxpack(OrderGet.struct)
+		(self.oid, self.slot), output = unxpack(OrderGet.struct)
 
 class OrderRemove(OrderGet):
 	type = ORD_RM

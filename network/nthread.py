@@ -9,33 +9,26 @@ from thread import allocate_lock
 # wxWindows imports
 from wxPython.wx import * 
 
+from extra.evtmgr import eventManager
+
 # Game imports
 from utils import *
 
 # Local imports
+from bthread import BaseThread
 from protocol import *
 from events import *
 
-class NetworkThread:
+class NetworkThread(BaseThread):
 	def __init__(self):
-		self.windows = []
+		BaseThread.__init__(self)
 
+		EVT_NETWORK_SEND(self, self.OnSend)
+	
 		self.socket = None
 		self.lock = allocate_lock()
 
-	def WinConnect(self, window):
-		"""\
-		Starts a window recieving the events from the network thread.
-		"""
-		self.windows.append(window)
-
-	def WinDisconnect(self, window):
-		"""\
-		Stops a window from recieving events from the network thread.
-		"""
-		self.windows.remove(window)
-
-	def Connect(self, host, port):
+	def NetConnect(self, host, port):
 		"""\
 		Causes the network thread to connect to a host/port
 
@@ -51,7 +44,7 @@ class NetworkThread:
 
 		return self.socket
 
-	def Disconnect(self):
+	def NetDisconnect(self):
 		"""\
 		Causes the network thread to disconnect.
 
@@ -98,6 +91,14 @@ class NetworkThread:
 		it is processing a packet.
 		"""
 		return self.lock.locked()
+
+	def OnSend(self, evt):
+		"""\
+		For sending packets when you don't have an event to go
+		with it.
+		"""
+		debug(DEBUG_NETWORK, "Got a packet to send")
+		self.Send(evt.value)
 
 	def __call__(self):
 		"""\

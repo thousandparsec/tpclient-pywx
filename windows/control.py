@@ -7,6 +7,7 @@ All the windows are controlled by this class
 from wxPython.wx import *
 
 # Python Imports
+from extra.wxPostEvent import *
 from utils import *
 from config import *
 

@@ -6,12 +6,15 @@ and raising all the other windows when one is clicked.
 
 from wxPython.wx import *
 
+from extra.wxPostEvent import *
+
 class winBase(wxFrame):
 	def __init__(self, application, parent, 
 			pos=wxDefaultPosition, 
 			size=wxDefaultSize, 
 			style=wxDEFAULT_FRAME_STYLE):
 		wxFrame.__init__(self, parent, -1, 'TP: ' + self.title, pos, size, style)
+		wxHandler(self)
 
 		self.application = application
 		self.parent = parent

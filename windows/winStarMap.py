@@ -40,9 +40,9 @@ class winStarMap(winBase):
 
 		self.app = application
 		self.app.game.WinConnect(self)
-		EVT_GAME_ARRIVEOBJ(self, self.Update)
+		EVT_GAME_OBJ_ARRIVE(self, self.Update)
 
-		EVT_WINDOWS_SELECTOBJ(self, self.OnSelect)
+		EVT_WINDOWS_OBJ_SELECT(self, self.OnSelect)
 
 		self.config = {}
 		self.config['System'] = sysPLAIN

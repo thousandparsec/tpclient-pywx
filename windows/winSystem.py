@@ -9,6 +9,7 @@ at this current location and "quick" details about them.
 from wxPython.wx import *
 from wxPython.gizmos import *
 
+
 # Game imports
 from utils import *
 from game.events import *
@@ -17,6 +18,9 @@ from game import objects
 # Local imports
 from winBase import winBase
 from events import *
+
+# Program imports
+from extra.wxPostEvent import *
 
 # Show the universe
 class winSystem(winBase):
@@ -28,7 +32,7 @@ class winSystem(winBase):
 		# Setup to recieve game events
 		self.app = application
 		self.app.game.WinConnect(self)
-		EVT_GAME_ARRIVEOBJ(self, self.OnGameArriveObj)
+		EVT_GAME_OBJ_ARRIVE(self, self.OnGameArriveObj)
 
 		class systemTree(wxRemotelyScrolledTreeCtrl):
 			def __init__(self, parent, ID, pos=wxDefaultPosition, size=wxDefaultSize, style=wxTR_HAS_BUTTONS):
@@ -99,17 +103,27 @@ class winSystem(winBase):
 
 	def Update(self):
 
+		selected_id = self.tree.GetPyData(self.tree.GetSelection())
+		if not selected_id:
+			selected_id = -1
+			
+		debug(DEBUG_WINDOWS, "Currently selected object... %i" % selected_id)
+		
 		# Remove all the current items
 		self.tree.DeleteAllItems()
 
 		universe=self.app.game.universe.Object(0)
-		self.Add(None, universe)
-		
-		# Append some padding
-		#for i in range(10):
-		#	item = self.tree.AppendItem(root, "")
+		selected = self.Add(None, universe, selected_id)
 	
-	def Add(self, root, object):
+		if selected:
+			debug(DEBUG_WINDOWS, "Trying to reselect an object... %s" % self.tree.GetPyData(selected))
+			self.tree.SelectItem(selected)
+			self.tree.EnsureVisible(selected)
+			new_evt = WindowsObjSelect(self.tree.GetPyData(selected))
+			wxPostEvent(new_evt)
+		
+	def Add(self, root, object, selected_id=-1):
+		selected = None
 		new_root = None
 		
 		if isinstance(object, objects.Actual):
@@ -123,22 +137,51 @@ class winSystem(winBase):
 			
 			for id in object.contains:
 				new = self.app.game.universe.Object(id)
-				self.Add(new_root, new)
-			
+				temp = self.Add(new_root, new, selected_id)
+
+				if temp:
+					selected = temp
+
 		else:
 			self.tree.AppendItem(root, "Unknown", self.tree.icons['Ship'])
 		
 		if new_root:
 			self.tree.SetPyData(new_root, object.id)
 
+			if object.id == selected_id:
+				return new_root
+			elif selected:
+				return selected
+				
+		return
+
 	def OnGameArriveObj(self, evt):
-		# Okay lets rebuild our tree
 		self.Update()
+
+#		g = self.app.game
+#		selected = self.tree.GetSelection()
+#		
+#		object = g.universe.Object(evt.id)
+#		parent = g.universe.Object(object.parent)
+#
+#		# Find the parent of this object
+#		root = self.tree.GetItem()
+#		new_root = self.tree.AppendItem(root, object.name, self.tree.icons['System'])
+#
+#		self.tree.SetSelection(selected)
+#		self.tree.EnsureVisible(selected)
+#		if self.tree.GetPyData(selected) == evt.id:
+#			# Okay we need to post an event now
+#			new_evt = WindowsObjSelect(evt.id)
+#			wxPostEvent(new_evt)
 	
 	def OnSelectItem(self, evt):
 		# Figure out which item it is
 		id = self.tree.GetPyData(evt.GetItem())
 		
 		# Okay we need to post an event now
-		new_evt = WindowsSelectObj(id)
-		self.app.windows.PostEvent(new_evt)
+		new_evt = WindowsObjSelect(id)
+		wxPostEvent(new_evt)
+
+
+
