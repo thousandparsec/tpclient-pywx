@@ -202,6 +202,9 @@ class panelConfigWindows(wx.Panel):
 		self.application.windows.system.Show(not evt.Checked())
 
 	def OnWindowsShow(self, evt):
+		if not hasattr(self.application, "windows"):
+			return
+
 		# Fill in the show settings
 		self.show_info.SetValue(not self.application.windows.config.info.show)
 		self.show_order.SetValue(not self.application.windows.config.order.show)
@@ -222,6 +225,8 @@ class panelConfigWindows(wx.Panel):
 		self.current_window.SetSize((-1, self.obj['height'].GetValue()))
 
 	def OnWindowSelection(self, evt):
+		if not hasattr(self.application, "windows"):
+			return
 		window = self.windows.GetStringSelection()
 		self.current_window = getattr(self.application.windows, window.lower())
 		pos = self.current_window.GetPosition()

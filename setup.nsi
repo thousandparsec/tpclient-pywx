@@ -8,16 +8,16 @@
 ;General
 
   ;Title Of Your Application 
-  Name "pywx-client" 
+  Name "tpclient-pywx" 
  
   ;Do A CRC Check 
   CRCCheck On 
  
   ;Output File Name 
-  OutFile "pywx-client-0.0.6-setup.exe" 
+  OutFile "tpclient-pywx-0.0.9-setup.exe" 
  
   ;The Default Installation Directory 
-  InstallDir "$PROGRAMFILES\Thousand Parsec\pywx-client" 
+  InstallDir "$PROGRAMFILES\Thousand Parsec\tpclient-pywx" 
 
 ;--------------------------------
 ;Variables
@@ -44,9 +44,9 @@
 
   ;Start Menu Folder Page Configuration
   !define MUI_STARTMENUPAGE_REGISTRY_ROOT "HKCU" 
-  !define MUI_STARTMENUPAGE_REGISTRY_KEY "Software\Thousand Parsec\pywx-client" 
+  !define MUI_STARTMENUPAGE_REGISTRY_KEY "Software\Thousand Parsec\Client pywx" 
   !define MUI_STARTMENUPAGE_REGISTRY_VALUENAME "Start Menu Folder"
-  !define MUI_STARTMENUPAGE_DEFAULTFOLDER "Thousand Parsec\pywx-client"
+  !define MUI_STARTMENUPAGE_DEFAULTFOLDER "Thousand Parsec\Client pywx"
   !insertmacro MUI_PAGE_STARTMENU Application $STARTMENU_FOLDER
 
   !insertmacro MUI_PAGE_INSTFILES
@@ -82,7 +82,7 @@ Section "Files" Files
   File /r "dist\*.*" 
   
   ;Store installation folder
-  WriteRegStr HKCU "Software\Thousand Parsec\pywx-client" "" $INSTDIR
+  WriteRegStr HKCU "Software\Thousand Parsec\tpclient-pywx" "" $INSTDIR
   
   ;Create uninstaller
   WriteUninstaller "$INSTDIR\Uninstall.exe"
@@ -91,7 +91,7 @@ Section "Files" Files
     
     ;Create shortcuts
     CreateDirectory "$SMPROGRAMS\$STARTMENU_FOLDER"
-    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\pywx-client.lnk" "$INSTDIR\main.exe" "" "$INSTDIR\main.exe" 0 
+    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\tpclient-pywx.lnk" "$INSTDIR\main.exe" "" "$INSTDIR\main.exe" 0 
     CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Uninstall.lnk" "$INSTDIR\Uninstall.exe"
   
   !insertmacro MUI_STARTMENU_WRITE_END
@@ -102,7 +102,7 @@ SectionEnd
 ;Descriptions
 
   ;Language strings
-  LangString DESC_Files ${LANG_ENGLISH} "Install pywx-client, a wxWidgets, python based client for Thousand Parsec."
+  LangString DESC_Files ${LANG_ENGLISH} "Install tpclient-pywx, a wxWidgets, python based client for Thousand Parsec."
 
   ;Assign language strings to sections
   !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
@@ -119,7 +119,7 @@ Section "Uninstall"
   !insertmacro MUI_STARTMENU_GETFOLDER Application $MUI_TEMP
     
   Delete "$SMPROGRAMS\$MUI_TEMP\Uninstall.lnk"
-  Delete "$SMPROGRAMS\$MUI_TEMP\pywx-client.lnk"
+  Delete "$SMPROGRAMS\$MUI_TEMP\tpclient-pywx.lnk"
   
   ;Delete empty start menu parent diretories
   StrCpy $MUI_TEMP "$SMPROGRAMS\$MUI_TEMP"
@@ -133,7 +133,7 @@ Section "Uninstall"
     StrCmp $MUI_TEMP $SMPROGRAMS startMenuDeleteLoopDone startMenuDeleteLoop
   startMenuDeleteLoopDone:
 
-  DeleteRegKey /ifempty HKCU "Software\Thousand Parsec\pywx-client"
+  DeleteRegKey /ifempty HKCU "Software\Thousand Parsec\Client pywx"
   DeleteRegKey /ifempty HKCU "Software\Thousand Parsec"
 SectionEnd
 
