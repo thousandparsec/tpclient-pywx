@@ -3,6 +3,8 @@ All the windows are controlled by this class
 
 """
 
+import wx
+
 # Local Imports
 from utils import *
 from config import *
