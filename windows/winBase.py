@@ -87,7 +87,7 @@ class winNormalBase(wx.Frame, winBaseMixIn):
 class winNormalSubBase(wx.MiniFrame, winBaseMixIn):
 	def __init__(self, application, parent, 
 			pos=wx.DefaultPosition, size=wx.DefaultSize, style=wx.DEFAULT_FRAME_STYLE):
-		wx.MiniFrame.__init__(self, parent, -1, 'TP: ' + self.title, pos, size, style)
+		wx.MiniFrame.__init__(self, parent, -1, 'TP: ' + self.title, pos, size, style + wx.FRAME_NO_TASKBAR)
 		winBaseMixIn.__init__(self, application, parent, pos, size, style)
 		
 if wx.Platform == '__WXMSW__':

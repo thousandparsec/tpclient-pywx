@@ -48,19 +48,16 @@ class winOrder(winBase):
 
 		# Create a base panel
 		base_panel = wx.Panel(self, -1)
-		base_panel.SetConstraints(wx.lib.anchors.LayoutAnchors(self, 1, 1, 1, 1))
 		base_panel.SetAutoLayout( True )
 
 		# Create a base sizer
-		base_sizer = wx.FlexGridSizer( 0, 1, 0, 0 )
+		base_sizer = wx.BoxSizer( wx.VERTICAL )
 		base_sizer.Fit( base_panel )
 		base_sizer.SetSizeHints( base_panel )
 
 		# Link the panel to the sizer
 		base_panel.SetSizer( base_sizer )
 		
-		base_sizer.AddGrowableCol( 0 )
-
 		# List of current orders
 		order_list = wx.ListCtrl( base_panel, -1, wx.DefaultPosition, wx.Size(160,80), wx.LC_REPORT|wx.LC_SINGLE_SEL|wx.SUNKEN_BORDER )
 		order_list.InsertColumn(TURNS_COL, "Turns")
@@ -101,12 +98,10 @@ class winOrder(winBase):
 		argument_panel.SetAutoLayout( True )
 
 		# Put them all on the sizer
-		base_sizer.AddWindow( order_list, 0, wx.GROW|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 1 )
-		base_sizer.AddGrowableRow( 0 )
+		base_sizer.AddWindow( order_list, 1, wx.GROW|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 1 )
 		base_sizer.AddWindow( line_horiz1, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
 		base_sizer.AddSizer ( button_sizer, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
 		base_sizer.AddWindow( line_horiz2, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
-		base_sizer.AddGrowableRow( 4 )
 		base_sizer.AddWindow( argument_panel, 0, wx.GROW|wx.ALIGN_CENTER|wx.ALL, 1 )
 
 		self.oid = -1
@@ -199,7 +194,13 @@ class winOrder(winBase):
 			elif type == constants.ARG_OBJECT:
 				args += [0]
 			elif type == constants.ARG_PLAYER:
-				args += [0]
+				args += [0,0]
+			elif type == constants.ARG_REL_COORD:
+				args += [0,0,0,0]
+			elif type == constants.ARG_RANGE:
+				args += [0,0,0,0]
+			elif type == constants.ARG_LIST:
+				args += [[],[]]
 
 		r = self.application.connection.insert_order(self.oid, slot, orderdesc.subtype, *args)
 		if failed(r):
@@ -263,21 +264,29 @@ class winOrder(winBase):
 				debug(DEBUG_WINDOWS, "Argument type (ARG_OBJECT) not implimented yet.")
 			elif type == constants.ARG_PLAYER:
 				debug(DEBUG_WINDOWS, "Argument type (ARG_PLAYER) not implimented yet.")
+			elif type == constants.ARG_RANGE:
+				debug(DEBUG_WINDOWS, "Argument type (ARG_RANGE) not implimented yet.")
+			elif type == constants.ARG_LIST:
+				args = argListGet( panel )
 
 			if args:
 				setattr(order, name, args)
 					
+		debug(DEBUG_WINDOWS, "OrderSave: Inserting.")
+		print order
 		order = self.application.connection.insert_order(self.oid, slot, order)
 		if failed(order):
 			debug(DEBUG_WINDOWS, "OrderSave: Insert failed.")
 			return
 		
+		debug(DEBUG_WINDOWS, "OrderSave: Getting.")
 		order = self.application.connection.get_orders(self.oid, slot)[0]
 		if failed(order):
 			debug(DEBUG_WINDOWS, "OrderSave: Get failed.")
 			return
 		self.application.cache.orders[self.oid].insert(slot, order)
 
+		debug(DEBUG_WINDOWS, "OrderSave: Removing.")
 		r = self.application.connection.remove_orders(self.oid, slot+1)
 		if failed(r):
 			debug(DEBUG_WINDOWS, "OrderSave: Remove failed.")
@@ -292,73 +301,64 @@ class winOrder(winBase):
 		Builds a panel for the entering of orders arguments.
 		"""
 		# Remove the previous panel and stuff
-		self.base_sizer.Remove(self.argument_panel)
 		self.argument_panel.Hide()
+		self.base_sizer.Remove(self.argument_panel)
 		self.argument_panel.Destroy()
 
 		# Create a new panel
 		self.argument_panel = wx.Panel(self.base_panel, -1)
+		self.argument_panel.SetAutoLayout( True )
 		self.argument_sizer = wx.FlexGridSizer( 0, 2, 0, 0)
 		
+		self.argument_panel.SetSizer(self.argument_sizer)
 		self.argument_sizer.AddGrowableCol( 1 )
 
-		self.argument_panel.SetSizer(self.argument_sizer)
-		self.argument_panel.SetAutoLayout( True )
-		
-		self.base_sizer.AddWindow( self.argument_panel, 0, wx.GROW|wx.ALIGN_CENTER|wx.ALL, 5 )
-		
 		# Do we actually have an order
 		if order:
 			orderdesc = OrderDescs()[order.type]
 			
-			if orderdesc:
-				# List for the argument subpanels
-				self.argument_subpanels = []
+			# List for the argument subpanels
+			self.argument_subpanels = []
 				
-				for name, type in orderdesc.names:
-					# Add there name..
-					name_text = wx.StaticText( self.argument_panel, -1, name.title())
-					name_text.SetFont(wx.local.normalFont)
+			for name, type in orderdesc.names:
+				# Add there name..
+				name_text = wx.StaticText( self.argument_panel, -1, name.title() )
+				name_text.SetFont(wx.local.normalFont)
 
-					self.argument_sizer.AddWindow( name_text, 0, wx.ALIGN_CENTER|wx.RIGHT, 4 )
+				self.argument_sizer.AddWindow( name_text, 0, wx.ALIGN_CENTER|wx.RIGHT, 4 )
 
-					# Add the arguments bit
-					if type == constants.ARG_ABS_COORD:
-						subpanel = argCoordPanel( self, self.argument_panel, getattr(order, name) )
-					elif type == constants.ARG_TIME:
-						subpanel = argTimePanel( self, self.argument_panel, getattr(order, name) )
-					else:
-						subpanel = argNotImplimentedPanel( self, self.argument_panel, None )
-					
-					subpanel.SetFont(wx.local.normalFont)
-					self.argument_subpanels.append( subpanel )
-					
-					self.argument_sizer.AddWindow( subpanel, 0, wx.GROW)
-					self.argument_sizer.AddGrowableRow( len(self.argument_subpanels) - 1 )
-
-				button_sizer = wx.FlexGridSizer( 1, 0, 0, 0 )
-
-				save_button = wx.Button( self.argument_panel, -1, "Save", size=wx.local.buttonSize )
-				save_button.SetFont(wx.local.normalFont)
-				revert_button = wx.Button( self.argument_panel, -1, "Revert", size=wx.local.buttonSize )
-				revert_button.SetFont(wx.local.normalFont)
+				# Add the arguments bit
+				if type == constants.ARG_ABS_COORD:
+					subpanel = argCoordPanel( self, self.argument_panel, getattr(order, name) )
+				elif type == constants.ARG_TIME:
+					subpanel = argTimePanel( self, self.argument_panel, getattr(order, name) )
+				elif type == constants.ARG_LIST:
+					subpanel = argListPanel( self, self.argument_panel, getattr(order, name) )
+				else:
+					subpanel = argNotImplimentedPanel( self, self.argument_panel, None )
 				
-				button_sizer.AddWindow( save_button, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
-				button_sizer.AddWindow( revert_button, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
-		
-				self.argument_sizer.AddSizer( wx.BoxSizer( wx.HORIZONTAL ) )
-				self.argument_sizer.AddSizer( button_sizer, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
+				subpanel.SetFont(wx.local.normalFont)
+				self.argument_subpanels.append( subpanel )
 				
-				self.Bind(wx.EVT_BUTTON, self.OnOrderSave, save_button)
-				self.Bind(wx.EVT_BUTTON, self.OnOrderSelect, revert_button)
+				self.argument_sizer.AddWindow( subpanel, 0, wx.GROW|wx.ALIGN_CENTER)
+				self.argument_sizer.AddGrowableRow( len(self.argument_subpanels) - 1 )
+
+			button_sizer = wx.FlexGridSizer( 1, 0, 0, 0 )
+
+			save_button = wx.Button( self.argument_panel, -1, "Save", size=wx.local.buttonSize )
+			save_button.SetFont(wx.local.normalFont)
+			self.Bind(wx.EVT_BUTTON, self.OnOrderSave, save_button)
+			revert_button = wx.Button( self.argument_panel, -1, "Revert", size=wx.local.buttonSize )
+			revert_button.SetFont(wx.local.normalFont)
+			self.Bind(wx.EVT_BUTTON, self.OnOrderSelect, revert_button)
 			
-			else:
-				# Display a message
-				text = "Waiting on order description."
-				msg = wx.StaticText( self.argument_panel, -1, text, wx.DefaultPosition, wx.DefaultSize, 0)
-				msg.SetFont(wx.local.normalFont)
-
-				self.argument_sizer.AddWindow( msg, 0, wx.ALIGN_CENTER|wx.ALL, 5)
+			button_sizer.AddWindow( save_button, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
+			button_sizer.AddWindow( revert_button, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
+	
+			self.argument_sizer.AddSizer( wx.BoxSizer( wx.HORIZONTAL ) )
+			self.argument_sizer.AddSizer( button_sizer, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
+			
+		
 		else:
 			# Display message
 			text = "No order selected."
@@ -367,6 +367,8 @@ class winOrder(winBase):
 			
 			self.argument_sizer.AddWindow( msg, 0, wx.ALIGN_CENTER|wx.ALL, 5)
 		
+		self.argument_sizer.Fit(self.argument_panel)
+		self.base_sizer.AddWindow( self.argument_panel, 0, wx.GROW|wx.ALIGN_CENTER|wx.ALL, 5 )
 		self.base_sizer.Layout()
 
 # The display for an ARG_COORD
@@ -389,7 +391,123 @@ def argNotImplimentedPanel(parent, parent_panel, args):
 	item0.AddWindow( item1, 0, wx.ALIGN_CENTRE|wx.LEFT, 0 )
 
 	return panel
-						
+
+def argListPanel(parent, parent_panel, args):
+	panel = wx.Panel(parent_panel, -1)
+	base = wx.BoxSizer(wx.VERTICAL)
+
+	# Convert the first arg to a dictionary
+	types = {}
+	for type, name, max in args[0]:
+		types[type] = (name, max)
+
+	panel.SetSizer(base)
+	panel.SetAutoLayout( True )
+	
+	selected = wx.ListCtrl( panel, -1, wx.DefaultPosition, wx.Size(130,80), wx.LC_REPORT|wx.LC_SINGLE_SEL|wx.SUNKEN_BORDER )
+	selected.InsertColumn(0, "#")
+	selected.SetColumnWidth(0, 25)
+	selected.InsertColumn(1, "Type")
+	selected.SetColumnWidth(1, 100)
+	selected.SetFont(wx.local.tinyFont)
+
+	# Fill in the selected box
+	for slot in range(0, len(args[1])):
+		type, number = args[1][slot]
+
+		selected.InsertStringItem(slot, "")
+		selected.SetStringItem(slot, 0, str(number))
+		selected.SetStringItem(slot, 1, types[type][0])
+
+		selected.SetItemPyData(slot, type)
+		
+	add = wx.Button( panel, -1, "Add", size=wx.local.buttonSize )
+	add.SetFont(wx.local.normalFont)
+	
+	number = wx.SpinCtrl( panel, -1, "", min=0, max=100, size=wx.local.spinSize )
+	number.SetFont(wx.local.tinyFont)
+
+	type_list = wx.Choice( panel, -1, choices=[], size=wx.local.buttonSize)
+	type_list.SetFont(wx.local.tinyFont)
+
+	for type, item in types.items():
+		type_list.Append(item[0], type)
+
+	delete = wx.Button( panel, -1, "D", size=(wx.local.smallSize[0],wx.local.buttonSize[1]) )
+	delete.SetFont(wx.local.normalFont)
+
+	box_add = wx.BoxSizer(wx.HORIZONTAL)
+	box_add.AddWindow( add, 0, wx.ALIGN_CENTRE|wx.LEFT, 1 )
+	box_add.AddWindow( number, 0, wx.ALIGN_CENTRE|wx.LEFT, 1 )
+	box_add.AddWindow( type_list, 0, wx.ALIGN_CENTRE|wx.LEFT, 1 )
+	box_add.AddWindow( delete, 0, wx.ALIGN_CENTRE|wx.LEFT, 1 )
+
+	base.AddSizer( selected, 1, wx.EXPAND|wx.ALIGN_CENTRE|wx.ALL, 1 )
+	base.AddSizer( box_add, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
+
+	base.Fit(panel)
+
+	def addf(evt, selected=selected, number=number, type_list=type_list):
+		"""\
+		Add a new selection to the list.
+		"""
+		amount = number.GetValue()
+		if amount < 1:
+			debug(DEBUG_WINDOWS, "ListAdd: Amount is invalid.")
+			return
+	
+		type = type_list.GetSelection()
+		if type == wx.NOT_FOUND:
+			debug(DEBUG_WINDOWS, "ListAdd: No type selected.")
+			return
+		type = type_list.GetClientData(type)
+
+		slot = selected.GetNextItem(-1, wx.LIST_NEXT_ALL, wx.LIST_STATE_SELECTED)
+		if slot == wx.NOT_FOUND:
+			debug(DEBUG_WINDOWS, "ListAdd: No selection selected.")
+			slot = 0
+		else:
+			slot += 1
+
+		selected.InsertStringItem(slot, "")
+		selected.SetStringItem(slot, 0, str(amount))
+		selected.SetStringItem(slot, 1, types[type][0])
+
+	def deletef(evt, selected=selected):
+		"""\
+		Delete a selection from the list.
+		"""
+		slot = selected.GetNextItem(-1, wx.LIST_NEXT_ALL, wx.LIST_STATE_SELECTED)
+		if slot == wx.NOT_FOUND:
+			debug(DEBUG_WINDOWS, "ListDel: No selection selected.")
+			return
+
+		selected.DeleteItem(slot)
+
+	def typef(evt, types=types, number=number, type_list=type_list):
+		"""\
+		Update the max for the spinner.
+		"""
+		type = type_list.GetSelection()
+		if type == wx.NOT_FOUND:
+			debug(DEBUG_WINDOWS, "ListAdd: No type selected.")
+			number.SetRange(0, 0)
+		else:
+			type = type_list.GetClientData(type)
+			if types[type][1] == 4294967295:
+				number.SetRange(0, 1000)
+			else:
+				number.SetRange(0, types[type][1])
+	
+	parent.Bind(wx.EVT_BUTTON, addf, add)
+	parent.Bind(wx.EVT_BUTTON, deletef, delete)
+	parent.Bind(wx.EVT_CHOICE, typef, type_list)
+	
+	return panel
+
+def argListGet(panel):
+	return [], []
+
 def argTimePanel(parent, parent_panel, args):
 	panel = wx.Panel(parent_panel, -1)
 	item0 = wx.BoxSizer( wx.HORIZONTAL )
