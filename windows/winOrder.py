@@ -279,7 +279,7 @@ class winOrder(winBase):
 		"""\
 		Called when an object is selected.
 		"""
-		if not self.application.cache.objects.has_key(self.oid):
+		if not self.application.cache.objects.has_key(evt.id):
 			return
 
 		if not force and self.oid == evt.id:
@@ -331,7 +331,10 @@ class winOrder(winBase):
 		elif len(slots) < 1:
 			order = _("No orders selected.")
 		else:
-			order = self.application.cache.orders[self.oid][slots[0]]
+			try:
+				order = self.application.cache.orders[self.oid][slots[0]]
+			except KeyError:
+				order = _("Object has been removed.")
 
 		self.BuildPanel(order)
 		self.application.windows.Post(wx.local.SelectOrderEvent(self.oid, slots))
