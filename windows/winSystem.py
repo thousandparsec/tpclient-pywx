@@ -100,7 +100,11 @@ class winSystem(winBase):
 		"""\
 		Rebuilds the list of objects.
 		"""
-		selected_id = self.tree.GetPyData(self.tree.GetSelection())
+		try:
+			selected_id = self.tree.GetPyData(self.tree.GetSelection())
+		except:
+			selected_id = -1
+
 		if not selected_id:
 			selected_id = -1
 			
