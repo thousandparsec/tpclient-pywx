@@ -8,12 +8,21 @@ Short Term
 			* Get the P button to work
 		* ARG_TIME (DONE)
 		* ARG_RANGE
+		* ARG_PLAYER
+		* ARG_LIST (DONE)
+		* ARG_STRING (DONE)
 
 	* Get order save to work :) (DONE)
 	* Add ships to the StarMap (DONE)
 		* Need to make sure i don't draw orbiting starships
 
 	* Put up screenshots on www.thousandparsec.net (DONE)
+
+	* Tool tips on orders arguments (and other stuff)
+
+	* Let the fonts be selected 
+
+	* Better positioning of windows default
 
 Longer Term
 	* Add a info panel (DONE)

@@ -34,6 +34,24 @@ class wxListCtrl(wx.ListCtrl):
 		except:
 			return None
 
+	def FindItemByPyData(self, data):
+		slot = -1
+		while True:
+			slot = self.GetNextItem(slot, wx.LIST_NEXT_ALL, wx.LIST_STATE_DONTCARE);
+			if slot == wx.NOT_FOUND:
+				return wx.NOT_FOUND
+				
+			if self.GetItemPyData(slot) == data:
+				return slot
+
+	def GetStringItem(self, slot, col):
+		item = self.GetItem(slot, col)
+		if item == wx.NOT_FOUND:
+			return wx.NOT_FOUND
+		else:
+			return item.GetText()
+		
+
 wx.ListCtrl = wxListCtrl
 
 buttonSize = (wx.local.buttonSize[0], wx.local.buttonSize[1]+2)
@@ -201,6 +219,8 @@ class winOrder(winBase):
 				args += [0,0,0,0]
 			elif type == constants.ARG_LIST:
 				args += [[],[]]
+			elif type == constants.ARG_STRING:
+				args += [0,""]
 
 		r = self.application.connection.insert_order(self.oid, slot, orderdesc.subtype, *args)
 		if failed(r):
@@ -251,15 +271,17 @@ class winOrder(winBase):
 		except:
 			debug(DEBUG_WINDOWS, "OrderSave: No order description.")
 			return
-			
+
+		args = [order.sequence, order.id, order.slot, order.type, 0, []]
+
 		subpanels = copy.copy(self.argument_subpanels)
 		for name, type in orderdesc.names:
-			panel = subpanels.pop()
+			panel = subpanels.pop(0)
 				
 			if type == constants.ARG_ABS_COORD:
-				args = argCoordGet( panel )
+				args += argCoordGet( panel )
 			elif type == constants.ARG_TIME:
-				args = argTimeGet( panel )
+				args += argTimeGet( panel )
 			elif type == constants.ARG_OBJECT:
 				debug(DEBUG_WINDOWS, "Argument type (ARG_OBJECT) not implimented yet.")
 			elif type == constants.ARG_PLAYER:
@@ -267,13 +289,15 @@ class winOrder(winBase):
 			elif type == constants.ARG_RANGE:
 				debug(DEBUG_WINDOWS, "Argument type (ARG_RANGE) not implimented yet.")
 			elif type == constants.ARG_LIST:
-				args = argListGet( panel )
+				args += argListGet( panel )
+			elif type == constants.ARG_STRING:
+				args += argStringGet( panel )
 
-			if args:
-				setattr(order, name, args)
-					
-		debug(DEBUG_WINDOWS, "OrderSave: Inserting.")
+		print args
+		order = apply(objects.Order, args)
 		print order
+
+		debug(DEBUG_WINDOWS, "OrderSave: Inserting.")
 		order = self.application.connection.insert_order(self.oid, slot, order)
 		if failed(order):
 			debug(DEBUG_WINDOWS, "OrderSave: Insert failed.")
@@ -322,7 +346,7 @@ class winOrder(winBase):
 				
 			for name, type in orderdesc.names:
 				# Add there name..
-				name_text = wx.StaticText( self.argument_panel, -1, name.title() )
+				name_text = wx.StaticText( self.argument_panel, -1, name.title().replace("_","") )
 				name_text.SetFont(wx.local.normalFont)
 
 				self.argument_sizer.AddWindow( name_text, 0, wx.ALIGN_CENTER|wx.RIGHT, 4 )
@@ -334,6 +358,8 @@ class winOrder(winBase):
 					subpanel = argTimePanel( self, self.argument_panel, getattr(order, name) )
 				elif type == constants.ARG_LIST:
 					subpanel = argListPanel( self, self.argument_panel, getattr(order, name) )
+				elif type == constants.ARG_STRING:
+					subpanel = argStringPanel( self, self.argument_panel, getattr(order, name) )
 				else:
 					subpanel = argNotImplimentedPanel( self, self.argument_panel, None )
 				
@@ -392,6 +418,23 @@ def argNotImplimentedPanel(parent, parent_panel, args):
 
 	return panel
 
+def argStringPanel(parent, parent_panel, args):
+	panel = wx.Panel(parent_panel, -1)
+	item0 = wx.BoxSizer( wx.HORIZONTAL )
+
+	panel.SetSizer(item0)
+	panel.SetAutoLayout( True )
+	
+	item1 = wx.TextCtrl( panel, -1, args[1], size=(wx.local.spinSize[0]*2, wx.local.spinSize[1]))
+	item1.SetFont(wx.local.tinyFont)
+	item0.AddWindow( item1, 0, wx.ALIGN_CENTRE|wx.LEFT, 1 )
+	
+	return panel
+	
+def argStringGet(panel):
+	windows = panel.GetChildren()
+	return [0, windows[0].GetValue()]
+	
 def argListPanel(parent, parent_panel, args):
 	panel = wx.Panel(parent_panel, -1)
 	base = wx.BoxSizer(wx.VERTICAL)
@@ -418,7 +461,6 @@ def argListPanel(parent, parent_panel, args):
 		selected.InsertStringItem(slot, "")
 		selected.SetStringItem(slot, 0, str(number))
 		selected.SetStringItem(slot, 1, types[type][0])
-
 		selected.SetItemPyData(slot, type)
 		
 	add = wx.Button( panel, -1, "Add", size=wx.local.buttonSize )
@@ -452,9 +494,6 @@ def argListPanel(parent, parent_panel, args):
 		Add a new selection to the list.
 		"""
 		amount = number.GetValue()
-		if amount < 1:
-			debug(DEBUG_WINDOWS, "ListAdd: Amount is invalid.")
-			return
 	
 		type = type_list.GetSelection()
 		if type == wx.NOT_FOUND:
@@ -462,16 +501,28 @@ def argListPanel(parent, parent_panel, args):
 			return
 		type = type_list.GetClientData(type)
 
-		slot = selected.GetNextItem(-1, wx.LIST_NEXT_ALL, wx.LIST_STATE_SELECTED)
+		slot = selected.FindItemByPyData(type)
 		if slot == wx.NOT_FOUND:
-			debug(DEBUG_WINDOWS, "ListAdd: No selection selected.")
+			# Insert new object
 			slot = 0
-		else:
-			slot += 1
 
-		selected.InsertStringItem(slot, "")
-		selected.SetStringItem(slot, 0, str(amount))
-		selected.SetStringItem(slot, 1, types[type][0])
+			selected.InsertStringItem(slot, "")
+			selected.SetStringItem(slot, 0, str(amount))
+			selected.SetStringItem(slot, 1, types[type][0])
+			selected.SetItemPyData(slot, type)
+
+		else:
+			# Need to update the amount slot
+			oldamount = int(selected.GetStringItem(slot, 0))
+		
+			max = types[type][1]
+			if max != -1 and (amount + oldamount) > max:
+				amount = max - oldamount
+
+			if amount + oldamount < 0:
+				amount = -1 * oldamount
+			
+			selected.SetStringItem(slot, 0, str(amount + oldamount))
 
 	def deletef(evt, selected=selected):
 		"""\
@@ -484,7 +535,7 @@ def argListPanel(parent, parent_panel, args):
 
 		selected.DeleteItem(slot)
 
-	def typef(evt, types=types, number=number, type_list=type_list):
+	def typef(evt, selected=selected, number=number, types=types, type_list=type_list, nocallback=False):
 		"""\
 		Update the max for the spinner.
 		"""
@@ -493,12 +544,35 @@ def argListPanel(parent, parent_panel, args):
 			debug(DEBUG_WINDOWS, "ListAdd: No type selected.")
 			number.SetRange(0, 0)
 		else:
+			current = 0
+		
+			slot = selected.FindItemByPyData(type)
+			if slot != wx.NOT_FOUND:
+				if not nocallback:
+					selected.SetItemState(slot, wx.LIST_STATE_SELECTED, wx.LIST_STATE_SELECTED)
+				current = int(selected.GetStringItem(slot, 0))*-1
+		
 			type = type_list.GetClientData(type)
 			if types[type][1] == 4294967295:
-				number.SetRange(0, 1000)
+				number.SetRange(current, 1000)
 			else:
-				number.SetRange(0, types[type][1])
-	
+				number.SetRange(current, types[type][1])
+
+	def selectf(evt, selected=selected, type_list=type_list, typef=typef):
+		slot = selected.GetNextItem(-1, wx.LIST_NEXT_ALL, wx.LIST_STATE_SELECTED)
+		if slot == wx.NOT_FOUND:
+			debug(DEBUG_WINDOWS, "ListSelect: No selection selected.")
+			return
+
+		type = selected.GetItemPyData(slot)
+
+		for slot in range(0, type_list.GetCount()):
+			if type_list.GetClientData(slot) == type:
+				type_list.SetSelection(slot)
+				typef(None, nocallback=True)
+				return
+		
+	parent.Bind(wx.EVT_LIST_ITEM_SELECTED, selectf, selected)
 	parent.Bind(wx.EVT_BUTTON, addf, add)
 	parent.Bind(wx.EVT_BUTTON, deletef, delete)
 	parent.Bind(wx.EVT_CHOICE, typef, type_list)
@@ -506,7 +580,22 @@ def argListPanel(parent, parent_panel, args):
 	return panel
 
 def argListGet(panel):
-	return [], []
+	selected = panel.GetChildren()[0]
+	
+	returns = [[], []]
+	
+	slot = -1
+	while True:
+		slot = selected.GetNextItem(slot, wx.LIST_NEXT_ALL, wx.LIST_STATE_DONTCARE);
+		if slot == wx.NOT_FOUND:
+			break
+		
+		type = selected.GetItemPyData(slot)
+		amount = int(selected.GetStringItem(slot, 0))
+		
+		returns[-1].append((type, amount))
+	
+	return returns
 
 def argTimePanel(parent, parent_panel, args):
 	panel = wx.Panel(parent_panel, -1)
@@ -523,7 +612,7 @@ def argTimePanel(parent, parent_panel, args):
 	
 def argTimeGet(panel):
 	windows = panel.GetChildren()
-	return windows[0].GetValue()
+	return [windows[0].GetValue()]
 
 def argCoordPanel(parent, parent_panel, args):
 
@@ -565,5 +654,5 @@ def argCoordPanel(parent, parent_panel, args):
 
 def argCoordGet(panel):
 	windows = panel.GetChildren()
-	return windows[1].GetValue(), windows[3].GetValue(), windows[5].GetValue()
+	return [windows[1].GetValue(), windows[3].GetValue(), windows[5].GetValue()]
 	
