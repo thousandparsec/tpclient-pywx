@@ -316,6 +316,8 @@ class winOrder(winBase):
 			desc = desc.strip()
 			self.type_list.SetToolTipItem(self.type_list.GetCount()-1, desc)
 
+		self.OnOrderSelect(None)
+
 	####################################################
 	# Local Event Handlers
 	####################################################

@@ -8,7 +8,6 @@ import wx.lib.anchors
 
 # Local Imports
 from winBase import *
-from config import *
 
 # Shows messages from the game system to the player.
 class winConfig(winBase):
