@@ -61,9 +61,7 @@ class winBaseMixIn:
 			return
 		
 		if wx.Platform != '__WXMSW__':
-			if self.application.windows.config.raise_ == "All on All":
-				self.application.windows.Raise()
-			elif self.application.windows.config.raise_ == "All on Main":
+			if self.application.windows.config.raise_ == "All on All" or self.application.windows.config.raise_ == "All on Main":
 				if self.title == "Thousand Parsec":
 					self.application.windows.Raise()
 			elif self.application.windows.config.raise_ == "Individual":
@@ -77,8 +75,6 @@ class winMDIBase(wx.MDIParentFrame, winBaseMixIn):
 			pos=wx.DefaultPosition, size=wx.DefaultSize, style=wx.DEFAULT_FRAME_STYLE):
 		wx.MDIParentFrame.__init__(self, None, -1, 'TP: ' + self.title, pos, size, style)
 		winBaseMixIn.__init__(self, application, parent, pos, size, style)
-
-		
 
 class winMDISubBase(wx.MDIChildFrame, winBaseMixIn):
 	def __init__(self, application, parent, 

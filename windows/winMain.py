@@ -32,7 +32,7 @@ ID_WIN_STARMAP = 11000
 ID_WIN_MESSAGES = 11001
 ID_WIN_SYSTEM = 11002
 ID_WIN_ORDERS = 11003
-ID_WIN_TECH = 11004
+ID_WIN_DESIGN = 11004
 ID_WIN_TIPS = 11005
 ID_WIN_HELP = 1105
 
@@ -66,8 +66,9 @@ def create_menu(source, target):
 	win.Append(  ID_WIN_STARMAP,  _("Hide Starmap"), _(""), True )
 	win.Append(  ID_WIN_SYSTEM,   _("Hide System"), _(""), True )
 	win.AppendSeparator()
+	win.Append(  ID_WIN_DESIGN,   _("Hide Design"), _(""), True )
+	win.AppendSeparator()
 	win.Append(  ID_WIN_TIPS, _("Show Tips"), _(""), True )
-	win.Append(  ID_WIN_TECH, _("Tech Browser"), _(""), True)
 	win.Append(  ID_WIN_HELP, _("Help"), _(""), True)
 
 	help = wx.Menu()
@@ -84,11 +85,11 @@ def create_menu(source, target):
 	wx.EVT_MENU(source, ID_EXIT,	target.OnProgramExit)
 
 	wx.EVT_MENU(source, ID_WIN_MESSAGES,	target.OnMessages)
-#	wx.EVT_MENU(source, ID_WIN_ORDERS,		target.OnOrders)
+	wx.EVT_MENU(source, ID_WIN_ORDERS,		target.OnOrders)
 	wx.EVT_MENU(source, ID_WIN_STARMAP,		target.OnStarMap)
 	wx.EVT_MENU(source, ID_WIN_SYSTEM,		target.OnSystem)
+	wx.EVT_MENU(source, ID_WIN_DESIGN,		target.OnDesign)
 	wx.EVT_MENU(source, ID_WIN_TIPS,		target.ShowTips)
-#	wx.EVT_MENU(source, ID_WIN_TECH,		target.changeWin)
 #	wx.EVT_MENU(source, ID_WIN_HELP,		target.OnHelp)
 	return bar
 
@@ -142,12 +143,18 @@ class winMain(winMainBase):
 
 	def OnConfig(self, evt):
 		self.application.windows.winconfig.Show(True)
-
-	def OnStarMap(self, evt):
-		self.application.windows.starmap.Show(not evt.Checked())
+		
+	def OnDesign(self, evt):
+		self.application.windows.design.Show(not evt.Checked())
 
 	def OnMessages(self, evt):
 		self.application.windows.message.Show(not evt.Checked())
+		
+	def OnOrders(self, evt):
+		self.application.windows.order.Show(not evt.Checked())
+		
+	def OnStarMap(self, evt):
+		self.application.windows.starmap.Show(not evt.Checked())
 
 	def OnSystem(self, evt):
 		self.application.windows.system.Show(not evt.Checked())

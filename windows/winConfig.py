@@ -168,6 +168,7 @@ class panelConfigWindows(wx.Panel):
 		revert = wx.Button( self, -1, _("Revert"), wx.DefaultPosition, wx.DefaultSize, 0 )
 		item21.AddWindow( revert, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
 		self.Bind(wx.EVT_BUTTON, self.OnRevert, revert)
+		revert.SetDefault()
 
 		item0.AddSizer( item21, 0, wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
 
