@@ -27,23 +27,74 @@ def send(s, p):
 	green(p)
 	s.send(str(p))
 
+def print_obj(o):
+	print "Contains:", o.contains
+	print "Valid orders:", o.orders_valid
+	print "Number of orders:", o.orders_no
+
 def get_contains(s, r):
 
-	print "Contains:", r.contains
-	print "Valid orders:", r.orders_valid
+	print_obj(r)
 	
 	for i in r.contains:
+	
 		g = ObjectGet(id=i)
 		send(s, g)
 		r = recv(s)
-		print "Contains:", r.contains
-		print "Valid orders:", r.orders_valid
+		
+		print_obj(r)
+		
 		for order in r.orders_valid:
 			gl = OrderDescGet(id=order)
 			send(s, gl)
 			rl = recv(s)
 			print rl.parameters			
 		
+			# Okay now we need to build from values for each of these parameters
+			print "Order Desc: ", i, rl.id
+			args = [None, i, rl.id, -1]
+			for name, type, desc in rl.parameters:
+				if type == OrderDesc.ARG_COORD:
+					args += [10,10,10]
+				elif type == OrderDesc.ARG_TIME:
+					args += [10]
+				elif type == OrderDesc.ARG_OBJECT:
+					args += [3]
+				elif type == OrderDesc.ARG_PLAYER:
+					args += [1]
+
+			go = apply(OrderAdd, args)
+			send(s, go)
+			ro = recv(s)
+		
+		# Update the object
+		g = ObjectGet(id=i)
+		send(s, g)
+		r = recv(s)
+
+		print_obj(r)
+
+		# Get the orders
+		for slot in range(0, r.orders_no):
+			gl = OrderGet(id=i, slot=slot)
+			send(s, gl)
+			rl = recv(s)
+
+		# Remove the orders
+		l = range(0, r.orders_no)
+		l.reverse()
+		for slot in l:
+			gl = OrderRemove(id=i, slot=slot)
+			send(s, gl)
+			rl = recv(s)
+
+		# Update the object
+		g = ObjectGet(id=i)
+		send(s, g)
+		r = recv(s)
+
+		print_obj(r)
+
 		get_contains(s, r)
 
 if __name__ == "__main__":

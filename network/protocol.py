@@ -164,8 +164,8 @@ class Login(Processed):
 				raise Exception("Username and password must be set if you don't set a string")
 			Header.__init__(self, None)
 
-		self.username = username
-		self.password = password
+			self.username = username
+			self.password = password
 
 	def __str__(self):
 		# Set length of packet
@@ -208,7 +208,7 @@ class ObjectGet(Processed):
 			Header.__init__(self, None)
 			self.length = calcsize(ObjectGet.struct)
 		
-		self.id = id
+			self.id = id
 
 	def __str__(self):
 		output = Processed.__str__(self)
@@ -216,7 +216,7 @@ class ObjectGet(Processed):
 		return output
 	
 	def SetData(self, data):
-		self.id, data = xunpack(ObjectGet.struct)
+		self.id, trash = xunpack(ObjectGet.struct)
 
 class Object(Processed):
 	"""\
@@ -246,20 +246,19 @@ class Object(Processed):
 				raise Exception("All information must be set if you don't set a string")
 			Header.__init__(self, None)
 		
-		self.id = long(id)
-		self.type = type
-		self.name = name
-		self.size = size
-		self.pos = pos
-		self.vel = vel
-		self.accel = accel
-		self.contains = contains
-		self.orders_valid = orders_valid
-		self.orders_no = orders_no
+			self.id = long(id)
+			self.type = type
+			self.name = name
+			self.size = size
+			self.pos = pos
+			self.vel = vel
+			self.accel = accel
+			self.contains = contains
+			self.orders_valid = orders_valid
+			self.orders_no = orders_no
 
 	def __str__(self):
-		output = Processed.__str__(self)
-		output += xpack(Object.struct,
+		temp = xpack(Object.struct,
 							self.id,
 							self.type,
 							self.name,
@@ -270,6 +269,10 @@ class Object(Processed):
 							self.contains,
 							self.orders_valid,
 							self.orders_no)
+		self.length = len(temp)
+		
+		output = Processed.__str__(self)
+		output += temp
 		return output
 
 	def SetData(self, data):
@@ -317,7 +320,7 @@ class OrderDescGet(Processed):
 			Header.__init__(self, None)
 			self.length = calcsize(ObjectGet.struct)
 		
-		self.id = long(id)
+			self.id = long(id)
 
 	def __str__(self):
 		output = Processed.__str__(self)
@@ -325,7 +328,7 @@ class OrderDescGet(Processed):
 		return output
 	
 	def SetData(self, data):
-		self.id = unxpack(OrderDescGet.struct)
+		self.id, trash = unxpack(OrderDescGet.struct)
 
 class OrderDesc(Processed):
 	"""\
@@ -337,6 +340,7 @@ class OrderDesc(Processed):
 	struct="L SS [SIS]"
 
 	orders = {}
+	
 	ARG_COORD = 0
 	ARG_TIME = 1
 	ARG_OBJECT = 2
@@ -355,15 +359,18 @@ class OrderDesc(Processed):
 			Header.__init__(self, None)
 			self.length = 4
 		
-		self.id = long(id)
+			self.id = long(id)
 
 	def __str__(self):
-		output = Processed.__str__(self)
-		output += xpack(OrderDesc.struct,
+		temp = xpack(OrderDesc.struct,
 							self.id,
 							self.name,
 							self.desc,
 							self.parameters)
+		self.length = len(temp)
+
+		output = Processed.__str__(self)
+		output += temp
 		return output
 	
 	def SetData(self, data):
@@ -375,7 +382,19 @@ class OrderDesc(Processed):
 
 	def get_struct(self):
 		# Build a struct defenition for this order.
-		pass
+		struct = ""
+
+		for name, type, desc in self.parameters:
+			if type == self.ARG_COORD:
+				struct += "LLL "
+			elif type == self.ARG_TIME:
+				struct += "I "
+			elif type == self.ARG_OBJECT:
+				struct += "I "
+			elif type == self.ARG_PLAYER:
+				struct += "I "
+
+		return struct
 
 class OrderGet(Processed):
 	pass
@@ -385,20 +404,79 @@ class Order(Processed):
 	An order object.
 	"""
 
-	struct = ""
+	type = ORD
+	struct = "III"
 
-	def __init__(self, s=None, type=None, **kw):
-		pass
-
-
-	def check_type(self):
-		# Check that the type we have has been described.
-		pass
+	def __init__(self, s=None, oid=None, otype=None, slot=None, *args):
+		if s != None:
+			if oid != None and otype != None and slot != None:
+				raise Exception("Stuff cannot be set when you have given me a string!")
+			
+			Header.__init__(self, s[:Header.size])
+			SetData(self, s[Header.size:])
+		else:
+			if oid == None or otype == None or slot == None:
+				raise Exception("Stuff must be set if you don't set a string")
+			Header.__init__(self, None)
 		
+			self.oid = long(oid)
+			self.otype = otype
+			self.slot = slot
+			self.args = args
+
+	def __str__(self):
+		temp = xpack(self.struct, self.oid, self.otype, self.slot)
+		struct = OrderDesc.orders[self.otype].get_struct()
+		temp += apply(xpack, [struct] + list(self.args))
+		self.length = len(temp)
+		
+		output = Processed.__str__(self)
+		output += temp
+		return output
 
 	def SetData(self, data):
-		pass		
+		(self.oid, self.otype, self.slot), data = unxpack(self.struct, data)
 
+		struct = OrderDesc.orders[self.otype].get_struct()
+		self.args, data = unxpack(struct, data)
+
+class OrderAdd(Order):
+	type = ORD_ADD
+
+class OrderGet(Processed):
+	"""\
+	A get order desc packet.
+	"""
+	type = ORD_GET
+
+	struct="II"
+
+	def __init__(self, s=None, id=None, slot=None):
+		if s != None:
+			if id != None and slot != None:
+				raise Exception("Stuff cannot be set when you have given me a string!")
+			
+			Header.__init__(self, s[:Header.size])
+			SetData(self, s[Header.size:])
+		else:
+			if id == None or slot == None:
+				raise Exception("Stuff must be set if you don't set a string")
+			Header.__init__(self, None)
+			self.length = calcsize(OrderGet.struct)
+		
+			self.id = id
+			self.slot = slot
+
+	def __str__(self):
+		output = Processed.__str__(self)
+		output += xpack(OrderGet.struct, self.id, self.slot)
+		return output
+	
+	def SetData(self, data):
+		(self.id, self.slot), output = unxpack(OrderGet.struct)
+
+class OrderRemove(OrderGet):
+	type = ORD_RM
 
 def read_packet(s, DEBUG=DEBUG):
 	"""\
