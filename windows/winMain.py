@@ -88,7 +88,7 @@ class winMain(winMainBase):
 		self.CreateStatusBar(1, wx.ST_SIZEGRIP)
 
 		if wx.Platform == "__WXMAC__":
-			for value in self.appliaction.windows.__dict__.values():
+			for value in self.application.windows.__dict__.values():
 				if hasattr(value, "SetMenuBar"):
 					value.SetMenuBar(bar)
 
