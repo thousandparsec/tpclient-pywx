@@ -36,11 +36,12 @@ setup(
 		'extra',
 		'extra.wxFloatCanvas',
 		],
-	data_files=[("vars", 		glob.glob("vars/config")),
-				("graphics", 	glob.glob("graphics/*.png")),
-				("graphics/media/planet-small",	glob.glob("graphics/media/planet-small/*.png")),
-				("graphics/media/star-small",	glob.glob("graphics/media/star-small/*.png")),
-				],
 	windows=["main.py"], scripts=["main.py"],
 )
+
+#	data_files=[("vars", 		glob.glob("vars/config")),
+#				("graphics", 	glob.glob("graphics/*.png")),
+#				("graphics/media/planet-small",	glob.glob("graphics/media/planet-small/*.png")),
+#				("graphics/media/star-small",	glob.glob("graphics/media/star-small/*.png")),
+#				],
 

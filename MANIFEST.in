@@ -2,5 +2,9 @@ include README
 include LICENSE
 include COPYING
 include AUTHORS
+include var/config
+include graphics/*.png
+include graphics/media/planet-small/*.png
+include graphics/media/star-small/*.png
 prune Makefile
 prune setup.py
