@@ -54,151 +54,156 @@ class NameMap(UserDict):
 		else:
 			raise KeyError, "No such name in this mapping"
 
-if __name__ == '__main__':
+class mainControl:
+	def __init__(self, app):
 
-	class mainControl:
-		def __init__(self, app):
+		self.app = app
 
-			self.app = app
+		##########
+		# Load the windows
+		##########
+		from windows.winConnect import winConnect
+		from windows.winMain    import winMain
+		from windows.winStarMap import winStarMap
+		from windows.winMessage import winMessage
+		from windows.winSystem  import winSystem
 
-			##########
-			# Load the windows
-			##########
-			from windows.winConnect import winConnect
-			from windows.winMain    import winMain
-			from windows.winStarMap import winStarMap
-			from windows.winMessage import winMessage
-			from windows.winSystem  import winSystem
-	
-			sc_width = 1024
-			sc_height = 768
-	
-			map_width = 600
-			map_height = 500
-	
-			padding = 5
-	
-			middle = sc_width-map_width-padding
-	
-			self.connect = winConnect(app, -1, None)
-			
-			self.main    = winMain(app, (0,0), (middle,50))
-			self.message = winMessage(app, self.main, (0,map_height-padding*4), (middle,200))
-			
-			self.map     = winStarMap(app, self.main, (middle+padding,0), (map_width-padding, map_height-padding*2))
-			self.system  = winSystem(app, self.main, (middle+padding,map_height), (map_width-padding, 200))
+		sc_width = 1024
+		sc_height = 768
 
-		def raise_(self):
-			"""\
-				Raise all the windows.
-			"""
-			self.system.Raise()
-			self.message.Raise()
-			self.map.Raise()
-			self.main.Raise()
+		map_width = 600
+		map_height = 500
 
-		def show(self):
-			"""\
-				Show the main window
-			"""
-			self.main.Show(TRUE)
-			self.map.Show(TRUE)
-			self.message.Show(TRUE)
-			self.system.Show(TRUE)
+		padding = 5
 
-		def hide(self):
-			"""\
-				Show the main window
-			"""
-			self.main.Show(FALSE)
-			self.map.Show(FALSE)
-			self.message.Show(FALSE)
-			self.system.Show(FALSE)
-	
-	class appTP(wxApp):
-		def OnInit(self):
-			wxInitAllImageHandlers()
+		middle = sc_width-map_width-padding
 
-			self.windows = mainControl(self)
-			self.connected = FALSE
-			self.logined = FALSE
-
-			# If autoconnect
-			if FALSE:
-				try:
-					self.Connect(host, username, password)
-				except:
-					# Pop-up a dialog saying connected failed.
-					pass
-			else:
-				self.windows.connect.Show(TRUE)
-			
-			return TRUE
-			
-		def ConnectTo(self, host, port, username, password):
+		self.connect = winConnect(app, -1, None)
 		
-			self.username = username
-			self.password = password
-			
-			if not self.connected or self.host != host or self.port == port:
-				self.host = host
-				self.port = port
-				
-				self.socket = protocol.create_socket(self.host, self.port)
-				if not self.socket:
-					self.windows.connect.OnConnection(None)
-					return
-			
-				self.network = network_thread([self, self.windows.connect])
-				args = tuple([self.socket])
-				thread.start_new_thread(self.network, args)
-			
-				EVT_NETWORK_PACKET(self, self.OnPacket)
+		self.main    = winMain(app, (0,0), (middle,50))
+		self.message = winMessage(app, self.main, (0,map_height-padding*4), (middle,200))
+		
+		self.map     = winStarMap(app, self.main, (middle+padding,0), (map_width-padding, map_height-padding*2))
+		self.system  = winSystem(app, self.main, (middle+padding,map_height), (map_width-padding, 200))
 
-				c = protocol.Connect()
-				self.socket.send(str(c))
-			
-			else:
-				# Just resend the username/password
-				self.Login()
+	def raise_(self):
+		"""\
+			Raise all the windows.
+		"""
+		self.system.Raise()
+		self.message.Raise()
+		self.map.Raise()
+		self.main.Raise()
 
-		def Login(self):
-			l = protocol.Login(username=self.username, password=self.password)
-			self.socket.send(str(l))
+	def show(self):
+		"""\
+			Show the main window
+		"""
+		self.main.Show(TRUE)
+		self.map.Show(TRUE)
+		self.message.Show(TRUE)
+		self.system.Show(TRUE)
 
-		def OnPacket(self, event):
+	def hide(self):
+		"""\
+			Show the main window
+		"""
+		self.main.Show(FALSE)
+		self.map.Show(FALSE)
+		self.message.Show(FALSE)
+		self.system.Show(FALSE)
+
+class appTP(wxApp):
+	def OnInit(self):
+		wxInitAllImageHandlers()
+
+		try:
+			self.windows = mainControl(self)
+		except:
+			do_traceback()
+		self.connected = FALSE
+		self.logined = FALSE
+
+		# If autoconnect
+		if FALSE:
 			try:
-				if not self.connected:
-					# Check to see if this is our success packet
-					if isinstance(event.value, protocol.Ok):
-						# Yay we connected okay!
-						self.connected = TRUE
-					
-						# Now we should login
-						self.Login()
-					
-					elif isinstance(event.value, protocol.Fail):
-						# Ekk the server is busy
-						pass
-					else:
-						raise SocketError("The server sent an unknown packet")
-				elif not self.logined:
-					if isinstance(event.value, protocol.Ok):
-						# Yay we connected okay!
-						self.logined = TRUE
-					else:
-						# We failed to login :( username/password is most proberly bad.
-						pass
-				else:
-					# Hrm do nothing for now..
+				self.Connect(host, username, password)
+			except:
+				# Pop-up a dialog saying connected failed.
+				pass
+		else:
+			self.windows.connect.Show(TRUE)
+		
+		return TRUE
+		
+	def ConnectTo(self, host, port, username, password):
+	
+		self.username = username
+		self.password = password
+		
+		if not self.connected or self.host != host or self.port == port:
+			self.host = host
+			self.port = port
+			
+			self.socket = protocol.create_socket(self.host, self.port)
+			if not self.socket:
+				self.windows.connect.OnConnection(None)
+				return
+		
+			self.network = network_thread([self, self.windows.connect])
+			args = tuple([self.socket])
+			thread.start_new_thread(self.network, args)
+		
+			EVT_NETWORK_PACKET(self, self.OnPacket)
+
+			c = protocol.Connect()
+			self.socket.send(str(c))
+		
+		else:
+			# Just resend the username/password
+			self.Login()
+
+	def Login(self):
+		l = protocol.Login(username=self.username, password=self.password)
+		self.socket.send(str(l))
+
+	def OnPacket(self, event):
+		try:
+			if not self.connected:
+				# Check to see if this is our success packet
+				if isinstance(event.value, protocol.Ok):
+					# Yay we connected okay!
+					self.connected = TRUE
+				
+					# Now we should login
+					self.Login()
+				
+				elif isinstance(event.value, protocol.Fail):
+					# Ekk the server is busy
 					pass
-			finally:
-				self.network.next()
+				else:
+					raise SocketError("The server sent an unknown packet")
+			elif not self.logined:
+				if isinstance(event.value, protocol.Ok):
+					# Yay we connected okay!
+					self.logined = TRUE
+				else:
+					# We failed to login :( username/password is most proberly bad.
+					pass
+			else:
+				# Hrm do nothing for now..
+				pass
+		finally:
+			self.network.next()
 
-		def Exit(self):
-			sys.exit(1)
+	def Exit(self):
+		sys.exit(1)
 
-
-	app = appTP()
-	app.MainLoop()
+if __name__ == '__main__':
+	try:
+		app = appTP()
+		app.MainLoop()
+	finally:
+		do_traceback()
+		sys.stdin.read(1)
 	

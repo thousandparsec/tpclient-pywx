@@ -1,5 +1,6 @@
 
 from wxPython.wx import *
+from wxPython.lib.anchors import LayoutAnchors
 
 from network import protocol
 from network.events import *
@@ -22,7 +23,9 @@ ID_CANCEL = 10044
 # Shows messages from the game system to the player.
 class winConnect(wxFrame):
 	def __init__(self, parent, ID, title=None, pos=wxDefaultPosition, size=wxDefaultSize, style=wxDEFAULT_FRAME_STYLE, message_list=[]):
-		wxFrame.__init__(self, None, ID, 'TP: Connect', pos, size, style)
+		wxFrame.__init__(self, None, ID, 'TP: Connect', pos, size, style|wxTAB_TRAVERSAL)
+
+		panel = wxPanel(self, -1)
 
 		self.parent = parent
 		self.obj = {}
@@ -31,7 +34,7 @@ class winConnect(wxFrame):
 	
 		item1 = wxBoxSizer( wxHORIZONTAL )
 	
-		item2 = wxStaticText( self, ID_TEXT, "Connect to a Thousand Parsec Server", wxDefaultPosition, wxDefaultSize, 0 )
+		item2 = wxStaticText( panel, ID_TEXT, "Connect to a Thousand Parsec Server", wxDefaultPosition, wxDefaultSize, 0 )
 		item2.SetFont( wxFont( 16, wxROMAN, wxNORMAL, wxBOLD ) )
 		item1.AddWindow( item2, 0, wxALIGN_CENTRE|wxALL, 5 )
 
@@ -39,27 +42,28 @@ class winConnect(wxFrame):
 
 		item3 = wxFlexGridSizer( 0, 2, 0, 0 )
 		
-		item4 = wxStaticText( self, ID_TEXT, "Host", wxDefaultPosition, wxDefaultSize, 0 )
+		item4 = wxStaticText( panel, ID_TEXT, "Host", wxDefaultPosition, wxDefaultSize, 0 )
 		item3.AddWindow( item4, 0, wxALIGN_CENTRE|wxALL, 5 )
 
-		item5 = wxComboBox( self, ID_HOST, "", wxDefaultPosition, wxSize(200,-1), 
+		item5 = wxComboBox( panel, ID_HOST, "", wxDefaultPosition, wxSize(200,-1), 
 			defaultServers, wxCB_DROPDOWN )
 		item3.AddWindow( item5, 0, wxALIGN_CENTRE|wxALL, 5 )
 
 		self.obj['host'] = item5
 
-		item6 = wxStaticText( self, ID_TEXT, "Username", wxDefaultPosition, wxDefaultSize, 0 )
+		item6 = wxStaticText( panel, ID_TEXT, "Username", wxDefaultPosition, wxDefaultSize, 0 )
 		item3.AddWindow( item6, 0, wxALIGN_CENTRE|wxALL, 5 )
 
-		item7 = wxComboBox( self, ID_USERNAME, "", wxDefaultPosition, wxSize(200,-1), [], wxCB_DROPDOWN )
+		item7 = wxComboBox( panel, ID_USERNAME, "", wxDefaultPosition, wxSize(200,-1),
+			[""], wxCB_DROPDOWN )
 		item3.AddWindow( item7, 0, wxALIGN_CENTRE|wxALL, 5 )
 
 		self.obj['username'] = item7
 
-		item8 = wxStaticText( self, ID_TEXT, "Password", wxDefaultPosition, wxDefaultSize, 0 )
+		item8 = wxStaticText( panel, ID_TEXT, "Password", wxDefaultPosition, wxDefaultSize, 0 )
 		item3.AddWindow( item8, 0, wxALIGN_CENTRE|wxALL, 5 )
 
-		item9 = wxTextCtrl( self, ID_PASSWORD, "", wxDefaultPosition, wxSize(200,-1), wxTE_PASSWORD )
+		item9 = wxTextCtrl( panel, ID_PASSWORD, "", wxDefaultPosition, wxSize(200,-1), wxTE_PASSWORD )
 		item3.AddWindow( item9, 0, wxALIGN_CENTRE|wxALL, 5 )
 
 		self.obj['password'] = item9
@@ -72,17 +76,18 @@ class winConnect(wxFrame):
 
 		item11 = wxBoxSizer( wxHORIZONTAL )
 
-		item12 = wxButton( self, ID_OK, "OK", wxDefaultPosition, wxDefaultSize, 0 )
+		item12 = wxButton( panel, ID_OK, "OK", wxDefaultPosition, wxDefaultSize, 0 )
 		item11.AddWindow( item12, 0, wxALIGN_CENTRE|wxALL, 5 )
 
-		item13 = wxButton( self, ID_CANCEL, "Cancel", wxDefaultPosition, wxDefaultSize, 0 )
+		item13 = wxButton( panel, ID_CANCEL, "Cancel", wxDefaultPosition, wxDefaultSize, 0 )
 		item11.AddWindow( item13, 0, wxALIGN_CENTRE|wxALL, 5 )
 
 		item3.AddSizer( item11, 0, wxALIGN_CENTRE|wxALL, 5 )
 
-		self.SetAutoLayout( true ) 
-		self.SetSizer( item0 )
-		#item0.Fit( self )
+		panel.SetAutoLayout( true )
+		panel.SetSizer( item0 )
+		
+		item0.Fit( panel )
 		item0.SetSizeHints( self )
 
 		EVT_BUTTON(self, ID_OK, self.OnOkay)
@@ -138,12 +143,14 @@ class winConnect(wxFrame):
 			eventManager.DeregisterListener(self.OnConnection)
 
 			if event != None and isinstance(event.value, protocol.Ok):
+				print "Connect Worked!"
 				eventManager.Register(self.OnLogin, EVT_NETWORK_PACKET, self)
 				self.progress.Update(2)
 			else:
-				print "OnConnect!"
+				print "Connect Failed!"
 				# Oh no! we didn't connect!
 				self.progress.Update(5)
+				self.progress.Destroy()
 
 				dlg = wxMessageDialog(self, 'The connection failed, this could be because,\n' +
 											'the server could be busy,\n' +
@@ -151,8 +158,10 @@ class winConnect(wxFrame):
 											'Please try again later.',
 											'TP: Connection Failed',
 				   						wxOK | wxICON_INFORMATION)
-				dlg.Show(TRUE)
+				dlg.ShowModal()
+				dlg.Destroy()
 		finally:
+			do_traceback()
 			if hasattr(self.parent, "network") and self.parent.network.locked():
 				self.parent.network.next()
 
@@ -161,6 +170,7 @@ class winConnect(wxFrame):
 			self.progress.Update(3)
 		
 			if isinstance(event.value, protocol.Ok):
+				print "Login Worked!"
 				eventManager.DeregisterListener(self.OnLogin)
 			
 				self.progress.Update(4)
@@ -170,6 +180,7 @@ class winConnect(wxFrame):
 				self.progress.Update(5)
 			elif isinstance(event.value, protocol.Fail):
 				# Show a message box
+				print "Login Failed!"
 				self.progress.Update(5)
 				
 				dlg = wxMessageDialog(self, 'Failed to connect, this could be because,\n' +
@@ -179,7 +190,9 @@ class winConnect(wxFrame):
 											'TP: Bad Username or Password',
 				   						wxOK | wxICON_INFORMATION)
 
-				dlg.Show(TRUE)
+				dlg.ShowModal()
+				dlg.Destroy()
+				
 				# Disable the host selection box
 				self.obj['host'].Enable(FALSE)
 

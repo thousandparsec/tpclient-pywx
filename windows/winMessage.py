@@ -4,6 +4,7 @@ from copy import deepcopy
 from winBase import winBase
 
 from wxPython.wx import *
+from wxPython.lib.anchors import LayoutAnchors
 from wxPython.html import *
 
 #from common.message import Message
@@ -33,8 +34,10 @@ class winMessage(winBase):
 	title = "Messages"
 	
 	def __init__(self, application, parent, pos=wxDefaultPosition, size=wxDefaultSize, style=wxDEFAULT_FRAME_STYLE, message_list=[]):	
-		winBase.__init__(self, application, parent, pos, size, style)
+		winBase.__init__(self, application, parent, pos, size, style|wxTAB_TRAVERSAL)
 
+		panel = wxPanel(self, -1)
+		panel.SetConstraints(LayoutAnchors(self, 1, 1, 1, 1))
 		self.obj = {}
 
 		item0 = wxFlexGridSizer( 0, 1, 0, 0 )
@@ -46,15 +49,15 @@ class winMessage(winBase):
 		item1.AddGrowableCol( 1 )
 		item1.AddGrowableCol( 2 )
 
-		item2 = wxCheckBox( self, MESSAGE_FILTER, "Filter", wxDefaultPosition, wxDefaultSize, 0 )
+		item2 = wxCheckBox( panel, MESSAGE_FILTER, "Filter", wxDefaultPosition, wxDefaultSize, 0 )
 		item1.AddWindow( item2, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 )
 
-		item3 = wxStaticText( self, MESSAGE_TITLE, "Title", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE )
+		item3 = wxStaticText( panel, MESSAGE_TITLE, "Title", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE )
 		item1.AddWindow( item3, 0, wxGROW|wxALIGN_CENTRE|wxALL, 5 )
 
 		self.obj['title'] = item3
 
-		item4 = wxStaticText( self, MESSAGE_ID, "# of #", wxDefaultPosition, wxDefaultSize, 0 )
+		item4 = wxStaticText( panel, MESSAGE_ID, "# of #", wxDefaultPosition, wxDefaultSize, 0 )
 		item1.AddWindow( item4, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxALL, 5 )
 
 		self.obj['counter'] = item4
@@ -66,7 +69,7 @@ class winMessage(winBase):
 		item5.AddGrowableRow( 0 )
 
 		# This is the main HTML display!
-		item6 = wxHtmlWindow(self, MESSAGE_HTML, wxDefaultPosition, wxSize(200,160))
+		item6 = wxHtmlWindow(panel, MESSAGE_HTML, wxDefaultPosition, wxSize(200,160))
 		item5.AddWindow( item6, 0, wxGROW|wxALIGN_CENTER_HORIZONTAL|wxALL, 5 )
 
 		self.html = item6
@@ -75,33 +78,34 @@ class winMessage(winBase):
 
 		item7 = wxBoxSizer( wxVERTICAL )
 
-		item8 = wxButton( self, MESSAGE_PREV, "Prev", wxDefaultPosition, wxDefaultSize, 0 )
+		item8 = wxButton( panel, MESSAGE_PREV, "Prev", wxDefaultPosition, wxDefaultSize, 0 )
 		item7.AddWindow( item8, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxALL, 5 )
 
-		item9 = wxButton( self, MESSAGE_GOTO, "Goto", wxDefaultPosition, wxDefaultSize, 0 )
+		item9 = wxButton( panel, MESSAGE_GOTO, "Goto", wxDefaultPosition, wxDefaultSize, 0 )
 		item7.AddWindow( item9, 0, wxALIGN_CENTRE|wxALL, 5 )
 
-		item10 = wxButton( self, MESSAGE_NEXT, "Next", wxDefaultPosition, wxDefaultSize, 0 )
+		item10 = wxButton( panel, MESSAGE_NEXT, "Next", wxDefaultPosition, wxDefaultSize, 0 )
 		item7.AddWindow( item10, 0, wxALIGN_CENTRE|wxALL, 5 )
 
-		item11 = wxStaticLine( self, MESSAGE_LINE, wxDefaultPosition, wxSize(20,-1), wxLI_HORIZONTAL )
+		item11 = wxStaticLine( panel, MESSAGE_LINE, wxDefaultPosition, wxSize(20,-1), wxLI_HORIZONTAL )
 		item11.Enable(false)
 		item7.AddWindow( item11, 0, wxALIGN_CENTRE|wxALL, 5 )
 
-		item12 = wxButton( self, MESSAGE_NEW, "New", wxDefaultPosition, wxDefaultSize, 0 )
+		item12 = wxButton( panel, MESSAGE_NEW, "New", wxDefaultPosition, wxDefaultSize, 0 )
 		item7.AddWindow( item12, 0, wxALIGN_CENTRE|wxALL, 5 )
 
-		item13 = wxButton( self, MESSAGE_DEL, "Delete", wxDefaultPosition, wxDefaultSize, 0 )
+		item13 = wxButton( panel, MESSAGE_DEL, "Delete", wxDefaultPosition, wxDefaultSize, 0 )
 		item7.AddWindow( item13, 0, wxALIGN_CENTRE|wxALL, 5 )
 
 		item5.AddSizer( item7, 0, wxGROW|wxALIGN_RIGHT|wxALL, 5 )
 
 		item0.AddSizer( item5, 0, wxGROW|wxALIGN_CENTER_HORIZONTAL|wxALL, 5 )
 
-		self.SetAutoLayout( true )
-		self.SetSizer( item0 )
-		item0.Fit( self )
-		item0.SetSizeHints( self )
+		panel.SetAutoLayout( true )
+		panel.SetSizer( item0 )
+		
+		item0.Fit( panel )
+		item0.SetSizeHints( panel )
 		
 		self.SetSize(size)
 		self.SetPosition(pos)

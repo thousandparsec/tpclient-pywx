@@ -18,5 +18,6 @@ class winBase(wxFrame):
 		evt.Veto(true)
 
 	def OnRaise(self, evt):
-		self.application.windows.raise_()
+		if wxPlatform != '__WXMSW__':
+			self.application.windows.raise_()
 		
