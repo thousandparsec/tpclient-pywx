@@ -72,17 +72,18 @@ class winSystem(wxFrame):
 
 		scroller = wxSplitterScrolledWindow(self, -1, (50,50), (350, 250), style=wxNO_BORDER | wxCLIP_CHILDREN | wxVSCROLL)
 		splitter = wxThinSplitterWindow(scroller, -1, style=wxSP_3DBORDER | wxCLIP_CHILDREN)
-		splitter.SetSashSize(2)
+		splitter.SetSashSize(3)
 		
 		self.tree = systemTree(splitter, -1, style = wxTR_HAS_BUTTONS | wxTR_NO_LINES | wxTR_ROW_LINES | wxNO_BORDER )
 		
 		self.value = systemValueWindow(splitter, -1, style=wxNO_BORDER)
 
 		splitter.SplitVertically(self.tree, self.value)
-		splitter.SetSashPosition(150)
+		#splitter.SetSashPosition(150)
 		scroller.SetTargetWindow(self.tree)
 		scroller.EnableScrolling(FALSE, FALSE)
 
 		self.value.SetTreeCtrl(self.tree)
 		self.tree.SetCompanionWindow(self.value)
 		
+		splitter.SetSashPosition(150)

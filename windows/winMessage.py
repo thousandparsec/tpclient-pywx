@@ -96,7 +96,7 @@ class winMessage(wxFrame):
 
 		self.SetAutoLayout( true )
 		self.SetSizer( item0 )
-		#item0.Fit( self )
+		item0.Fit( self )
 		item0.SetSizeHints( self )
 
 		# Contains the messages

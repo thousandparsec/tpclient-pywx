@@ -65,12 +65,24 @@ if __name__ == '__main__':
 			from windows.winStarMap import winStarMap
 			from windows.winMessage import winMessage
 			from windows.winSystem  import winSystem
-		
+	
+			sc_width = 1024
+			sc_height = 768
+	
+			map_width = 600
+			map_height = 500
+	
+			padding = 5
+	
+			middle = sc_width-map_width-padding
+	
 			self.connect = winConnect(app, -1, None)
-			self.main    = winMain(app, -1, None, (0,0), (1024-600-5,50))
-			self.map     = winStarMap(self.main, -1, None, (1024-600,0), (600-5,500))
-			self.message = winMessage(self.main, -1, None, (0,476), (1024-600-5,200))
-			self.system  = winSystem(self.main, -1, None, (1024-600,523), (600-5,187))
+			
+			self.main    = winMain(app, -1, None, (0,0), (middle,50))
+			self.message = winMessage(self.main, -1, None, (0,map_height-100), (middle,100))
+			
+			self.map     = winStarMap(self.main, -1, None, (middle+padding,0), (map_width-padding, map_height-padding*2))
+			self.system  = winSystem(self.main, -1, None, (middle+padding,map_height), (map_width-padding, 200))
 
 		def show(self):
 			##########

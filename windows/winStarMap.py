@@ -105,7 +105,7 @@ class winStarMap(wxFrame):
 				EVT_MOTION(self, self.OnMotion)
 
 			def OnPaint(self, event):
-				print "On paint!"
+				#print "On paint!"
 				dst = wxPaintDC(self)
 				self.PrepareDC(dst)
 
@@ -127,9 +127,9 @@ class winStarMap(wxFrame):
 
 					self.parent.RenderDrag(dc)
 
-					start = self.parent.start
+					start = self.start
 					end = self.ConvertEventCoords(event)
-					self.parent.end = end
+					self.end = end
 ##					x,y = self.GetViewStart()
 ##					h,w = self.GetClientSize()
 ##					px, py = self.GetScrollPixelsPerUnit()
@@ -142,10 +142,10 @@ class winStarMap(wxFrame):
 
 			def OnLeftDown(self, event):
 				"""called when the left mouse button is pressed"""
-				print event.GetX(), event.GetY()
-				print self.ConvertEventCoords(event)
-				self.parent.start = self.ConvertEventCoords(event)
-				self.parent.end = self.parent.start
+				#print event.GetX(), event.GetY()
+				#print self.ConvertEventCoords(event)
+				self.start = self.ConvertEventCoords(event)
+				self.end = self.start
 				self.CaptureMouse()
 				self.parent.dragging = 1
 
@@ -211,14 +211,14 @@ class winStarMap(wxFrame):
 		startpos = startpos[0] - size[0], startpos[1] - size[1]
 		endpos = endpos[0] + size[0], endpos[1] + size[1]
 
-		print startpos, size, endpos, (endpos[0]-startpos[0], endpos[1]-startpos[1])
+		#print startpos, size, endpos, (endpos[0]-startpos[0], endpos[1]-startpos[1])
 
 		x = size[0] * (startpos[0] / size[0])
 		while x < endpos[0]:
 			y = size[1] * (startpos[1] / size[1])
 			while y < endpos[1]:
 				if x >= startpos[0] and y >= startpos[1]:
-					print (x,y)
+					#print (x,y)
 					dc.DrawBitmap(background, x, y, TRUE)
 				y += size[1]
 			x += size[0]
@@ -256,14 +256,14 @@ class winStarMap(wxFrame):
 
 			if isinstance(i, System):
 
-				print i.x/zoom, i.y/zoom
+				#print i.x/zoom, i.y/zoom
 
 				if self.config['Scanner']:
 					scanner = i.getScanner()
 					if scanner is not None:
 						p, s, a = scanner.getRange()
 
-						print "Topleft", i.x, i.y, "Range", s, "Scanner topleft", i.x/zoom-s/2/zoom, i.y/zoom-s/2/zoom
+						#print "Topleft", i.x, i.y, "Range", s, "Scanner topleft", i.x/zoom-s/2/zoom, i.y/zoom-s/2/zoom
 
 						#dc.SetLogicalFunction(wxSET)
 
@@ -280,7 +280,7 @@ class winStarMap(wxFrame):
 						#dc.SetLogicalFunction(wxSET)
 
 				if self.config['DrawNames']:
-					print "Drawing the name", i.name
+					#print "Drawing the name", i.name
 					tw, th = dc.GetTextExtent(i.name) 
 					dc.DrawText(i.name, i.x/zoom-tw/2+POINT/2, i.y/zoom+POINT+1)
 
