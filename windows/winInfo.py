@@ -51,7 +51,6 @@ class winInfo(winBase):
 		self.Layout()
 
 	def OnSelectObject(self, evt):
-		print "Info.OnSelectObject"
 		try:
 			object = self.application.cache.objects[evt.id]
 		except:

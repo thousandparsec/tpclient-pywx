@@ -76,6 +76,8 @@ class winStarMap(winBase):
 
 	def Rebuild(self):
 		try:
+			self.Canvas.ClearAll()
+		
 			application = self.application
 			C = self.Create
 			
@@ -113,8 +115,7 @@ class winStarMap(winBase):
 						
 					if object.vel != (0, 0, 0):
 						# We need to draw in a vector
-						velocity = 0
-						pass
+						C(object, Line(scale((object.pos[0:2], object.vel[0:2])), LineColor="Green"), as="velocity")
 
 			self.arrow = PolyNoSize([(0,0), (-5,-10), (0, -8), (5,-10)], LineWidth=1,LineColor="Red",FillColor="Red",InForeground=True)
 			self.Canvas.AddObject(self.arrow)

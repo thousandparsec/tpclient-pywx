@@ -26,6 +26,7 @@ class winSystem(winBase):
 
 		# Setup to recieve game events
 		self.application = application
+		self.ignore = False
 
 		self.tree = wx.gizmos.TreeListCtrl(self, -1, style=wx.TR_DEFAULT_STYLE | wx.TR_HAS_VARIABLE_ROW_HEIGHT)
 
@@ -118,6 +119,9 @@ class winSystem(winBase):
 		"""\
 		When somebody selects an item on the list.
 		"""
+		if self.ignore:
+			return
+
 		# Figure out which item it is
 		id = self.tree.GetPyData(evt.GetItem())
 		
@@ -140,9 +144,13 @@ class winSystem(winBase):
 		
 		item = self.tree.FindItemByData(evt.id)
 		if item:
+			self.ignore = True
+			
 			self.tree.CollapseAll()			# Collapse all the other stuff
 			self.tree.SelectItem(item)		# Select Item
 			if not self.tree.IsVisible(item):
 				self.tree.EnsureVisible(item)
 			self.tree.Expand(item)			# Expand the Item
+
+			self.ignore = False
 	

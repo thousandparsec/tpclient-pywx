@@ -246,6 +246,7 @@ class MainControl:
 		wx.CallAfter(self._Post, event)
 		
 	def _Post(self, event):
+		print "Posting", event.__class__.__name__[:-5]
 		func = 'On' + event.__class__.__name__[:-5]
 		for window in [self.main, self.info, self.message, self.order, self.starmap, self.system]:
 			if hasattr(window, func):
