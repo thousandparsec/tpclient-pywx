@@ -9,7 +9,7 @@ from math import *
 # wxPython imports
 from wxPython.wx import *
 from wxPython.lib.floatbar import *
-from extra.floatcanvas import FloatCanvas
+from extra.wxFloatCanvas.NavCanvas import NavCanvas
 
 from netlib.objects.ObjectExtra.StarSystem import StarSystem
 from netlib.objects.ObjectExtra.Fleet import Fleet
@@ -39,13 +39,7 @@ class winStarMap(winBase):
 		self.CreateStatusBar()
 		self.SetStatusText("")
 
-		self.Canvas = FloatCanvas(self, -1, (500,500),
-				Debug = 1,
-				EnclosingFrame = self,
-				BackgroundColor = "BLACK",
-				UseBackground = 1,
-				UseToolbar = 1)
-
+		self.Canvas = NavCanvas(self, size=(500,500), Debug = 1, BackgroundColor = "BLACK")
 		self.Canvas.ZoomToBB()
 
 		EVT_ACTIVATE(self, self.OnFocus)
@@ -62,10 +56,10 @@ class winStarMap(winBase):
 				# Draw an orbit
 				if len(object.contains) > 0:
 					so = round(s * 1.5)
-					self.Canvas.AddDot(x,y,10,LineWidth = 1,LineColor="White",FillColor="Black")
+					self.Canvas.AddCircle(x,y,10,LineWidth=2,LineColor="White",FillColor="Black")
 					
-				self.Canvas.AddDot(x,y,4,LineWidth = 1,LineColor="Yellow",FillColor="Yellow")
-				self.Canvas.AddText(object.name,x,y-15,Position="tc",ForeGround="White",Size=8)
+				self.Canvas.AddCircle(x,y,4,LineWidth=1,LineColor="Yellow",FillColor="Yellow")
+				self.Canvas.AddText(object.name,x,y-15,Position="tc",Color="White",Size=8)
 
 			if isinstance(object, Fleet):
 				if object.vel != (0, 0, 0):
