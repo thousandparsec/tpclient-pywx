@@ -275,14 +275,14 @@ class winOrder(winBase):
 	####################################################
 	# Remote Event Handlers
 	####################################################
-	def OnSelectObject(self, evt):
+	def OnSelectObject(self, evt, force=False):
 		"""\
 		Called when an object is selected.
 		"""
 		if not self.application.cache.objects.has_key(self.oid):
 			return
 
-		if self.oid == evt.id:
+		if not force and self.oid == evt.id:
 			return
 		else:
 			self.oid = evt.id
@@ -377,7 +377,7 @@ class winOrder(winBase):
 		self.application.cache.orders[self.oid].insert(slot, order)
 		self.application.cache.objects[self.oid].order_number += 1
 
-		self.OnSelectObject(wx.local.SelectObjectEvent(self.oid))
+		self.OnSelectObject(wx.local.SelectObjectEvent(self.oid), force=True)
 		self.application.windows.Post(wx.local.UpdateOrderEvent(self.oid, slot))
 
 	def OnOrderDelete(self, evt):
@@ -393,7 +393,8 @@ class winOrder(winBase):
 			del self.application.cache.orders[self.oid][slot]
 			self.application.cache.objects[self.oid].order_number -= 1
 
-		self.OnSelectObject(wx.local.SelectObjectEvent(self.oid))
+		self.OnSelectObject(wx.local.SelectObjectEvent(self.oid), force=True)
+		self.OnOrderSelect(None)
 		self.application.windows.Post(wx.local.SelectOrderEvent(self.oid, -1))
 
 	def OnOrderSave(self, evt):
