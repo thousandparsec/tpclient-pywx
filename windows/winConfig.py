@@ -144,6 +144,7 @@ class panelConfigStartup(wx.Panel):
 		pass
 
 ID_MESSAGE	= 10054
+ID_INFO		= 10064
 ID_ORDER	= 10055
 ID_STARMAP	= 10056
 ID_SYSTEM	= 10057
@@ -175,6 +176,11 @@ class panelConfigWindows(wx.Panel):
 		self.obj['show_message'] = item4
 		wx.EVT_CHECKBOX(self, ID_MESSAGE, self.OnShowMessage)
 
+		item4 = wx.CheckBox( self, ID_INFO, "Info", wx.DefaultPosition, wx.DefaultSize, 0 )
+		item2.AddWindow( item4, 0, wx.GROW|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+		self.obj['show_info'] = item4
+		wx.EVT_CHECKBOX(self, ID_INFO, self.OnShowMessage)
+
 		item5 = wx.CheckBox( self, ID_ORDER, "Order", wx.DefaultPosition, wx.DefaultSize, 0 )
 		item2.AddWindow( item5, 0, wx.GROW|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
 		self.obj['show_order'] = item5
@@ -205,7 +211,7 @@ class panelConfigWindows(wx.Panel):
 		wx.EVT_RADIOBOX(self, ID_RAISE, self.OnRaiseSelection)
 
 		item9 = wx.RadioBox( self, ID_RADIOBOX, "Window", wx.DefaultPosition, wx.DefaultSize, 
-				["Main", "Message","Order","StarMap","System"] , 1, wx.RA_SPECIFY_COLS )
+				["Main", "Info", "Message","Order","StarMap","System"] , 1, wx.RA_SPECIFY_COLS )
 		item1.AddWindow( item9, 0, wx.GROW|wx.ALIGN_CENTER_HORIZONTAL|wx.ALL, 5 )
 		self.obj['window'] = item9
 		wx.EVT_RADIOBOX(self, ID_RADIOBOX, self.OnWindowSelection)

@@ -126,9 +126,14 @@ password = "%(password)s"
 				objects += self.connection.get_objects(object.contains)
 
 			# Download the orders from this object
-			orders = self.connection.get_orders(object.id, range(0, object.order_number))
-			self.cache.orders[object.id] = list(orders)
+			if object.order_number == 0:
+				orders = []
+			if object.order_number == 1:
+				orders = [self.connection.get_orders(object.id, range(0, object.order_number))]
+			else:
+				orders = self.connection.get_orders(object.id, range(0, object.order_number))
 
+			self.cache.orders[object.id] = list(orders)
 			progress.Update(len(self.cache.objects.keys()))
 		
 		progress.Update(100)

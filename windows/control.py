@@ -14,6 +14,7 @@ class MainControl:
 		if not config:
 			# Create some default positioning, good for 1024x768 on linux
 			config = Blank()
+			config.info = Blank()
 			config.main = Blank()
 			config.message = Blank()
 			config.order = Blank()
@@ -33,6 +34,10 @@ class MainControl:
 			config.main.pos = (0,0)
 			config.main.size = (middle, 50)
 			config.main.show = True
+			
+			config.info.pos = (0,0)
+			config.info.size = (middle, 50)
+			config.info.show = True
 			
 			config.message.pos = (0, map_height-padding*4)
 			config.message.size = (middle, 200)
@@ -59,6 +64,9 @@ class MainControl:
 		config.main.pos = self.main.GetPositionTuple()
 		config.main.size = self.main.GetSizeTuple()
 		config.main.show = self.main.IsShown()
+		config.info.pos = self.info.GetPositionTuple()
+		config.info.size = self.info.GetSizeTuple()
+		config.info.show = self.info.IsShown()
 		config.message.pos = self.message.GetPositionTuple()
 		config.message.size = self.message.GetSizeTuple()
 		config.message.show = self.message.IsShown()
@@ -79,6 +87,8 @@ class MainControl:
 
 		self.main.SetPosition(config.main.pos)
 		self.main.SetSize(config.main.size)
+		self.info.SetPosition(config.info.pos)
+		self.info.SetSize(config.info.size)
 		self.message.SetPosition(config.message.pos)
 		self.message.SetSize(config.message.size)
 		self.order.SetPosition(config.order.pos)
@@ -90,6 +100,7 @@ class MainControl:
 		
 		if show:
 			self.main.Show(config.main.show)
+			self.info.Show(config.info.show)
 			self.message.Show(config.message.show)
 			self.order.Show(config.order.show)
 			self.starmap.Show(config.starmap.show)
@@ -110,6 +121,9 @@ class MainControl:
 
 		from windows.winMain    import winMain
 		self.main = winMain(application, config.main.pos, config.main.size)
+
+		from windows.winInfo    import winInfo
+		self.info = winInfo(application, self.main, config.info.pos, config.info.size)
 
 		from windows.winConfig  import winConfig
 		self.winconfig = winConfig(application, self.main)
@@ -138,6 +152,7 @@ class MainControl:
 		self.message.Raise()
 		self.order.Raise()
 		self.starmap.Raise()
+		self.info.Raise()
 		self.main.Raise()
 
 		self.winconfig.Raise()
@@ -152,6 +167,7 @@ class MainControl:
 		self.ConfigActivate()
 
 		self.main.Show(config.main.show)
+		self.info.Show(config.info.show)
 		self.message.Show(config.message.show)
 		self.order.Show(config.order.show)
 		self.starmap.Show(config.starmap.show)
@@ -162,6 +178,7 @@ class MainControl:
 			Show the main window
 		"""
 		self.main.Show(False)
+		self.info.Show(False)
 		self.message.Show(False)
 		self.order.Show(False)
 		self.starmap.Show(False)
@@ -169,7 +186,7 @@ class MainControl:
 	
 	def Post(self, event):
 		func = 'On' + event.__class__.__name__[:-5]
-		for window in [self.main, self.message, self.order, self.starmap, self.system]:
+		for window in [self.main, self.info, self.message, self.order, self.starmap, self.system]:
 			if hasattr(window, func):
 				getattr(window, func)(event)
 		

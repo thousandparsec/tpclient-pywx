@@ -13,10 +13,11 @@ Short Term
 	* Add ships to the StarMap
 		(DONE) - Need to make sure i don't draw orbiting starships
 
-	* Put up screenshots on www.thousandparsec.net
+	* Put up screenshots on www.thousandparsec.net (DONE)
 
 Longer Term
-	* Add a info panel
+	* Add a info panel (DONE)
+		* Add data to the info panel
 	* Add ship "path" to StarMap
 	
 	* Check time till end of turn
