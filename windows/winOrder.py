@@ -110,35 +110,22 @@ class winOrder(winBase):
 		self.Bind(wx.EVT_BUTTON, self.OnOrderDelete, delete_button)
 		
 #		EVT_LIST_ITEM_SELECTED(self, ORDER_LIST, self.OnOrderSelect)
-#		
-#		EVT_SELECT_OBJECT(self, self.OnSelect)
-#		EVT_SELECT_ORDER(self,  self.OnOrder)
 
 		self.SetSize(size)
 		self.SetPosition(pos)
 
 	# Update the display for the new object
-	def OnSelect(self, evt):
-		g = self.app.game
-		oid = evt.value
+	def OnSelectObject(self, evt):
+		id = evt.id
 
 		# The object that was selected and set it as the currently selected one
-		object = g.universe.Object(oid)
-		self.oid = oid
-
+		object = self.application.cache[id]
 		if object:
-			# Set which orders can be added to this object
-			self.new_type_list.Clear()
-			for type in object.orders_valid:
-				orderdesc = g.descs.OrderDesc(type)
-				if orderdesc:
-					self.new_type_list.Append(orderdesc.name, type)
-				else:
-					self.new_type_list.Append("Waiting on description for (%i)" % type, type)
-
 			# Add a whole bunch of place holders until we get the order
 			self.order_list.DeleteAllItems()
-			for slot in range(0, object.orders_no):
+			for slot in range(0, object.order_number):
+				order = self.application.connection.get_orders(slot)
+				print order
 				self.order_list.InsertStringItem(slot, "")
 				self.order_list.SetStringItem(slot, TURNS_COL, "Unknown")
 				self.order_list.SetStringItem(slot, ORDERS_COL, "Waiting on order (%i) information" % slot)
@@ -148,9 +135,19 @@ class winOrder(winBase):
 #				nevt = GameOrderGetEvent(object.id, slot)
 #				wx.PostEvent(nevt)
 
+			# Set which orders can be added to this object
+			self.new_type_list.Clear()
+			for type in object.order_types:
+				self.new_type_list.Append(str(type), type)
+#				orderdesc = g.descs.OrderDesc(type)
+#				if orderdesc:
+#					self.new_type_list.Append(orderdesc.name, type)
+#				else:
+#					self.new_type_list.Append("Waiting on description for (%i)" % type, type)
+
 			self.BuildPanel(None)
 
-	def OnOrder(self, evt):
+	def OnSelectOrder(self, evt):
 		g = self.app.game
 		
 		order = evt.value
@@ -293,8 +290,6 @@ class winOrder(winBase):
 		"""\
 		Builds a panel for the entering of orders arguments.
 		"""
-		g = self.app.game
-		
 		# Remove the previous panel and stuff
 		self.base_sizer.Remove(self.argument_panel)
 		self.argument_panel.Hide()
@@ -313,7 +308,7 @@ class winOrder(winBase):
 		
 		# Do we actually have an order
 		if order:
-			orderdesc = g.descs.OrderDesc(order.otype)
+			orderdesc = None # g.descs.OrderDesc(order.otype)
 			
 			if orderdesc:
 				args = list(order.args)

@@ -9,9 +9,10 @@ from math import *
 # wxPython imports
 import wx
 from extra.wxFloatCanvas.NavCanvas import NavCanvas
-from extra.wxFloatCanvas.FloatCanvas import EVT_FC_ENTER_OBJECT, EVT_FC_LEAVE_OBJECT
-from extra.wxFloatCanvas.FloatCanvas import Text
+from extra.wxFloatCanvas.FloatCanvas import EVT_FC_LEFT_DOWN
+from extra.wxFloatCanvas.FloatCanvas import Text, Polygon, Rectangle
 from extra.wxFloatCanvas.CircleNoSmall import CircleNoSmall
+from extra.wxFloatCanvas.PolyNoSize import PolyNoSize
 
 # Network imports
 from netlib.objects.ObjectExtra.StarSystem import StarSystem
@@ -31,6 +32,15 @@ sysOWNER = 2
 sysHAB = 3
 sysMIN = 4
 
+def scale(value):
+	if hasattr(value, "__getitem__"):
+		r = []
+		for i in value:
+			r.append(scale(i))
+		return r
+	else:
+		return round(value/(1000*1000))
+
 # Shows the main map of the universe.
 class winStarMap(winBase):
 	title = "StarMAP, The Known Universe"
@@ -40,9 +50,6 @@ class winStarMap(winBase):
 
 		self.application = application
 
-		self.CreateStatusBar()
-		self.SetStatusText("")
-
 		self.Canvas = NavCanvas(self, size=wx.Size(500,500), Debug = 1, BackgroundColor = "BLACK")
 		self.Canvas.ZoomToBB()
 
@@ -50,15 +57,20 @@ class winStarMap(winBase):
 		self.Rebuild()
 
 	def Rebuild(self):
+		drawable = Rectangle(0,0,1,1, LineWidth=1,LineColor="White",FillColor="Black")
+		drawable.data = 0
+		self.Canvas.AddObject(drawable)
+		drawable.Bind(EVT_FC_LEFT_DOWN, self.OnClick)
+		
 		try:
 			application = self.application
 			C = self.Create
 			
 			for object in application.cache.values():
 				if isinstance(object, StarSystem):
-					s = round(object.size/(1000*100))
-					x = round(object.pos[0]/(1000*1000))
-					y = round(object.pos[1]/(1000*1000))
+					s = scale(object.size)
+					x = scale(object.pos[0])
+					y = scale(object.pos[1])
 
 					# Draw an orbit
 					so = round(s * 1.25)
@@ -77,29 +89,29 @@ class winStarMap(winBase):
 						pass
 					pass
 
+			self.arrow = PolyNoSize([(0,0), (-5,-10), (0, -8), (5,-10)], LineWidth=1,LineColor="Red",FillColor="Red")
+			self.Canvas.AddObject(self.arrow)
+
 			self.Canvas.ZoomToBB()
 
 		except Exception, e:
 			do_traceback()
 
 	def Create(self, object, drawable):
-		drawable.oid = object.id
+		drawable.data = object.id
 
 		self.Canvas.AddObject(drawable)
 
-		drawable.Bind(EVT_FC_ENTER_OBJECT, self.OnEnter)
-		drawable.Bind(EVT_FC_LEAVE_OBJECT, self.OnLeave)
+		drawable.Bind(EVT_FC_LEFT_DOWN, self.OnClick)
+#		drawable.Bind(EVT_FC_ENTER_OBJECT, self.OnEnter)
+#		drawable.Bind(EVT_FC_LEAVE_OBJECT, self.OnLeave)
 
-	def OnEnter(self, evt):
-		self.cid = evt.oid
-		
-		print "Enter ", evt.oid
-		
-		object = self.application.cache[evt.oid]
-		self.SetStatusText(object.name)
+	def OnClick(self, evt):
+		self.application.windows.Post(wx.local.SelectObjectEvent(evt.data))
 
-	def OnLeave(self, evt):
-		print "Leave ", evt.oid
-		
-		self.cid = None
-		self.SetStatusText("")	
+	def OnSelectObject(self, evt):
+		object = self.application.cache[evt.id]
+		print "Selecting object", evt.id
+
+		self.arrow.Move(scale(object.pos))
+		self.Canvas.Zoom(1)

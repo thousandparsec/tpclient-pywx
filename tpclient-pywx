@@ -101,6 +101,40 @@ password = "%(password)s"
 """ % self.config.__dict__
 		open(os.path.join("var", "config"), "w+").write(data)
 
+	def CacheLoad(self):
+		pass
+
+	def CacheSave(self):
+		pass
+
+	def CacheUpdate(self):
+		progress = wx.ProgressDialog("TP: Downloading Universe", "pywx-client is now downloading the Universe.", \
+			100, self.windows.connect, wx.PD_APP_MODAL | wx.PD_AUTO_HIDE | wx.PD_ELAPSED_TIME | wx.PD_REMAINING_TIME)
+		
+		self.cache = {}
+		
+		objects = self.connection.get_objects(0)
+		while len(objects) > 0:
+			object = objects.pop(0)
+			
+#			# Download the orders on this object
+#			if object.order_number > 0:
+#				object.orders = self.connection.get_orders(range(0, object.order_number))
+#			else:
+#				object.orders = []
+#			print "Orders", object.orders
+			
+			self.cache[object.id] = object
+			
+			# Download the objects inside this object
+			if len(object.contains) > 0:
+				objects += self.connection.get_objects(object.contains)
+		
+			progress.Update(len(self.cache.keys()))
+		
+		progress.Update(100)
+		self.windows.Post(wx.local.CacheUpdateEvent())
+
 	def Exit(self):
 		print "AppTp.exit"
 		sys.exit(1)

@@ -29,16 +29,34 @@ class TreeListCtrl(wx.gizmos.TreeListCtrl):
 			return item
 		else:
 			if self.ItemHasChildren(item):
+				cookieo = -1
 				child, cookie = self.GetFirstChild(item)
 
-				while child != None:
+				while cookieo != cookie:
 					r = self.FindItemByData(pyData, child)
 					if r:
 						return r
 					
+					cookieo = cookie
 					child, cookie = self.GetNextChild(item, cookie)
 
 		return None
+
+	def CollapseAll(self, item=None):
+		if item == None:
+			item = self.GetRootItem()
+
+		if self.ItemHasChildren(item):
+			cookieo = -1
+			child, cookie = self.GetFirstChild(item)
+
+			while cookieo != cookie:
+				self.CollapseAll(child)
+			
+				cookieo = cookie
+				child, cookie = self.GetNextChild(item, cookie)
+
+		self.Collapse(item)
 
 wx.gizmos.TreeListCtrl = TreeListCtrl
 
@@ -52,7 +70,7 @@ class winSystem(winBase):
 		# Setup to recieve game events
 		self.application = application
 
-		self.tree = wx.gizmos.TreeListCtrl(self, -1, style=wx.TR_DEFAULT_STYLE)
+		self.tree = wx.gizmos.TreeListCtrl(self, -1, style=wx.TR_DEFAULT_STYLE | wx.TR_HAS_VARIABLE_ROW_HEIGHT)
 
 		self.icons = {}
 		self.icons['Blank'] = wx.Image("graphics/blank-icon.png").ConvertToBitmap()
@@ -67,12 +85,16 @@ class winSystem(winBase):
 		for i in self.icons.keys():
 			self.icons[i] = self.il.Add(self.icons[i])
 		self.tree.SetImageList(self.il)
-		
+
+		self.tree.SetFont(wx.local.normalFont)
+
 		# create some columns
 		self.tree.AddColumn("Object")
-		self.tree.AddColumn("Details")
+#		self.tree.AddColumn("Details")
 		self.tree.SetMainColumn(0)
-		self.tree.SetColumnWidth(0, 250)
+		self.tree.SetColumnWidth(0, 225)
+
+		self.Bind(wx.EVT_TREE_SEL_CHANGED, self.OnSelectItem)
 
 	def Rebuild(self):
 		"""\
@@ -128,6 +150,16 @@ class winSystem(winBase):
 				return selected
 		return
 
+	def OnSelectItem(self, evt):
+		"""\
+		When somebody selects an item on the list.
+		"""
+		# Figure out which item it is
+		id = self.tree.GetPyData(evt.GetItem())
+		
+		# Okay we need to post an event now
+		self.application.windows.Post(wx.local.SelectObjectEvent(id))
+
 	def OnCacheUpdate(self, evt):
 		self.Rebuild()
 
@@ -136,18 +168,10 @@ class winSystem(winBase):
 		When somebody selects an object.
 		"""
 		debug(DEBUG_WINDOWS, "Selecting object... %i" % evt.id)
+		
 		item = self.tree.FindItemByData(evt.id)
 		if item:
-			self.tree.SelectItem(item)
+			self.tree.CollapseAll()			# Collapse all the other stuff
+			self.tree.SelectItem(item)		# Select Item
+			self.tree.Expand(item)			# Expand the Item
 			self.tree.EnsureVisible(item)
-
-	def SelectItem(self, evt):
-		"""\
-		When somebody selects an item on the list.
-		"""
-		# Figure out which item it is
-		id = self.tree.GetPyData(evt.GetItem())
-		
-		# Okay we need to post an event now
-		self.application.Post(wx.local.SelectObjectEvent(id))
-

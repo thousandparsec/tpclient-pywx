@@ -26,7 +26,7 @@ class SelectOrderEvent(wx.PyEvent):
 wx.local.SelectOrderEvent = SelectOrderEvent
 
 wx.local.normalFont = wx.Font(8,  wx.DEFAULT, wx.NORMAL, wx.NORMAL)
-wx.local.tinyFont   = wx.Font(4,  wx.DEFAULT, wx.NORMAL, wx.NORMAL)
+wx.local.tinyFont   = wx.Font(6,  wx.DEFAULT, wx.LIGHT, wx.NORMAL)
 wx.local.largeFont  = wx.Font(12, wx.DEFAULT, wx.NORMAL, wx.NORMAL)
 
 class winBaseMixIn:
@@ -59,31 +59,29 @@ class winBaseMixIn:
 # These give a MDI interface under windows
 class winMDIBase(wx.MDIParentFrame, winBaseMixIn):
 	def __init__(self, application, parent, 
-			pos=wx.DefaultPosition, 
-			size=wx.DefaultSize, 
-			style=wx.DEFAULT_FRAME_STYLE):
+			pos=wx.DefaultPosition, size=wx.DefaultSize, style=wx.DEFAULT_FRAME_STYLE):
 		wx.MDIParentFrame.__init__(self, None, -1, 'TP: ' + self.title, pos, size, style)
 		winBaseMixIn.__init__(self, application, parent, pos, size, style)
 
 class winMDISubBase(wx.MDIChildFrame, winBaseMixIn):
 	def __init__(self, application, parent, 
-			pos=wx.DefaultPosition, 
-			size=wx.DefaultSize, 
-			style=wx.DEFAULT_FRAME_STYLE):
+			pos=wx.DefaultPosition, size=wx.DefaultSize, style=wx.DEFAULT_FRAME_STYLE):
 		wx.MDIChildFrame.__init__(self, parent, -1, 'TP: ' + self.title, pos, size, style)
 		winBaseMixIn.__init__(self, application, parent, pos, size, style)
 
 # These give a non-MDI interface under other operating systems
 class winNormalBase(wx.Frame, winBaseMixIn):
 	def __init__(self, application, parent, 
-			pos=wx.DefaultPosition, 
-			size=wx.DefaultSize, 
-			style=wx.DEFAULT_FRAME_STYLE):
+			pos=wx.DefaultPosition, size=wx.DefaultSize, style=wx.DEFAULT_FRAME_STYLE):
 		wx.Frame.__init__(self, parent, -1, 'TP: ' + self.title, pos, size, style)
 		winBaseMixIn.__init__(self, application, parent, pos, size, style)
 
-winNormalSubBase = winNormalBase
-
+class winNormalSubBase(wx.MiniFrame, winBaseMixIn):
+	def __init__(self, application, parent, 
+			pos=wx.DefaultPosition, size=wx.DefaultSize, style=wx.DEFAULT_FRAME_STYLE):
+		wx.MiniFrame.__init__(self, parent, -1, 'TP: ' + self.title, pos, size, style)
+		winBaseMixIn.__init__(self, application, parent, pos, size, style)
+		
 if wx.Platform == '__WXMSW__':
 	winMainBase = winMDIBase
 	winBase = winMDISubBase

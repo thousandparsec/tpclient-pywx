@@ -132,27 +132,8 @@ class winConnect(wx.Frame):
 		progress.Update(5)
 		if dlg == None:
 			print "Success"
-			
-			progress = wx.ProgressDialog(TITLE_DOWNLOAD, TEXT_DOWNLOAD, 100, self, \
-				wx.PD_APP_MODAL | wx.PD_AUTO_HIDE | wx.PD_ELAPSED_TIME | wx.PD_REMAINING_TIME)
-		
-			application.cache = {}
-		
-			objects = application.connection.get_objects(0)
-			while len(objects) > 0:
-				object = objects.pop(0)
-				application.cache[object.id] = object
-			
-				if len(object.contains) > 0:
-					objects += application.connection.get_objects(object.contains)
-		
-				progress.Update(len(application.cache.keys()))
-		
-			progress.Update(100)
-		
 			self.Hide()
-			print "PostEvent"
-			application.windows.Post(wx.local.CacheUpdateEvent())
+			application.CacheUpdate()
 			application.windows.Show()
 		else:
 			dlg.ShowModal()
