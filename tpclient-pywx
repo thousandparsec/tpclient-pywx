@@ -13,6 +13,8 @@ from windows.winStarMap import winStarMap
 from windows.winMessage import winMessage
 from windows.winSystem  import winSystem
 
+map = message = system = None
+
 if __name__ == '__main__':
 
 	class appTP(wxApp):
@@ -22,11 +24,11 @@ if __name__ == '__main__':
 			map = winStarMap(None, -1, None, (1024-600,0), (600-5,500))
 			map.Show(TRUE)
 			
-#			message = winMessage(map, -1, None, (0,476), (1024-600-5,200))
-#			system = winSystem(map, -1, None, (1024-600,523), (600-5,187))
+			message = winMessage(map, -1, None, (0,476), (1024-600-5,200))
+			system = winSystem(map, -1, None, (1024-600,523), (600-5,187))
 			
-#			message.Show(TRUE)
-#			system.Show(TRUE)
+			message.Show(TRUE)
+			system.Show(TRUE)
 			
 			return TRUE
 

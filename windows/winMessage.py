@@ -1,4 +1,6 @@
 
+from copy import deepcopy
+
 from wxPython.wx import *
 from wxPython.html import *
 

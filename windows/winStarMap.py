@@ -1,4 +1,7 @@
 
+import os
+from math import *
+
 from wxPython.wx import *
 from wxPython.lib.floatbar import *
 
@@ -87,8 +90,6 @@ class winStarMap(wxFrame):
 
 				self.maxWidth  = 10000/self.parent.config['Zoom']
 				self.maxHeight = 10000/self.parent.config['Zoom']
-
-				self.canvas = wxEmptyBitmap(self.maxWidth, self.maxHeight, -1)
 				
 				self.SetBackgroundColour(wxBLACK)
 				self.SetCursor(wxStockCursor(wxCURSOR_CROSS))
@@ -172,13 +173,13 @@ class winStarMap(wxFrame):
 	
 
 		self.windowScroll = starCanvas(self)
-		self.canvas = self.windowScroll.canvas
+#		self.canvas = self.windowScroll.canvas
 		self.maxWidth = self.windowScroll.maxWidth
 		self.maxHeight = self.windowScroll.maxHeight
 
 		# Load the graphics
 		self.graphics = {}
-		self.graphics['background'] = wxImage("space_back.gif").ConvertToBitmap()
+		self.graphics['background'] = wxImage(os.path.join("graphics", "space_back.gif")).ConvertToBitmap()
 
 	def OnPaint(self, event):
 		print "On pain! main"
@@ -187,8 +188,8 @@ class winStarMap(wxFrame):
 
 		print "rendering", dc
 
-		if dc == None:
-			dc = self.canvas
+#		if dc == None:
+#			dc = self.canvas
 
 		dc.BeginDrawing()
 		dc.SetBackground(wxBrush(wxBLACK, wxSOLID))
