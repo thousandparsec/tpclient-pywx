@@ -12,4 +12,16 @@ def do_traceback():
 	type, val, tb = sys.exc_info()
 	sys.stderr.write(string.join(traceback.format_exception(type, val, tb), ''))
 	lasts = (type, val, tb)
-	
+
+DEBUG_NETWORK = 0
+DEBUG_MAIN = 1
+DEBUG_WINDOWS = 2
+
+DEBUGGING = [DEBUG_NETWORK, DEBUG_MAIN, DEBUG_WINDOWS]
+
+def debug(id, string):
+
+	if id in DEBUGGING:
+		print string
+
+

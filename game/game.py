@@ -41,12 +41,19 @@ class Game:
 				container = self.GetParent(new.id)
 				if not container and new.id != 0:
 					# Ekk! we got a child object but no parent
-					raise ChildBeforeParent(str(new.id))
+					raise ChildBeforeParent(repr(new.id))
 				else:
 					new.container = container
 				
 				self.map[new.id] = new
-				
+
+				if isinstance(new, Container):
+					# Request it's children
+					for id in new.contains:
+						if id not in self.map.keys():
+							r = protocol.GetObject(id=id)
+							evt.network.socket.send(str(r))
+
 			else:
 				# Just ignored it
 				pass
@@ -55,7 +62,7 @@ class Game:
 			evt.next()
 
 	def GetParent(self, id):
-		for id,o in self.map.items():
+		for theid,o in self.map.items():
 			if isinstance(o, Container):
 				if id in o.contains:
 					return o

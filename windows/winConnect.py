@@ -27,6 +27,7 @@ class winConnect(wxFrame):
 	def __init__(self, parent, ID, title=None, pos=wxDefaultPosition, size=wxDefaultSize, style=wxDEFAULT_FRAME_STYLE, message_list=[]):
 		wxFrame.__init__(self, None, ID, 'TP: Connect', pos, size, style|wxTAB_TRAVERSAL)
 
+
 		panel = wxPanel(self, -1)
 
 		self.parent = parent
@@ -125,6 +126,7 @@ class winConnect(wxFrame):
 					host, port = temp
 					port = int(port)
 
+				self.parent.app.network.win_connect(self)
 				eventManager.Register(self.OnConnection, EVT_NETWORK_PACKET, self)
 				
 				self.progress = wxProgressDialog("TP: Connecting to Server",
@@ -176,12 +178,14 @@ class winConnect(wxFrame):
 			if isinstance(evt.value, protocol.Ok):
 				print "Login Worked!"
 				eventManager.DeregisterListener(self.OnLogin)
+				self.parent.app.network.win_disconnect(self)
 			
 				self.progress.Update(4)
 			
 				self.OnExit(None)
 			
 				self.progress.Update(5)
+
 			elif isinstance(evt.value, protocol.Fail):
 				# Show a message box
 				print "Login Failed!"

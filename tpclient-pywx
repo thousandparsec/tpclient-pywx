@@ -13,14 +13,16 @@ import pprint
 import thread
 
 from network import protocol
-from network.nthread import network_thread
+from network.nthread import NetworkThread
 from network.events import *
+
+from game.game import Game
+from game.gthread import GameThread
 
 from utils import *
 from config import *
 
 from windows.control import MainControl
-from game.game import Game
 
 class AppTP(wxApp):
 	def ConfigLoad(self):
@@ -36,13 +38,25 @@ class AppTP(wxApp):
 		self.connected = FALSE
 		self.logined = FALSE
 		
+		# Start up the windows
 		try:
 			self.windows = MainControl(self)
 		except:
 			do_traceback()
 
+		# Startup the Game
 		try:
 			self.game = Game(self)
+			thread.start_new_thread(self.game)
+		except:
+			do_traceback()
+
+		# Startup the Network
+		try:
+			self.network = NetworkThread(self)
+			thread.start_new_thread(self.network)
+
+			self.network.win_connect(self)
 		except:
 			do_traceback()
 
@@ -66,20 +80,16 @@ class AppTP(wxApp):
 		if not self.connected or self.host != host or self.port == port:
 			self.host = host
 			self.port = port
-			
-			self.socket = protocol.create_socket(self.host, self.port)
+
+			self.network.connect(self.host, self.port)
 			if not self.socket:
 				self.windows.connect.OnConnection(None)
 				return
 
 			EVT_NETWORK_PACKET(self, self.OnPacket)
-		
-			self.network = network_thread([self, self.windows.connect])
-			args = tuple([self.socket])
-			thread.start_new_thread(self.network, args)
 
 			c = protocol.Connect()
-			self.socket.send(str(c))
+			self.network.send(c)
 		
 		else:
 			# Just resend the username/password
@@ -115,12 +125,13 @@ class AppTP(wxApp):
 
 					# Okay now try to get the universe
 					g = protocol.GetObject(id=0)
-					self.socket.send(str(g))
+					evt.network.socket.send(str(g))
 					
 				else:
 					# We failed to login :( username/password is most proberly bad.
 					pass
 			else:
+				# Now we are logged in okay just pass everything on to the game engine
 				self.game.OnPacket(evt)
 		
 		finally:

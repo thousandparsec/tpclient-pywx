@@ -9,7 +9,6 @@ from cStringIO import StringIO
 import string
 import socket
 import sys
-import pprint
 
 CONNECT=0
 OK=1
@@ -23,10 +22,21 @@ Y = 1
 Z = 2
 
 class Header:
+	"""\
+	Base class for all protocol packets.
+
+	Includes all the common parts for the packets.
+	"""
+	
 	size=4+4+4
 	struct="!4sLL"
 
 	def __init__(self, s=None):
+		"""\
+		Create a new header object.
+
+		It takes a string which contains the "header" data.
+		"""
 		if s:
 			self.protocol, self.type, self.length = unpack(Header.struct, s)
 			if self.protocol != ("TP01"):
@@ -38,12 +48,20 @@ class Header:
 		self.data = None
 
 	def set_data(self, data=None):
+		"""\
+		Processes the data of the packet.
+		"""
 		if self.data == None:
 			self.length = 0
 		else:
 			self.length = len(data)
 
 	def process(self):
+		"""\
+		Look at the packet type and muta this object into the
+		correct type.
+		"""
+		
 		if self.type == CONNECT:
 			self.__class__ = Connect
 		elif self.type == OK:
@@ -58,23 +76,47 @@ class Header:
 			self.__class__ = Object
 
 	def __str__(self):
+		"""\
+		Produce a string suitable to be send over the wire.
+		"""
 		output = pack(Header.struct, self.protocol, self.type, self.length)
 		return output
 
 class Processed(Header):
+	"""\
+	Superclass for all objects which have been processed.
+
+	Basicly stops you processing an object twice.
+	"""
+
 	def process(self):
 		raise Exception("Cannot reprocess an already processed packet")
 
 class Connect(Processed):
+	"""\
+	Connect packet.
+
+	Sent just after connecting to the server to check it actually is
+	a TP server and uses a compatible protocol.
+	"""
 	type = CONNECT
 
 class Ok(Processed):
+	"""\
+	Something succeded..
+	"""
 	type = OK
 
 class Fail(Processed):
+	"""\
+	Something failed....
+	"""
 	type = FAIL
 
 class GetObject(Processed):
+	"""\
+	Request an object from the server.
+	"""
 	type = GETOBJ
 	struct="!L"
 
@@ -91,7 +133,7 @@ class GetObject(Processed):
 			Header.__init__(self, None)
 			self.length = 4
 		
-		self.id = id
+		self.id = long(id)
 
 	def __str__(self):
 		output = Processed.__str__(self)
@@ -102,9 +144,10 @@ class GetObject(Processed):
 		self.id = unpack(GetObject.struct)
 
 class Object(Processed):
+	"""\
+	An object returned by the server.
+	"""
 	type = OBJ
-
-# int32 object ID, int32 object type, string name, unsigned int64 size (diameter), 3 by signed int64 position, 3 by signed int64 velocity, 3 by signed int64 acceleration, and a list of int32 object IDs of objects contained in the current object, prefixed by the int32 of the number of items in the list
 
 	def __init__(self, s=None, id=None, type=None, name=None, size=None, 
 					pos=None, vel=None, accel=None, contains = None):
@@ -123,7 +166,7 @@ class Object(Processed):
 				raise Exception("All information must be set if you don't set a string")
 			Header.__init__(self, None)
 		
-		self.id = id
+		self.id = long(id)
 		self.type = type
 		self.name = name
 		self.size = size
@@ -178,6 +221,10 @@ class Object(Processed):
 
 
 class Login(Processed):
+	"""\
+	A login packet.
+	"""
+
 	type = LOGIN
 	
 	def __init__(self, s=None, username=None, password=None):
@@ -238,6 +285,9 @@ def pad(s):
 	return s
 
 def read_packet(s):
+	"""\
+	Reads a single TP packet from the socket and returns it.
+	"""
 	string = s.recv(Header.size)
 	h = Header(string)
 	h.process()
@@ -248,12 +298,17 @@ def read_packet(s):
 	return h
 
 class debug_socket(socket.socket):
+	"""\
+	Special socket which will print out every packet
+	sent over it.
+	"""
 	def send(self, string):
-		print "OUTGOING ->>>>>>:",
-		pprint.pprint(string)
 		socket.socket.send(self, string)
 
 def create_socket(address, port):
+	"""\
+	Creates a socket, just a convience function.
+	"""
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 #	s = debug_socket(socket.AF_INET, socket.SOCK_STREAM)
 	try:
@@ -263,6 +318,12 @@ def create_socket(address, port):
 		return None
 
 def connect(address, port):
+	"""\
+	Connects to a TP server.
+
+	Checks that the server is actually a TP server and that
+	the protocol is compatible with the client.
+	"""
 	s = create_socket(address, port)
 
 	packet = Header()
@@ -277,12 +338,9 @@ def connect(address, port):
 		socket.close()
 		return None
 
-def sprint(data):
-	for i in range(0, len(data), 4):
-		pprint.pprint(data[i:i+4])
-
 if __name__ == "__main__":
-	
+	import pprint
+
 	if sys.argv[1].lower() == "default":
 		host, port = ("127.0.0.1", 6923)
 	else:
