@@ -383,7 +383,10 @@ class winOrder(winBase):
 		self.application.cache.objects[self.oid].order_number += 1
 
 		self.OnSelectObject(wx.local.SelectObjectEvent(self.oid), force=True)
-		self.application.windows.Post(wx.local.UpdateOrderEvent(self.oid, slot))
+		self.order_list.SetSelected([slot])
+		self.OnOrderSelect(None)
+#		self.application.windows.Post(wx.local.UpdateOrderEvent(self.oid, slot))
+#		self.application.windows.Post(wx.local.SelectOrderEvent(self.oid, slot))
 
 	def OnOrderDelete(self, evt):
 		"""\
