@@ -107,7 +107,7 @@ class winConnect(wxFrame):
 
 		dlg = None
 		try:
-			application.connection.setup(host=host, port=port, debug=True)
+			application.connection.setup(host=host, port=port, debug=False)
 			progress.Update(1)
 			
 			print "Connect...",

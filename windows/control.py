@@ -71,9 +71,9 @@ class MainControl:
 		config.starmap.pos = self.starmap.GetPositionTuple()
 		config.starmap.size = self.starmap.GetSizeTuple()
 		config.starmap.show = self.starmap.IsShown()
-#		config.system.pos = self.system.GetPositionTuple()
-#		config.system.size = self.system.GetSizeTuple()
-#		config.system.show = self.system.IsShown()
+		config.system.pos = self.system.GetPositionTuple()
+		config.system.size = self.system.GetSizeTuple()
+		config.system.show = self.system.IsShown()
 
 		save_data("windows", config)
 
@@ -88,19 +88,19 @@ class MainControl:
 #		self.order.SetSize(config.order.size)
 		self.starmap.SetPosition(config.starmap.pos)
 		self.starmap.SetSize(config.starmap.size)
-#		self.system.SetPosition(config.system.pos)
-#		self.system.SetSize(config.system.size)
+		self.system.SetPosition(config.system.pos)
+		self.system.SetSize(config.system.size)
 		
 		if show:
 			self.main.Show(config.main.show)
 			self.message.Show(config.message.show)
 #			self.order.Show(config.order.show)
 			self.starmap.Show(config.starmap.show)
-#			self.system.Show(config.system.show)
+			self.system.Show(config.system.show)
 
-	def __init__(self, app):
+	def __init__(self, application):
 
-		self.app = app
+		self.application = application
 		self.config = self.ConfigLoad()
 
 		config = self.config
@@ -109,25 +109,25 @@ class MainControl:
 		# Load the windows
 		##########
 		from windows.winConnect import winConnect
-		self.connect = winConnect(app, -1, None)
+		self.connect = winConnect(application, -1, None)
 
 		from windows.winMain    import winMain
-		self.main = winMain(app, config.main.pos, config.main.size)
+		self.main = winMain(application, config.main.pos, config.main.size)
 
 		from windows.winConfig  import winConfig
-		self.winconfig = winConfig(app, self.main)
+		self.winconfig = winConfig(application, self.main)
 
 		from windows.winMessage import winMessage
-		self.message = winMessage(app, self.main, config.message.pos, config.message.size)
+		self.message = winMessage(application, self.main, config.message.pos, config.message.size)
 
 #		from windows.winOrder   import winOrder
-#		self.order = winOrder(app, self.main, config.order.pos, config.order.size)
+#		self.order = winOrder(application, self.main, config.order.pos, config.order.size)
 
 		from windows.winStarMap import winStarMap
-		self.starmap = winStarMap(app, self.main, config.starmap.pos, config.starmap.size)
+		self.starmap = winStarMap(application, self.main, config.starmap.pos, config.starmap.size)
 
-#		from windows.winSystem  import winSystem
-#		self.system = winSystem(app, self.main, config.system.pos, config.system.size)
+		from windows.winSystem  import winSystem
+		self.system = winSystem(application, self.main, config.system.pos, config.system.size)
 
 		self.ConfigActivate(FALSE)
 
@@ -137,7 +137,7 @@ class MainControl:
 		"""
 		self.connect.Raise()
 
-#		self.system.Raise()
+		self.system.Raise()
 		self.message.Raise()
 #		self.order.Raise()
 		self.starmap.Raise()
@@ -158,7 +158,7 @@ class MainControl:
 		self.message.Show(config.message.show)
 #		self.order.Show(config.order.show)
 		self.starmap.Show(config.starmap.show)
-#		self.system.Show(config.system.show)
+		self.system.Show(config.system.show)
 
 	def Hide(self):
 		"""\
@@ -170,5 +170,5 @@ class MainControl:
 		self.message.Show(FALSE)
 #		self.order.Show(FALSE)
 		self.starmap.Show(FALSE)
-#		self.system.Show(FALSE)
+		self.system.Show(FALSE)
 

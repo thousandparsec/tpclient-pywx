@@ -1,12 +1,14 @@
 
 # Show the splash screen on startup
-splash = TRUE
+splash = True
 
 # Show the "tips" on startup
-tips = TRUE
+tips = True
 
 # On startup connect to the default server
-autoconnect = FALSE
+autoconnect = False
 
-# 
-
+# Autoconnect information
+host = "127.0.0.1:6923"
+username = "t"
+password = "t"

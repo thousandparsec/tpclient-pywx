@@ -23,18 +23,65 @@ from config import *
 
 from windows.control import MainControl
 
+class Splash(wxSplashScreen):
+	def __init__(self, application):
+		image = wxImage("graphics/splash.png").ConvertToBitmap()
+		wxSplashScreen.__init__(self, image, wxSPLASH_CENTRE_ON_SCREEN | wxSPLASH_TIMEOUT, 3000, None, -1)
+		self.Bind(EVT_CLOSE, self.OnClose)
+
+		self.application = application
+
+	def OnClose(self, evt):
+		self.Hide()
+		self.application.windows.connect.Show(TRUE)
+
 class AppTP(wxApp):
 	def ConfigLoad(self):
 		print "AppTp.ConfigLoad"
-		config = load_data("main")
 
-		if not config:
+		try:
+			import sys
+			sys.path.append("var")
+			import config as config
+			self.config = config
+		except ImportError:
 			config = Blank()
-	
+			config.splash = True
+			config.tips = True
+			config.autoconnect = False
+
+			config.host = "127.0.0.1"
+			config.username = ""
+			config.password = ""
+
+		return config
+
+	def ConfigSave(self):
+		print "AppTp.ConfigSave"
+
+		data = """\
+# Show the splash screen on startup
+splash = %(splash)s
+ 
+# Show the "tips" on startup
+tips = %(tips)s
+ 
+# On startup connect to the default server
+autoconnect = %(autoconnect)s
+ 
+# Autoconnect information
+host = "%(host)s"
+username = "%(username)s"
+password = "%(password)s"
+""" % self.config.__dict__
+		open(os.path.join("var", "config"), "w+").write(data)
+
 	def OnInit(self):
 		try:
 			print "AppTp.OnInit.AllImageHandlers"
 			wxInitAllImageHandlers()
+			
+			self.config = self.ConfigLoad()
 			
 			print "AppTp.OnInit.cache"
 			self.cache = {}
@@ -44,8 +91,10 @@ class AppTP(wxApp):
 
 			print "AppTp.OnInit.connection"
 			self.connection = Connection()
+		
+			splash = Splash(self)
+			splash.Show()
 			
-			self.windows.connect.Show(TRUE)
 		except:
 			do_traceback()
 

@@ -42,6 +42,8 @@ class winMessage(winBase):
 	def __init__(self, application, parent, pos=wxDefaultPosition, size=wxDefaultSize, style=wxDEFAULT_FRAME_STYLE, message_list=[]):	
 		winBase.__init__(self, application, parent, pos, size, style|wxTAB_TRAVERSAL)
 
+		font = wxFont(8, wxDEFAULT, wxNORMAL, wxNORMAL)
+
 		panel = wxPanel(self, -1)
 		panel.SetConstraints(LayoutAnchors(self, 1, 1, 1, 1))
 		self.obj = {}
@@ -56,19 +58,22 @@ class winMessage(winBase):
 		item1.AddGrowableCol( 2 )
 
 		item2 = wxCheckBox( panel, MESSAGE_FILTER, "Filter", wxDefaultPosition, wxDefaultSize, 0 )
-		item1.AddWindow( item2, 0, wxALIGN_CENTER_VERTICAL|wxALL, 5 )
+		item2.SetFont(font)
+		item1.AddWindow( item2, 0, wxALIGN_CENTER_VERTICAL|wxALL, 1 )
 
 		item3 = wxStaticText( panel, MESSAGE_TITLE, "Title", wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE )
-		item1.AddWindow( item3, 0, wxGROW|wxALIGN_CENTRE|wxALL, 5 )
+		item3.SetFont(font)
+		item1.AddWindow( item3, 0, wxGROW|wxALIGN_CENTRE|wxALL, 1 )
 
 		self.obj['title'] = item3
 
 		item4 = wxStaticText( panel, MESSAGE_ID, "# of #", wxDefaultPosition, wxDefaultSize, 0 )
-		item1.AddWindow( item4, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxALL, 5 )
+		item4.SetFont(font)
+		item1.AddWindow( item4, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxALL, 1 )
 
 		self.obj['counter'] = item4
 
-		item0.AddSizer( item1, 0, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 5 )
+		item0.AddSizer( item1, 0, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 1 )
 
 		item5 = wxFlexGridSizer( 0, 2, 0, 0 )
 		item5.AddGrowableCol( 0 )
@@ -76,36 +81,41 @@ class winMessage(winBase):
 
 		# This is the main HTML display!
 		item6 = wxHtmlWindow(panel, MESSAGE_HTML, wxDefaultPosition, wxSize(200,160))
-		item5.AddWindow( item6, 0, wxGROW|wxALIGN_CENTER_HORIZONTAL|wxALL, 5 )
+		item5.AddWindow( item6, 0, wxGROW|wxALIGN_CENTER_HORIZONTAL|wxALL, 1 )
 
 		self.html = item6
-		self.html.SetFonts("Swiss", "Courier", [10, 12, 14, 16, 19, 24, 32])
+		self.html.SetFonts("Swiss", "Courier", [6, 8, 10, 12, 14, 16, 18])
 		self.html.SetPage(self.nomessage)
 
 		item7 = wxBoxSizer( wxVERTICAL )
 
 		item8 = wxButton( panel, MESSAGE_PREV, "Prev", wxDefaultPosition, wxDefaultSize, 0 )
-		item7.AddWindow( item8, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxALL, 5 )
+		item8.SetFont(font)
+		item7.AddWindow( item8, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxALL, 1 )
 
 		item9 = wxButton( panel, MESSAGE_GOTO, "Goto", wxDefaultPosition, wxDefaultSize, 0 )
-		item7.AddWindow( item9, 0, wxALIGN_CENTRE|wxALL, 5 )
+		item9.SetFont(font)
+		item7.AddWindow( item9, 0, wxALIGN_CENTRE|wxALL, 1 )
 
 		item10 = wxButton( panel, MESSAGE_NEXT, "Next", wxDefaultPosition, wxDefaultSize, 0 )
-		item7.AddWindow( item10, 0, wxALIGN_CENTRE|wxALL, 5 )
+		item10.SetFont(font)
+		item7.AddWindow( item10, 0, wxALIGN_CENTRE|wxALL, 1 )
 
 		item11 = wxStaticLine( panel, MESSAGE_LINE, wxDefaultPosition, wxSize(20,-1), wxLI_HORIZONTAL )
 		item11.Enable(false)
-		item7.AddWindow( item11, 0, wxALIGN_CENTRE|wxALL, 5 )
+		item7.AddWindow( item11, 0, wxALIGN_CENTRE|wxALL, 1 )
 
 		item12 = wxButton( panel, MESSAGE_NEW, "New", wxDefaultPosition, wxDefaultSize, 0 )
-		item7.AddWindow( item12, 0, wxALIGN_CENTRE|wxALL, 5 )
+		item12.SetFont(font)
+		item7.AddWindow( item12, 0, wxALIGN_CENTRE|wxALL, 1 )
 
 		item13 = wxButton( panel, MESSAGE_DEL, "Delete", wxDefaultPosition, wxDefaultSize, 0 )
-		item7.AddWindow( item13, 0, wxALIGN_CENTRE|wxALL, 5 )
+		item13.SetFont(font)
+		item7.AddWindow( item13, 0, wxALIGN_CENTRE|wxALL, 1 )
 
-		item5.AddSizer( item7, 0, wxGROW|wxALIGN_RIGHT|wxALL, 5 )
+		item5.AddSizer( item7, 0, wxGROW|wxALIGN_RIGHT|wxALL, 1 )
 
-		item0.AddSizer( item5, 0, wxGROW|wxALIGN_CENTER_HORIZONTAL|wxALL, 5 )
+		item0.AddSizer( item5, 0, wxGROW|wxALIGN_CENTER_HORIZONTAL|wxALL, 1 )
 
 		panel.SetAutoLayout( true )
 		panel.SetSizer( item0 )
@@ -124,7 +134,6 @@ class winMessage(winBase):
 		self.filter = []
 
 		self.MessageSet([])
-
 
 	filtered = """\
 	<html>

@@ -7,7 +7,7 @@ at this current location and "quick" details about them.
 
 # wxPython imports
 from wxPython.wx import *
-from wxPython.gizmos.treelistctrl import wxTreeListCtrl
+from wxPython.gizmos import wxTreeListCtrl
 
 # Game imports
 from utils import *
@@ -27,7 +27,7 @@ class winSystem(winBase):
 		# Setup to recieve game events
 		self.application = application
 
-		self.tree = wxTreeListCtrl(self, -1, style = wxTR_DEFAULT_STYLE | wxTR_TWIST_BUTTONS)
+		self.tree = wxTreeListCtrl(self, -1, style = wxTR_DEFAULT_STYLE)
 
 		self.icons = {}
 		self.icons['Blank'] = wxImage("graphics/blank-icon.png").ConvertToBitmap()
