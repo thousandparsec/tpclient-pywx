@@ -131,7 +131,10 @@ def readpacket(s):
 	string = s.recv(Header.size)
 	h = Header(string)
 	h.process()
-	h.set_data(s.recv(h.length))
+
+	if h.length > 0:
+		h.set_data(s.recv(h.length))
+
 	return h
 
 def connect(address, port):
