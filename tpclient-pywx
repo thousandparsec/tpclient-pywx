@@ -5,7 +5,7 @@ try:
 	import string
 	
 	version = string.split(wxPython.__version__, '.')
-	intversion = int(version[0])*1000000+int(version[1])*10000+int(version[2])*100+int(version[3])
+	intversion = int(version[0])*1000000+int(version[1])*10000+int(version[2])*100
 
 except ImportError:
 	intversion = 0
