@@ -391,7 +391,7 @@ class winOrder(winBase):
 	def OnOrderDelete(self, evt):
 		for slot in self.order_list.GetSelected():
 			r = self.application.connection.remove_orders(self.oid, slot)
-			if failed(r):
+			if failed(r[0]):
 				debug(DEBUG_WINDOWS, "OrderDelete: Remove %s failed!" % slot)
 				continue
 
