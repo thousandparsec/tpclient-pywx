@@ -1,6 +1,11 @@
 #!/usr/bin/env python2.3
 
 try:
+	import psyco
+except ImportError:
+	pass
+
+try:
     from Numeric import array,asarray,Float,cos,pi,sum,minimum,maximum,Int32,zeros
 except ImportError:
     from numarray import array, asarray, Float, cos, pi, sum, minimum, maximum, Int32, zeros
