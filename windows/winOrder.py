@@ -145,7 +145,7 @@ class winOrder(winBase):
 			print order
 			self.order_list.InsertStringItem(slot, "")
 			self.order_list.SetStringItem(slot, TURNS_COL, str(order.turns))
-			self.order_list.SetStringItem(slot, ORDERS_COL, order.__class__.__name__)
+			self.order_list.SetStringItem(slot, ORDERS_COL, order.name)
 
 			if slot == oslot:
 				self.order_list.Select(slot)

@@ -1,4 +1,25 @@
 
+# Version check
+try:
+	import wxPython
+	import string
+	
+	version = string.split(wxPython.wx.wxVERSION_STRING, '.')
+	intversion = int(version[0])*1000000+int(version[1])*10000+int(version[2])*100+int(version[3])
+
+except ImportError:
+	intversion = 0
+
+if intversion < 2050000:
+	print "Your version of wxPython is too old. You will not be able to run pywx-client."
+	print "You have version", version
+	print "You need version atleast", [2, 5, 0, 0]
+	import sys
+	sys.exit(1)
+else:
+	del wxPython
+	del string
+
 import sys
 
 # wx.Python imports
@@ -137,11 +158,6 @@ password = "%(password)s"
 			# Download the orders from this object
 			if object.order_number == 0:
 				orders = []
-			if object.order_number == 1:
-				if hasattr(orders, "__getitem__"):
-					orders = self.connection.get_orders(object.id, range(0, object.order_number))
-				else:
-					orders = [self.connection.get_orders(object.id, range(0, object.order_number))]
 			else:
 				orders = self.connection.get_orders(object.id, range(0, object.order_number))
 
@@ -151,17 +167,16 @@ password = "%(password)s"
 		# Download any order descriptions not already downloaded
 		descs = []
 		while True:
-			descs.append(self.connection.get_orderdescs(len(descs))[0])
-
-			if not failed(descs[-1]):
+			r = self.connection.get_orderdescs(len(descs))[0]
+			if not failed(r):
+				descs.append(r)
 				descs[-1].register()
 			else:
 				break
 
 		# Download message boards
-		boards = self.connection.get_boards(0)
-		if not failed(boards):
-			board = boards[0]
+		board = self.connection.get_boards(0)[0]
+		if not failed(board):
 			# Download the messages from this board
 			if board.number == 0:
 				messages = []
