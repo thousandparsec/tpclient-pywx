@@ -12,12 +12,10 @@ import string
 import pprint
 import thread
 
-from network import protocol
-from network.nthread import NetworkThread
-from network.events import *
+import sys
+sys.path.append("..")
 
-from game.gthread import GameThread
-from game.events import *
+from netlib import Connection
 
 from utils import *
 from config import *
@@ -26,128 +24,28 @@ from windows.control import MainControl
 
 class AppTP(wxApp):
 	def ConfigLoad(self):
+		print "AppTp.ConfigLoad"
 		config = load_data("main")
 
 		if not config:
 			config = Blank()
 	
 	def OnInit(self):
-		wxInitAllImageHandlers()
-
-		self.connected = FALSE
-		self.logined = FALSE
-		
-		# Startup the Network
 		try:
-			self.network = NetworkThread()
-			thread.start_new_thread(self.network, ())
+			print "AppTp.OnInit"
+			wxInitAllImageHandlers()
 
-			self.network.WinConnect(self)
-		except:
-			do_traceback()
-
-		# Startup the Game
-		try:
-			self.game = GameThread()
-			thread.start_new_thread(self.game, ())
-		except:
-			do_traceback()
-
-		# Start up the windows
-		try:
 			self.windows = MainControl(self)
+			self.connection = Connection()
+
+			self.windows.connect.Show(TRUE)
 		except:
 			do_traceback()
 
-		# If autoconnect
-		if FALSE:
-			try:
-				self.NetConnect(host, username, password)
-			except:
-				# Pop-up a dialog saying connected failed.
-				pass
-		else:
-			self.windows.connect.Show(TRUE)
-		
 		return TRUE
 		
-	def ConnectTo(self, host, port, username, password):
-		debug(DEBUG_MAIN, "Trying to connect to %s:%s" % (host, port))
-
-		self.username = username
-		self.password = password
-		
-		if not self.connected or self.host != host or self.port != port:
-			self.host = host
-			self.port = port
-
-			if not self.network.NetConnect(self.host, self.port):
-				self.windows.connect.OnConnection(None)
-				return
-
-			EVT_NETWORK_PACKET(self, self.OnPacket)
-
-			self.network.Send(protocol.Connect())
-		
-		else:
-			# Just resend the username/password
-			debug(DEBUG_MAIN, "Already connected, just login")
-			self.Login()
-
-	def Login(self):
-		l = protocol.Login(username=self.username, password=self.password)
-		self.network.Send(l)
-
-	def OnPacket(self, evt):
-		try:
-			if not self.connected:
-				# Check to see if this is our success packet
-				if isinstance(evt.value, protocol.Ok):
-					debug(DEBUG_MAIN, "Connected Okay")
-					# Yay we connected okay!
-					self.connected = TRUE
-				
-					# Now we should login
-					self.Login()
-				
-				elif isinstance(evt.value, protocol.Fail):
-					debug(DEBUG_MAIN, "Didn't Connect")
-					# Ekk the server is busy
-					pass
-				else:
-					raise SocketError("The server sent an unknown packet")
-
-			elif not self.logined:
-				if isinstance(evt.value, protocol.Ok):
-					debug(DEBUG_MAIN, "Login went okay!")
-					# Yay we connected okay!
-					self.logined = TRUE
-					
-					# Setup and register the universe
-
-					# Okay now try to get the universe
-					g = protocol.ObjectGet(id=0)
-					evt.network.Send(g)
-					
-				else:
-					# We failed to login :( username/password is most proberly bad.
-					debug(DEBUG_MAIN, "Login failed :(")
-					pass
-			else:
-				# Now we are logged in okay just pass everything on to the game engine
-				debug(DEBUG_MAIN, "Pushing evt %s containing %s"  % (str(evt), repr(evt.value)) )
-				self.game.OnPacket(evt)
-		
-		finally:
-			evt.Next()
-
 	def Exit(self):
-		for key,data in self.game.universe.map.items():
-			print key,data
-			print data.contains
-		pprint.pprint(self.game.universe.map)
-		pprint.pprint(self.game.descs.o)
-		
+		print "AppTp.exit"
 		sys.exit(1)
 
 if __name__ == '__main__':

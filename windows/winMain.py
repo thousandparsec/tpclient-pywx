@@ -9,7 +9,6 @@ from wxPython.wx import *
 
 # Game imports
 from utils import *
-from game.events import *
 
 # Local imports
 from winBase import winMainBase
@@ -42,62 +41,56 @@ class winMain(winMainBase):
 	def __init__(self, application, pos=wxDefaultPosition, size=wxDefaultSize, style=wxDEFAULT_FRAME_STYLE):
 		winMainBase.__init__(self, application, None, pos, size, style)
 
-		# Setup to recieve game events
-		application.game.WinConnect(self)
-		EVT_GAME_OBJ_GET(self, self.OnGameGetObj)
-		EVT_GAME_OBJ_ARRIVE(self, self.OnGameArriveObj)
-		self.status = {}
-
-		item0 = wxMenuBar()
-
-		item1 = wxMenu() # wxMENU_TEAROFF )
-
-		item1.Append( ID_OPEN, "Connect to Game\tCtrl-O", "Connect to a diffrent Game" )
+		# File Menu
+		file = wxMenu()
+		file.Append( ID_OPEN, "Connect to Game\tCtrl-O", "Connect to a diffrent Game" )
+		file.AppendSeparator()
+		file.Append( ID_CONFIG, "Config", "Configure the Client" )
+		file.AppendSeparator()
+		file.Append( ID_EXIT, "Exit", "Exit" )
 		EVT_MENU(self, ID_OPEN, self.OnConnect)
-		item1.AppendSeparator()
-		item1.Append( ID_REVERT, "Revert Game", "Forget non-saved changes" )
-		item1.AppendSeparator()
-		item1.Append( ID_CONFIG, "Config", "Configure the Client" )
 		EVT_MENU(self, ID_CONFIG, self.OnConfig)
-		item1.AppendSeparator()
-		item1.Append( ID_EXIT, "Exit", "Exit" )
 		EVT_MENU(self, ID_EXIT, self.OnProgramExit)
-		item0.Append( item1, "File" )
 
-		item3 = wxMenu()
-		item3.Append( ID_STAT_EAAG, "Empire at a Glance", "" )
-		item3.AppendSeparator()
-		item3.Append( ID_STAT_SYSTEM, "Systems", "" )
-		item3.Append( ID_STAT_PLANET, "Planets", "" )
-		item3.Append( ID_STAT_FLEET, "Fleets", "" )
-		item3.AppendSeparator()
-		item3.Append( ID_STAT_BATTLE, "Battles", "" )
-		item0.Append( item3, "Statistics" )
+		# Statistics Menu
+		stat = wxMenu()
+		stat.Append( ID_STAT_EAAG, "Empire at a Glance", "" )
+		stat.AppendSeparator()
+		stat.Append( ID_STAT_SYSTEM, "Systems", "" )
+		stat.Append( ID_STAT_PLANET, "Planets", "" )
+		stat.Append( ID_STAT_FLEET, "Fleets", "" )
+		stat.AppendSeparator()
+		stat.Append( ID_STAT_BATTLE, "Battles", "" )
 
-		item4 = wxMenu()
-		item4.Append(  ID_WIN_MESSAGES, "Hide Messages", "", TRUE )
-		EVT_MENU(self, ID_WIN_MESSAGES,  self.OnMessages)
-		item4.Append(  ID_WIN_ORDERS,   "Hide Orders", "", TRUE )
-		#EVT_MENU(self, ID_WIN_ORDERS,    self.changeWin)
-		item4.Append(  ID_WIN_STARMAP,  "Hide Starmap", "", TRUE )
-		EVT_MENU(self, ID_WIN_STARMAP,   self.OnStarMap)
-		item4.Append(  ID_WIN_SYSTEM,   "Hide System", "", TRUE )
-		EVT_MENU(self, ID_WIN_SYSTEM,    self.OnSystem)
-		item4.AppendSeparator()
-		item4.Append(  ID_WIN_TECH, "Tech Browser", "", TRUE)
-		#EVT_MENU(self, ID_WIN_TECH,  self.changeWin)
-		item4.Append(  ID_WIN_HELP, "Help", "", TRUE)
-		#EVT_MENU(self, ID_WIN_HELP,  self.changeWin)
-		item0.Append( item4, "Windows" )
+		# Windows Menu
+#		win = wxMenu()
+#		win.Append(  ID_WIN_MESSAGES, "Hide Messages", "", TRUE )
+#		win.Append(  ID_WIN_ORDERS,   "Hide Orders", "", TRUE )
+#		win.Append(  ID_WIN_STARMAP,  "Hide Starmap", "", TRUE )
+#		win.Append(  ID_WIN_SYSTEM,   "Hide System", "", TRUE )
+#		win.AppendSeparator()
+#		win.Append(  ID_WIN_TECH, "Tech Browser", "", TRUE)
+#		win.Append(  ID_WIN_HELP, "Help", "", TRUE)
 
-		item5 = wxMenu()
-		item0.Append( item5, "Help" )
+#		EVT_MENU(self, ID_WIN_MESSAGES,  self.OnMessages)
+#		EVT_MENU(self, ID_WIN_ORDERS,    self.OnOrders)
+#		EVT_MENU(self, ID_WIN_STARMAP,   self.OnStarMap)
+#		EVT_MENU(self, ID_WIN_SYSTEM,    self.OnSystem)
+#		#EVT_MENU(self, ID_WIN_TECH,  self.changeWin)
+#		EVT_MENU(self, ID_WIN_HELP,  self.OnHelp)
+
+		help = wxMenu()
 		
-		self.SetMenuBar(item0)
+		bar = wxMenuBar()
+		bar.Append( file, "File" )
+		bar.Append( stat, "Statistics" )
+#		bar.Append( win, "Windows" )
+		bar.Append( help, "Help" )
+		
+		self.SetMenuBar(bar)
 		self.CreateStatusBar(1, wxST_SIZEGRIP)
 
 	def OnConnect(self, evt):
-		# FIXME: Should popup a do you want to connect message.
 		self.application.windows.Hide()
 		self.application.windows.connect.Show(TRUE)
 
@@ -115,26 +108,3 @@ class winMain(winMainBase):
 
 	def OnProgramExit(self, evt):
 		self.application.Exit()
-
-	def UpdateStatus(self):
-		string = "Currently: "
-		for id,name in self.status.items():
-			if name:
-				string += "Getting %s (%i), " % (name, id)
-			else:
-				string += "Getting id %i, " % (id)
-
-		string = string[:-2]
-		debug(DEBUG_WINDOWS, "Setting main status to: " + string)
-		self.SetStatusText(string)
-
-
-	def OnGameGetObj(self, evt):
-		self.status[evt.id] = evt.name
-		# Get the status bar to update
-		self.UpdateStatus()
-	
-	def OnGameArriveObj(self, evt):
-		del self.status[evt.id]
-		# Get the status bar to update
-		self.UpdateStatus()

@@ -6,92 +6,74 @@ person enter the server/username/password.
 from wxPython.wx import *
 from wxPython.lib.anchors import LayoutAnchors
 
-from network import protocol
-from network.events import *
 from utils import *
 
 from extra.wxProgressDialog import wxProgressDialog
 from extra.evtmgr import eventManager
 
-defaultServers = ["127.0.0.1:6923","code-bear.dyndns.org:6923","mithro.dyndns.org:6923"] 
+defaultServers = ["127.0.0.1:6923"]
 
-ID_TEXT = 10039
-ID_HOST = 10040
-ID_USERNAME = 10041
-ID_PASSWORD = 10042
 ID_OK = 10043
 ID_CANCEL = 10044
 
+from lang.en.winConnect import *
+
 # Shows messages from the game system to the player.
 class winConnect(wxFrame):
-	def __init__(self, app, ID, title=None, pos=wxDefaultPosition, size=wxDefaultSize, style=wxDEFAULT_FRAME_STYLE, message_list=[]):
+	def __init__(self, application, ID, \
+			title=None, pos=wxDefaultPosition, size=wxDefaultSize, style=wxDEFAULT_FRAME_STYLE, message_list=[]):
 		wxFrame.__init__(self, None, ID, 'TP: Connect', pos, size, style|wxTAB_TRAVERSAL)
+
+		self.application = application
 
 		panel = wxPanel(self, -1)
 
-		self.app = app
-		self.obj = {}
+		# The title
+		text_top = wxStaticText( panel, -1, "Connect to a Thousand Parsec Server", wxDefaultPosition, wxDefaultSize, 0 )
+		text_top.SetFont( wxFont( 16, wxROMAN, wxNORMAL, wxBOLD ) )
 
-		item0 = wxBoxSizer( wxVERTICAL )
-	
-		item1 = wxBoxSizer( wxHORIZONTAL )
-	
-		item2 = wxStaticText( panel, ID_TEXT, "Connect to a Thousand Parsec Server", wxDefaultPosition, wxDefaultSize, 0 )
-		item2.SetFont( wxFont( 16, wxROMAN, wxNORMAL, wxBOLD ) )
-		item1.AddWindow( item2, 0, wxALIGN_CENTRE|wxALL, 5 )
+		# The fill in text areas
+		sizer_top = wxBoxSizer( wxHORIZONTAL )
+		sizer_top.AddWindow( text_top, 0, wxALIGN_CENTRE|wxALL, 5 )
 
-		item0.AddSizer( item1, 0, wxALIGN_CENTRE|wxALL, 5 )
+		text_host = wxStaticText( panel, -1, "Host", wxDefaultPosition, wxDefaultSize, 0 )
+		self.host = wxComboBox( panel, -1, "", wxDefaultPosition, wxSize(200,-1), defaultServers, wxCB_DROPDOWN )
 
-		item3 = wxFlexGridSizer( 0, 2, 0, 0 )
-		
-		item4 = wxStaticText( panel, ID_TEXT, "Host", wxDefaultPosition, wxDefaultSize, 0 )
-		item3.AddWindow( item4, 0, wxALIGN_CENTRE|wxALL, 5 )
+		text_username = wxStaticText( panel, -1, "Username", wxDefaultPosition, wxDefaultSize, 0 )
+		self.username = wxComboBox( panel, -1, "", wxDefaultPosition, wxSize(200,-1), [""], wxCB_DROPDOWN )
 
-		item5 = wxComboBox( panel, ID_HOST, "", wxDefaultPosition, wxSize(200,-1), 
-			defaultServers, wxCB_DROPDOWN )
-		item3.AddWindow( item5, 0, wxALIGN_CENTRE|wxALL, 5 )
+		text_password = wxStaticText( panel, -1, "Password", wxDefaultPosition, wxDefaultSize, 0 )
+		self.password = wxTextCtrl( panel, -1, "", wxDefaultPosition, wxSize(200,-1), wxTE_PASSWORD )
 
-		self.obj['host'] = item5
+		grid = wxFlexGridSizer( 0, 2, 0, 0 )
+		grid.AddWindow( text_host, 0, wxALIGN_CENTRE|wxALL, 5 )
+		grid.AddWindow( self.host, 0, wxALIGN_CENTRE|wxALL, 5 )
+		grid.AddWindow( text_username, 0, wxALIGN_CENTRE|wxALL, 5 )
+		grid.AddWindow( self.username, 0, wxALIGN_CENTRE|wxALL, 5 )
+		grid.AddWindow( text_password, 0, wxALIGN_CENTRE|wxALL, 5 )
+		grid.AddWindow( self.password, 0, wxALIGN_CENTRE|wxALL, 5 )
 
-		item6 = wxStaticText( panel, ID_TEXT, "Username", wxDefaultPosition, wxDefaultSize, 0 )
-		item3.AddWindow( item6, 0, wxALIGN_CENTRE|wxALL, 5 )
+		# The buttons
+		button_ok = wxButton( panel, ID_OK, "OK", wxDefaultPosition, wxDefaultSize, 0 )
+		button_cancel = wxButton( panel, ID_CANCEL, "Cancel", wxDefaultPosition, wxDefaultSize, 0 )
 
-		item7 = wxComboBox( panel, ID_USERNAME, "", wxDefaultPosition, wxSize(200,-1),
-			[""], wxCB_DROPDOWN )
-		item3.AddWindow( item7, 0, wxALIGN_CENTRE|wxALL, 5 )
+		buttons = wxBoxSizer( wxHORIZONTAL )
+		buttons.AddWindow( button_ok, 0, wxALIGN_CENTRE|wxALL, 5 )
+		buttons.AddWindow( button_cancel, 0, wxALIGN_CENTRE|wxALL, 5 )
 
-		self.obj['username'] = item7
+		# The main sizer
+		sizer = wxBoxSizer( wxVERTICAL )
+		sizer.AddSizer( sizer_top, 0, wxALIGN_CENTRE|wxALL, 5 )
+		sizer.AddSizer( grid, 0, wxALIGN_CENTRE|wxALL, 5 )
+		sizer.AddSizer( buttons, 0, wxALIGN_CENTRE|wxALL, 5 )
 
-		item8 = wxStaticText( panel, ID_TEXT, "Password", wxDefaultPosition, wxDefaultSize, 0 )
-		item3.AddWindow( item8, 0, wxALIGN_CENTRE|wxALL, 5 )
-
-		item9 = wxTextCtrl( panel, ID_PASSWORD, "", wxDefaultPosition, wxSize(200,-1), wxTE_PASSWORD )
-		item3.AddWindow( item9, 0, wxALIGN_CENTRE|wxALL, 5 )
-
-		self.obj['password'] = item9
-
-		item0.AddSizer( item3, 0, wxALIGN_CENTRE|wxALL, 5 )
-
-		item10 = wxBoxSizer( wxHORIZONTAL )
-
-		item3.AddSizer( item10, 0, wxALIGN_CENTRE|wxALL, 5 )
-
-		item11 = wxBoxSizer( wxHORIZONTAL )
-
-		item12 = wxButton( panel, ID_OK, "OK", wxDefaultPosition, wxDefaultSize, 0 )
-		item11.AddWindow( item12, 0, wxALIGN_CENTRE|wxALL, 5 )
-
-		item13 = wxButton( panel, ID_CANCEL, "Cancel", wxDefaultPosition, wxDefaultSize, 0 )
-		item11.AddWindow( item13, 0, wxALIGN_CENTRE|wxALL, 5 )
-
-		item3.AddSizer( item11, 0, wxALIGN_CENTRE|wxALL, 5 )
-
+		# Join the panel and the base sizer
 		panel.SetAutoLayout( true )
-		panel.SetSizer( item0 )
-		
-		item0.Fit( panel )
-		item0.SetSizeHints( self )
+		panel.SetSizer( sizer )
+		sizer.Fit( panel )
+		sizer.SetSizeHints( self )
 
+		# Hook up the events
 		EVT_BUTTON(self, ID_OK, self.OnOkay)
 		EVT_BUTTON(self, ID_CANCEL, self.OnCancel)
 		EVT_CLOSE(self, self.OnExit)
@@ -100,111 +82,75 @@ class winConnect(wxFrame):
 		self.OnExit(evt)
 
 	def OnExit(self, evt):
-		# Check if the server is connected
-		self.Show(FALSE)
-		if self.app.logined:
-			self.app.windows.Show()
-		else:
-			# Exit then
-			self.app.Exit()
+		application = self.application
+		application.Exit()
 			
 	def OnOkay(self, evt):
-		host = self.obj['host'].GetValue()
-		username = self.obj['username'].GetValue()
-		password = self.obj['password'].GetValue()
+		application = self.application
 
-		if host != "" and username != "":
+		# Pull out the values
+		host = self.host.GetValue()
+		username = self.username.GetValue()
+		password = self.password.GetValue()
 
-			try:
-				temp = string.split(host, ":", 1)
+		if host == "" or username == "":
+			return
 
-				if len(temp) == 1:
-					host = host
-					port = 6923
-				else:
-					host, port = temp
-					port = int(port)
+		temp = string.split(host, ":", 1)
+		if len(temp) == 1:
+			host = host
+			port = 6923
+		else:
+			host, port = temp
+			port = int(port)
 
-				self.app.network.WinConnect(self)
-				eventManager.Register(self.OnConnection, EVT_NETWORK_PACKET, self)
-				
-				self.progress = wxProgressDialog("TP: Connecting to Server",
-												"Thousand Parsec is now attempting to connect to the specified server",
-												5,
-												self,
-												wxPD_APP_MODAL | wxPD_AUTO_HIDE)
-												
-				self.app.ConnectTo(host, port, username, password)
-				self.progress.Update(1)
-				
-			except:
-				# Pop-up a dialog telling us why it didn't succed.
-				do_traceback()
+		progress = wxProgressDialog(TITLE_PROGRESS, TEXT_PROGRESS, 5, self, wxPD_APP_MODAL | wxPD_AUTO_HIDE)
 
-	def OnConnection(self, evt):
+		dlg = None
 		try:
-			eventManager.DeregisterListener(self.OnConnection)
+			application.connection.setup(host=host, port=port)
+			progress.Update(1)
+			
+			print "Connect...",
+			if application.connection.connect():
+				progress.Update(3)
 
-			if evt != None and isinstance(evt.value, protocol.Ok):
-				debug(DEBUG_WINDOWS, "Connect Worked!")
-				eventManager.Register(self.OnLogin, EVT_NETWORK_PACKET, self)
-				self.progress.Update(2)
+				print "Login...",
+				if not application.connection.login(username, password):
+					print "Failed"
+					dlg = wxMessageDialog(self, TEXT_LOGIN, TITLE_LOGIN, wxOK | wxICON_INFORMATION)
 			else:
-				debug(DEBUG_WINDOWS, "Connect Failed!")
-				# Oh no! we didn't connect!
-				self.progress.Update(5)
-				#self.progress.Destroy()
+				print "Failed"
+				dlg = wxMessageDialog(self, TEXT_CONNECT, TITLE_CONNECT, wxOK | wxICON_INFORMATION)
 
-				dlg = wxMessageDialog(self, 'The connection failed, this could be because,\n' +
-											'the server could be busy,\n' +
-											'the server doesn\'t exist.\n' +
-											'Please try again later.',
-											'TP: Connection Failed',
-				   						wxOK | wxICON_INFORMATION)
-				dlg.ShowModal()
-				dlg.Destroy()
+		except:
+			print "Failed"
+			dlg = wxMessageDialog(self, TEXT_CONNECT, TITLE_CONNECT, wxOK | wxICON_INFORMATION)
 
-		finally:
-			debug(DEBUG_WINDOWS, "Connection Finishing")
-			debug(DEBUG_WINDOWS, evt)
-			if evt:
-				evt.Next()
-
-	def OnLogin(self, evt):
-		try:
-			self.progress.Update(3)
+		progress.Update(5)
+		if dlg == None:
+			print "Success"
+			
+			progress = wxProgressDialog(TITLE_DOWNLOAD, TEXT_DOWNLOAD, 100, self, \
+				wxPD_APP_MODAL | wxPD_AUTO_HIDE | wxPD_ELAPSED_TIME | wxPD_REMAINING_TIME)
 		
-			if isinstance(evt.value, protocol.Ok):
-				debug(DEBUG_WINDOWS, "Login Worked!")
-				eventManager.DeregisterListener(self.OnLogin)
-				self.app.network.WinDisconnect(self)
+			application.cache = {}
+		
+			objects = application.connection.get_objects(0)
+			while len(objects) > 0:
+				object = objects.pop(0)
+				application.cache[object.id] = object
 			
-				self.progress.Update(4)
-			
-				self.OnExit(None)
-			
-				self.progress.Update(5)
-
-			elif isinstance(evt.value, protocol.Fail):
-				# Show a message box
-				debug(DEBUG_WINDOWS, "Login Failed!")
-				self.progress.Update(5)
-				
-				dlg = wxMessageDialog(self, 'Failed to connect, this could be because,\n' +
-											'the server could be busy,\n' +
-											'your username and password could be incorrect.\n' +
-											'Please try again.',
-											'TP: Bad Username or Password',
-				   						wxOK | wxICON_INFORMATION)
-
-				dlg.ShowModal()
-				dlg.Destroy()
-				
-				# Disable the host selection box
-				self.obj['host'].Enable(FALSE)
-
-		finally:
-			debug(DEBUG_WINDOWS, "Login Finishing")
-			debug(DEBUG_WINDOWS, evt)
-			if evt:
-				evt.Next()
+				if len(object.contains) > 0:
+					objects += application.connection.get_objects(object.contains)
+		
+				progress.Update(len(application.cache.keys()))
+		
+			progress.Update(100)
+		
+			self.Hide()
+			application.windows.Show()
+		else:
+			dlg.ShowModal()
+			dlg.Destroy()
+		return
