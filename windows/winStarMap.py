@@ -98,6 +98,10 @@ class winStarMap(winBase):
 					if points:
 						C(object, Line(scale(points), LineColor="Grey"), as="path")
 
+					parent = application.cache.objects[object.parent]
+					if parent.pos == object.pos:
+						continue
+
 					# Draw the ship
 					ship = PolyNoSize([(0,0), (3,0), (0,4), (0,2), (-3,0)], LineWidth=1,LineColor="Blue",FillColor="Blue")
 					ship.Move(scale(object.pos))
@@ -108,7 +112,6 @@ class winStarMap(winBase):
 						# We need to draw in a vector
 						velocity = 0
 						pass
-					pass
 
 			self.arrow = PolyNoSize([(0,0), (-5,-10), (0, -8), (5,-10)], LineWidth=1,LineColor="Red",FillColor="Red",InForeground=True)
 			self.Canvas.AddObject(self.arrow)

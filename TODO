@@ -6,6 +6,7 @@ Short Term
 	* Add more Order Argument panel types
 		* ARG_ABS_COORD (DONE)
 			* Get the P button to work
+		* ARG_OBJECT (HALF DONE) - Need to fix it
 		* ARG_TIME (DONE)
 		* ARG_RANGE
 		* ARG_PLAYER
@@ -14,19 +15,27 @@ Short Term
 
 	* Get order save to work :) (DONE)
 	* Add ships to the StarMap (DONE)
-		* Need to make sure i don't draw orbiting starships
+		* Need to make sure i don't draw orbiting starships (DONE)
 
 	* Put up screenshots on www.thousandparsec.net (DONE)
+	* Put more screenshots on www.thousandparsec.net
 
 	* Tool tips on orders arguments (and other stuff)
+		* Argument Panels (DONE)
+		* Order List Items
+		* Order Type Items
+	* Allow tooltips to be disabled in the config
 
-	* Let the fonts be selected 
+	* Better default positioning of windows
 
-	* Better positioning of windows default
+	* Add starting tips
+	* Allow starting tips to be disabled in the config
 
 Longer Term
 	* Add a info panel (DONE)
-		* Add data to the info panel
+		* Add data to the info panel (DONE)
+		* Make data in the info panel good looking
+		
 	* Add ship "path" to StarMap (DONE)
 		* Maybe see if we can get antialias lines
 		* Realtime changes?
@@ -38,7 +47,14 @@ Longer Term
 	* Add right click pop-up menu
 		* Include useful options on this menu, Quick add Order?
 
-	* Use non-blocking version of the protocol stack
+	* Use non-blocking version of the protocol stack <- No need?
+
+	* Add option to not use MDI interface under windows
+	* Add option to make the little windows not appear on the task bar
+	
+	* Let the fonts be selected
+	* Fix the default fonts
+
 
 Longest Term
 	* Check what it looks like under windows / MacOSX

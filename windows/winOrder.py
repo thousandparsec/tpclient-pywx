@@ -9,6 +9,7 @@ import copy
 # wxPython Imports
 import wx
 import wx.lib.anchors
+import wx.lib.mixins.listctrl
 
 # Local Imports
 from winBase import *
@@ -22,7 +23,12 @@ from netlib.objects import OrderDescs, constants
 TURNS_COL = 0
 ORDERS_COL = 1
 
-class wxListCtrl(wx.ListCtrl):
+wx.ListCtrlOrig = wx.ListCtrl
+class wxListCtrl(wx.ListCtrlOrig, wx.lib.mixins.listctrl.ListCtrlAutoWidthMixin):
+	def __init__(self, parent, ID, pos=wx.DefaultPosition, size=wx.DefaultSize, style=0):
+		wx.ListCtrlOrig.__init__(self, parent, ID, pos, size, style)
+		wx.lib.mixins.listctrl.ListCtrlAutoWidthMixin.__init__(self)
+
 	def SetItemPyData(self, slot, data):
 		if not hasattr(self, "objects"):
 			self.objects = {}
@@ -150,7 +156,6 @@ class winOrder(winBase):
 			debug(DEBUG_WINDOWS, "SelectObject: No such object.")
 			return
 			
-		# Add a whole bunch of place holders until we get the order
 		self.order_list.DeleteAllItems()
 		for slot in range(0, object.order_number):
 			order = self.application.cache.orders[self.oid][slot]
@@ -172,13 +177,15 @@ class winOrder(winBase):
 			else:
 				self.type_list.Append("Wait on (%i)" % type, type)
 
+		self.OnOrderSelect(None)
+
 	def OnOrderSelect(self, evt):
 		slot = self.order_list.GetNextItem(-1, wx.LIST_NEXT_ALL, wx.LIST_STATE_SELECTED)
 		if slot == wx.NOT_FOUND:
-			debug(DEBUG_WINDOWS, "No order selected")
-			return
+			order = None
+		else:
+			order = self.application.cache.orders[self.oid][slot]
 
-		order = self.application.cache.orders[self.oid][slot]
 		self.BuildPanel(order)
 
 	def OnOrderNew(self, evt):
@@ -283,7 +290,7 @@ class winOrder(winBase):
 			elif type == constants.ARG_TIME:
 				args += argTimeGet( panel )
 			elif type == constants.ARG_OBJECT:
-				debug(DEBUG_WINDOWS, "Argument type (ARG_OBJECT) not implimented yet.")
+				args += argObjectGet( panel )
 			elif type == constants.ARG_PLAYER:
 				debug(DEBUG_WINDOWS, "Argument type (ARG_PLAYER) not implimented yet.")
 			elif type == constants.ARG_RANGE:
@@ -356,13 +363,17 @@ class winOrder(winBase):
 					subpanel = argCoordPanel( self, self.argument_panel, getattr(order, name) )
 				elif type == constants.ARG_TIME:
 					subpanel = argTimePanel( self, self.argument_panel, getattr(order, name) )
+				elif type == constants.ARG_OBJECT:
+					subpanel = argObjectPanel( self, self.argument_panel, getattr(order, name) )
 				elif type == constants.ARG_LIST:
 					subpanel = argListPanel( self, self.argument_panel, getattr(order, name) )
 				elif type == constants.ARG_STRING:
 					subpanel = argStringPanel( self, self.argument_panel, getattr(order, name) )
 				else:
 					subpanel = argNotImplimentedPanel( self, self.argument_panel, None )
-				
+
+				subpanel.SetToolTip(wx.ToolTip(getattr(orderdesc, name+'__doc__')))
+
 				subpanel.SetFont(wx.local.normalFont)
 				self.argument_subpanels.append( subpanel )
 				
@@ -434,6 +445,31 @@ def argStringPanel(parent, parent_panel, args):
 def argStringGet(panel):
 	windows = panel.GetChildren()
 	return [0, windows[0].GetValue()]
+	
+def argObjectPanel(parent, parent_panel, args):
+	panel = wx.Panel(parent_panel, -1)
+	item0 = wx.BoxSizer( wx.HORIZONTAL )
+
+	panel.SetSizer(item0)
+	panel.SetAutoLayout( True )
+
+	if args == -1:
+		args = "None selected..."
+	else:
+		args = str(args)
+
+	item1 = wx.TextCtrl( panel, -1, args, size=(wx.local.spinSize[0]*2, wx.local.spinSize[1]))
+	item1.SetFont(wx.local.tinyFont)
+	item0.AddWindow( item1, 0, wx.ALIGN_CENTRE|wx.LEFT, 1 )
+	
+	return panel
+
+def argObjectGet(panel):
+	windows = panel.GetChildren()
+	try:
+		return [int(windows[0].GetValue())]
+	except:
+		return [-1]
 	
 def argListPanel(parent, parent_panel, args):
 	panel = wx.Panel(parent_panel, -1)

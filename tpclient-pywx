@@ -153,7 +153,14 @@ password = "%(password)s"
 			
 			# Download the objects inside this object
 			if len(object.contains) > 0:
-				objects += self.connection.get_objects(object.contains)
+				# Set the parent relationship
+				for nobject in self.connection.get_objects(object.contains):
+					if failed(nobject):
+						print nobject
+						continue
+					else:
+						nobject.parent = object.id
+					objects.append(nobject)
 
 			# Download the orders from this object
 			if object.order_number == 0:
