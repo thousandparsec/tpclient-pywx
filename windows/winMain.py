@@ -42,7 +42,7 @@ class winMain(wxFrame):
 		item1.Append( ID_REVERT, "Revert Game", "Forget non-saved changes" )
 		item1.AppendSeparator()
 		item1.Append( ID_EXIT, "Exit", "Exit" )
-		EVT_MENU(self, ID_EXIT, self.programExit)
+		EVT_MENU(self, ID_EXIT, self.OnProgramExit)
 		item0.Append( item1, "File" )
 
 		item3 = wxMenu()
@@ -77,6 +77,8 @@ class winMain(wxFrame):
 		self.SetMenuBar(item0)
 		self.CreateStatusBar(1, wxST_SIZEGRIP)
 
-	def programExit(self, evt):
-		self.parent.exit()
+		EVT_CLOSE(self, self.OnProgramExit)
+
+	def OnProgramExit(self, evt):
+		self.parent.Exit()
 	

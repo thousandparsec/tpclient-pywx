@@ -1,7 +1,8 @@
 
 from wxPython.wx import *
+from utils import *
 
-defaultServers = ["code-bear.dyndns.org:6923"] 
+defaultServers = ["203.96.149.160:6923","code-bear.dyndns.org:6923","mithro.dyndns.org:6923"] 
 
 ID_TEXT = 10039
 ID_HOST = 10040
@@ -15,6 +16,7 @@ class winConnect(wxFrame):
 	def __init__(self, parent, ID, title=None, pos=wxDefaultPosition, size=wxDefaultSize, style=wxDEFAULT_FRAME_STYLE, message_list=[]):
 		wxFrame.__init__(self, None, ID, 'TP: Connect', pos, size, style)
 
+		self.parent = parent
 		self.obj = {}
 
 		item0 = wxBoxSizer( wxVERTICAL )
@@ -77,18 +79,36 @@ class winConnect(wxFrame):
 
 		EVT_BUTTON(self, ID_OK, self.OnOkay)
 		EVT_BUTTON(self, ID_CANCEL, self.OnCancel)
-	
+		EVT_CLOSE(self, self.OnExit)
+
 	def OnOkay(self, event):
 		# Check the host and username arn't blank
-		pass	
+		
+		#self.parent.connected = TRUE
+
+		host = self.obj['host'].GetValue()
+		username = self.obj['username'].GetValue()
+		password = self.obj['password'].GetValue()
+
+		if host != "" and username != "":
+
+			try:
+				self.parent.Connect(host, username, password)
+			
+				# We connected successfully
+				self.OnExit(event)
+			except:
+				# Pop-up a dialog telling us why it didn't succed.
+				do_traceback()
 	
 	def OnCancel(self, event):
-		self.Show(FALSE)
-		self.parent.windows.show()
+		self.OnExit(event)
 
-	def OnExit(self, evt):
+	def OnExit(self, event):
 		# Check if the server is connected
-
-		# Exit then
-		self.parent.exit()		
-
+		self.Show(FALSE)
+		if self.parent.connected:
+			self.parent.windows.show()
+		else:
+			# Exit then
+			self.parent.Exit()

@@ -77,13 +77,15 @@ class Login(Processed):
 			Header.__init__(self, s[:Header.size])
 			set_data(self, s[Header.size:])
 		else:
+			if username == None or password == None:
+				raise Exception("Username and password must be set if you don't set a string")
 			Header.__init__(self, None)
 
 		self.username = username
 		self.password = password
 
 	def __str__(self):
-		temp = prep_string(username) + prep_string(password)
+		temp = prep_string(self.username) + prep_string(self.password)
 		self.length = len(temp)
 		output = Processed.__str__(self)
 		output += temp
