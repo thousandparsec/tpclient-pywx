@@ -19,14 +19,14 @@ from winBase import *
 from utils import *
 
 class winInfo(winBase):
-	title = "Information"
+	title = _("Information")
 
 	def __init__(self, application, parent, pos=wx.DefaultPosition, size=wx.DefaultSize, style=wx.DEFAULT_FRAME_STYLE):
 		winBase.__init__(self, application, parent, pos, size, style)
 
 		self.application = application
 
-		self.title = wx.StaticText(self, -1, "No Object Selected.")
+		self.title = wx.StaticText(self, -1, _("No Object Selected."))
 		self.picture = wx.StaticBitmap(self, -1, wx.BitmapFromImage(wx.EmptyImage(128, 128)))
 		self.text = wx.TextCtrl(self, -1, "", style=wx.TE_MULTILINE|wx.TE_READONLY)
 

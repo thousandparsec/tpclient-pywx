@@ -23,8 +23,11 @@ ORDERS_COL = 1
 
 buttonSize = (wx.local.buttonSize[0], wx.local.buttonSize[1]+2)
 
+class OrderDataObject(wx.PyDataObjectSimple):
+	pass
+
 class winOrder(winBase):
-	title = "Orders"
+	title = _("Orders")
 	
 	def __init__(self, application, parent, pos=wx.DefaultPosition, size=wx.DefaultSize, style=wx.DEFAULT_FRAME_STYLE):
 		winBase.__init__(self, application, parent, pos, size, style)
@@ -45,9 +48,9 @@ class winOrder(winBase):
 		
 		# List of current orders
 		order_list = wx.ListCtrl( base_panel, -1, wx.DefaultPosition, wx.Size(160,80), wx.LC_REPORT|wx.SUNKEN_BORDER )
-		order_list.InsertColumn(TURNS_COL, "Turns")
+		order_list.InsertColumn(TURNS_COL, _("Turns"))
 		order_list.SetColumnWidth(TURNS_COL, 40)
-		order_list.InsertColumn(ORDERS_COL, "Order Information")
+		order_list.InsertColumn(ORDERS_COL, _("Order Information"))
 		order_list.SetColumnWidth(ORDERS_COL, 140)
 		order_list.SetFont(wx.local.normalFont)
 
@@ -61,12 +64,12 @@ class winOrder(winBase):
 		type_list = wx.Choice( base_panel, -1, choices=[], size=wx.local.buttonSize)
 		type_list.SetFont(wx.local.tinyFont)
 		
-		new_button = wx.Button( base_panel, -1, "New", size=wx.local.buttonSize)
+		new_button = wx.Button( base_panel, -1, _("New"), size=wx.local.buttonSize)
 		new_button.SetFont(wx.local.normalFont)
 		
 		line_vert = wx.StaticLine( base_panel, -1, wx.DefaultPosition, wx.Size(-1,10), wx.LI_VERTICAL )
 
-		delete_button = wx.Button( base_panel, -1, "Delete", size=wx.local.buttonSize)
+		delete_button = wx.Button( base_panel, -1, _("Delete"), size=wx.local.buttonSize)
 		delete_button.SetFont(wx.local.normalFont)
 		
 		button_sizer.AddWindow( type_list,     0, wx.ALIGN_CENTRE, 1 )
@@ -103,9 +106,102 @@ class winOrder(winBase):
 		
 		self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.OnOrderSelect, order_list)
 		self.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.OnOrderSelect, order_list)
+		order_list.Bind(wx.EVT_RIGHT_UP, self.OnRightClick)
 
 		self.SetSize(size)
 		self.SetPosition(pos)
+
+	def BuildMenu(self, menu):
+		try:
+			object = self.application.cache.objects[self.oid]
+		except KeyError:
+			debug(DEBUG_WINDOWS, "BuildMenu: No such object.")
+			return
+		
+		for type in object.order_types:
+			if not objects.OrderDescs().has_key(type):
+				continue
+
+			od = objects.OrderDescs()[type]
+			
+			if hasattr(od, "doc"):
+				desc = od.doc
+			else:
+				desc = od.__doc__
+			desc = desc.strip()
+			menu.Append(-1, od.name, desc)
+
+	def OnRightClick(self, evt):
+		slot = self.order_list.HitTest(evt.GetPosition())[0]
+		if slot != wx.NOT_FOUND:
+			self.order_list.SetSelected([slot])
+	
+		id = wx.NewId()
+		menu = wx.Menu()
+		menu.SetTitle(_("Top"))
+
+		# Open the clipboard and see if it's valid...
+		nopaste = True
+
+		slots = self.order_list.GetSelected()
+		if len(slots) > 0:
+			before = wx.Menu()
+			before.SetTitle(_("Before"))
+			menu.AppendMenu(-1, _("New Before"), before)
+			self.BuildMenu(before)
+
+			after = wx.Menu()
+			after.SetTitle(_("After"))
+			menu.AppendMenu(-1, _("New After"), after)
+			self.BuildMenu(after)
+	
+			menu.Append(-1, _("Delete"))
+
+			menu.AppendSeparator()
+			
+			menu.Append(-1, _("Cut"))
+			menu.Append(-1, _("Copy"))
+			
+			menu.Append(-1, _("Paste After"))
+			menu.Enable(menu.GetMenuItemCount(), nopaste)
+			menu.Append(-1, _("Paste Before"))
+			menu.Enable(menu.GetMenuItemCount(), nopaste)
+		else:
+			new = wx.Menu()
+			new.SetTitle(_("New"))
+			menu.AppendMenu(-1, _("New"), new)
+			self.BuildMenu(new)
+			
+			menu.Append(-1, _("Paste"))
+			menu.Enable(menu.GetMenuItemCount(), nopaste)
+			
+		self.Bind(wx.EVT_MENU, self.OnOrderMenu)
+		self.PopupMenu(menu, evt.GetPosition())
+
+	def OnOrderMenu(self, evt):
+		menu = evt.GetEventObject()
+		item = menu.FindItemById(evt.GetId())
+		
+		t = item.GetText()
+		if t == _("Delete"):
+			self.OnOrderDelete(None)
+		elif t == _("Cut"):
+			print "Cutting items..."
+		elif t == _("Copy"):
+			print _("Copying items...")
+		elif t.startswith(_("Paste")):
+			print "Pasting items..."
+		else:
+			slot = self.type_list.FindString(t)
+			if slot == wx.NOT_FOUND:
+				return
+
+			self.type_list.SetSelection(slot)
+			
+			if menu.GetTitle() == _("Before"):
+				self.OnOrderNew(None, extra=-1)
+			else:
+				self.OnOrderNew(None)
 
 	def OnSelectType(self, evt):
 		print "Selecting!"
@@ -116,11 +212,11 @@ class winOrder(winBase):
 		self.oid = evt.id
 		try:
 			object = self.application.cache.objects[self.oid]
-		except IndexError:
+		except KeyError:
 			debug(DEBUG_WINDOWS, "SelectObject: No such object.")
 			return
 			
-		self.order_list.SetToolTipDefault("Current orders on %s." % object.name)
+		self.order_list.SetToolTipDefault(_("Current orders on %s.") % object.name)
 		
 		self.order_list.DeleteAllItems()
 		for slot in range(0, object.order_number):
@@ -129,7 +225,7 @@ class winOrder(winBase):
 			self.order_list.InsertStringItem(slot, "")
 			self.order_list.SetStringItem(slot, TURNS_COL, str(order.turns))
 			self.order_list.SetStringItem(slot, ORDERS_COL, order.name)
-			self.order_list.SetToolTipItem(slot, "Tip %s" % slot)
+			self.order_list.SetToolTipItem(slot, _("Tip %s") % slot)
 
 			if slot == oslot:
 				self.order_list.Select(slot)
@@ -137,7 +233,7 @@ class winOrder(winBase):
 			
 		# Set which orders can be added to this object
 		self.type_list.Clear()
-		self.type_list.SetToolTipDefault("Order type to create")
+		self.type_list.SetToolTipDefault(_("Order type to create"))
 		for type in object.order_types:
 			if not objects.OrderDescs().has_key(type):
 				continue
@@ -157,15 +253,15 @@ class winOrder(winBase):
 	def OnOrderSelect(self, evt):
 		slots = self.order_list.GetSelected()
 		if len(slots) > 1:
-			order = "Multiple orders selected."
+			order = _("Multiple orders selected.")
 		elif len(slots) < 1:
-			order = "No orders selected."
+			order = _("No orders selected.")
 		else:
 			order = self.application.cache.orders[self.oid][slots[0]]
 
 		self.BuildPanel(order)
 
-	def OnOrderNew(self, evt):
+	def OnOrderNew(self, evt, extra=1):
 		type = self.type_list.GetSelection()
 		if type == wx.NOT_FOUND:
 			debug(DEBUG_WINDOWS, "OrderNew: No order type selected for new.")
@@ -176,13 +272,16 @@ class winOrder(winBase):
 		# Append a new order to the list below the currently selected one
 		slots = self.order_list.GetSelected()
 		if len(slots) != 0:
-			slot = slots[0] + 1
+			slot = slots[0] + extra
 		else:
 			slot = 0
-			
+		
+		if slot < 0:
+			slot = 0
+		
 		try:
 			orderdesc = objects.OrderDescs()[type]
-		except IndexError:
+		except KeyError:
 			debug(DEBUG_WINDOWS, "OrderNew: Have not got OrderDesc yet (%i)" % type)
 			return
 			
@@ -242,13 +341,13 @@ class winOrder(winBase):
 		
 		try:
 			order = self.application.cache.orders[self.oid][slot]
-		except IndexError:
+		except KeyError:
 			debug(DEBUG_WINDOWS, "OrderSave: Could not get order (%s)" % slot)
 			return
 		
 		try:
 			orderdesc = objects.OrderDescs()[order.type]
-		except IndexError:
+		except KeyError:
 			debug(DEBUG_WINDOWS, "OrderSave: No order description. (%s)" % order.type)
 			return
 
@@ -359,10 +458,10 @@ class winOrder(winBase):
 
 			button_sizer = wx.FlexGridSizer( 1, 0, 0, 0 )
 
-			save_button = wx.Button( self.argument_panel, -1, "Save", size=wx.local.buttonSize )
+			save_button = wx.Button( self.argument_panel, -1, _("Save"), size=wx.local.buttonSize )
 			save_button.SetFont(wx.local.normalFont)
 			self.Bind(wx.EVT_BUTTON, self.OnOrderSave, save_button)
-			revert_button = wx.Button( self.argument_panel, -1, "Revert", size=wx.local.buttonSize )
+			revert_button = wx.Button( self.argument_panel, -1, _("Revert"), size=wx.local.buttonSize )
 			revert_button.SetFont(wx.local.normalFont)
 			self.Bind(wx.EVT_BUTTON, self.OnOrderSelect, revert_button)
 			
@@ -398,7 +497,7 @@ def argNotImplimentedPanel(parent, parent_panel, args):
 	panel.SetSizer(item0)
 	panel.SetAutoLayout( True )
 	
-	item1 = wx.StaticText( panel, -1, "Not implimented.")
+	item1 = wx.StaticText( panel, -1, _("Not implimented."))
 	item1.SetFont(wx.local.normalFont)
 	item0.AddWindow( item1, 0, wx.ALIGN_CENTRE|wx.LEFT, 0 )
 
@@ -431,12 +530,12 @@ def argObjectPanel(parent, parent_panel, args, cache):
 	item1 = wx.ComboBox( panel, -1, "", choices=(), style=wx.CB_READONLY, \
 				size=(wx.local.spinSize[0]*4, wx.local.spinSize[1]))
 
-	item1.Append("No object", -1)
+	item1.Append(_("No object"), -1)
 	item1.SetSelection(0)
 	for id, object in cache.objects.items():
 		item1.Append(object.name + " (%s)" % object.id, object.id)
 		if hasattr(object, "parent"):
-			item1.SetToolTipItem(item1.GetCount()-1, "At " + cache.objects[object.parent].name)
+			item1.SetToolTipItem(item1.GetCount()-1, _("At ") + cache.objects[object.parent].name)
 
 		if object.id == args:
 			item1.SetSelection(item1.GetCount()-1)
@@ -466,7 +565,7 @@ def argListPanel(parent, parent_panel, args):
 	selected = wx.ListCtrl( panel, -1, wx.DefaultPosition, wx.Size(130,80), wx.LC_REPORT|wx.LC_SINGLE_SEL|wx.SUNKEN_BORDER )
 	selected.InsertColumn(0, "#")
 	selected.SetColumnWidth(0, 25)
-	selected.InsertColumn(1, "Type")
+	selected.InsertColumn(1, _("Type"))
 	selected.SetColumnWidth(1, 100)
 	selected.SetFont(wx.local.tinyFont)
 
@@ -488,10 +587,10 @@ def argListPanel(parent, parent_panel, args):
 	number = wx.SpinCtrl( panel, -1, "", min=0, max=100, size=wx.local.spinSize )
 	number.SetFont(wx.local.tinyFont)
 
-	add = wx.Button( panel, -1, "Add", size=wx.local.buttonSize )
+	add = wx.Button( panel, -1, _("Add"), size=wx.local.buttonSize )
 	add.SetFont(wx.local.normalFont)
 	
-	delete = wx.Button( panel, -1, "D", size=(wx.local.smallSize[0],wx.local.buttonSize[1]) )
+	delete = wx.Button( panel, -1, _("D"), size=(wx.local.smallSize[0],wx.local.buttonSize[1]) )
 	delete.SetFont(wx.local.normalFont)
 
 	box_add = wx.BoxSizer(wx.HORIZONTAL)
@@ -662,7 +761,7 @@ def argCoordPanel(parent, parent_panel, args):
 	item6.SetFont(wx.local.tinyFont)
 	item0.AddWindow( item6, 0, wx.ALIGN_CENTRE|wx.LEFT, 1 )
 
-	item7 = wx.Button( panel, -1, "P", size=wx.local.smallSize )
+	item7 = wx.Button( panel, -1, _("P"), size=wx.local.smallSize )
 	item7.SetFont(wx.local.normalFont)
 	item0.AddWindow( item7, 0, wx.ALIGN_CENTRE|wx.LEFT, 3 )
 

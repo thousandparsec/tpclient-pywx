@@ -22,6 +22,9 @@ else:
 
 import sys
 
+import gettext
+gettext.install("pywx-client")
+
 # wx.Python imports
 import wx
 import extra
@@ -188,7 +191,6 @@ class AppTP(wx.App):
 if __name__ == '__main__':
 	try:
 		app = AppTP()
-		
 		app.MainLoop()
 	finally:
 		do_traceback()

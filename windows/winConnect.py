@@ -20,11 +20,33 @@ defaultServers = ["mithro.dyndns.org", "code-bear.dyndns.org", "127.0.0.1:6923"]
 ID_OK = 10043
 ID_CANCEL = 10044
 
-from lang.en.winConnect import *
+TITLE_PROGRESS = _("TP: Connecting to Server")
+TEXT_PROGRESS = _("""\
+pywx-client is now attempting to connect to the specified server.
+""")
+
+TITLE_CONNECT = _("TP: Login Failed")
+TEXT_CONNECT = _("""\
+Failed to connect.
+This could be because, the server is busy or the server doesn't exist.
+Please try again later.
+""")
+
+TITLE_LOGIN = _("TP: Connection Failed")
+TEXT_LOGIN = _("""\
+Failed to login.
+This could be because, the server could be busy or your username and password could be incorrect.
+Please try again later.
+""")
+
+TITLE_DOWNLOAD = _("TP: Downloding Universe...")
+TEXT_DOWNLOAD = _("""\
+pywx-client is now downloading the Universe.
+""")
 
 # Shows messages from the game system to the player.
 class winConnect(wx.Frame, winBaseMixIn):
-	title = "Connect"
+	title = _("Connect")
 
 	def __init__(self, application, 
 			pos=wx.DefaultPosition, size=wx.DefaultSize, style=wx.DEFAULT_FRAME_STYLE):
@@ -36,20 +58,20 @@ class winConnect(wx.Frame, winBaseMixIn):
 		panel = wx.Panel(self, -1)
 
 		# The title
-		text_top = wx.StaticText( panel, -1, "Connect to a Thousand Parsec Server", wx.DefaultPosition, wx.DefaultSize, 0 )
+		text_top = wx.StaticText( panel, -1, _("Connect to a Thousand Parsec Server"), wx.DefaultPosition, wx.DefaultSize, 0 )
 		text_top.SetFont( wx.Font( 16, wx.ROMAN, wx.NORMAL, wx.BOLD ) )
 
 		# The fill in text areas
 		sizer_top = wx.BoxSizer( wx.HORIZONTAL )
 		sizer_top.AddWindow( text_top, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
 
-		text_host = wx.StaticText( panel, -1, "Host", wx.DefaultPosition, wx.DefaultSize, 0 )
+		text_host = wx.StaticText( panel, -1, _("Host"), wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.host = wx.ComboBox( panel, -1, "", wx.DefaultPosition, wx.Size(200,-1), defaultServers, wx.CB_DROPDOWN )
 
-		text_username = wx.StaticText( panel, -1, "Username", wx.DefaultPosition, wx.DefaultSize, 0 )
+		text_username = wx.StaticText( panel, -1, _("Username"), wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.username = wx.ComboBox( panel, -1, "", wx.DefaultPosition, wx.Size(200,-1), [""], wx.CB_DROPDOWN )
 
-		text_password = wx.StaticText( panel, -1, "Password", wx.DefaultPosition, wx.DefaultSize, 0 )
+		text_password = wx.StaticText( panel, -1, _("Password"), wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.password = wx.TextCtrl( panel, -1, "", wx.DefaultPosition, wx.Size(200,-1), wx.TE_PASSWORD )
 
 		grid = wx.FlexGridSizer( 0, 2, 0, 0 )
@@ -61,8 +83,8 @@ class winConnect(wx.Frame, winBaseMixIn):
 		grid.AddWindow( self.password, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
 
 		# The buttons
-		button_ok = wx.Button( panel, ID_OK, "OK", wx.DefaultPosition, wx.DefaultSize, 0 )
-		button_cancel = wx.Button( panel, ID_CANCEL, "Cancel", wx.DefaultPosition, wx.DefaultSize, 0 )
+		button_ok = wx.Button( panel, ID_OK, _("OK"), wx.DefaultPosition, wx.DefaultSize, 0 )
+		button_cancel = wx.Button( panel, ID_CANCEL, _("Cancel"), wx.DefaultPosition, wx.DefaultSize, 0 )
 
 		buttons = wx.BoxSizer( wx.HORIZONTAL )
 		buttons.AddWindow( button_ok, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )

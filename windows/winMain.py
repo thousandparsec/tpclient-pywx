@@ -5,6 +5,7 @@ This module contains the main menu window.
 # Python imports
 import time
 import math
+import os.path
 
 # wxPython imports
 import wx
@@ -39,39 +40,39 @@ def create_menu(source, target):
 
 	# File Menu
 	file = wx.Menu()
-	file.Append( ID_OPEN, "Connect to Game\tCtrl-O", "Connect to a diffrent Game" )
+	file.Append( ID_OPEN, _("Connect to Game\tCtrl-O"), _("Connect to a diffrent Game") )
 	file.AppendSeparator()
-	file.Append( ID_CONFIG, "Config", "Configure the Client" )
+	file.Append( ID_CONFIG, _("Config"), _("Configure the Client") )
 	file.AppendSeparator()
-	file.Append( ID_EXIT, "Exit", "Exit" )
+	file.Append( ID_EXIT, _("Exit"), _("Exit") )
 
 	# Statistics Menu
 	stat = wx.Menu()
-	stat.Append( ID_STAT_EAAG, "Empire at a Glance", "" )
+	stat.Append( ID_STAT_EAAG, _("Empire at a Glance"), _("") )
 	stat.AppendSeparator()
-	stat.Append( ID_STAT_SYSTEM, "Systems", "" )
-	stat.Append( ID_STAT_PLANET, "Planets", "" )
-	stat.Append( ID_STAT_FLEET,  "Fleets", "" )
+	stat.Append( ID_STAT_SYSTEM, _("Systems"), _("") )
+	stat.Append( ID_STAT_PLANET, _("Planets"), _("") )
+	stat.Append( ID_STAT_FLEET,  _("Fleets"), _("") )
 	stat.AppendSeparator()
-	stat.Append( ID_STAT_BATTLE, "Battles", "" )
+	stat.Append( ID_STAT_BATTLE, _("Battles"), _("") )
 
 	# Windows Menu
 	win = wx.Menu()
-	win.Append(  ID_WIN_MESSAGES, "Hide Messages", "", True )
-	win.Append(  ID_WIN_ORDERS,   "Hide Orders", "", True )
-	win.Append(  ID_WIN_STARMAP,  "Hide Starmap", "", True )
-	win.Append(  ID_WIN_SYSTEM,   "Hide System", "", True )
+	win.Append(  ID_WIN_MESSAGES, _("Hide Messages"), _(""), True )
+	win.Append(  ID_WIN_ORDERS,   _("Hide Orders"), _(""), True )
+	win.Append(  ID_WIN_STARMAP,  _("Hide Starmap"), _(""), True )
+	win.Append(  ID_WIN_SYSTEM,   _("Hide System"), _(""), True )
 	win.AppendSeparator()
-	win.Append(  ID_WIN_TECH, "Tech Browser", "", True)
-	win.Append(  ID_WIN_HELP, "Help", "", True)
+	win.Append(  ID_WIN_TECH, _("Tech Browser"), _(""), True)
+	win.Append(  ID_WIN_HELP, _("Help"), _(""), True)
 
 	help = wx.Menu()
 	
 	bar = wx.MenuBar()
-	bar.Append( file, "File" )
-	bar.Append( stat, "Statistics" )
-	bar.Append( win,  "Windows" )
-	bar.Append( help, "Help" )
+	bar.Append( file, _("File") )
+	bar.Append( stat, _("Statistics") )
+	bar.Append( win,  _("Windows") )
+	bar.Append( help, _("Help") )
 
 	wx.EVT_MENU(source, ID_OPEN,	target.OnConnect)
 	wx.EVT_MENU(source, ID_CONFIG,	target.OnConfig)
@@ -84,6 +85,8 @@ def create_menu(source, target):
 #	wx.EVT_MENU(source, ID_WIN_TECH,		target.changeWin)
 #	wx.EVT_MENU(source, ID_WIN_HELP,		target.OnHelp)
 	return bar
+
+
 
 class TimeStatusBar(wx.StatusBar):
 	def __init__(self, parent):
@@ -108,7 +111,7 @@ class TimeStatusBar(wx.StatusBar):
 			hours = math.floor(left / sih)
 			mins = math.floor((left - hours * sih) / sim)
 			secs = math.floor((left - hours * sih - mins * sim))
-			self.SetStatusText("EOT: %i:%i:%i" % (hours, mins, secs), 1)
+			self.SetStatusText("EOT: %02i:%02i:%02i" % (hours, mins, secs), 1)
 		else:
 			self.SetStatusText("EOT: Unknown", 1)
 
@@ -145,3 +148,16 @@ class winMain(winMainBase):
 
 	def OnProgramExit(self, evt):
 		self.application.Exit()
+
+	def ShowTips(self):
+		config = load_data("pywx_tips")
+		if not config:
+			config = [True, 0]
+		
+		if config[0]:
+			tp = wx.CreateFileTipProvider(os.path.join("doc", "tips.txt"), config[1])
+			config[0] = wx.ShowTip(None, tp)
+			config[1] = tp.GetCurrentTip()
+
+			save_data("pywx_tips", config)
+

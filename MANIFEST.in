@@ -5,6 +5,7 @@ include AUTHORS
 include graphics/*.png
 include graphics/media/planet-small/*.jpg
 include graphics/media/star-small/*.jpg
+include doc/*.txt
 prune Makefile
 prune setup.py
 prune graphics/sidebar.bmp

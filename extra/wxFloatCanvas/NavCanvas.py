@@ -64,7 +64,9 @@ class NavCanvas(wx.Panel):
         # default to Mouse mode
         self.ToolBar.ToggleTool(ID_POINTER_BUTTON,1)
         self.Canvas.SetMode("Mouse")
-        
+
+        self.Canvas.Bind(wx.EVT_MOUSEWHEEL, self.WheelEvent) 
+
         return None
 
     def __getattr__(self, name):
@@ -75,6 +77,20 @@ class NavCanvas(wx.Panel):
         ## add the attribute to this module's dict for future calls
         self.__dict__[name] = attrib
         return attrib
+
+    def WheelEvent(self, event):
+        if event.GetWheelRotation() > 0:
+            self.ZoomInWheel(event)
+        elif event.GetWheelRotation() < 0:
+            self.ZoomOutWheel(event)
+
+    def ZoomInWheel(self, event):
+        center = self.Canvas.PixelToWorld( event.GetPosition() )
+        self.Canvas.Zoom(1/1.5, center)
+
+    def ZoomOutWheel(self, event):
+        center = self.Canvas.PixelToWorld( event.GetPosition() )
+        self.Canvas.Zoom(1.5/1, center)
 
     def BuildToolbar(self):
         tb = wx.ToolBar(self,-1)

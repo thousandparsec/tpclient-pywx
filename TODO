@@ -17,7 +17,7 @@ Short Term
 	
 	* Add ships to the StarMap (DONE)
 		* Need to make sure i don't draw orbiting starships (DONE)
-	* Let a person unselect an order so they can insert a position 0
+	* Let a person unselect an order so they can insert a position 0 (DONE ???)
 
 	* Put up screenshots on www.thousandparsec.net (DONE)
 	* Put more screenshots on www.thousandparsec.net (DONE)
@@ -27,20 +27,22 @@ Short Term
 		* Order List Items (DONE)
 		* Order Type Items (DONE - as far as wx will let me)
 	* Allow tooltips to be disabled in the config
-	* Right Click on orders lets you insert
+	
+	* Right Click on orders lets you insert (DONE)
+		* Right Click copy/paste works
 
 	* Better default positioning of windows (DONE)
 		* Have better default position for a wide range of configurations
 
-	* Add starting tips
+	* Add starting tips (DONE)
 	* Allow starting tips to be disabled in the config
 
 	* Stop annoying flicker on save
 
-	* Fixup and cleanup the Config dialog..
+	* Fixup and cleanup the Config dialog.. (PARTIAL DONE)
 	* Fixup and cleanup the Main dialog...
 
-	* Remove the lang stuff and fix it to use gettext or something
+	* Remove the lang stuff and fix it to use gettext or something (DONE)
 
 Longer Term
 	* Add a info panel (DONE)
@@ -51,13 +53,13 @@ Longer Term
 		* Maybe see if we can get antialias lines
 		* Realtime changes?
 
-	* Check time till end of turn
+	* Check time till end of turn (DONE)
 		* Pop-up message when getting close
 		* Reload the Universe cache after turn
 
 	* Add right click pop-up menu to starmap
 		* Include useful options on this menu, Quick add Order?
-		* Mouse wheel should zoom in/out the starmap
+		* Mouse wheel should zoom in/out the starmap (DONE)
 		* Left (or right) click and hold for pan?
 
 	* Use non-blocking version of the protocol stack <- Not need?

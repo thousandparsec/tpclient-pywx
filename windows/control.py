@@ -10,7 +10,7 @@ from utils import *
 
 class MainControl:
 	def ConfigLoad(self):
-		config = load_data("windows")
+		config = load_data("pywx_windows")
 
 		if not config:
 			config = Blank()
@@ -126,7 +126,7 @@ class MainControl:
 		config.system.size = self.system.GetSizeTuple()
 		config.system.show = self.system.IsShown()
 
-		save_data("windows", config)
+		save_data("pywx_windows", config)
 
 	def ConfigActivate(self, show=True):
 		config = self.config
@@ -194,6 +194,8 @@ class MainControl:
 
 		self.ConfigActivate(False)
 
+		self.first = True
+
 	def Raise(self):
 		"""\
 			Raise all the windows.
@@ -225,6 +227,10 @@ class MainControl:
 		self.starmap.Show(config.starmap.show)
 		self.system.Show(config.system.show)
 
+		if self.first:
+			self.first = False
+			wx.CallAfter(self.main.ShowTips)
+
 	def Hide(self):
 		"""\
 			Show the main window
@@ -237,6 +243,9 @@ class MainControl:
 		self.system.Show(False)
 	
 	def Post(self, event):
+		wx.CallAfter(self._Post, event)
+		
+	def _Post(self, event):
 		func = 'On' + event.__class__.__name__[:-5]
 		for window in [self.main, self.info, self.message, self.order, self.starmap, self.system]:
 			if hasattr(window, func):

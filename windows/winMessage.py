@@ -32,7 +32,7 @@ MESSAGE_DEL = 10009
 
 # Shows messages from the game system to the player.
 class winMessage(winBase):
-	title = "Messages"
+	title = _("Messages")
 	
 	def __init__(self, application, parent, pos=wx.DefaultPosition, size=wx.DefaultSize, style=wx.DEFAULT_FRAME_STYLE):
 		winBase.__init__(self, application, parent, pos, size, style|wx.TAB_TRAVERSAL)
@@ -48,15 +48,15 @@ class winMessage(winBase):
 		item1 = wx.FlexGridSizer( 0, 3, 0, 0 )
 		item1.AddGrowableCol( 1 )
 
-		self.filter = wx.CheckBox( panel, MESSAGE_FILTER, "Filter", wx.DefaultPosition, wx.local.buttonSize, 0 )
+		self.filter = wx.CheckBox( panel, MESSAGE_FILTER, _("Filter"), wx.DefaultPosition, wx.local.buttonSize, 0 )
 		self.filter.SetFont(wx.local.normalFont)
 		item1.AddWindow( self.filter, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 1 )
 
-		self.title = wx.StaticText( panel, MESSAGE_TITLE, "Title", wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_CENTRE|wx.ST_NO_AUTORESIZE )
+		self.title = wx.StaticText( panel, MESSAGE_TITLE, _("Title"), wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_CENTRE|wx.ST_NO_AUTORESIZE )
 		self.title.SetFont(wx.local.normalFont)
 		item1.AddWindow( self.title, 0, wx.GROW|wx.ALIGN_CENTRE_HORIZONTAL|wx.ALL, 1 )
 
-		self.counter = wx.StaticText( panel, MESSAGE_ID, "# of #", wx.DefaultPosition, wx.local.buttonSize, 0 )
+		self.counter = wx.StaticText( panel, MESSAGE_ID, _("# of #"), wx.DefaultPosition, wx.local.buttonSize, 0 )
 		self.counter.SetFont(wx.local.normalFont)
 		item1.AddWindow( self.counter, 0, wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 1 )
 
@@ -76,16 +76,16 @@ class winMessage(winBase):
 
 		item7 = wx.BoxSizer( wx.VERTICAL )
 
-		prev = wx.Button( panel, -1, "Prev", wx.DefaultPosition, wx.local.buttonSize)
+		prev = wx.Button( panel, -1, _("Prev"), wx.DefaultPosition, wx.local.buttonSize)
 		prev.SetFont(wx.local.normalFont)
 		item7.AddWindow( prev, 0, wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 1 )
 		self.Bind(wx.EVT_BUTTON, self.MessagePrev, prev)
 
-		goto = wx.Button( panel, -1, "Goto", wx.DefaultPosition, wx.local.buttonSize)
+		goto = wx.Button( panel, -1, _("Goto"), wx.DefaultPosition, wx.local.buttonSize)
 		goto.SetFont(wx.local.normalFont)
 		item7.AddWindow( goto, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
 
-		next = wx.Button( panel, -1, "Next", wx.DefaultPosition, wx.local.buttonSize)
+		next = wx.Button( panel, -1, _("Next"), wx.DefaultPosition, wx.local.buttonSize)
 		next.SetFont(wx.local.normalFont)
 		item7.AddWindow( next, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
 		self.Bind(wx.EVT_BUTTON, self.MessageNext, next)
@@ -94,12 +94,12 @@ class winMessage(winBase):
 		item11.Enable(False)
 		item7.AddWindow( item11, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
 
-		new = wx.Button( panel, -1, "New", wx.DefaultPosition, wx.local.buttonSize)
+		new = wx.Button( panel, -1, _("New"), wx.DefaultPosition, wx.local.buttonSize)
 		new.SetFont(wx.local.normalFont)
 		item7.AddWindow( new, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
 		self.Bind(wx.EVT_BUTTON, self.MessageNew, new)
 
-		delete = wx.Button( panel, -1, "Delete", wx.DefaultPosition, wx.local.buttonSize)
+		delete = wx.Button( panel, -1, _("Delete"), wx.DefaultPosition, wx.local.buttonSize)
 		delete.SetFont(wx.local.normalFont)
 		item7.AddWindow( delete, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
 		self.Bind(wx.EVT_BUTTON, self.MessageDelete, delete)
@@ -223,10 +223,10 @@ class winMessage(winBase):
 		if self.slot == -1:
 			# Is it because we filtered the messages?
 			if len(messages) == 0:
-				message_subject = "No messages"
+				message_subject = _("No messages")
 				message_body = self.html_nomessage
 			else:
-				message_subject = "All filtered"
+				message_subject = _("All filtered")
 				message_body = self.html_allfiltered
 				
 			message_filter = False
@@ -245,7 +245,7 @@ class winMessage(winBase):
 
 		self.filter.SetValue(message_filter)
 		self.title.SetLabel(message_subject)
-		self.counter.SetLabel("%i of %i" % (self.slot+1, len(messages)))
+		self.counter.SetLabel(_("%i of %i") % (self.slot+1, len(messages)))
 		self.html.SetPage(message_body)
 
 	def MessageNext(self, evt=None):

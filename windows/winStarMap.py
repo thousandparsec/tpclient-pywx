@@ -55,7 +55,7 @@ def scale(value):
 
 # Shows the main map of the universe.
 class winStarMap(winBase):
-	title = "StarMAP, The Known Universe"
+	title = _("StarMAP, The Known Universe")
 
 	def __init__(self, application, parent, pos=wx.DefaultPosition, size=wx.DefaultSize, style=wx.DEFAULT_FRAME_STYLE):
 		winBase.__init__(self, application, parent, pos, size, style)
@@ -67,7 +67,9 @@ class winStarMap(winBase):
 
 		self.cache = {}
 		self.path = None
-	
+
+		self.mode = "Normal"
+
 	def OnCacheUpdate(self, evt):
 		self.Rebuild()
 

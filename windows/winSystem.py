@@ -62,7 +62,7 @@ wx.gizmos.TreeListCtrl = TreeListCtrl
 
 # Show the universe
 class winSystem(winBase):
-	title = "System"
+	title = _("System")
 	
 	def __init__(self, application, parent, pos=wx.DefaultPosition, size=wx.DefaultSize, style=wx.DEFAULT_FRAME_STYLE):
 		winBase.__init__(self, application, parent, pos, size, style)
@@ -90,7 +90,7 @@ class winSystem(winBase):
 		self.tree.SetFont(wx.local.normalFont)
 
 		# create some columns
-		self.tree.AddColumn("Object")
+		self.tree.AddColumn(_("Object"))
 #		self.tree.AddColumn("Details")
 		self.tree.SetMainColumn(0)
 		self.tree.SetColumnWidth(0, 225)
@@ -130,7 +130,7 @@ class winSystem(winBase):
 		new_root = None
 		
 		if root == None:
-			new_root = self.tree.AddRoot("Known Universe", self.icons['Root'])
+			new_root = self.tree.AddRoot(_("Known Universe"), self.icons['Root'])
 		else:
 			if object != None:
 				if self.icons.has_key(object.__class__.__name__):

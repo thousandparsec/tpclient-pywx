@@ -58,6 +58,9 @@ class winBaseMixIn:
 		evt.Veto(True)
 
 	def OnRaise(self, evt):
+		if not evt.GetActive():
+			return
+		
 		if wx.Platform != '__WXMSW__':
 			if self.application.windows.config.raise_ == "All on All":
 				self.application.windows.Raise()

@@ -115,6 +115,15 @@ class wxListCtrl(wx.ListCtrlOrig, wx.lib.mixins.listctrl.ListCtrlAutoWidthMixin,
 		slots.reverse()
 		return slots
 
+	def SetSelected(self, slots):
+		# Unselect the currently selected items
+		for slot in self.GetSelected():
+			self.SetItemState(slot, 0, wx.LIST_STATE_SELECTED)
+
+		for slot in slots:
+			self.SetItemState(slot, wx.LIST_STATE_SELECTED, wx.LIST_STATE_SELECTED)
+		
+
 wx.ChoiceOrig = wx.Choice
 class wxChoice(wx.Choice, ToolTipItemMixIn):
 	def __init__(self, *arg, **kw):

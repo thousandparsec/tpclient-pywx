@@ -12,7 +12,7 @@ from config import *
 
 # Shows messages from the game system to the player.
 class winConfig(winBase):
-	title = "Config"
+	title = _("Config")
 	
 	def __init__(self, application, parent, pos=wx.DefaultPosition, size=wx.DefaultSize, style=wx.DEFAULT_FRAME_STYLE):
 		winBase.__init__(self, application, parent, pos, size, style|wx.TAB_TRAVERSAL)
@@ -26,7 +26,7 @@ class winConfig(winBase):
 		item0 = wx.BoxSizer( wx.HORIZONTAL )
 	
 		self.notebook = wx.Notebook( panel, -1, wx.DefaultPosition, wx.DefaultSize, 0 )
-		self.notebook.AddPage(panelConfigWindows(application, self, self.notebook), "Windows" )
+		self.notebook.AddPage(panelConfigWindows(application, self, self.notebook), _("Windows") )
 
 		item1 = wx.NotebookSizer( self.notebook )
 		item0.AddSizer( item1, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
@@ -73,26 +73,26 @@ class panelConfigWindows(wx.Panel):
 	
 		item1 = wx.BoxSizer( wx.HORIZONTAL )
 	
-		self.show_box = wx.StaticBox( self, -1, "Hide Windows" )
+		self.show_box = wx.StaticBox( self, -1, _("Hide Windows") )
 		self.show_sizer = wx.StaticBoxSizer( self.show_box, wx.VERTICAL )
 		
-		self.show_info = wx.CheckBox( self, -1, "Info", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.show_info = wx.CheckBox( self, -1, _("Info"), wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.show_sizer.AddWindow( self.show_info, 0, wx.GROW|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
 		self.Bind(wx.EVT_CHECKBOX, self.OnShowInfo, self.show_info)
 
-		self.show_order = wx.CheckBox( self, -1, "Order", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.show_order = wx.CheckBox( self, -1, _("Order"), wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.show_sizer.AddWindow( self.show_order, 0, wx.GROW|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
 		self.Bind(wx.EVT_CHECKBOX, self.OnShowOrder, self.show_order)
 
-		self.show_message = wx.CheckBox( self, -1, "Message", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.show_message = wx.CheckBox( self, -1, _("Message"), wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.show_sizer.AddWindow( self.show_message, 0, wx.GROW|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
 		self.Bind(wx.EVT_CHECKBOX, self.OnShowMessage, self.show_message)
 
-		self.show_starmap = wx.CheckBox( self, -1, "StarMap", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.show_starmap = wx.CheckBox( self, -1, _("StarMap"), wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.show_sizer.AddWindow( self.show_starmap, 0, wx.GROW|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
 		self.Bind(wx.EVT_CHECKBOX, self.OnShowStarMap, self.show_starmap)
 
-		self.show_system = wx.CheckBox( self, -1, "System", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.show_system = wx.CheckBox( self, -1, _("System"), wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.show_sizer.AddWindow( self.show_system, 0, wx.GROW|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
 		self.Bind(wx.EVT_CHECKBOX, self.OnShowSystem, self.show_system)
 
@@ -100,29 +100,29 @@ class panelConfigWindows(wx.Panel):
 
 		options = []
 		if wx.Platform == '__WXMSW__':
-			options = ["Individual", "All on Main"]
+			options = [_("Individual"), _("All on Main")]
 		elif wx.Platform == '__WXMAC__':
-			options = ["Individual", "All on All"]
+			options = [_("Individual"), _("All on All")]
 		else:
-			options = ["Individual", "All on Main", "All on All"]
+			options = [_("Individual"), _("All on Main"), _("All on All")]
 
-		self.raisebox = wx.RadioBox( self, -1, "Raise", wx.DefaultPosition, wx.DefaultSize, options, 1, wx.RA_SPECIFY_COLS )
-		self.raisebox.SetToolTip( wx.ToolTip("Choose a method for raising the windows.") )
+		self.raisebox = wx.RadioBox( self, -1, _("Raise"), wx.DefaultPosition, wx.DefaultSize, options, 1, wx.RA_SPECIFY_COLS )
+		self.raisebox.SetToolTip( wx.ToolTip(_("Choose a method for raising the windows.")) )
 		item1.AddWindow( self.raisebox, 0, wx.GROW|wx.ALIGN_CENTER_HORIZONTAL|wx.ALL, 5 )
 		self.Bind(wx.EVT_RADIOBOX, self.OnRaiseSelection, self.raisebox)
 
-		self.windows = wx.RadioBox( self, -1, "Window", wx.DefaultPosition, wx.DefaultSize, 
-				["Main", "Info", "Order", "Message", "StarMap","System"] , 1, wx.RA_SPECIFY_COLS )
+		self.windows = wx.RadioBox( self, -1, _("Window"), wx.DefaultPosition, wx.DefaultSize, 
+				[_("Main"), _("Info"), _("Order"), _("Message"), _("StarMap"), _("System")] , 1, wx.RA_SPECIFY_COLS )
 		item1.AddWindow( self.windows, 0, wx.GROW|wx.ALIGN_CENTER_HORIZONTAL|wx.ALL, 5 )
 		self.Bind(wx.EVT_RADIOBOX, self.OnWindowSelection, self.windows)
 
-		item11 = wx.StaticBox( self, -1, "Attributes" )
+		item11 = wx.StaticBox( self, -1, _("Attributes") )
 		item10 = wx.StaticBoxSizer( item11, wx.VERTICAL )
 		
 		item12 = wx.FlexGridSizer( 0, 2, 0, 0 )
 		item12.AddGrowableCol( 1 )
 		
-		item13 = wx.StaticText( self, -1, "X Position", wx.DefaultPosition, wx.DefaultSize, 0 )
+		item13 = wx.StaticText( self, -1, _("X Position"), wx.DefaultPosition, wx.DefaultSize, 0 )
 		item12.AddWindow( item13, 0, wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
 
 		item14 = wx.SpinCtrl( self, ID_XPOS, "0", wx.DefaultPosition, wx.Size(50,-1), 0, 0, 10000, 0 )
@@ -130,7 +130,7 @@ class panelConfigWindows(wx.Panel):
 		self.obj['xpos'] = item14
 		wx.EVT_SPINCTRL(self, ID_XPOS, self.OnXPos)
 
-		item15 = wx.StaticText( self, -1, "Y Position", wx.DefaultPosition, wx.DefaultSize, 0 )
+		item15 = wx.StaticText( self, -1, _("Y Position"), wx.DefaultPosition, wx.DefaultSize, 0 )
 		item12.AddWindow( item15, 0, wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
 
 		item16 = wx.SpinCtrl( self, ID_YPOS, "0", wx.DefaultPosition, wx.Size(50,-1), 0, 0, 10000, 0 )
@@ -138,7 +138,7 @@ class panelConfigWindows(wx.Panel):
 		self.obj['ypos'] = item16
 		wx.EVT_SPINCTRL(self, ID_YPOS, self.OnYPos)
 
-		item17 = wx.StaticText( self, -1, "Width", wx.DefaultPosition, wx.DefaultSize, 0 )
+		item17 = wx.StaticText( self, -1, _("Width"), wx.DefaultPosition, wx.DefaultSize, 0 )
 		item12.AddWindow( item17, 0, wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
 
 		item18 = wx.SpinCtrl( self, ID_WIDTH, "0", wx.DefaultPosition, wx.Size(50,-1), 0, 0, 10000, 0 )
@@ -146,7 +146,7 @@ class panelConfigWindows(wx.Panel):
 		self.obj['width'] = item18
 		wx.EVT_SPINCTRL(self, ID_WIDTH, self.OnWidth)
 
-		item19 = wx.StaticText( self, -1, "Height", wx.DefaultPosition, wx.DefaultSize, 0 )
+		item19 = wx.StaticText( self, -1, _("Height"), wx.DefaultPosition, wx.DefaultSize, 0 )
 		item12.AddWindow( item19, 0, wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
 
 		item20 = wx.SpinCtrl( self, ID_HEIGHT, "0", wx.DefaultPosition, wx.Size(50,-1), 0, 0, 10000, 0 )
@@ -162,11 +162,11 @@ class panelConfigWindows(wx.Panel):
 
 		item21 = wx.BoxSizer( wx.HORIZONTAL )
 		
-		save = wx.Button( self, -1, "Save", wx.DefaultPosition, wx.DefaultSize, 0 )
+		save = wx.Button( self, -1, _("Save"), wx.DefaultPosition, wx.DefaultSize, 0 )
 		item21.AddWindow( save, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
 		self.Bind(wx.EVT_BUTTON, self.OnSave, save)
 
-		revert = wx.Button( self, -1, "Revert", wx.DefaultPosition, wx.DefaultSize, 0 )
+		revert = wx.Button( self, -1, _("Revert"), wx.DefaultPosition, wx.DefaultSize, 0 )
 		item21.AddWindow( revert, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
 		self.Bind(wx.EVT_BUTTON, self.OnRevert, revert)
 
