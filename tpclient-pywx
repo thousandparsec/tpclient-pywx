@@ -84,19 +84,28 @@ if __name__ == '__main__':
 			self.map     = winStarMap(self.main, -1, None, (middle+padding,0), (map_width-padding, map_height-padding*2))
 			self.system  = winSystem(self.main, -1, None, (middle+padding,map_height), (map_width-padding, 200))
 
+		def raise_(self):
+			"""\
+				Raise all the windows.
+			"""
+			self.system.Raise()
+			self.message.Raise()
+			self.map.Raise()
+			self.main.Raise()
+
 		def show(self):
-			##########
-			# Show the main window
-			##########
+			"""\
+				Show the main window
+			"""
 			self.main.Show(TRUE)
 			self.map.Show(TRUE)
 			self.message.Show(TRUE)
 			self.system.Show(TRUE)
 
 		def hide(self):
-			##########
-			# Show the main window
-			##########
+			"""\
+				Show the main window
+			"""
 			self.main.Show(FALSE)
 			self.map.Show(FALSE)
 			self.message.Show(FALSE)

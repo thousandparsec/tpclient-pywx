@@ -77,8 +77,12 @@ class winMain(wxFrame):
 		self.SetMenuBar(item0)
 		self.CreateStatusBar(1, wxST_SIZEGRIP)
 
+		EVT_ACTIVATE(self, self.OnRaise)
 		EVT_CLOSE(self, self.OnProgramExit)
 
 	def OnProgramExit(self, evt):
 		self.parent.Exit()
 	
+	def OnRaise(self, evt):
+		print "Raising!"
+		self.parent.windows.raise_()

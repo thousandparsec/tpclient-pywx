@@ -2,7 +2,7 @@
 from wxPython.wx import *
 from utils import *
 
-defaultServers = ["203.96.149.160:6923","code-bear.dyndns.org:6923","mithro.dyndns.org:6923"] 
+defaultServers = ["127.0.0.1:6923","code-bear.dyndns.org:6923","mithro.dyndns.org:6923"] 
 
 ID_TEXT = 10039
 ID_HOST = 10040
