@@ -27,16 +27,29 @@ class SelectOrderEvent(wx.PyEvent):
 		self.save = save
 wx.local.SelectOrderEvent = SelectOrderEvent
 
-wx.local.smallSize  = wx.Size(15,15)
-wx.local.buttonSize = wx.Size(50,20)
-wx.local.spinSize   = wx.Size(40,15)
+if wx.Platform == "__WXMAC__":
+	wx.local.smallSize  = wx.Size(25,25)
+	wx.local.buttonSize = wx.Size(60,30)
+	wx.local.spinSize   = wx.Size(50,25)
 
-wx.local.normalFont = wx.Font(7,  wx.DEFAULT, wx.NORMAL, wx.NORMAL)
-try:
-    wx.local.tinyFont   = wx.Font(6,  wx.DEFAULT, wx.LIGHT, wx.NORMAL)
-except:
-    wx.local.tinyFont   = wx.Font(6,  wx.DEFAULT, wx.NORMAL, wx.NORMAL)    
-wx.local.largeFont  = wx.Font(12, wx.DEFAULT, wx.NORMAL, wx.NORMAL)
+	wx.local.normalFont = wx.Font(12,  wx.DEFAULT, wx.NORMAL, wx.NORMAL)
+	try:
+	    wx.local.tinyFont   = wx.Font(10,  wx.DEFAULT, wx.LIGHT, wx.NORMAL)
+	except:
+	    wx.local.tinyFont   = wx.Font(10,  wx.DEFAULT, wx.NORMAL, wx.NORMAL)    
+	wx.local.largeFont  = wx.Font(16, wx.DEFAULT, wx.NORMAL, wx.NORMAL)
+
+else:
+	wx.local.smallSize  = wx.Size(15,15)
+	wx.local.buttonSize = wx.Size(50,20)
+	wx.local.spinSize   = wx.Size(40,15)
+
+	wx.local.normalFont = wx.Font(7,  wx.DEFAULT, wx.NORMAL, wx.NORMAL)
+	try:
+	    wx.local.tinyFont   = wx.Font(6,  wx.DEFAULT, wx.LIGHT, wx.NORMAL)
+	except:
+	    wx.local.tinyFont   = wx.Font(6,  wx.DEFAULT, wx.NORMAL, wx.NORMAL)    
+	wx.local.largeFont  = wx.Font(12, wx.DEFAULT, wx.NORMAL, wx.NORMAL)
 
 class winBaseMixIn:
 	def __init__(self, application, parent, 
