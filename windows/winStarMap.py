@@ -37,6 +37,7 @@ def getpath(application, object):
 	orders = application.cache.orders[object.id]
 	points = [object.pos[0:2]]
 	for order in orders:
+		print order
 		if order.type == 1:
 			points += [order.pos[0:2]]
 					

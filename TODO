@@ -17,13 +17,15 @@ Short Term
 	* Add ships to the StarMap (DONE)
 		* Need to make sure i don't draw orbiting starships (DONE)
 
+	* Let a person unselect an order so they can insert a position 0
+
 	* Put up screenshots on www.thousandparsec.net (DONE)
 	* Put more screenshots on www.thousandparsec.net
 
 	* Tool tips on orders arguments (and other stuff)
 		* Argument Panels (DONE)
-		* Order List Items
-		* Order Type Items
+		* Order List Items (DONE)
+		* Order Type Items (DONE - as far as wx will let me)
 	* Allow tooltips to be disabled in the config
 
 	* Better default positioning of windows
@@ -47,14 +49,14 @@ Longer Term
 	* Add right click pop-up menu
 		* Include useful options on this menu, Quick add Order?
 
-	* Use non-blocking version of the protocol stack <- No need?
+	* Use non-blocking version of the protocol stack <- Not need?
 
 	* Add option to not use MDI interface under windows
-	* Add option to make the little windows not appear on the task bar
+	* Make the little windows not appear on the task bar (DONE)
+		* Add option to let the above be enabled/disabled
 	
 	* Let the fonts be selected
 	* Fix the default fonts
-
 
 Longest Term
 	* Check what it looks like under windows / MacOSX

@@ -27,6 +27,7 @@ import wx
 import extra.fixdc
 
 # Python Imports
+import time
 from math import *
 from copy import *
 from types import *
@@ -57,6 +58,7 @@ class Splash(wx.SplashScreen):
 
 	def OnClose(self, evt):
 		self.Hide()
+		time.sleep(1)
 		self.application.windows.connect.Show(True)
 
 class AppTP(wx.App):
@@ -163,12 +165,13 @@ password = "%(password)s"
 					objects.append(nobject)
 
 			# Download the orders from this object
-			if object.order_number == 0:
-				orders = []
-			else:
-				orders = self.connection.get_orders(object.id, range(0, object.order_number))
+			self.cache.orders[object.id] = []
+			if object.order_number != 0:
+				for order in self.connection.get_orders(object.id, range(0, object.order_number)):
+					if failed(order):
+						break
+					self.cache.orders[object.id].append(order)
 
-			self.cache.orders[object.id] = list(orders)
 			progress.Update(len(self.cache.objects.keys()))
 
 		# Download any order descriptions not already downloaded

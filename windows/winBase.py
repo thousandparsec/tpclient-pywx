@@ -89,7 +89,21 @@ class winNormalSubBase(wx.MiniFrame, winBaseMixIn):
 			pos=wx.DefaultPosition, size=wx.DefaultSize, style=wx.DEFAULT_FRAME_STYLE):
 		wx.MiniFrame.__init__(self, parent, -1, 'TP: ' + self.title, pos, size, style + wx.FRAME_NO_TASKBAR)
 		winBaseMixIn.__init__(self, application, parent, pos, size, style)
-		
+
+		self.Bind(wx.EVT_WINDOW_CREATE, self.OnCreate)
+
+	def OnCreate(self, evt):
+		if wx.Platform == '__WXGTK__':
+			try:
+				import pygtk
+				pygtk.require("2.0")
+				
+				import gtk
+				window = gtk.gdk.window_lookup(long(self.GetHandle())).get_toplevel()
+				window.set_skip_taskbar_hint(True)
+			except:
+				print "WARNING: You don't have pygtk (>2.2) installed - I won't be able to hide windows under linux."
+
 if wx.Platform == '__WXMSW__':
 	winMainBase = winMDIBase
 	winBase = winMDISubBase

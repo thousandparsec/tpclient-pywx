@@ -29,9 +29,12 @@ class wxListCtrl(wx.ListCtrlOrig, wx.lib.mixins.listctrl.ListCtrlAutoWidthMixin)
 		wx.ListCtrlOrig.__init__(self, parent, ID, pos, size, style)
 		wx.lib.mixins.listctrl.ListCtrlAutoWidthMixin.__init__(self)
 
+		self.tooltips = {}
+		self.objects = {}
+
+		self.Bind(wx.EVT_MOTION, self.OnMouseMotion)
+
 	def SetItemPyData(self, slot, data):
-		if not hasattr(self, "objects"):
-			self.objects = {}
 		self.objects[slot] = data
 
 	def GetItemPyData(self, slot):
@@ -56,10 +59,66 @@ class wxListCtrl(wx.ListCtrlOrig, wx.lib.mixins.listctrl.ListCtrlAutoWidthMixin)
 			return wx.NOT_FOUND
 		else:
 			return item.GetText()
+
+	def SetToolTip(self, tooltip):
+		if isinstance(tooltip, wx.ToolTip):
+			tooltip = tooltip.GetTip()
+		self.tooltips[-1] = tooltip
+		wx.ListCtrlOrig.SetToolTip(self, wx.ToolTip(tooltip))
+
+	def SetToolTipItem(self, slot, text):
+		self.tooltips[slot] = text
+	
+	def GetToolTipItem(self, slot):
+		if self.tooltips.has_key(slot):
+			return self.tooltips[slot]
+		else:
+			return None
+	
+	def OnMouseMotion(self, evt):
+		slot = self.HitTest(evt.GetPosition())[0]
 		
+		if self.tooltips.has_key(slot):
+			if self.GetToolTip() == None:
+				wx.ListCtrlOrig.SetToolTip(self, wx.ToolTip(self.tooltips[slot]))
+			elif self.GetToolTip().GetTip() != self.tooltips[slot]:
+				self.GetToolTip().SetTip(self.tooltips[slot])
 
 wx.ListCtrl = wxListCtrl
 
+wx.ChoiceOrig = wx.Choice
+class wxChoice(wx.Choice):
+	def __init__(self, *arg, **kw):
+		wx.ChoiceOrig.__init__(self, *arg, **kw)
+
+		self.tooltips = {}
+		self.Bind(wx.EVT_CHOICE, self.OnSelection)
+
+	def SetToolTip(self, tooltip):
+		if isinstance(tooltip, wx.ToolTip):
+			tooltip = tooltip.GetTip()
+		self.tooltips[-1] = tooltip
+		wx.ChoiceOrig.SetToolTip(self, wx.ToolTip(tooltip))
+
+	def SetToolTipItem(self, slot, text):
+		self.tooltips[slot] = text
+	
+	def GetToolTipItem(self, slot):
+		if self.tooltips.has_key(slot):
+			return self.tooltips[slot]
+		else:
+			return None
+	
+	def OnSelection(self, evt):
+		slot = self.GetSelection()
+		
+		if self.tooltips.has_key(slot):
+			if self.GetToolTip() == None:
+				wx.ChoiceOrig.SetToolTip(self, wx.ToolTip(self.tooltips[slot]))
+			elif self.GetToolTip().GetTip() != self.tooltips[slot]:
+				self.GetToolTip().SetTip(self.tooltips[slot])
+
+wx.Choice = wxChoice
 buttonSize = (wx.local.buttonSize[0], wx.local.buttonSize[1]+2)
 
 class winOrder(winBase):
@@ -145,6 +204,9 @@ class winOrder(winBase):
 		self.SetSize(size)
 		self.SetPosition(pos)
 
+	def OnSelectType(self, evt):
+		print "Selecting!"
+
 	def OnSelectObject(self, evt):
 		oslot = self.order_list.GetNextItem(-1, wx.LIST_NEXT_ALL, wx.LIST_STATE_SELECTED)
 
@@ -156,14 +218,16 @@ class winOrder(winBase):
 			debug(DEBUG_WINDOWS, "SelectObject: No such object.")
 			return
 			
+		self.order_list.SetToolTip("Current orders on %s." % object.name)
+		
 		self.order_list.DeleteAllItems()
 		for slot in range(0, object.order_number):
 			order = self.application.cache.orders[self.oid][slot]
 
-			print order
 			self.order_list.InsertStringItem(slot, "")
 			self.order_list.SetStringItem(slot, TURNS_COL, str(order.turns))
 			self.order_list.SetStringItem(slot, ORDERS_COL, order.name)
+			self.order_list.SetToolTipItem(slot, "Tip %s" % slot)
 
 			if slot == oslot:
 				self.order_list.Select(slot)
@@ -171,11 +235,20 @@ class winOrder(winBase):
 			
 		# Set which orders can be added to this object
 		self.type_list.Clear()
+		self.type_list.SetToolTip("Order type to create")
 		for type in object.order_types:
-			if OrderDescs().has_key(type):
-				self.type_list.Append(OrderDescs()[type].name, type)
+			if not OrderDescs().has_key(type):
+				continue
+
+			od = OrderDescs()[type]
+			
+			self.type_list.Append(od.name, type)
+			if hasattr(od, "doc"):
+				desc = od.doc
 			else:
-				self.type_list.Append("Wait on (%i)" % type, type)
+				desc = od.__doc__
+			desc = desc.strip()
+			self.type_list.SetToolTipItem(self.type_list.GetCount()-1, desc)
 
 		self.OnOrderSelect(None)
 
@@ -364,7 +437,7 @@ class winOrder(winBase):
 				elif type == constants.ARG_TIME:
 					subpanel = argTimePanel( self, self.argument_panel, getattr(order, name) )
 				elif type == constants.ARG_OBJECT:
-					subpanel = argObjectPanel( self, self.argument_panel, getattr(order, name) )
+					subpanel = argObjectPanel( self, self.argument_panel, getattr(order, name), self.application.cache )
 				elif type == constants.ARG_LIST:
 					subpanel = argListPanel( self, self.argument_panel, getattr(order, name) )
 				elif type == constants.ARG_STRING:
@@ -395,7 +468,6 @@ class winOrder(winBase):
 			self.argument_sizer.AddSizer( wx.BoxSizer( wx.HORIZONTAL ) )
 			self.argument_sizer.AddSizer( button_sizer, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
 			
-		
 		else:
 			# Display message
 			text = "No order selected."
@@ -446,7 +518,7 @@ def argStringGet(panel):
 	windows = panel.GetChildren()
 	return [0, windows[0].GetValue()]
 	
-def argObjectPanel(parent, parent_panel, args):
+def argObjectPanel(parent, parent_panel, args, cache):
 	panel = wx.Panel(parent_panel, -1)
 	item0 = wx.BoxSizer( wx.HORIZONTAL )
 
