@@ -1,4 +1,5 @@
 
+import pprint
 import struct
 import sys
 import string
@@ -45,14 +46,14 @@ def xpack(struct, *args):
 		
 		if char == ' ' or char == '!':
 			continue
-		elif char == '[':
-			# Find the closing brace
-			substruct, struct = string.split(struct, ']', maxsplit=1)
-			output += pack_list('L', substruct, args.pop(0))
 		elif char == '{':
 			# Find the closing brace
 			substruct, struct = string.split(struct, '}', maxsplit=1)
-			output += pack_shortlist('I', args.pop(0))
+			output += pack_list('L', substruct, args.pop(0))
+		elif char == '[':
+			# Find the closing brace
+			substruct, struct = string.split(struct, ']', maxsplit=1)
+			output += pack_list('I', substruct, args.pop(0))
 		elif char == 'S':
 			output += pack_string(args.pop(0))
 		elif char in string.digits:
@@ -81,15 +82,15 @@ def unxpack(struct, s):
 
 		if char == ' ' or char == '!':
 			continue
-		elif char == '[':
-			# Find the closing brace
-			substruct, struct = string.split(struct, ']', maxsplit=1)
-			data, s = unpack_list("L", substruct, s)
-
-			output.append(data)
 		elif char == '{':
 			# Find the closing brace
 			substruct, struct = string.split(struct, '}', maxsplit=1)
+			data, s = unpack_list("L", substruct, s)
+
+			output.append(data)
+		elif char == '[':
+			# Find the closing brace
+			substruct, struct = string.split(struct, ']', maxsplit=1)
 			data, s = unpack_list("I", substruct, s)
 
 			output.append(data)
@@ -173,14 +174,15 @@ def unpack_string(s):
 	Returns the first string from the input data and any remaining data
 	"""
 	# Remove the length
-	l = int(unpack("!I", s[0:4])[0])
+	(l, ), s = unxpack("I", s)
 	if l > 0:
-		s = s[4:]
 		# Get the string, (we don't need the null terminator so nuke it)
 		output = s[:l-1]
 		s = s[l:]
+		
 		# Remove anyremaining null terminators
-		s = s[4 - (l % 4):]
+		s = unpad(l, s)
+
 		return output, s
 	else:
 		return "", s
@@ -193,3 +195,9 @@ def pad(s):
 	if len(s) % 4 != 0:
 		s += "\0" * (4 - (len(s) % 4))
 	return s
+
+def unpad(l, s):
+	if l % 4 != 0:
+		s = s[4 - (l % 4):]
+	return s
+	

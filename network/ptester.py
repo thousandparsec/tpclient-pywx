@@ -19,7 +19,7 @@ def green(p):
 	sys.stdout.flush()
 
 def recv(s):
-	r = read_packet(s)
+	r = read_packet(s, DEBUG=1)
 	red(r)
 	return r
 	

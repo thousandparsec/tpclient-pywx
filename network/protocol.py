@@ -11,6 +11,9 @@ import string
 import socket
 import sys
 
+# Set this to true to put some asserts etc into the code...
+DEBUG=0
+
 CONNECT=0
 OK=1
 LOGIN=2
@@ -288,7 +291,7 @@ class Object(Processed):
 		self.orders_no = output
 		
 		# Check to see if we have any data left, if so we have stuffed up
-		if len(trash) > 0:
+		if len(trash) > 0 and DEBUG:
 			pprint.pprint("Leftover: (" + trash + ")")
 			raise "Leftover data was found, something went wrong!"
 			
@@ -397,16 +400,24 @@ class Order(Processed):
 		pass		
 
 
-def read_packet(s):
+def read_packet(s, DEBUG=DEBUG):
 	"""\
 	Reads a single TP packet from the socket and returns it.
 	"""
 	string = s.recv(Header.size)
+	if DEBUG:
+		print "Header:",
+		pprint.pprint(string)
 	h = Header(string)
 	h.Process()
 	
 	if h.length > 0:
+		if DEBUG:
+			print "Data packet length:", h.length
 		data = s.recv(h.length)
+		if DEBUG:
+			print "Data:",
+			pprint.pprint(data)
 		h.SetData(data)
 
 	return h
