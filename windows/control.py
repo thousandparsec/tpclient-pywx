@@ -7,7 +7,6 @@ import wx
 
 # Local Imports
 from utils import *
-from config import *
 
 class MainControl:
 	def ConfigLoad(self):

@@ -2,7 +2,6 @@ include README
 include LICENSE
 include COPYING
 include AUTHORS
-include var/config
 include graphics/*.png
 include graphics/media/planet-small/*.jpg
 include graphics/media/star-small/*.jpg

@@ -45,8 +45,6 @@ except ImportError:
 	import tp.netlib
 
 from utils import *
-from config import *
-
 from tp.netlib import Connection, failed
 
 from windows.control import MainControl
@@ -89,44 +87,10 @@ class AppTP(wx.App):
 			do_traceback()
 
 	def ConfigLoad(self):
-		print "AppTp.ConfigLoad"
-
-		try:
-			import sys
-			sys.path.append("var")
-			import config as config
-			self.config = config
-		except ImportError:
-			config = Blank()
-			config.splash = True
-			config.tips = True
-			config.autoconnect = False
-
-			config.host = "127.0.0.1"
-			config.username = ""
-			config.password = ""
-
-		return config
+		pass
 
 	def ConfigSave(self):
-		print "AppTp.ConfigSave"
-
-		data = """\
-# Show the splash screen on startup
-splash = %(splash)s
- 
-# Show the "tips" on startup
-tips = %(tips)s
- 
-# On startup connect to the default server
-autoconnect = %(autoconnect)s
- 
-# Autoconnect information
-host = "%(host)s"
-username = "%(username)s"
-password = "%(password)s"
-""" % self.config.__dict__
-		open(os.path.join("var", "config"), "w+").write(data)
+		pass
 
 	def CacheLoad(self):
 		pass

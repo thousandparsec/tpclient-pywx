@@ -4,6 +4,7 @@ This module contains the main menu window.
 
 # Python imports
 import time
+import math
 
 # wxPython imports
 import wx
@@ -99,9 +100,15 @@ class TimeStatusBar(wx.StatusBar):
 		self.Notify()
 
 	def Notify(self):
+		sih = 60*60
+		sim = 60
+	
 		left = self.endtime - time.time()
 		if left > 0:
-			self.SetStatusText(time.strftime("EOT: %I:%M:%S", time.localtime(left)), 1)
+			hours = math.floor(left / sih)
+			mins = math.floor((left - hours * sih) / sim)
+			secs = math.floor((left - hours * sih - mins * sim))
+			self.SetStatusText("EOT: %i:%i:%i" % (hours, mins, secs), 1)
 		else:
 			self.SetStatusText("EOT: Unknown", 1)
 
