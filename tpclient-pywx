@@ -125,6 +125,7 @@ class AppTP(wx.App):
 			
 			self.cache.objects[object.id] = object
 			
+			print object, object.contains
 			# Download the objects inside this object
 			if len(object.contains) > 0:
 				# Set the parent relationship
