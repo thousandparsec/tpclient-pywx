@@ -1,0 +1,8 @@
+Big jobs:
+
+Process a Out.<player id>.t<turn> file
+Get order processing working
+	- Generate a dynamic panel for orders from the "args" tuple each order has
+	- Put new orders in out queue
+	- ******Delete order order*********
+Produce a In.<player id>.t<turn> file
