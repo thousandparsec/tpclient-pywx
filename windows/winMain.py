@@ -83,16 +83,11 @@ class winMain(winMainBase):
 		bar.Append( stat, "Statistics" )
 		bar.Append( win,  "Windows" )
 		bar.Append( help, "Help" )
-		
+
+		self.bar = bar
+
 		self.SetMenuBar(bar)
 		self.CreateStatusBar(1, wx.ST_SIZEGRIP)
-
-		if wx.Platform == "__WXMAC__":
-			for value in self.application.windows.__dict__.values():
-				if hasattr(value, "SetMenuBar"):
-					value.SetMenuBar(bar)
-
-			self.Show(False)
 
 	def OnConnect(self, evt):
 		self.application.windows.Hide()

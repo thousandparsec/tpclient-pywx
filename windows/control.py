@@ -188,6 +188,11 @@ class MainControl:
 		from windows.winSystem  import winSystem
 		self.system = winSystem(application, self.main, config.system.pos, config.system.size)
 
+		if wx.Platform == "__WXMAC__":
+			for value in self.__dict__.values():
+				if hasattr(value, "SetMenuBar"):
+					value.SetMenuBar(self.main.bar)
+
 		self.ConfigActivate(False)
 
 	def Raise(self):
