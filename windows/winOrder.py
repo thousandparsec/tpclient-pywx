@@ -70,7 +70,8 @@ class winOrder(winBase):
 		order_list.SetFont(wx.local.normalFont)
 
 		# A horizontal line
-		line_horiz = wx.StaticLine( base_panel, -1, wx.DefaultPosition, wx.Size(20,-1), wx.LI_HORIZONTAL)
+		line_horiz1 = wx.StaticLine( base_panel, -1, wx.DefaultPosition, wx.Size(20,-1), wx.LI_HORIZONTAL)
+		line_horiz2 = wx.StaticLine( base_panel, -1, wx.DefaultPosition, wx.Size(20,-1), wx.LI_HORIZONTAL)
 
 		# Buttons to add/delete orders
 		button_sizer = wx.FlexGridSizer( 1, 0, 0, 0 )
@@ -102,9 +103,9 @@ class winOrder(winBase):
 		# Put them all on the sizer
 		base_sizer.AddWindow( order_list, 0, wx.GROW|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 1 )
 		base_sizer.AddGrowableRow( 0 )
-		base_sizer.AddWindow( line_horiz, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
+		base_sizer.AddWindow( line_horiz1, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
 		base_sizer.AddSizer ( button_sizer, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
-		base_sizer.AddWindow( line_horiz, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
+		base_sizer.AddWindow( line_horiz2, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
 		base_sizer.AddGrowableRow( 4 )
 		base_sizer.AddWindow( argument_panel, 0, wx.GROW|wx.ALIGN_CENTER|wx.ALL, 1 )
 
