@@ -13,6 +13,7 @@ from extra.wxFloatCanvas.FloatCanvas import EVT_FC_LEFT_DOWN, EVT_FC_RIGHT_DOWN
 from extra.wxFloatCanvas.FloatCanvas import Text, Polygon, Rectangle, Line
 from extra.wxFloatCanvas.CircleNoSmall import CircleNoSmall
 from extra.wxFloatCanvas.PolyNoSize import PolyNoSize
+from extra.wxFloatCanvas.CrossLine import CrossLine
 
 # Network imports
 from tp.netlib.objects.ObjectExtra.StarSystem import StarSystem
@@ -102,7 +103,9 @@ class winStarMap(winBase):
 					points = getpath(application, object)
 					if points:
 						C(object, Line(scale(points), LineColor="Grey", InForeground=True), as="path")
-
+					elif object.vel != (0, 0, 0):
+						C(object, CrossLine(scale((object.pos[0:2], object.vel[0:2])), 2, LineColor="Grey"), as="path")
+						
 					parent = application.cache.objects[object.parent]
 					if parent.pos == object.pos:
 						continue
@@ -112,10 +115,7 @@ class winStarMap(winBase):
 					ship.Move(scale(object.pos))
 
 					C(object, ship, as="icon")
-						
-					if object.vel != (0, 0, 0):
-						# We need to draw in a vector
-						C(object, Line(scale((object.pos[0:2], object.vel[0:2])), LineColor="Green"), as="velocity")
+					
 
 			self.arrow = PolyNoSize([(0,0), (-5,-10), (0, -8), (5,-10)], LineWidth=1,LineColor="Red",FillColor="Red",InForeground=True)
 			self.Canvas.AddObject(self.arrow)
@@ -205,7 +205,9 @@ class winStarMap(winBase):
 			points = getpath(self.application, object)
 			if points:
 				self.path = self.Create(object, Line(scale(points), LineColor="Blue", InForeground=True))
-	
+			elif object.vel != (0, 0, 0): 
+				self.path = self.Create(object, CrossLine(scale((object.pos[0:2], object.vel[0:2])), 2, LineColor="Blue", InForeground=True))
+				
 		self.Canvas.Draw()
 
 	def OnUpdateOrder(self, evt):
