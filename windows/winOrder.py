@@ -33,6 +33,7 @@ class winOrder(winBase):
 		winBase.__init__(self, application, parent, pos, size, style)
 
 		self.application = application
+		self.clipboard = None
 
 		# Create a base panel
 		base_panel = wx.Panel(self, -1)
@@ -131,17 +132,33 @@ class winOrder(winBase):
 			desc = desc.strip()
 			menu.Append(-1, od.name, desc)
 
+	def CheckClipBoard(self):
+		if self.clipboard != None:
+			for order in self.clipboard:
+				if not objects.OrderDescs().has_key(order.type):
+					return False
+
+				slot = self.type_list.FindString(objects.OrderDescs()[order.type].name)
+				if slot == wx.NOT_FOUND:
+					return False
+			return True
+		return False
+
 	def OnRightClick(self, evt):
 		slot = self.order_list.HitTest(evt.GetPosition())[0]
 		if slot != wx.NOT_FOUND:
-			self.order_list.SetSelected([slot])
-	
+			if not evt.ControlDown() and not evt.ShiftDown():
+				# Check if shift or ctrl is being held down...
+				self.order_list.SetSelected([slot])
+			else:
+				self.order_list.AddSelected(slot)
+
 		id = wx.NewId()
 		menu = wx.Menu()
 		menu.SetTitle(_("Top"))
 
-		# Open the clipboard and see if it's valid...
-		nopaste = True
+		# Check to see if we can paste the stuff here...
+		nopaste = self.CheckClipBoard()
 
 		slots = self.order_list.GetSelected()
 		if len(slots) > 0:
@@ -161,19 +178,21 @@ class winOrder(winBase):
 			
 			menu.Append(-1, _("Cut"))
 			menu.Append(-1, _("Copy"))
-			
-			menu.Append(-1, _("Paste After"))
-			menu.Enable(menu.GetMenuItemCount(), nopaste)
-			menu.Append(-1, _("Paste Before"))
-			menu.Enable(menu.GetMenuItemCount(), nopaste)
+
+			if self.clipboard != None:
+				menu.Append(-1, _("Paste After"))
+				menu.Enable(menu.FindItem(_("Paste After")), nopaste)
+				menu.Append(-1, _("Paste Before"))
+				menu.Enable(menu.FindItem(_("Paste Before")), nopaste)
 		else:
 			new = wx.Menu()
 			new.SetTitle(_("New"))
 			menu.AppendMenu(-1, _("New"), new)
 			self.BuildMenu(new)
 			
-			menu.Append(-1, _("Paste"))
-			menu.Enable(menu.GetMenuItemCount(), nopaste)
+			if self.clipboard != None:
+				menu.Append(-1, _("Paste"))
+				menu.Enable(menu.FindItem(_("Paste")), nopaste)
 			
 		self.Bind(wx.EVT_MENU, self.OnOrderMenu)
 		self.PopupMenu(menu, evt.GetPosition())
@@ -188,9 +207,54 @@ class winOrder(winBase):
 		elif t == _("Cut"):
 			print "Cutting items..."
 		elif t == _("Copy"):
-			print _("Copying items...")
+			slots = self.order_list.GetSelected()
+
+			if len(slots) < 1:
+				return
+
+			self.clipboard = []
+
+			for slot in slots:
+				order = self.application.cache.orders[self.oid][slot]
+				self.clipboard.append(order)
+			
 		elif t.startswith(_("Paste")):
-			print "Pasting items..."
+			if self.CheckClipBoard() == False:
+				print "Cant paste because the orders arn't valid on this object."
+				return
+				
+			# Figure out whats out new position
+			slots = self.order_list.GetSelected()
+			if len(slots) != 0:
+				slot = slots[0] + t.endswith(_("After"))
+			else:
+				slot = -1
+			
+			if slot > self.order_list.GetItemCount():
+				slot = -1
+
+			for order in self.clipboard:
+				order = copy.copy(order)
+
+				r = self.application.connection.insert_order(self.oid, slot, order)
+				if failed(r):
+					debug(DEBUG_WINDOWS, "OrderNew: Insert failed")
+					return
+
+				if slot == -1:
+					nslot = self.order_list.GetItemCount()
+				else:
+					nslot = slot
+
+				order = self.application.connection.get_orders(self.oid, nslot)[0]
+				if failed(order):
+					debug(DEBUG_WINDOWS, "OrderNew: Get failed")
+					return
+
+				self.application.cache.orders[self.oid].insert(nslot, order)
+				self.application.cache.objects[self.oid].order_number += 1
+				
+			self.OnSelectObject(wx.local.SelectObjectEvent(self.oid))
 		else:
 			slot = self.type_list.FindString(t)
 			if slot == wx.NOT_FOUND:
@@ -199,7 +263,7 @@ class winOrder(winBase):
 			self.type_list.SetSelection(slot)
 			
 			if menu.GetTitle() == _("Before"):
-				self.OnOrderNew(None, extra=-1)
+				self.OnOrderNew(None, after=False)
 			else:
 				self.OnOrderNew(None)
 
@@ -261,7 +325,7 @@ class winOrder(winBase):
 
 		self.BuildPanel(order)
 
-	def OnOrderNew(self, evt, extra=1):
+	def OnOrderNew(self, evt, after=True):
 		type = self.type_list.GetSelection()
 		if type == wx.NOT_FOUND:
 			debug(DEBUG_WINDOWS, "OrderNew: No order type selected for new.")
@@ -272,12 +336,12 @@ class winOrder(winBase):
 		# Append a new order to the list below the currently selected one
 		slots = self.order_list.GetSelected()
 		if len(slots) != 0:
-			slot = slots[0] + extra
+			slot = slots[0] + after
 		else:
-			slot = 0
+			slot = -1
 		
-		if slot < 0:
-			slot = 0
+		if slot > self.order_list.GetItemCount():
+			slot = -1
 		
 		try:
 			orderdesc = objects.OrderDescs()[type]
@@ -308,7 +372,10 @@ class winOrder(winBase):
 		if failed(r):
 			debug(DEBUG_WINDOWS, "OrderNew: Insert failed")
 			return
-					
+
+		if slot == -1:
+			slot = self.order_list.GetItemCount()
+
 		order = self.application.connection.get_orders(self.oid, slot)[0]
 		if failed(order):
 			debug(DEBUG_WINDOWS, "OrderNew: Get failed")

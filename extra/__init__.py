@@ -123,6 +123,8 @@ class wxListCtrl(wx.ListCtrlOrig, wx.lib.mixins.listctrl.ListCtrlAutoWidthMixin,
 		for slot in slots:
 			self.SetItemState(slot, wx.LIST_STATE_SELECTED, wx.LIST_STATE_SELECTED)
 		
+	def AddSelected(self, slot):
+		self.SetItemState(slot, wx.LIST_STATE_SELECTED, wx.LIST_STATE_SELECTED)
 
 wx.ChoiceOrig = wx.Choice
 class wxChoice(wx.Choice, ToolTipItemMixIn):
