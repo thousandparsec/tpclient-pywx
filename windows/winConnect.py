@@ -14,7 +14,7 @@ from netlib import failed
 from winBase import *
 from utils import *
 
-defaultServers = ["127.0.0.1:6923"]
+defaultServers = ["127.0.0.1:6924","127.0.0.1:6923"]
 
 ID_OK = 10043
 ID_CANCEL = 10044

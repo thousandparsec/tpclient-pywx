@@ -37,7 +37,7 @@ def getpath(application, object):
 	orders = application.cache.orders[object.id]
 	points = [object.pos[0:2]]
 	for order in orders:
-		if isinstance(order, Move):
+		if order.type == 1:
 			points += [order.pos[0:2]]
 					
 	if len(points) > 1:
@@ -96,7 +96,7 @@ class winStarMap(winBase):
 				if isinstance(object, Fleet):
 					points = getpath(application, object)
 					if points:
-						C(object, Line(points, LineColor="Grey"), as="path")
+						C(object, Line(scale(points), LineColor="Grey"), as="path")
 
 					# Draw the ship
 					ship = PolyNoSize([(0,0), (3,0), (0,4), (0,2), (-3,0)], LineWidth=1,LineColor="Blue",FillColor="Blue")
@@ -152,7 +152,7 @@ class winStarMap(winBase):
 		if isinstance(object, Fleet):
 			points = getpath(self.application, object)
 			if points:
-				self.path = self.Create(object, Line(points, LineColor="Blue", InForeground=True))
+				self.path = self.Create(object, Line(scale(points), LineColor="Blue", InForeground=True))
 	
 		self.Canvas.Draw()
 
@@ -166,13 +166,13 @@ class winStarMap(winBase):
 		if isinstance(object, Fleet):
 			points = getpath(self.application, object)
 			if points:
-				self.path = self.Create(object, Line(points, LineColor="Blue", InForeground=True))
+				self.path = self.Create(object, Line(scale(points), LineColor="Blue", InForeground=True))
 		
 			if evt.save:
 				# Need to update the grey line as well
-				self.Canvas.RemoveObject(self.cache[evt.id]["path"])
-
-				self.Create(object, Line(points, LineColor="Grey"), as="path")
+				if points:
+					self.Canvas.RemoveObject(self.cache[evt.id]["path"])
+					self.Create(object, Line(scale(points), LineColor="Grey"), as="path")
 
 				self.Canvas.RemoveObject(self.cache[evt.id]["icon"])
 				self.Canvas.AddObject(self.cache[evt.id]["icon"])

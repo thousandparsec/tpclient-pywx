@@ -135,6 +135,8 @@ class winSystem(winBase):
 		
 		if hasattr(object, "contains"):
 			for id in object.contains:
+				if not self.application.cache.objects.has_key(id):
+					continue
 				new = self.application.cache.objects[id]
 				temp = self.Add(new_root, new, selected_id)
 

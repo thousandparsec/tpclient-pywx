@@ -11,11 +11,11 @@ import wx
 import wx.lib.anchors
 
 # Local Imports
-from netlib import failed
 from winBase import *
 from utils import *
 
 # Protocol Imports
+from netlib import failed
 from netlib import objects
 from netlib.objects import OrderDescs, constants
 
@@ -142,6 +142,7 @@ class winOrder(winBase):
 		for slot in range(0, object.order_number):
 			order = self.application.cache.orders[self.oid][slot]
 
+			print order
 			self.order_list.InsertStringItem(slot, "")
 			self.order_list.SetStringItem(slot, TURNS_COL, str(order.turns))
 			self.order_list.SetStringItem(slot, ORDERS_COL, order.__class__.__name__)
@@ -205,7 +206,7 @@ class winOrder(winBase):
 			debug(DEBUG_WINDOWS, "OrderNew: Insert failed")
 			return
 					
-		order = self.application.connection.get_orders(self.oid, slot)
+		order = self.application.connection.get_orders(self.oid, slot)[0]
 		if failed(order):
 			debug(DEBUG_WINDOWS, "OrderNew: Get failed")
 			return
@@ -271,7 +272,7 @@ class winOrder(winBase):
 			debug(DEBUG_WINDOWS, "OrderSave: Insert failed.")
 			return
 		
-		order = self.application.connection.get_orders(self.oid, slot)
+		order = self.application.connection.get_orders(self.oid, slot)[0]
 		if failed(order):
 			debug(DEBUG_WINDOWS, "OrderSave: Get failed.")
 			return

@@ -6,7 +6,7 @@ Messages are displayed using basic HTML.
 """
 
 # Python Imports
-from copy import deepcopy
+from sets import Set
 
 # wxPython Imports
 import wx
@@ -16,13 +16,8 @@ import wx.lib.anchors
 # Local Imports
 from winBase import *
 
-class wxMessage:
-
-	def render(self):
-		# Render the message, first you need to convert the <link> to wx objects
-
-		# Then return the real HTML stuff
-		pass
+# Protocol Imports
+from netlib import failed
 
 MESSAGE_FILTER = 10000
 MESSAGE_TITLE = 10001
@@ -39,7 +34,7 @@ MESSAGE_DEL = 10009
 class winMessage(winBase):
 	title = "Messages"
 	
-	def __init__(self, application, parent, pos=wx.DefaultPosition, size=wx.DefaultSize, style=wx.DEFAULT_FRAME_STYLE, message_list=[]):
+	def __init__(self, application, parent, pos=wx.DefaultPosition, size=wx.DefaultSize, style=wx.DEFAULT_FRAME_STYLE):
 		winBase.__init__(self, application, parent, pos, size, style|wx.TAB_TRAVERSAL)
 
 		panel = wx.Panel(self, -1)
@@ -51,25 +46,19 @@ class winMessage(winBase):
 		item0.AddGrowableRow( 1 )
 
 		item1 = wx.FlexGridSizer( 0, 3, 0, 0 )
-		item1.AddGrowableCol( 0 )
 		item1.AddGrowableCol( 1 )
-		item1.AddGrowableCol( 2 )
 
-		item2 = wx.CheckBox( panel, MESSAGE_FILTER, "Filter", wx.DefaultPosition, wx.DefaultSize, 0 )
-		item2.SetFont(wx.local.normalFont)
-		item1.AddWindow( item2, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 1 )
+		self.filter = wx.CheckBox( panel, MESSAGE_FILTER, "Filter", wx.DefaultPosition, wx.local.buttonSize, 0 )
+		self.filter.SetFont(wx.local.normalFont)
+		item1.AddWindow( self.filter, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 1 )
 
-		item3 = wx.StaticText( panel, MESSAGE_TITLE, "Title", wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_CENTRE )
-		item3.SetFont(wx.local.normalFont)
-		item1.AddWindow( item3, 0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
+		self.title = wx.StaticText( panel, MESSAGE_TITLE, "Title", wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_CENTRE|wx.ST_NO_AUTORESIZE )
+		self.title.SetFont(wx.local.normalFont)
+		item1.AddWindow( self.title, 0, wx.GROW|wx.ALIGN_CENTRE_HORIZONTAL|wx.ALL, 1 )
 
-		self.obj['title'] = item3
-
-		item4 = wx.StaticText( panel, MESSAGE_ID, "# of #", wx.DefaultPosition, wx.DefaultSize, 0 )
-		item4.SetFont(wx.local.normalFont)
-		item1.AddWindow( item4, 0, wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 1 )
-
-		self.obj['counter'] = item4
+		self.counter = wx.StaticText( panel, MESSAGE_ID, "# of #", wx.DefaultPosition, wx.local.buttonSize, 0 )
+		self.counter.SetFont(wx.local.normalFont)
+		item1.AddWindow( self.counter, 0, wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 1 )
 
 		item0.AddSizer( item1, 0, wx.GROW|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 1 )
 
@@ -83,34 +72,37 @@ class winMessage(winBase):
 
 		self.html = item6
 		self.html.SetFonts("Swiss", "Courier", [4, 6, 8, 10, 12, 14, 16])
-		self.html.SetPage(self.nomessage)
+		self.html.SetPage("")
 
 		item7 = wx.BoxSizer( wx.VERTICAL )
 
+		prev = wx.Button( panel, -1, "Prev", wx.DefaultPosition, wx.local.buttonSize)
+		prev.SetFont(wx.local.normalFont)
+		item7.AddWindow( prev, 0, wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 1 )
+		self.Bind(wx.EVT_BUTTON, self.MessagePrev, prev)
 
-		item8 = wx.Button( panel, MESSAGE_PREV, "Prev", wx.DefaultPosition, wx.local.buttonSize, 0 )
-		item8.SetFont(wx.local.normalFont)
-		item7.AddWindow( item8, 0, wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 1 )
+		goto = wx.Button( panel, -1, "Goto", wx.DefaultPosition, wx.local.buttonSize)
+		goto.SetFont(wx.local.normalFont)
+		item7.AddWindow( goto, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
 
-		item9 = wx.Button( panel, MESSAGE_GOTO, "Goto", wx.DefaultPosition, wx.local.buttonSize, 0 )
-		item9.SetFont(wx.local.normalFont)
-		item7.AddWindow( item9, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
-
-		item10 = wx.Button( panel, MESSAGE_NEXT, "Next", wx.DefaultPosition, wx.local.buttonSize, 0 )
-		item10.SetFont(wx.local.normalFont)
-		item7.AddWindow( item10, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
+		next = wx.Button( panel, -1, "Next", wx.DefaultPosition, wx.local.buttonSize)
+		next.SetFont(wx.local.normalFont)
+		item7.AddWindow( next, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
+		self.Bind(wx.EVT_BUTTON, self.MessageNext, next)
 
 		item11 = wx.StaticLine( panel, MESSAGE_LINE, wx.DefaultPosition, wx.Size(20,-1), wx.LI_HORIZONTAL )
 		item11.Enable(False)
 		item7.AddWindow( item11, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
 
-		item12 = wx.Button( panel, MESSAGE_NEW, "New", wx.DefaultPosition, wx.local.buttonSize, 0 )
-		item12.SetFont(wx.local.normalFont)
-		item7.AddWindow( item12, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
+		new = wx.Button( panel, -1, "New", wx.DefaultPosition, wx.local.buttonSize)
+		new.SetFont(wx.local.normalFont)
+		item7.AddWindow( new, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
+		self.Bind(wx.EVT_BUTTON, self.MessageNew, new)
 
-		item13 = wx.Button( panel, MESSAGE_DEL, "Delete", wx.DefaultPosition, wx.local.buttonSize, 0 )
-		item13.SetFont(wx.local.normalFont)
-		item7.AddWindow( item13, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
+		delete = wx.Button( panel, -1, "Delete", wx.DefaultPosition, wx.local.buttonSize)
+		delete.SetFont(wx.local.normalFont)
+		item7.AddWindow( delete, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
+		self.Bind(wx.EVT_BUTTON, self.MessageDelete, delete)
 
 		item5.AddSizer( item7, 0, wx.GROW|wx.ALIGN_RIGHT|wx.ALL, 1 )
 
@@ -125,67 +117,49 @@ class winMessage(winBase):
 		self.SetSize(size)
 		self.SetPosition(pos)
 
-		# Contains the messages
-		self.messages = []
-		# The current message
-		self.current = 0
+		# The current message slot
+		self.slot = 0
+
 		# Contains the message types to be filtered
-		self.filter = []
+		self.filtered = Set()
 
-		self.MessageSet([])
-
-	filtered = """\
+	html_filtered = """\
 <html>
 <body>
 <center>
-	<table COLS=1 WIDTH="100%" BACKGROUND="./graphics/filtered.png">
+	<table cols=1 width="100%%" background="./graphics/filtered.png">
 		<tr>
-			<td><b>From:</b> %s</td>
+			<td><b>Subject:</b> %(subject)s</td>
 		</tr>
 		<tr>
-			<td><b>Subject:</b> %s</td>
-		</tr>
-		<tr>
-			<td>Related: %s</td>
-		</tr>
-		<tr>
-			<td>%s</td>
+			<td>%(body)s</td>
 		</tr>
 	</table>
 </center>
 </body>
 </html>"""
 
-	message = """\
+	html_message = """\
 <html>
 <body>
 <center>
-	<table COLS=1 WIDTH="100%">
+	<table cols=1 width="100%%">
 		<tr>
-			<td><b>From:</b> %s</td>
+			<td><b>Subject:</b> %(subject)s</td>
 		</tr>
 		<tr>
-			<td><b>Subject:</b> %s</td>
-		</tr>
-		<tr>
-			<td>Related: %s</td>
-		</tr>
-		<tr>
-			<td>%s</td>
+			<td>%(body)s</td>
 		</tr>
 	</table>
 </center>
 </body>
 </html>"""
 
-	nomessage = """\
+	html_nomessage = """\
 <html>
 <body>
 <center>
-	<table COLS=1 WIDTH="100%">
-		<tr>
-			<td><b>From:</b> SYSTEM</td>
-		</tr>
+	<table cols=1 width="100%">
 		<tr>
 			<td><b>Subject:</b> You are unloved!
 		</tr>
@@ -193,9 +167,8 @@ class winMessage(winBase):
 			<td>
 			You have recived no messages this turn!<br><br>
 			Actually if you didn't recive any messages it most proberly
-			means that your results file is missing so your client
-			couldn't load it. Check that you have a results file and
-			reload/restart the client.
+			means that your client couldn't load the results from the server.
+			Try reload/restart the client.
 			</td>
 		</tr>
 	 </table>
@@ -203,14 +176,11 @@ class winMessage(winBase):
 </body>
 </html>"""
 
-	allfiltered = """\
+	html_allfiltered = """\
 <html>
 <body>
 <center>
-	<table COLS=1 WIDTH="100%">
-		<tr>
-			<td><b>From:</b> SYSTEM</td>
-		</tr>
+	<table cols=1 width="100%" background="./graphics/filtered.png">
 		<tr>
 			<td><b>Subject:</b> All messages filtered
 		</tr>
@@ -222,77 +192,122 @@ class winMessage(winBase):
 </body>
 </html>"""
 
-	def MessageSet(self, list):
+	def OnCacheUpdate(self, evt=None):
+		self.BoardSet(0)
 
-		# Updates the bits and pieces
-		self.messages = deepcopy(list)
+	def BoardSet(self, id):
+		self.bid = id
+		messages = self.application.cache.messages[self.bid]
 
-		# If no messages display this text
-		if len(self.messages) == 0:
-			self.html.SetPage(self.nomessage)
-			self.obj['title'].SetLabel("No messages")
-			self.obj['counter'].SetLabel("%i of %i" % (0, 0))
-			return
+		# Figure out the first non-filter message
+		slot = -1
+		for i in range(0, len(messages)):
+			message = messages[i]
+			if self.filtered > Set(message.types):
+				continue
+			else:
+				slot = i
+				break
 
-		# Else get a message
-		count = 0
-		for message in self.messages:
-			if message.type not in self.filter:
-				self.current = count
-				# FIXME: Set the title to something intresting
-				self.obj['title'].SetLabel("")
-				self.obj['counter'].SetLabel("%i of %i" % (self.current, len(self.messages)))
-				self.html.SetPage(self.message % message.render())
-				return
-			count += 1
+		# Set that message as the current
+		self.MessageSet(slot)
+	
+	def MessageSet(self, slot):
+		messages = self.application.cache.messages[self.bid]
 
-		self.html.SetPage(self.allfiltered)
-		return
-
-	def MessageNext(self):
-		# Check we arn't at the last message
-		if self.current >= len(self.messages):
-			self.current = len(self.messages)-1
-			return
-
-		# Cycle through message list until we get to our one
-		count = 0
-		for message in self.messages[self.current:]:
-			if message.type not in self.filter:
-				self.current += count
-				self.obj['counter'].SetLabel("%i of %i" % (self.current, len(self.messages)))
-				self.html.SetPage(self.messages % message.render())
-				return
-			count += 1
-		
-	def MessagePrev(self):
-		# Check we arn't at the last message
-		if self.current <= 0:
-			self.current = len(self.messages)-1
-			return
-		
-		# Cycle through message list until we get to our one
-		count = self.current
-		while count >= 0:
-			if self.messages[count].type not in self.filter:
-				self.current = count
-				self.html.SetPage(self.message % self.messages[count].render())
-				self.obj['counter'].SetLabel("%i of %i" % (self.current, len(self.messages)))
-				return
-			count -= 1
-		
-	def MessageGoto(self, no):
-		if no > len(self.messages) or no < 0:
-			return
-
-		if self.message.type in self.filter:
-			html = self.filtered
+		if slot >= len(messages) or slot < 0:
+			self.slot = -1
 		else:
-			html = self.message
+			self.slot = slot
+			
+		if self.slot == -1:
+			# Is it because we filtered the messages?
+			if len(messages) == 0:
+				message_subject = "No messages"
+				message_body = self.html_nomessage
+			else:
+				message_subject = "All filtered"
+				message_body = self.html_allfiltered
+				
+			message_filter = False
+		else:
+			message = messages[self.slot]
 
-		self.current = no
-		self.obj['counter'].SetLabel("%i of %i" % (self.current, len(self.messages)))
-		self.html.SetPage(html % self.messages[no].render())
+			if self.filtered > Set(message.types):
+				html = self.html_filtered
+				message_filter = True
+			else:
+				html = self.html_message
+				message_filter = False
+				
+			message_subject = message.subject
+			message_body = html % message.__dict__
 
+		self.filter.SetValue(message_filter)
+		self.title.SetLabel(message_subject)
+		self.counter.SetLabel("%i of %i" % (self.slot+1, len(messages)))
+		self.html.SetPage(message_body)
+
+	def MessageNext(self, evt=None):
+		print "Going to next message..."
+		messages = self.application.cache.messages[self.bid]
+
+		# Find next non-filter message
+		slot = self.slot
+		for i in range(slot+1, len(messages)):
+			message = messages[i]
+			if self.filtered > Set(message.types):
+				print "Slot %i filtered" % i
+				continue
+			else:
+				print "Using %i" % i
+				slot = i
+				break
+
+		# Set that message as the current
+		self.MessageSet(slot)
+
+	def MessagePrev(self, evt=None):
+		print "Going to previous message..."
+		messages = self.application.cache.messages[self.bid]
+
+		# Find next non-filter message
+		slot = self.slot
+		for i in range(slot-1, -1, -1):
+			message = messages[i]
+			if self.filtered > Set(message.types):
+				continue
+			else:
+				slot = i
+				break
+
+		# Set that message as the current
+		self.MessageSet(slot)
+		
+	def MessageDelete(self, evt=None):
+		# Get the current slot
+		slot = self.slot
+
+		if slot == -1:
+			return
+
+		# Remove the order
+		r = self.application.connection.remove_messages(self.bid, slot)
+		if failed(r):
+			debug(DEBUG_WINDOWS, "MessageDelete: Remove failed!")
+			return
+
+		del self.application.cache.messages[self.bid][slot]
+		# FIXME: self.application.cache.boards[self.bid].number -= 1
+
+		self.MessagePrev()
+
+	def MessageGoto(self, slot):
+		messages = self.application.cache.messages[self.bid]
+		self.MessageSet(slot-1)
+
+	def MessageNew(self, evt=None):
+		pass
+	
 	def MessageFilter(self):
 		pass

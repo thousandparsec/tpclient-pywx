@@ -8,6 +8,7 @@ import extra.fixdc
 # Python Imports
 from math import *
 from copy import *
+from types import *
 
 import string
 import pprint
@@ -17,6 +18,7 @@ import sys
 sys.path.append("..")
 
 from netlib import Connection
+from netlib import failed
 
 from utils import *
 from config import *
@@ -114,10 +116,17 @@ password = "%(password)s"
 		self.cache = Blank()
 		self.cache.objects = {}
 		self.cache.orders = {}
+		self.cache.boards = {}
+		self.cache.messages = {}
 
+		# Download objects
 		objects = self.connection.get_objects(0)
 		while len(objects) > 0:
 			object = objects.pop(0)
+			
+			if failed(object):
+				print object
+				continue
 			
 			self.cache.objects[object.id] = object
 			
@@ -129,13 +138,45 @@ password = "%(password)s"
 			if object.order_number == 0:
 				orders = []
 			if object.order_number == 1:
-				orders = [self.connection.get_orders(object.id, range(0, object.order_number))]
+				if hasattr(orders, "__getitem__"):
+					orders = self.connection.get_orders(object.id, range(0, object.order_number))
+				else:
+					orders = [self.connection.get_orders(object.id, range(0, object.order_number))]
 			else:
 				orders = self.connection.get_orders(object.id, range(0, object.order_number))
 
 			self.cache.orders[object.id] = list(orders)
 			progress.Update(len(self.cache.objects.keys()))
-		
+
+		# Download any order descriptions not already downloaded
+		descs = []
+		while True:
+			descs.append(self.connection.get_orderdescs(len(descs))[0])
+
+			if not failed(descs[-1]):
+				descs[-1].register()
+			else:
+				break
+
+		# Download message boards
+		boards = self.connection.get_boards(0)
+		if not failed(boards):
+			board = boards[0]
+			# Download the messages from this board
+			if board.number == 0:
+				messages = []
+			if board.number == 1:
+				messages = self.connection.get_messages(board.id, range(0, board.number))
+				if not hasattr(messages, "__getitem__"):
+					messages = [messages]
+				else:
+					messages = list(messages)
+			else:
+				messages = self.connection.get_messages(board.id, range(0, board.number))
+			self.cache.messages[board.id] = list(messages)
+		else:
+			self.cache.messages[0] = []
+
 		progress.Update(100)
 		self.windows.Post(wx.local.CacheUpdateEvent())
 
