@@ -1,4 +1,6 @@
 
+import time
+
 class ChildBeforeParent(Exception):
 	pass
 
@@ -47,6 +49,36 @@ class Universe:
 			return self.map[id]
 		except:
 			return None
+
+class DescHolder:
+	"""\
+	The holder of the descriptions.
+	"""
+	def __init__(self):
+		# Register for object informations
+		self.o = {}
+
+	def OrderDescIDs(self):
+		return self.o.keys()
+
+	def OrderDescs(self):
+		return self.o.values()
+		
+	def OrderDesc(self, id):
+		try:
+			# Check to see if I have the order
+			if not self.o.has_key(id):
+				return None
+
+			return self.o[id]
+		except:
+			return None
+
+	def OrderDescAdd(self, object):
+		self.o[object.id] = object
+
+	def __del__(self):
+		print self.o
 
 class UniverseObject:
 	"""\

@@ -86,7 +86,8 @@ ORDER_LIST = 10010
 ORDER_LINE = 10011
 ORDER_NEW = 10012
 ORDER_DELETE = 10013
-ORDER_EDIT = 10014
+ID_ORDERTYPE = 10014
+ORDER_EDIT = 10015
 
 def panelOrders( parent, call_fit = true, set_sizer = true ):
     item0 = wxFlexGridSizer( 0, 1, 0, 0 )
@@ -110,15 +111,19 @@ def panelOrders( parent, call_fit = true, set_sizer = true ):
 
     item0.AddSizer( item3, 0, wxALIGN_CENTRE|wxALL, 5 )
 
-    item6 = wxStaticLine( parent, ORDER_LINE, wxDefaultPosition, wxSize(20,-1), wxLI_HORIZONTAL )
+    item6 = wxChoice( parent, ID_ORDERTYPE, wxDefaultPosition, wxSize(100,-1), 
+        ["ChoiceItem"] , 0 )
     item0.AddWindow( item6, 0, wxALIGN_CENTRE|wxALL, 5 )
 
-    item7 = wxFlexGridSizer( 0, 2, 0, 0 )
-    
-    item8 = parent.FindWindowById( ORDER_EDIT )
-    item7.AddWindow( item8, 0, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 5 )
+    item7 = wxStaticLine( parent, ORDER_LINE, wxDefaultPosition, wxSize(20,-1), wxLI_HORIZONTAL )
+    item0.AddWindow( item7, 0, wxALIGN_CENTRE|wxALL, 5 )
 
-    item0.AddSizer( item7, 0, wxGROW|wxALIGN_CENTER_HORIZONTAL|wxALL, 5 )
+    item8 = wxFlexGridSizer( 0, 2, 0, 0 )
+    
+    item9 = parent.FindWindowById( ORDER_EDIT )
+    item8.AddWindow( item9, 0, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 5 )
+
+    item0.AddSizer( item8, 0, wxGROW|wxALIGN_CENTER_HORIZONTAL|wxALL, 5 )
 
     if set_sizer == true:
         parent.SetAutoLayout( true )
@@ -129,13 +134,13 @@ def panelOrders( parent, call_fit = true, set_sizer = true ):
     
     return item0
 
-OBJ_PICT = 10015
-OBJ_LINE = 10016
-OBJ_ICON = 10017
-OBJ_NAME = 10018
-OBJ_PANEL = 10019
-OBJ_NEXT = 10020
-OBJ_PREV = 10021
+OBJ_PICT = 10016
+OBJ_LINE = 10017
+OBJ_ICON = 10018
+OBJ_NAME = 10019
+OBJ_PANEL = 10020
+OBJ_NEXT = 10021
+OBJ_PREV = 10022
 
 def panelObject( parent, call_fit = true, set_sizer = true ):
     item0 = wxFlexGridSizer( 1, 0, 0, 0 )
@@ -191,11 +196,11 @@ def panelObject( parent, call_fit = true, set_sizer = true ):
     
     return item0
 
-OBJ_SHIP_FUELSLD = 10022
-OBJ_SHIP_FUEL = 10023
-OBJ_SHIP_CARGOSLD = 10024
-OBJ_SHIP_CARGO = 10025
-OBJ_SHIP_CON = 10026
+OBJ_SHIP_FUELSLD = 10023
+OBJ_SHIP_FUEL = 10024
+OBJ_SHIP_CARGOSLD = 10025
+OBJ_SHIP_CARGO = 10026
+OBJ_SHIP_CON = 10027
 
 def panelObject_Ship( parent, call_fit = true, set_sizer = true ):
     item0 = wxFlexGridSizer( 0, 1, 0, 0 )
@@ -239,18 +244,18 @@ def panelObject_Ship( parent, call_fit = true, set_sizer = true ):
     
     return item0
 
-OBJ_PLT_TEXT = 10027
-OBJ_PLT_POP = 10028
-OBJ_PLT_LINE = 10029
-OBJ_PLT_HAB = 10030
-OBJ_PLT_GRAV = 10031
-OBJ_PLT_RAD = 10032
-OBJ_PLT_TEMP = 10033
-OBJ_PLT_FACT = 10034
-OBJ_PLT_MINE = 10035
-OBJ_PLT_DEFNO = 10036
-OBJ_PLT_SCAN = 10037
-OBJ_PLT_DEF = 10038
+OBJ_PLT_TEXT = 10028
+OBJ_PLT_POP = 10029
+OBJ_PLT_LINE = 10030
+OBJ_PLT_HAB = 10031
+OBJ_PLT_GRAV = 10032
+OBJ_PLT_RAD = 10033
+OBJ_PLT_TEMP = 10034
+OBJ_PLT_FACT = 10035
+OBJ_PLT_MINE = 10036
+OBJ_PLT_DEFNO = 10037
+OBJ_PLT_SCAN = 10038
+OBJ_PLT_DEF = 10039
 
 def panelObject_Planet( parent, call_fit = true, set_sizer = true ):
     item0 = wxFlexGridSizer( 0, 1, 0, 0 )
@@ -371,12 +376,12 @@ def panelObject_Planet( parent, call_fit = true, set_sizer = true ):
     
     return item0
 
-ID_TEXT = 10039
-ID_HOST = 10040
-ID_USERNAME = 10041
-ID_PASSWORD = 10042
-ID_OK = 10043
-ID_CANCEL = 10044
+ID_TEXT = 10040
+ID_HOST = 10041
+ID_USERNAME = 10042
+ID_PASSWORD = 10043
+ID_OK = 10044
+ID_CANCEL = 10045
 
 def panelConnect( parent, call_fit = true, set_sizer = true ):
     item0 = wxBoxSizer( wxVERTICAL )
@@ -435,7 +440,7 @@ def panelConnect( parent, call_fit = true, set_sizer = true ):
     
     return item0
 
-ID_NOTEBOOK = 10045
+ID_NOTEBOOK = 10046
 
 def panelConfig( parent, call_fit = true, set_sizer = true ):
     item0 = wxBoxSizer( wxHORIZONTAL )
@@ -462,14 +467,14 @@ def panelConfig( parent, call_fit = true, set_sizer = true ):
     
     return item0
 
-ID_SPLASH = 10046
-ID_AUTOCONNECT = 10047
-ID_TIPS = 10048
-ID_AUTOSERVER = 10049
-ID_AUTOUSERNAME = 10050
-ID_AUTOPASSWORD = 10051
-ID_SAVE = 10052
-ID_REVERT = 10053
+ID_SPLASH = 10047
+ID_AUTOCONNECT = 10048
+ID_TIPS = 10049
+ID_AUTOSERVER = 10050
+ID_AUTOUSERNAME = 10051
+ID_AUTOPASSWORD = 10052
+ID_SAVE = 10053
+ID_REVERT = 10054
 
 def panelConfigStartup( parent, call_fit = true, set_sizer = true ):
     item0 = wxBoxSizer( wxVERTICAL )
@@ -538,14 +543,14 @@ def panelConfigStartup( parent, call_fit = true, set_sizer = true ):
     
     return item0
 
-ID_MESSAGE = 10054
-ID_CHECKBOX = 10055
-ID_RAISE = 10056
-ID_RADIOBOX = 10057
-ID_XPOS = 10058
-ID_YPOS = 10059
-ID_WIDTH = 10060
-ID_HEIGHT = 10061
+ID_MESSAGE = 10055
+ID_CHECKBOX = 10056
+ID_RAISE = 10057
+ID_RADIOBOX = 10058
+ID_XPOS = 10059
+ID_YPOS = 10060
+ID_WIDTH = 10061
+ID_HEIGHT = 10062
 
 def panelConfigWindows( parent, call_fit = true, set_sizer = true ):
     item0 = wxBoxSizer( wxVERTICAL )
@@ -633,27 +638,65 @@ def panelConfigWindows( parent, call_fit = true, set_sizer = true ):
     
     return item0
 
+ID_X = 10063
+ID_Y = 10064
+ID_Z = 10065
+ID_PICKPOS = 10066
+
+def argPos( parent, call_fit = true, set_sizer = true ):
+    item0 = wxBoxSizer( wxHORIZONTAL )
+    
+    item1 = wxStaticText( parent, ID_TEXT, "X", wxDefaultPosition, wxDefaultSize, 0 )
+    item0.AddWindow( item1, 0, wxALIGN_CENTRE|wxALL, 5 )
+
+    item2 = wxSpinCtrl( parent, ID_X, "0", wxDefaultPosition, wxSize(50,-1), wxSP_WRAP, 0, 100, 0 )
+    item0.AddWindow( item2, 0, wxALIGN_CENTRE|wxALL, 5 )
+
+    item3 = wxStaticText( parent, ID_TEXT, "Y", wxDefaultPosition, wxDefaultSize, 0 )
+    item0.AddWindow( item3, 0, wxALIGN_CENTRE|wxALL, 5 )
+
+    item4 = wxSpinCtrl( parent, ID_Y, "0", wxDefaultPosition, wxSize(50,-1), wxSP_WRAP, 0, 100, 0 )
+    item0.AddWindow( item4, 0, wxALIGN_CENTRE|wxALL, 5 )
+
+    item5 = wxStaticText( parent, ID_TEXT, "Z", wxDefaultPosition, wxDefaultSize, 0 )
+    item0.AddWindow( item5, 0, wxALIGN_CENTRE|wxALL, 5 )
+
+    item6 = wxSpinCtrl( parent, ID_Z, "0", wxDefaultPosition, wxSize(50,-1), wxSP_WRAP, 0, 100, 0 )
+    item0.AddWindow( item6, 0, wxALIGN_CENTRE|wxALL, 5 )
+
+    item7 = wxButton( parent, ID_PICKPOS, "PP", wxDefaultPosition, wxSize(30,-1), 0 )
+    item0.AddWindow( item7, 0, wxALIGN_CENTRE|wxALL, 5 )
+
+    if set_sizer == true:
+        parent.SetAutoLayout( true )
+        parent.SetSizer( item0 )
+        if call_fit == true:
+            item0.Fit( parent )
+            item0.SetSizeHints( parent )
+    
+    return item0
+
 # Menubar functions
 
-ID_NEW_GAME = 10062
-ID_NEW_RACE = 10063
-ID_NEW = 10064
-ID_MENU = 10065
-ID_OPEN = 10066
-ID_CLOSE = 10067
-ID_LOADTURN = 10068
-ID_GENTURN = 10069
-ID_EXIT = 10070
-ID_FILE = 10071
-ID_STAT_EAAG = 10072
-ID_STAT_SYSTEM = 10073
-ID_STAT_PLANET = 10074
-ID_STAT_FLEET = 10075
-ID_STAT_BATTLE = 10076
-ID_STATS = 10077
-ID_WIN_STARMAP = 10078
-ID_WIN = 10079
-ID_HELP = 10080
+ID_NEW_GAME = 10067
+ID_NEW_RACE = 10068
+ID_NEW = 10069
+ID_MENU = 10070
+ID_OPEN = 10071
+ID_CLOSE = 10072
+ID_LOADTURN = 10073
+ID_GENTURN = 10074
+ID_EXIT = 10075
+ID_FILE = 10076
+ID_STAT_EAAG = 10077
+ID_STAT_SYSTEM = 10078
+ID_STAT_PLANET = 10079
+ID_STAT_FLEET = 10080
+ID_STAT_BATTLE = 10081
+ID_STATS = 10082
+ID_WIN_STARMAP = 10083
+ID_WIN = 10084
+ID_HELP = 10085
 
 def MainMenu():
     item0 = wxMenuBar()

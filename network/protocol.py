@@ -360,7 +360,7 @@ class OrderDesc(Processed):
 	def __str__(self):
 		output = Processed.__str__(self)
 		output += xpack(OrderDesc.struct,
-							self.type,
+							self.id,
 							self.name,
 							self.desc,
 							self.parameters)
@@ -369,9 +369,9 @@ class OrderDesc(Processed):
 	def SetData(self, data):
 		# Type
 		output, trash = unxpack(OrderDesc.struct, data)
-		self.type, self.name, self.desc, self.parameters = output
+		self.id, self.name, self.desc, self.parameters = output
 
-		OrderDesc.orders[self.type] = self
+		OrderDesc.orders[self.id] = self
 
 	def get_struct(self):
 		# Build a struct defenition for this order.

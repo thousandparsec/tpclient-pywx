@@ -29,7 +29,6 @@ class AppTP(wxApp):
 		config = load_data("main")
 
 		if not config:
-			# Create some default positioning, good for 1024x768 on linux
 			config = Blank()
 	
 	def OnInit(self):
@@ -38,19 +37,19 @@ class AppTP(wxApp):
 		self.connected = FALSE
 		self.logined = FALSE
 		
-		# Startup the Game
-		try:
-			self.game = GameThread()
-			thread.start_new_thread(self.game, ())
-		except:
-			do_traceback()
-
 		# Startup the Network
 		try:
 			self.network = NetworkThread()
 			thread.start_new_thread(self.network, ())
 
 			self.network.WinConnect(self)
+		except:
+			do_traceback()
+
+		# Startup the Game
+		try:
+			self.game = GameThread()
+			thread.start_new_thread(self.game, ())
 		except:
 			do_traceback()
 
@@ -136,6 +135,7 @@ class AppTP(wxApp):
 					pass
 			else:
 				# Now we are logged in okay just pass everything on to the game engine
+				print "Pushing evt", evt
 				self.game.OnPacket(evt)
 		
 		finally:

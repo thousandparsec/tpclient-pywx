@@ -21,6 +21,7 @@ class MainControl:
 			config = Blank()
 			config.main = Blank()
 			config.message = Blank()
+			config.order = Blank()
 			config.starmap = Blank()
 			config.system = Blank()
 
@@ -42,6 +43,10 @@ class MainControl:
 			config.message.size = (middle, 200)
 			config.message.show = TRUE
 
+			config.order.pos = (0, 55)
+			config.order.size = (middle, map_height-55-padding*4)
+			config.order.show = TRUE
+
 			config.starmap.pos = (middle+padding, 0)
 			config.starmap.size = (map_width-padding, map_height-padding*2)
 			config.starmap.show = TRUE
@@ -61,13 +66,16 @@ class MainControl:
 		config.main.show = self.main.IsShown()
 		config.message.pos = self.message.GetPositionTuple()
 		config.message.size = self.message.GetSizeTuple()
-		config.message.show = self.main.IsShown()
+		config.message.show = self.message.IsShown()
+		config.order.pos = self.order.GetPositionTuple()
+		config.order.size = self.order.GetSizeTuple()
+		config.order.show = self.order.IsShown()
 		config.starmap.pos = self.starmap.GetPositionTuple()
 		config.starmap.size = self.starmap.GetSizeTuple()
-		config.starmap.show = self.main.IsShown()
+		config.starmap.show = self.starmap.IsShown()
 		config.system.pos = self.system.GetPositionTuple()
 		config.system.size = self.system.GetSizeTuple()
-		config.system.show = self.main.IsShown()
+		config.system.show = self.system.IsShown()
 
 		save_data("windows", config)
 
@@ -78,6 +86,8 @@ class MainControl:
 		self.main.SetSize(config.main.size)
 		self.message.SetPosition(config.message.pos)
 		self.message.SetSize(config.message.size)
+		self.order.SetPosition(config.order.pos)
+		self.order.SetSize(config.order.size)
 		self.starmap.SetPosition(config.starmap.pos)
 		self.starmap.SetSize(config.starmap.size)
 		self.system.SetPosition(config.system.pos)
@@ -86,6 +96,7 @@ class MainControl:
 		if show:
 			self.main.Show(config.main.show)
 			self.message.Show(config.message.show)
+			self.order.Show(config.order.show)
 			self.starmap.Show(config.starmap.show)
 			self.system.Show(config.system.show)
 
@@ -100,6 +111,7 @@ class MainControl:
 		from windows.winConnect import winConnect
 		from windows.winMain    import winMain
 		from windows.winMessage import winMessage
+		from windows.winOrder	import winOrder
 		from windows.winStarMap import winStarMap
 		from windows.winSystem  import winSystem
 
@@ -112,7 +124,9 @@ class MainControl:
 		self.connect = winConnect(app, -1, None)
 		
 		self.message = winMessage(app, self.main, config.message.pos, config.message.size)
-		
+	
+		self.order = winOrder(app, self.main, config.order.pos, config.order.size)
+	
 		self.starmap = winStarMap(app, self.main, config.starmap.pos, config.starmap.size)
 		self.system = winSystem(app, self.main, config.system.pos, config.system.size)
 
@@ -124,6 +138,7 @@ class MainControl:
 		"""
 		self.system.Raise()
 		self.message.Raise()
+		self.order.Raise()
 		self.starmap.Raise()
 		self.main.Raise()
 
@@ -137,6 +152,7 @@ class MainControl:
 		config = self.config
 		self.main.Show(config.main.show)
 		self.message.Show(config.message.show)
+		self.order.Show(config.order.show)
 		self.starmap.Show(config.starmap.show)
 		self.system.Show(config.system.show)
 
@@ -149,12 +165,14 @@ class MainControl:
 		"""
 		self.main.Show(FALSE)
 		self.message.Show(FALSE)
+		self.order.Show(FALSE)
 		self.starmap.Show(FALSE)
 		self.system.Show(FALSE)
 
 	def PostEvent(self, evt):
 		wxPostEvent(self.main, evt)
 		wxPostEvent(self.message, evt)
+		wxPostEvent(self.order, evt)
 		wxPostEvent(self.starmap, evt)
 		wxPostEvent(self.system, evt)
 

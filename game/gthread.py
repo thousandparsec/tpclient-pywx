@@ -23,6 +23,7 @@ class GameThread:
 		self.windows = []
 
 		self.universe = Universe()
+		self.descs = DescHolder()
 
 	def WinConnect(self, window):
 		"""\
@@ -68,6 +69,14 @@ class GameThread:
 					
 						g = protocol.ObjectGet(id=id)
 						evt.network.Send(g)
+			
+			for id in new.orders_valid:
+				g = protocol.OrderDescGet(id=id)
+				evt.network.Send(g)
+		
+		elif isinstance(evt.value, protocol.OrderDesc):
+			new = copy.deepcopy(evt.value)
+			self.descs.OrderDescAdd(new)
 
 	def __call__(self):
 		"""\
