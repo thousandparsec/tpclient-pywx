@@ -4,7 +4,8 @@ include COPYING
 include AUTHORS
 include var/config
 include graphics/*.png
-include graphics/media/planet-small/*.png
-include graphics/media/star-small/*.png
+include graphics/media/planet-small/*.jpg
+include graphics/media/star-small/*.jpg
 prune Makefile
 prune setup.py
+prune graphics/sidebar.bmp

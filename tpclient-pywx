@@ -12,7 +12,7 @@ except ImportError:
 
 if intversion < 2050000:
 	print "Your version of wxPython is too old. You will not be able to run pywx-client."
-	print "You have version", version
+	print "You have version", intversion
 	print "You need version atleast", [2, 5, 0, 0]
 	import sys
 	sys.exit(1)
@@ -69,18 +69,19 @@ class AppTP(wx.App):
 	def __init__(self):
 		wx.App.__init__(self)
 
-		try:
-			print "AppTp.OnInit.AllImageHandlers"
-			wx.InitAllImageHandlers()
-			
-			self.config = self.ConfigLoad()
-			
-			print "AppTp.OnInit.windows"
-			self.windows = MainControl(self)
+		if wx.Platform == '__WXMSW__':
+			class Null(object):
+				def write(self, *args, **kw):
+					pass
+				def flush(self, *args, **kw):
+					pass
+			sys.stdout = Null()
 
-			print "AppTp.OnInit.connection"
+		try:
+			wx.InitAllImageHandlers()
+			self.config = self.ConfigLoad()
+			self.windows = MainControl(self)
 			self.connection = Connection()
-		
 			splash = Splash(self)
 			splash.Show()
 
@@ -216,6 +217,7 @@ password = "%(password)s"
 if __name__ == '__main__':
 	try:
 		app = AppTP()
+		
 		app.MainLoop()
 	finally:
 		do_traceback()

@@ -27,8 +27,10 @@ Short Term
 		* Order List Items (DONE)
 		* Order Type Items (DONE - as far as wx will let me)
 	* Allow tooltips to be disabled in the config
+	* Right Click on orders lets you insert
 
-	* Better default positioning of windows
+	* Better default positioning of windows (DONE)
+		* Have better default position for a wide range of configurations
 
 	* Add starting tips
 	* Allow starting tips to be disabled in the config

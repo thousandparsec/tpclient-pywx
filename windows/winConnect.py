@@ -12,10 +12,10 @@ import wx
 # Local Imports
 from tp.netlib import failed
 
-from winBase import *
+from winBase import winBaseMixIn
 from utils import *
 
-defaultServers = ["127.0.0.1:6924","127.0.0.1:6923"]
+defaultServers = ["mithro.dyndns.org", "code-bear.dyndns.org", "127.0.0.1:6923"]
 
 ID_OK = 10043
 ID_CANCEL = 10044
@@ -23,10 +23,13 @@ ID_CANCEL = 10044
 from lang.en.winConnect import *
 
 # Shows messages from the game system to the player.
-class winConnect(wx.Frame):
-	def __init__(self, application, ID, \
-			title=None, pos=wx.DefaultPosition, size=wx.DefaultSize, style=wx.DEFAULT_FRAME_STYLE, message_list=[]):
-		wx.Frame.__init__(self, None, ID, 'TP: Connect', pos, size, style|wx.TAB_TRAVERSAL)
+class winConnect(wx.Frame, winBaseMixIn):
+	title = "Connect"
+
+	def __init__(self, application, 
+			pos=wx.DefaultPosition, size=wx.DefaultSize, style=wx.DEFAULT_FRAME_STYLE):
+		wx.Frame.__init__(self, None, -1, 'TP: ' + self.title, pos, size, style)
+		winBaseMixIn.__init__(self, application, None, pos, size, style)
 
 		self.application = application
 

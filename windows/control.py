@@ -27,17 +27,17 @@ class MainControl:
 				config.main.size = (1024, 768)
 				config.main.show = True
 				
-				config.info.pos = (1,75)
-				config.info.size = (425, 176)
+				config.info.pos = (0,0)
+				config.info.size = (425, 175)
 				config.info.show = True
 				
-				config.message.pos = (1, 578)
-				config.message.size = (396, 163)
-				config.message.show = True
-
-				config.order.pos = (1, 251)
+				config.order.pos = (0, 176)
 				config.order.size = (213, 327)
 				config.order.show = True
+
+				config.message.pos = (0, 504)
+				config.message.size = (396, 163)
+				config.message.show = True
 
 				config.starmap.pos = (426, 0)
 				config.starmap.size = (600, 523)
@@ -47,7 +47,7 @@ class MainControl:
 				config.system.size = (257, 218)
 				config.system.show = True
 			
-				config.raise_ = "All on All" 
+				config.raise_ = "Individual" 
 				
 			else:
 				# Create some default positioning, good for 1024x768 on linux
@@ -59,13 +59,13 @@ class MainControl:
 				config.info.size = (425, 176)
 				config.info.show = True
 				
-				config.message.pos = (1, 578)
-				config.message.size = (396, 163)
-				config.message.show = True
-
 				config.order.pos = (1, 251)
 				config.order.size = (213, 327)
 				config.order.show = True
+
+				config.message.pos = (1, 578)
+				config.message.size = (396, 163)
+				config.message.show = True
 
 				config.starmap.pos = (426, 0)
 				config.starmap.size = (600, 523)
@@ -137,7 +137,7 @@ class MainControl:
 		# Load the windows
 		##########
 		from windows.winConnect import winConnect
-		self.connect = winConnect(application, -1, None)
+		self.connect = winConnect(application)
 
 		from windows.winMain    import winMain
 		self.main = winMain(application, config.main.pos, config.main.size)
@@ -147,6 +147,7 @@ class MainControl:
 
 		from windows.winConfig  import winConfig
 		self.winconfig = winConfig(application, self.main)
+		self.winconfig.Show(False)
 
 		from windows.winMessage import winMessage
 		self.message = winMessage(application, self.main, config.message.pos, config.message.size)

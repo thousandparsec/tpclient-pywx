@@ -74,6 +74,7 @@ class winSystem(winBase):
 
 		self.icons = {}
 		self.icons['Blank'] = wx.Image("graphics/blank-icon.png").ConvertToBitmap()
+		self.icons['Root'] = wx.Image("graphics/tp-icon.png").ConvertToBitmap()
 		self.icons['Container'] = wx.Image("graphics/link-icon.png").ConvertToBitmap()
 		self.icons['StarSystem'] = wx.Image("graphics/system-icon.png").ConvertToBitmap()
 		self.icons['Fleet'] = wx.Image("graphics/ship-icon.png").ConvertToBitmap()
@@ -129,7 +130,7 @@ class winSystem(winBase):
 		new_root = None
 		
 		if root == None:
-			new_root = self.tree.AddRoot("Known Universe", self.icons['Blank'])
+			new_root = self.tree.AddRoot("Known Universe", self.icons['Root'])
 		else:
 			if object != None:
 				if self.icons.has_key(object.__class__.__name__):

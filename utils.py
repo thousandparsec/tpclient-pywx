@@ -11,6 +11,8 @@ def do_traceback():
 	
 	type, val, tb = sys.exc_info()
 	sys.stderr.write(string.join(traceback.format_exception(type, val, tb), ''))
+	if hasattr(sys.stderr, "flush"):
+		sys.stderr.flush()
 	lasts = (type, val, tb)
 
 DEBUG_NETWORK = "NETWORK:"

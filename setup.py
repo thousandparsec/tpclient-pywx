@@ -2,6 +2,7 @@
 
 import os
 import os.path
+import shutil
 
 import glob
 
@@ -9,35 +10,51 @@ from distutils.core import setup
 try:
 	import py2exe
 
-	from py2exe.build_exe import py2exe as build_exe
-	class new_py2exe(build_exe): 
-		def create(self, pathname=os.path.join("dist", "pywx-client.iss")):
-			self.pathname = pathname
-			self.file = open(pathname, "w")
-			self.file.write("; WARNING: This script has been created by py2exe. Changes to this script\n")
-			self.file.write("; will be overwritten the next time py2exe is run!\n")
-			self.file.write("[Setup]\n")
-	
 except ImportError:
-	class new_py2exe:
-		pass
+	pass
 
 from __init__ import version
 version = "%s.%s.%s" % version
 
-if os.path.exists('CVS'):
-	base = ['LICENSE', 'COPYING']
-	for file in base:
-		if os.path.exists(file):
-			os.unlink(file)
-		print "Getting %s" % file
-		if hasattr(os, "link"):
-			os.link(os.path.join('..', file), file)
+def link(a, b):
+	if os.path.isdir(a):
+		if hasattr(os, "symlink"):
+			os.symlink(a, b)
 		else:
-			import shutil
-			shutil.copy(os.path.join('..', file), file)
+			shutil.copytree(a, b)
+	else:
+		if hasattr(os, "symlink"):
+			os.link(a, b)
+		else:
+			shutil.copy(a, b)
+
+def unlink(a):
+	if os.path.isdir(a) and not os.path.islink(a):
+		shutil.rmtree(a)
+	else:
+		os.unlink(a)
+
+if os.path.exists('CVS'):
+	base = [ \
+		(os.path.join('..', 'LICENSE'), 'LICENSE'),
+		(os.path.join('..', 'COPYING'), 'COPYING'),
+		(os.path.join('..', 'media'), os.path.join('graphics', 'media')),
+	]
+
+	for afile, bfile in base:
+		afile, bfile = os.path.abspath(afile), os.path.abspath(bfile)
+		try:
+			unlink(bfile)
+		except OSError, e:
+			print e
+		link(afile, bfile)
+
+excludes = [\
+	"Tkconstants","Tkinter","tcl", # TK/TCL
+	"pydoc", "unittest"]
 
 setup(
+# Meta data
 	name="pywx-client",
 	version=version,
 	license="GPL",
@@ -45,13 +62,31 @@ setup(
 	author="Tim Ansell",
 	author_email="tim@thousandparsec.net",
 	url="http://www.thousandparsec.net",
+# Files to include
+	windows=[{
+		"script": "main.py",
+		"icon_resources": [(1, "graphics/icon.ico")],
+	}],
+	scripts=["main.py"],
 	packages=[ \
 		'.',
 		'windows',
 		'extra',
 		'extra.wxFloatCanvas',
 		],
-	windows=["main.py"], scripts=["main.py"],
-	cmdclass = {"py2exe": new_py2exe}, 
-	options = {"py2exe": { "dll_excludes": ["wxbase251h_net_vc.dll"] }}, 
+	data_files=[(".",			("LICENSE", "COPYING", "README")),
+				("var",			glob.glob("var/config")),
+				("graphics",	glob.glob("graphics/*.png")),
+				("graphics/media/planet-small",		glob.glob("graphics/media/planet-small/*.jpg")),
+				("graphics/media/star-small",		glob.glob("graphics/media/star-small/*.jpg")),
+	],
+# Py2EXE stuff
+	options={"py2exe": { \
+		"dll_excludes": [], \
+		"excludes": excludes, \
+		"packages": ["tp.netlib"], \
+		"optimize": 2,
+		"compressed": 0,
+		}}, 
 )
+

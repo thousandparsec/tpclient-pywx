@@ -5,6 +5,7 @@ and raising all the other windows when one is clicked.
 """
 
 import wx
+import os.path
 
 class Blank:
 	pass
@@ -45,6 +46,10 @@ class winBaseMixIn:
 
 		self.application = application
 		self.parent = parent
+
+		_icon = wx.EmptyIcon()
+		_icon.CopyFromBitmap(wx.Bitmap(os.path.join("graphics", "icon.ico"), wx.BITMAP_TYPE_ANY))
+		self.SetIcon(_icon)
 
 		self.Bind(wx.EVT_ACTIVATE, self.OnRaise)
 		self.Bind(wx.EVT_CLOSE, self.OnProgramExit)
