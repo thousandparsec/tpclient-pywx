@@ -15,7 +15,7 @@ from tp.netlib import failed
 from winBase import winBaseMixIn
 from utils import *
 
-defaultServers = ["mithro.dyndns.org", "code-bear.dyndns.org", "127.0.0.1:6923"]
+defaultServers = ["mithro.dyndns.org", "code-bear.dyndns.org", "llnz.dyndns.org", "127.0.0.1:6923"]
 
 ID_OK = 10043
 ID_CANCEL = 10044
@@ -140,7 +140,7 @@ class winConnect(wx.Frame, winBaseMixIn):
 
 		dlg = None
 		try:
-			application.connection.setup(host=host, port=port, debug=False)
+			application.connection.setup(host=host, port=port, debug=True)
 			progress.Update(1)
 			
 			print "Connect...",
