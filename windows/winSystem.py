@@ -25,6 +25,7 @@ class winSystem(winBase):
 
 				# make an image list
 				self.il = wxImageList(16, 16)
+				self.il.Add(wxImage("graphics/blank.png").ConvertToBitmap())
 				for i in self.icons.keys():
 					self.icons[i] = self.il.Add(self.icons[i])
 
