@@ -8,12 +8,16 @@ from copy import *
 
 import string
 import pprint
+import thread
 
 # setup the path for the common stuff
 import sys
 sys.path.append("..")
 
 from network import protocol
+from network.thread import network_thread
+from network.events import *
+
 from utils import *
 
 from UserDict import UserDict
@@ -117,6 +121,7 @@ if __name__ == '__main__':
 
 			self.windows = mainControl(self)
 			self.connected = FALSE
+			self.logined = FALSE
 
 			# If autoconnect
 			if FALSE:
@@ -130,40 +135,62 @@ if __name__ == '__main__':
 			
 			return TRUE
 			
-		def Connect(self, host, username, password):
-			temp = string.split(host, ":", 1)
-
-			if len(temp) == 1:
-				self.host = host
-				self.port = 6923
-			else:
-				self.host, self.port = temp
-				self.port = int(self.port)
-			
-			self.socket = protocol.connect(self.host, self.port)
-	
-			if not self.socket:
-				raise SocketError("Server is overloaded or busy! Please try again later.")
-
+		def ConnectTo(self, host, port, username, password):
+		
 			self.username = username
 			self.password = password
+			
+			if not self.connected or self.host != host or self.port == port:
+				self.host = host
+				self.port = port
+				
+				self.socket = protocol.create_socket(self.host, self.port)
+				if not self.socket:
+					self.windows.connect.OnConnection(None)
+					return
+			
+				self.network = network_thread([self, self.windows.connect])
+				args = tuple([self.socket])
+				thread.start_new_thread(self.network, args)
+			
+				EVT_NETWORK_PACKET(self, self.OnPacket)
 
-			l = protocol.Login(username=username, password=password)
-			self.socket.send(str(l))
-			r = protocol.readpacket(self.socket)
-
-			pprint.pprint(l)
-			pprint.pprint(str(l))
-			pprint.pprint(r)
-			pprint.pprint(str(r))
-
-			if isinstance(r, protocol.Ok):
-				self.connected = TRUE
-				return TRUE
-			elif isinstance(r, protocol.Fail):
-				raise Exception("The username/password is bad")
+				c = protocol.Connect()
+				self.socket.send(str(c))
+			
 			else:
-				raise Exception("The server returned a bad response.")
+				# Just resend the username/password
+				self.Login()
+
+		def Login(self):
+			l = protocol.Login(username=self.username, password=self.password)
+			self.socket.send(str(l))
+					
+		def OnPacket(self, event):
+			if not self.connected:
+				# Check to see if this is our success packet
+				if isinstance(event.value, protocol.Ok):
+					# Yay we connected okay!
+					self.connected = TRUE
+					
+					# Now we should login
+					self.Login()
+					
+				elif isinstance(event.value, protocol.Fail):
+					# Ekk the server is busy
+					pass
+				else:
+					raise SocketError("The server sent an unknown packet")
+			elif not self.logined:
+				if isinstance(event.value, protocol.Ok):
+					# Yay we connected okay!
+					self.logined = TRUE
+				else:
+					# We failed to login :( username/password is most proberly bad.
+					pass
+			else:
+				# Hrm do nothing for now..
+				pass
 
 		def Exit(self):
 			sys.exit(1)

@@ -1,6 +1,11 @@
 
 from wxPython.wx import *
+
+from network import protocol
+from network.events import *
 from utils import *
+
+from wxPython.lib.evtmgr import eventManager
 
 defaultServers = ["127.0.0.1:6923","code-bear.dyndns.org:6923","mithro.dyndns.org:6923"] 
 
@@ -81,26 +86,6 @@ class winConnect(wxFrame):
 		EVT_BUTTON(self, ID_CANCEL, self.OnCancel)
 		EVT_CLOSE(self, self.OnExit)
 
-	def OnOkay(self, event):
-		# Check the host and username arn't blank
-		
-		#self.parent.connected = TRUE
-
-		host = self.obj['host'].GetValue()
-		username = self.obj['username'].GetValue()
-		password = self.obj['password'].GetValue()
-
-		if host != "" and username != "":
-
-			try:
-				self.parent.Connect(host, username, password)
-			
-				# We connected successfully
-				self.OnExit(event)
-			except:
-				# Pop-up a dialog telling us why it didn't succed.
-				do_traceback()
-	
 	def OnCancel(self, event):
 		self.OnExit(event)
 
@@ -112,3 +97,79 @@ class winConnect(wxFrame):
 		else:
 			# Exit then
 			self.parent.Exit()
+			
+	def OnOkay(self, event):
+		host = self.obj['host'].GetValue()
+		username = self.obj['username'].GetValue()
+		password = self.obj['password'].GetValue()
+
+		if host != "" and username != "":
+
+			try:
+				temp = string.split(host, ":", 1)
+
+				if len(temp) == 1:
+					host = host
+					port = 6923
+				else:
+					host, port = temp
+					port = int(port)
+
+				eventManager.Register(self.OnConnection, EVT_NETWORK_PACKET, self)
+				
+				self.progress = wxProgressDialog("TP: Connecting to Server",
+												"Thousand Parsec is now attempting to connect to the specified server",
+												5,
+												self,
+												wxPD_APP_MODAL | wxPD_AUTO_HIDE)
+												
+				self.parent.ConnectTo(host, port, username, password)
+				self.progress.Update(1)
+				
+			except:
+				# Pop-up a dialog telling us why it didn't succed.
+				do_traceback()
+
+	def OnConnection(self, event):
+		eventManager.DeregisterListener(self.OnConnection)
+
+		if event != None and isinstance(event.value, protocol.Ok):
+			eventManager.Register(self.OnLogin, EVT_NETWORK_PACKET, self)
+			self.progress.Update(2)
+		else:
+			# Oh no! we didn't connect!
+			self.progress.Update(5)
+
+			dlg = wxMessageDialog(self, 'The connection failed, this could be because,\n' +
+										'the server could be busy,\n' +
+										'the server doesn\'t exist.\n' +
+										'Please try again later.',
+										'TP: Connection Failed',
+			   						wxOK | wxICON_INFORMATION)
+			dlg.Show(TRUE)
+
+	def OnLogin(self, event):
+		self.progress.Update(3)
+		
+		if isinstance(event.value, protocol.Ok):
+			eventManager.DeregisterListener(self.OnLogin)
+			
+			self.progress.Update(4)
+			
+			self.OnExit(None)
+			
+			self.progress.Update(5)
+		elif isinstance(event.value, protocol.Fail):
+			# Show a message box
+			self.progress.Update(5)
+			
+			dlg = wxMessageDialog(self, 'Failed to connect, this could be because,\n' +
+										'the server could be busy,\n' +
+										'your username and password could be incorrect.\n' +
+										'Please try again.',
+										'TP: Bad Username or Password',
+			   						wxOK | wxICON_INFORMATION)
+
+			dlg.Show(TRUE)
+			# Disable the host selection box
+			self.obj['host'].Enable(FALSE)

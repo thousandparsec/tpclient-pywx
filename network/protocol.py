@@ -137,9 +137,16 @@ def readpacket(s):
 
 	return h
 
-def connect(address, port):
+def create_socket(address, port):
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	s.connect((address, port))
+	try:
+		s.connect((address, port))
+		return s
+	except:
+		return None
+
+def connect(address, port):
+	s = create_socket(address, port)
 
 	packet = Header()
 	packet.type = CONNECT
