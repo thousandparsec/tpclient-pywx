@@ -16,6 +16,13 @@ LOGIN=2
 FAIL=3
 GETOBJ=4
 OBJ=5
+GETORD=5
+ORD=6
+ADDORD=6
+RMORD=7
+GETOUT=8
+OUT=9
+
 
 X = 0
 Y = 1
@@ -176,22 +183,21 @@ class Object(Processed):
 		self.contains = contains
 
 	struct1="!LL"
-	struct2="!Q 3q 3q 3q L"
+	struct2="!Q 3q 3q 3q"
 	struct3="!L"
 
 	def __str__(self):
 		output = Processed.__str__(self)
 		output += pack(Object.struct1, self.id, self.type)
-		output += prep_string(self.name)
+		output += pack_string(self.name)
 		output += pack(Object.struct2, self.size, 
 						self.pos[X], self.pos[Y], self.pos[Z],
 						self.vel[X], self.vel[Y], self.vel[Z],
-						self.accel[X], self.accel[Y], self.accel[Z],
-						len(self.contains))
+						self.accel[X], self.accel[Y], self.accel[Z])
 
-		for id in self.contains:
-			output += pack(Object.struct3, id)
-
+		output += pack_idlist(self.contains)
+		output += pack_idlist(self.valid_orders)
+		
 		return output
 
 	def SetData(self, data):
@@ -201,11 +207,11 @@ class Object(Processed):
 		data = data[calcsize(Object.struct1):]
 		
 		# Extra the name
-		self.name, data = unprep_string(data)
+		self.name, data = unpack_string(data)
 		
 		# Second bit
 		struct2_data = data[0:calcsize(Object.struct2)]
-		s, px, py, pz, vx, vy, vz, ax, ay, az, lc = unpack(Object.struct2, struct2_data)
+		s, px, py, pz, vx, vy, vz, ax, ay, az = unpack(Object.struct2, struct2_data)
 		self.size = s
 		self.pos = (px, py, pz)
 		self.vel = (vx, vy, vz)
@@ -213,12 +219,18 @@ class Object(Processed):
 		data = data[calcsize(Object.struct2):]
 		
 		# Contains ID's
-		struct3_size = calcsize(Object.struct3)
-		contains = []
-		for i in range(0, lc*struct3_size, struct3_size):
-			contains.append(unpack(Object.struct3, data[i:i+struct3_size])[0])
-		self.contains = contains
+		self.contains, data = unpack_idlist(data)
 
+		# Valid orders
+		self.valid_orders, data = unpack_idlist(data)
+
+		self.num_orders = unpack(Object.struct3, data[0:calcsize(Object.struct3)])
+		data = data[0:calcsize(Object.struct3)]
+
+		# Check to see if we have any data left, if so we have stuffed up
+#		if len(data) > 0:
+#			raise "Leftover data was found, something went wrong!"
+			
 
 class Login(Processed):
 	"""\
@@ -242,7 +254,7 @@ class Login(Processed):
 		self.password = password
 
 	def __str__(self):
-		temp = prep_string(self.username) + prep_string(self.password)
+		temp = pack_string(self.username) + pack_string(self.password)
 		self.length = len(temp)
 		output = Processed.__str__(self)
 		output += temp
@@ -250,10 +262,43 @@ class Login(Processed):
 		return output
 
 	def SetData(self, data):
-		username, data = unprep_string(data)
-		password, data = unprep_string(data)
+		username, data = unpack_string(data)
+		password, data = unpack_string(data)
 
-def unprep_string(s):
+
+
+def pack_idlist(list):
+	"""\
+	Packs the id list so it can be send.
+	"""
+
+	# The length
+	output = pack("!L", len(list))
+
+	# The list
+	for id in list:
+		output += pack("!L", id)
+		
+	return output
+
+def unpack_idlist(s):
+	"""\
+	Returns the first string from the input data and any remaining data
+	"""
+
+	size = calcsize("!L")
+
+	length = unpack("!L", s[0:size])[0]
+	s = s[size:]
+	
+	list = []
+	for i in range(0, length*size, size):
+		list.append(unpack("!L", s[i:i+size])[0])
+	s = s[length*size:]
+	
+	return list, s
+
+def unpack_string(s):
 	"""\
 	Returns the first string from the input data and any remaining data
 	"""
@@ -270,22 +315,30 @@ def unprep_string(s):
 	else:
 		return "", s
 
-def prep_string(s):
+def pack_string(s):
 	"""\
 	Prepares a string to be send out on a wire.
 	
-	It appends the string length to the beginning, adds a null terminator and padds the string to a 32 bit boundry.
+	It appends the string length to the beginning, adds a 
+	null terminator and padds the string to a 32 bit boundry.
 	"""
 	temp = s + "\0"
 	return pad(pack("!I", len(temp)) + temp)
 
 def pad(s):
 	"""\
-	Pads a string with null characters untill it gets to a 32 bit boundry
+	Pads a string with null characters untill it gets to a
+	32 bit boundry
 	"""
 	if len(s) % 4 != 0:
 		s += "\0" * (4 - (len(s) % 4))
 	return s
+
+
+
+
+
+
 
 def read_packet(s):
 	"""\
@@ -343,6 +396,8 @@ def get_contains(r):
 		s.send(str(g))
 		r = read_packet(s)
 		pprint.pprint(r)
+		print "Contains:", r.contains
+		print "Valid orders:", r.valid_orders
 		pprint.pprint(str(r))
 		
 		get_contains(r)
