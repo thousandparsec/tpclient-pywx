@@ -152,6 +152,8 @@ class MainControl:
 			self.starmap.Show(config.starmap.show)
 			self.system.Show(config.system.show)
 
+		self.windesign.Show(True)
+
 	def __init__(self, application):
 
 		self.application = application
@@ -175,6 +177,10 @@ class MainControl:
 		self.winconfig = winConfig(application, self.main)
 		self.winconfig.Show(False)
 
+		from windows.winDesign  import winDesign
+		self.windesign = winDesign(application, self.main)
+		self.windesign.Show(False)
+		
 		from windows.winMessage import winMessage
 		self.message = winMessage(application, self.main, config.message.pos, config.message.size)
 
