@@ -15,7 +15,7 @@ import sys
 sys.path.append("..")
 
 from network import protocol
-from network.thread import network_thread
+from network.nthread import network_thread
 from network.events import *
 
 from utils import *
@@ -165,32 +165,35 @@ if __name__ == '__main__':
 		def Login(self):
 			l = protocol.Login(username=self.username, password=self.password)
 			self.socket.send(str(l))
-					
+
 		def OnPacket(self, event):
-			if not self.connected:
-				# Check to see if this is our success packet
-				if isinstance(event.value, protocol.Ok):
-					# Yay we connected okay!
-					self.connected = TRUE
+			try:
+				if not self.connected:
+					# Check to see if this is our success packet
+					if isinstance(event.value, protocol.Ok):
+						# Yay we connected okay!
+						self.connected = TRUE
 					
-					# Now we should login
-					self.Login()
+						# Now we should login
+						self.Login()
 					
-				elif isinstance(event.value, protocol.Fail):
-					# Ekk the server is busy
-					pass
+					elif isinstance(event.value, protocol.Fail):
+						# Ekk the server is busy
+						pass
+					else:
+						raise SocketError("The server sent an unknown packet")
+				elif not self.logined:
+					if isinstance(event.value, protocol.Ok):
+						# Yay we connected okay!
+						self.logined = TRUE
+					else:
+						# We failed to login :( username/password is most proberly bad.
+						pass
 				else:
-					raise SocketError("The server sent an unknown packet")
-			elif not self.logined:
-				if isinstance(event.value, protocol.Ok):
-					# Yay we connected okay!
-					self.logined = TRUE
-				else:
-					# We failed to login :( username/password is most proberly bad.
+					# Hrm do nothing for now..
 					pass
-			else:
-				# Hrm do nothing for now..
-				pass
+			finally:
+				self.network.next()
 
 		def Exit(self):
 			sys.exit(1)

@@ -134,7 +134,6 @@ class winConnect(wxFrame):
 				do_traceback()
 
 	def OnConnection(self, event):
-		self.parent.network.lock()
 		try:
 			eventManager.DeregisterListener(self.OnConnection)
 
@@ -154,30 +153,35 @@ class winConnect(wxFrame):
 				   						wxOK | wxICON_INFORMATION)
 				dlg.Show(TRUE)
 		finally:
-			self.parent.network.unlock()
+			if hasattr(self.parent, "network") and self.parent.network.locked():
+				self.parent.network.next()
 
 	def OnLogin(self, event):
-		self.progress.Update(3)
+		try:
+			self.progress.Update(3)
 		
-		if isinstance(event.value, protocol.Ok):
-			eventManager.DeregisterListener(self.OnLogin)
+			if isinstance(event.value, protocol.Ok):
+				eventManager.DeregisterListener(self.OnLogin)
 			
-			self.progress.Update(4)
+				self.progress.Update(4)
 			
-			self.OnExit(None)
+				self.OnExit(None)
 			
-			self.progress.Update(5)
-		elif isinstance(event.value, protocol.Fail):
-			# Show a message box
-			self.progress.Update(5)
-			
-			dlg = wxMessageDialog(self, 'Failed to connect, this could be because,\n' +
-										'the server could be busy,\n' +
-										'your username and password could be incorrect.\n' +
-										'Please try again.',
-										'TP: Bad Username or Password',
-			   						wxOK | wxICON_INFORMATION)
+				self.progress.Update(5)
+			elif isinstance(event.value, protocol.Fail):
+				# Show a message box
+				self.progress.Update(5)
+				
+				dlg = wxMessageDialog(self, 'Failed to connect, this could be because,\n' +
+											'the server could be busy,\n' +
+											'your username and password could be incorrect.\n' +
+											'Please try again.',
+											'TP: Bad Username or Password',
+				   						wxOK | wxICON_INFORMATION)
 
-			dlg.Show(TRUE)
-			# Disable the host selection box
-			self.obj['host'].Enable(FALSE)
+				dlg.Show(TRUE)
+				# Disable the host selection box
+				self.obj['host'].Enable(FALSE)
+
+		finally:
+			self.parent.network.next()
