@@ -1,6 +1,10 @@
 
 from FloatCanvas import Polygon
-import Numeric
+
+try:
+	import Numeric
+except ImportError:
+	import numarray as Numeric
 
 class PolyNoSize(Polygon):
 	def _Draw(self, dc, WorldToPixel, ScaleWorldToPixel, HTdc=None):
