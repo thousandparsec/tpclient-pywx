@@ -386,7 +386,7 @@ class OrderDesc(Processed):
 
 		for name, type, desc in self.parameters:
 			if type == self.ARG_COORD:
-				struct += "LLL "
+				struct += "qqq "
 			elif type == self.ARG_TIME:
 				struct += "I "
 			elif type == self.ARG_OBJECT:

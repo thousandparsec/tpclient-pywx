@@ -65,6 +65,7 @@ def get_contains(s, r):
 					args += [1]
 
 			go = apply(OrderAdd, args)
+			print "Send Args:", go.args
 			send(s, go)
 			ro = recv(s)
 		
@@ -80,6 +81,7 @@ def get_contains(s, r):
 			gl = OrderGet(oid=i, slot=slot)
 			send(s, gl)
 			rl = recv(s)
+			print "Got Args:", rl.args
 
 		# Remove the orders
 		l = range(0, r.orders_no)
@@ -98,22 +100,7 @@ def get_contains(s, r):
 
 		get_contains(s, r)
 
-import curses
-
-def main(stdsrc):
-	print "Peanut"
-
-if __name__ == "__main__":
-#	if sys.argv[1].lower() == "default":
-#		host, port = ("127.0.0.1", 6923)
-#	else:
-#		host, port = string.split(sys.argv[1], ':', 1)
-#		port = int(port)
-
-	curses.wrapper(main)
-
-
-def testall(self, host, port):
+def testall(host, port):
 
 	print "Connection to", host, port
 	s = connect(host, port)
@@ -134,3 +121,19 @@ def testall(self, host, port):
 	send(s, g)
 	r = recv(s)
 	get_contains(s, r)
+
+import curses
+
+def main(stdsrc):
+	print "Peanut"
+
+if __name__ == "__main__":
+	if sys.argv[1].lower() == "default":
+		host, port = ("127.0.0.1", 6923)
+	else:
+		host, port = string.split(sys.argv[1], ':', 1)
+		port = int(port)
+
+	testall(host, port)
+
+	#curses.wrapper(main)
