@@ -55,7 +55,7 @@ excludes = [\
 
 setup(
 # Meta data
-	name="pywx-client",
+	name="tpclient-pywx",
 	version=version,
 	license="GPL",
 	description="wxPython based client for Thousand Parsec",
