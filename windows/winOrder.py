@@ -11,6 +11,7 @@ import wx
 import wx.lib.anchors
 
 # Local Imports
+from netlib import failed
 from winBase import *
 from utils import *
 
@@ -184,10 +185,11 @@ class winOrder(winBase):
 					elif type == constants.ARG_PLAYER:
 						args += [0]
 
-				self.application.connection.insert_order(self.oid, orderdesc.subtype, slot, *args)
-				self.application.cache[self.oid].order_number += 1
+				if not failed(self.application.connection.insert_order(self.oid, slot, orderdesc.subtype, *args)):
+					self.application.cache[self.oid].order_number += 1
 
-				self.OnSelectObject(wx.local.SelectObjectEvent(self.oid))
+					self.OnSelectObject(wx.local.SelectObjectEvent(self.oid))
+
 			else:
 				debug(DEBUG_WINDOWS, "Have not got the orderdesc yet (%i) :(" % type)
 		else:
@@ -199,11 +201,21 @@ class winOrder(winBase):
 		# Check that something is selected in the "type" box
 		slot = self.order_list.GetNextItem(-1, wx.LIST_NEXT_ALL, wx.LIST_STATE_SELECTED)
 		if slot != wx.NOT_FOUND:
-			# Update the Panel
-			self.BuildPanel(None)
+			
+			print "Saving", slot
+			
+			# Remove the order
+			if not failed(self.application.connection.remove_orders(self.oid, slot)):
+				self.application.cache[self.oid].order_number -= 1
+
+				self.OnSelectObject(wx.local.SelectObjectEvent(self.oid))
+		
+				# Update the Panel
+				self.BuildPanel(None)
 
 	def OnOrderSave(self, evt):
 		slot = self.order_list.GetNextItem(-1, wx.LIST_NEXT_ALL, wx.LIST_STATE_SELECTED)
+		print "Saving", slot
 		if slot == wx.NOT_FOUND:
 			return
 
@@ -219,7 +231,7 @@ class winOrder(winBase):
 					if type == constants.ARG_ABS_COORD:
 						args = argCoordGet( panel )
 					elif type == constants.ARG_TIME:
-						debug(DEBUG_WINDOWS, "Argument type (ARG_TIME) not implimented yet.")
+						args = argTimeGet( panel )
 					elif type == constants.ARG_OBJECT:
 						debug(DEBUG_WINDOWS, "Argument type (ARG_OBJECT) not implimented yet.")
 					elif type == constants.ARG_PLAYER:
@@ -227,6 +239,9 @@ class winOrder(winBase):
 
 					if args:
 						setattr(order, name, args)
+					
+				if not failed(self.application.connection.insert_order(self.oid, slot, order)):
+					self.application.connection.remove_orders(self.oid, slot+1)
 
 	def OnOrderSelect(self, evt):
 		slot = self.order_list.GetNextItem(-1, wx.LIST_NEXT_ALL, wx.LIST_STATE_SELECTED)
@@ -275,8 +290,10 @@ class winOrder(winBase):
 					# Add the arguments bit
 					if type == constants.ARG_ABS_COORD:
 						subpanel = argCoordPanel( self.argument_panel, getattr(order, name) )
+					elif type == constants.ARG_TIME:
+						subpanel = argTimePanel( self.argument_panel, getattr(order, name) )
 					else:
-						subpanel = argNotImplimented( self.argument_panel, None )
+						subpanel = argNotImplimentedPanel( self.argument_panel, None )
 					
 					subpanel.SetFont(wx.local.normalFont)
 					self.argument_subpanels.append( subpanel )
@@ -325,7 +342,7 @@ Z = 2
 max = 2**31-1
 min = -1*max
 
-def argNotImplimented(parent_panel, args):
+def argNotImplimentedPanel(parent_panel, args):
 	panel = wx.Panel(parent_panel, -1)
 	item0 = wx.BoxSizer( wx.HORIZONTAL )
 
@@ -338,6 +355,23 @@ def argNotImplimented(parent_panel, args):
 
 	return panel
 						
+def argTimePanel(parent_panel, args):
+	panel = wx.Panel(parent_panel, -1)
+	item0 = wx.BoxSizer( wx.HORIZONTAL )
+
+	panel.SetSizer(item0)
+	panel.SetAutoLayout( True )
+	
+	item1 = wx.SpinCtrl( panel, -1, str(args), min=min, max=max, size=(wx.local.spinSize[0]*2, wx.local.spinSize[1]) )
+	item1.SetFont(wx.local.tinyFont)
+	item0.AddWindow( item1, 0, wx.ALIGN_CENTRE|wx.LEFT, 1 )
+	
+	return panel
+	
+def argTimeGet(panel):
+	windows = panel.GetChildren()
+	return windows[0].GetValue()
+
 def argCoordPanel(parent_panel, args):
 	print args
 

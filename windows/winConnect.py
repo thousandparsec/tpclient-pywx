@@ -3,10 +3,14 @@ This module contains the "connect" window which lets a
 person enter the server/username/password.
 """
 
+# Python imports
+import string
+
 # wxPython Imports
 import wx
 
 # Local Imports
+from netlib import failed
 from winBase import *
 from utils import *
 
@@ -109,15 +113,15 @@ class winConnect(wx.Frame):
 
 		dlg = None
 		try:
-			application.connection.setup(host=host, port=port, debug=False)
+			application.connection.setup(host=host, port=port, debug=True)
 			progress.Update(1)
 			
 			print "Connect...",
-			if application.connection.connect():
+			if not failed(application.connection.connect()):
 				progress.Update(3)
 
 				print "Login...",
-				if not application.connection.login(username, password):
+				if failed(application.connection.login(username, password)):
 					print "Login Failed"
 					dlg = wx.MessageDialog(self, TEXT_LOGIN, TITLE_LOGIN, wx.OK | wx.ICON_INFORMATION)
 			else:

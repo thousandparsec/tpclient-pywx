@@ -25,4 +25,4 @@ def debug(id, string):
 	if id in DEBUGGING:
 		print id, string
 
-
+__all__ = ['do_traceback', 'DEBUG_NETWORK', 'DEBUG_MAIN', 'DEBUG_WINDOWS', 'DEBUG_GAME', 'debug']
