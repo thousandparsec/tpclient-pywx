@@ -374,6 +374,70 @@ def panelObject_Planet( parent, call_fit = true, set_sizer = true ):
 
 # Menu bar functions
 
+ID_NEW_GAME = 10039
+ID_NEW_RACE = 10040
+ID_NEW = 10041
+ID_MENU = 10042
+ID_OPEN = 10043
+ID_SAVE = 10044
+ID_CLOSE = 10045
+ID_REVERT = 10046
+ID_LOADTURN = 10047
+ID_GENTURN = 10048
+ID_EXIT = 10049
+ID_FILE = 10050
+ID_STAT_EAAG = 10051
+ID_STAT_SYSTEM = 10052
+ID_STAT_PLANET = 10053
+ID_STAT_FLEET = 10054
+ID_STAT_BATTLE = 10055
+ID_STATS = 10056
+ID_WIN_STARMAP = 10057
+ID_WIN = 10058
+ID_HELP = 10059
+
+def MainMenu():
+    item0 = wxMenuBar()
+    
+    item1 = wxMenu( wxMENU_TEAROFF )
+    
+    item2 = wxMenu()
+    item2.Append( ID_NEW_GAME, "Game", "Start a new Game" )
+    item2.Append( ID_NEW_RACE, "Race", "Start a new Race" )
+    item1.AppendMenu( ID_NEW, "New", item2 )
+
+    item1.AppendSeparator()
+    item1.Append( ID_OPEN, "Open Game\tCtrl-O", "Open a diffrent Game" )
+    item1.Append( ID_SAVE, "Save Game\tCtrl-S", "Save this Game" )
+    item1.Append( ID_CLOSE, "Close Game\tCtrl-C", "Close this Game" )
+    item1.AppendSeparator()
+    item1.Append( ID_REVERT, "Revert Game", "Forget non-saved changes" )
+    item1.AppendSeparator()
+    item1.Append( ID_LOADTURN, "Load Turn File\tCtrl-L", "Load a turn file" )
+    item1.Append( ID_GENTURN, "Generate Turn File\tCtrl-T", "Generate a turn file" )
+    item1.AppendSeparator()
+    item1.Append( ID_EXIT, "Exit", "Exit" )
+    item0.Append( item1, "File" )
+    
+    item3 = wxMenu()
+    item3.Append( ID_STAT_EAAG, "Empire at a Glance", "" )
+    item3.AppendSeparator()
+    item3.Append( ID_STAT_SYSTEM, "Systems", "" )
+    item3.Append( ID_STAT_PLANET, "Planets", "" )
+    item3.Append( ID_STAT_FLEET, "Fleets", "" )
+    item3.AppendSeparator()
+    item3.Append( ID_STAT_BATTLE, "Battles", "" )
+    item0.Append( item3, "Statistics" )
+    
+    item4 = wxMenu()
+    item4.Append( ID_WIN_STARMAP, "TP: Starmap", "", true )
+    item0.Append( item4, "Windows" )
+    
+    item5 = wxMenu()
+    item0.Append( item5, "Help" )
+    
+    return item0
+
 # Bitmap functions
 
 

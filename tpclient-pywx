@@ -5,15 +5,44 @@ from wxPython.wx import *
 # Python Imports
 from math import *
 from copy import *
+
 # setup the path for the common stuff
 import sys
 sys.path.append("..")
 
-from windows.winStarMap import winStarMap
-from windows.winMessage import winMessage
-from windows.winSystem  import winSystem
+from UserDict import UserDict
+class NameMap(UserDict):
+	def __init__(self, dict=None):
+		self.data = {}
+		if dict is not None:
+			self.update(dict)
 
-map = message = system = None
+	def saveconfig(self, file, overwrite=1):
+		if os.path.exists(file) and overwrite:
+			os.remove(file)
+		elif os.path.exists(file):
+			raise IOError, "Mapping file (%s) already exists" % file
+		
+		f = open(file, 'w+')
+		for ID in self.data.keys():
+			f.write("%s %s\n" % (str(ID), self.data[i]) )
+
+	def loadconfig(self, file):
+		if not os.path.exists(file):
+			raise IOError, "Mapping file (%s) doesn't exist" % file
+		f = open(file)
+		input = f.read()
+		for line in string.split(input, '\n'):
+			key = string.split(line[0])[0]
+			self.data[key] = line[len(key):]
+
+	def getName(self, name):
+		if name in self.data.items():
+			for i in self.data.keys():
+				if self.data[i] == name:
+					return i
+		else:
+			raise KeyError, "No such name in this mapping"
 
 if __name__ == '__main__':
 
@@ -21,16 +50,107 @@ if __name__ == '__main__':
 		def OnInit(self):
 			wxInitAllImageHandlers()
 			
-			map = winStarMap(None, -1, None, (1024-600,0), (600-5,500))
-			map.Show(TRUE)
+			class temp:
+				pass
+
+			self.windows = temp()
 			
-			message = winMessage(map, -1, None, (0,476), (1024-600-5,200))
-			system = winSystem(map, -1, None, (1024-600,523), (600-5,187))
+			##########
+			# Inits the game information
+			##########
+			self.game = temp()
+			self.closegame()
 			
-			message.Show(TRUE)
-			system.Show(TRUE)
+			##########
+			# Load the windows
+			##########
+			from windows.winMain    import winMain
+			from windows.winStarMap import winStarMap
+			from windows.winMessage import winMessage
+			from windows.winSystem  import winSystem
+			
+			self.windows.main = winMain(self, -1, None, (0,0), (1024-600-5,50))
+			self.windows.map = winStarMap(self.windows.main, -1, None, (1024-600,0), (600-5,500))
+			self.windows.message = winMessage(self.windows.main, -1, None, (0,476), (1024-600-5,200))
+			self.windows.system = winSystem(self.windows.main, -1, None, (1024-600,523), (600-5,187))
+
+			##########
+			# Show the main window
+			##########
+			self.windows.main.Show(TRUE)
 			
 			return TRUE
+
+		def newgame(self, dir):
+			"""\
+			Start New game
+			"""
+			## Close the current game
+			self.closegame()
+
+			self.game.game = dir
+			
+			## Create a new name mapping
+			self.game.mapping = NameMap()
+			self.game.mapping.saveconfig(os.path.join(dir, "Mapping.current"))
+			
+			## Create a new known universe
+			self.game.universe = ()
+			
+
+		def closegame(self):
+			"""\
+			closes a game, no regard for saving
+			"""
+			self.game = None
+			self.turn = 0
+			self.universe = None
+			self.mapping = None
+		
+		def loadgame(self):
+			"""\
+			loads a game
+			"""
+			########
+			# Load the data files
+			########
+			# Need to load the "name mappings", ie ID to Name mappings, Name to ID
+
+			# Need to load the Known Universe
+
+			# Need to load the "current orders"
+			pass
+
+		def savegame(self):
+			"""\
+			saves a game
+			"""
+			#######
+			# Save the data files
+			#######
+			pass
+		
+		def genturn(self):
+			"""\
+			Generate a turn file
+			"""
+			pass
+		
+		def loadturn(self):
+			"""\
+			Updates the universe with the new information found in the <turn> file.
+			This also increases the known universe file to be KnownUniverse.t<no>
+			So as to not overwrite the information.
+			"""
+			pass
+
+		
+		def __del__(self):
+
+			# Save the "name mappings"
+
+			# Save the Known Universe
+			pass
 
 	app = appTP()
 	app.MainLoop()
