@@ -278,8 +278,6 @@ class winStarMap(winBase):
 
 			if isinstance(object, objects.Actual):
 
-				print object.pos[X]/zoom, object.pos[Y]/zoom
-#
 #				if self.config['Scanner']:
 #					scanner = object.GetScanner()
 #					if scanner is not None:
@@ -302,7 +300,6 @@ class winStarMap(winBase):
 #						#dc.SetLogicalFunction(wxSET)
 
 				pos = [ object.pos[X]/zoom + 1500, object.pos[Y]/zoom + 1500 ]
-				print pos
 
 				if self.config['DrawNames']:
 					tw, th = dc.GetTextExtent(object.name) 
@@ -357,6 +354,5 @@ class winStarMap(winBase):
 		
 			pos = [(pos[0] - cx/2)/px, (pos[1] - cy/2)/py]
 
-			print "---------->", pos, (cx, cy), (px, py)
 			self.canvas.Scroll(pos[0], pos[1])
 
