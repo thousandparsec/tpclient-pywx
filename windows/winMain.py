@@ -2,6 +2,9 @@
 This module contains the main menu window.
 """
 
+# Python imports
+import time
+
 # wxPython imports
 import wx
 
@@ -81,15 +84,41 @@ def create_menu(source, target):
 #	wx.EVT_MENU(source, ID_WIN_HELP,		target.OnHelp)
 	return bar
 
+class TimeStatusBar(wx.StatusBar):
+	def __init__(self, parent):
+		wx.StatusBar.__init__(self, parent, -1)
+
+		self.SetFieldsCount(2)
+		self.SetStatusWidths([-3, -1])
+
+		self.SetStatusText("", 0)
+		self.endtime = 0
+
+		self.timer = wx.PyTimer(self.Notify)
+		self.timer.Start(1000)
+		self.Notify()
+
+	def Notify(self):
+		left = self.endtime - time.time()
+		if left > 0:
+			self.SetStatusText(time.strftime("EOT: %I:%M:%S", time.localtime(left)), 1)
+		else:
+			self.SetStatusText("EOT: Unknown", 1)
+
+	def SetEndTime(self, endtime):
+		self.endtime = endtime
+
 class winMain(winMainBase):
 	title = "Thousand Parsec"
 	
 	def __init__(self, application, pos=wx.DefaultPosition, size=wx.DefaultSize, style=wx.DEFAULT_FRAME_STYLE):
 		winMainBase.__init__(self, application, None, pos, size, style)
 
-		bar = create_menu(self, self)
-		self.SetMenuBar(bar)
-		self.CreateStatusBar(1, wx.ST_SIZEGRIP)
+		self.menubar = create_menu(self, self)
+		self.SetMenuBar(self.menubar)
+
+		self.statusbar = TimeStatusBar(self)
+		self.SetStatusBar(self.statusbar)
 
 	def OnConnect(self, evt):
 		self.application.windows.Hide()

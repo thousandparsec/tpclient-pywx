@@ -210,6 +210,13 @@ password = "%(password)s"
 		progress.Update(100)
 		self.windows.Post(wx.local.CacheUpdateEvent())
 
+		# Get the time remaining
+		seconds = self.connection.time()
+		print seconds
+		if not failed(seconds):
+			import time
+			self.windows.main.statusbar.SetEndTime(time.time() + seconds[1] - 5)
+
 	def Exit(self):
 		print "AppTp.exit"
 		sys.exit(1)

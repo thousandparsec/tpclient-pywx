@@ -14,13 +14,13 @@ Short Term
 		* ARG_STRING (DONE)
 
 	* Get order save to work :) (DONE)
+	
 	* Add ships to the StarMap (DONE)
 		* Need to make sure i don't draw orbiting starships (DONE)
-
 	* Let a person unselect an order so they can insert a position 0
 
 	* Put up screenshots on www.thousandparsec.net (DONE)
-	* Put more screenshots on www.thousandparsec.net
+	* Put more screenshots on www.thousandparsec.net (DONE)
 
 	* Tool tips on orders arguments (and other stuff)
 		* Argument Panels (DONE)
@@ -55,8 +55,10 @@ Longer Term
 		* Pop-up message when getting close
 		* Reload the Universe cache after turn
 
-	* Add right click pop-up menu
+	* Add right click pop-up menu to starmap
 		* Include useful options on this menu, Quick add Order?
+		* Mouse wheel should zoom in/out the starmap
+		* Left (or right) click and hold for pan?
 
 	* Use non-blocking version of the protocol stack <- Not need?
 
@@ -69,4 +71,4 @@ Longer Term
 
 Longest Term
 	* Check what it looks like under windows / MacOSX
-	
+	* Make the windows dockable on the side of the screen	

@@ -10,9 +10,6 @@ import wx.lib.anchors
 from winBase import *
 from config import *
 
-ID_TEXT=-1
-ID_NOTEBOOK = 10045
-
 # Shows messages from the game system to the player.
 class winConfig(winBase):
 	title = "Config"
@@ -28,15 +25,10 @@ class winConfig(winBase):
 
 		item0 = wx.BoxSizer( wx.HORIZONTAL )
 	
-		item2 = wx.Notebook( panel, ID_NOTEBOOK, wx.DefaultPosition, wx.DefaultSize, 0 )
-		item1 = wx.NotebookSizer( item2 )
+		self.notebook = wx.Notebook( panel, -1, wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.notebook.AddPage(panelConfigWindows(application, self, self.notebook), "Windows" )
 
-#		item3 = panelConfigStartup(application, self, item2)
-#		item2.AddPage( item3, "Startup" )
-
-		item4 = panelConfigWindows(application, self, item2)
-		item2.AddPage( item4, "Windows" )
-
+		item1 = wx.NotebookSizer( self.notebook )
 		item0.AddSizer( item1, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
 
 		panel.SetAutoLayout( True )
@@ -47,101 +39,14 @@ class winConfig(winBase):
 
 		self.Fit()
 
-
-ID_SPLASH = 10046
-ID_AUTOCONNECT = 10047
-ID_TIPS = 10048
-ID_AUTOSERVER = 10049
-ID_AUTOUSERNAME = 10050
-ID_AUTOPASSWORD = 10051
-ID_SAVE = 10052
-ID_REVERT = 10053
-
-class panelConfigStartup(wx.Panel):
-	def __init__(self, application, frame, parent):
-		wx.Panel.__init__(self, parent, -1)
-
-		self.frame = frame
-		self.application = application
+		self.Bind(wx.EVT_ACTIVATE, self.OnFocus)
 		
-		self.obj = {}
-
-		item0 = wx.BoxSizer( wx.VERTICAL )
-	
-		item1 = wx.BoxSizer( wx.HORIZONTAL )
-	
-		item2 = wx.BoxSizer( wx.VERTICAL )
-	
-		item3 = wx.CheckBox( self, ID_SPLASH, "Show Splash Screen", wx.DefaultPosition, wx.DefaultSize, 0 )
-		item2.AddWindow( item3, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-		self.obj['splash'] = item3
-	
-		item4 = wx.CheckBox( self, ID_AUTOCONNECT, "Connect on Startup", wx.DefaultPosition, wx.DefaultSize, 0 )
-		item2.AddWindow( item4, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-		self.obj['auto_connect'] = item4
-
-		item5 = wx.CheckBox( self, ID_TIPS, "Show Welcome Tips", wx.DefaultPosition, wx.DefaultSize, 0 )
-		item2.AddWindow( item5, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-		self.obj['tips'] = item5
-
-		item1.AddSizer( item2, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
-
-		item6 = wx.GridSizer( 0, 2, 0, 0 )
-	
-		item7 = wx.StaticText( self, ID_TEXT, "Startup Server", wx.DefaultPosition, wx.DefaultSize, 0 )
-		item6.AddWindow( item7, 0, wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-	
-		item8 = wx.ComboBox( self, ID_AUTOSERVER, "", wx.DefaultPosition, wx.Size(100,-1), [], wx.CB_DROPDOWN )
-		item8.SetToolTip( wx.ToolTip("The server to connect to on autoconnect.") )
-		item8.Enable(False)
-		item6.AddWindow( item8, 0, wx.GROW|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-		self.obj['auto_server'] = item8
-
-		item9 = wx.StaticText( self, ID_TEXT, "Username", wx.DefaultPosition, wx.DefaultSize, 0 )
-		item6.AddWindow( item9, 0, wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-	
-		item10 = wx.ComboBox( self, ID_AUTOUSERNAME, "", wx.DefaultPosition, wx.Size(100,-1), [], wx.CB_DROPDOWN )
-		item10.SetToolTip( wx.ToolTip("The username to use on autoconnect.") )
-		item10.Enable(False)
-		item6.AddWindow( item10, 0, wx.GROW|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-		self.obj['auto_username'] = item10
-
-		item11 = wx.StaticText( self, ID_TEXT, "Password", wx.DefaultPosition, wx.DefaultSize, 0 )
-		item6.AddWindow( item11, 0, wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-
-		item12 = wx.TextCtrl( self, ID_AUTOPASSWORD, "", wx.DefaultPosition, wx.Size(80,-1), wx.TE_PASSWORD )
-		item12.Enable(False)
-		item6.AddWindow( item12, 0, wx.GROW|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-		self.obj['auto_password'] = item12
-
-		item1.AddSizer( item6, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
-
-		item0.AddSizer( item1, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
-
-		item13 = wx.BoxSizer( wx.HORIZONTAL )
-	
-		item14 = wx.Button( self, ID_SAVE, "Save", wx.DefaultPosition, wx.DefaultSize, 0 )
-		item14.SetDefault()
-		item13.AddWindow( item14, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
-		wx.EVT_BUTTON(self, ID_SAVE, self.OnSave)
-
-		item15 = wx.Button( self, ID_REVERT, "Revert", wx.DefaultPosition, wx.DefaultSize, 0 )
-		item13.AddWindow( item15, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
-		wx.EVT_BUTTON(self, ID_SAVE, self.OnRevert)
-
-		item0.AddSizer( item13, 0, wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+	def OnFocus(self, evt):
+		page = self.notebook.GetSelection()
+		if page >= 0:
+			panel = self.notebook.GetPage(page)
+			panel.OnFocus(evt)
 		
-		self.SetAutoLayout( True )
-		self.SetSizer( item0 )
-		
-		item0.Fit( self )
-		item0.SetSizeHints( self )
-	
-	def OnSave(self, evt):
-		pass
-	
-	def OnRevert(self, evt):
-		pass
 
 ID_MESSAGE	= 10054
 ID_INFO		= 10064
@@ -168,53 +73,48 @@ class panelConfigWindows(wx.Panel):
 	
 		item1 = wx.BoxSizer( wx.HORIZONTAL )
 	
-		item3 = wx.StaticBox( self, -1, "Show Windows" )
-		item2 = wx.StaticBoxSizer( item3, wx.VERTICAL )
+		self.show_box = wx.StaticBox( self, -1, "Hide Windows" )
+		self.show_sizer = wx.StaticBoxSizer( self.show_box, wx.VERTICAL )
 		
-		item4 = wx.CheckBox( self, ID_MESSAGE, "Message", wx.DefaultPosition, wx.DefaultSize, 0 )
-		item2.AddWindow( item4, 0, wx.GROW|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-		self.obj['show_message'] = item4
-		wx.EVT_CHECKBOX(self, ID_MESSAGE, self.OnShowMessage)
+		self.show_info = wx.CheckBox( self, -1, "Info", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.show_sizer.AddWindow( self.show_info, 0, wx.GROW|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+		self.Bind(wx.EVT_CHECKBOX, self.OnShowInfo, self.show_info)
 
-		item4 = wx.CheckBox( self, ID_INFO, "Info", wx.DefaultPosition, wx.DefaultSize, 0 )
-		item2.AddWindow( item4, 0, wx.GROW|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-		self.obj['show_info'] = item4
-		wx.EVT_CHECKBOX(self, ID_INFO, self.OnShowMessage)
+		self.show_order = wx.CheckBox( self, -1, "Order", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.show_sizer.AddWindow( self.show_order, 0, wx.GROW|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+		self.Bind(wx.EVT_CHECKBOX, self.OnShowOrder, self.show_order)
 
-		item5 = wx.CheckBox( self, ID_ORDER, "Order", wx.DefaultPosition, wx.DefaultSize, 0 )
-		item2.AddWindow( item5, 0, wx.GROW|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-		self.obj['show_order'] = item5
-		wx.EVT_CHECKBOX(self, ID_ORDER, self.OnShowOrder)
+		self.show_message = wx.CheckBox( self, -1, "Message", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.show_sizer.AddWindow( self.show_message, 0, wx.GROW|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+		self.Bind(wx.EVT_CHECKBOX, self.OnShowMessage, self.show_message)
 
-		item6 = wx.CheckBox( self, ID_STARMAP, "StarMap", wx.DefaultPosition, wx.DefaultSize, 0 )
-		item2.AddWindow( item6, 0, wx.GROW|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-		self.obj['show_starmap'] = item6
-		wx.EVT_CHECKBOX(self, ID_STARMAP, self.OnShowStarMap)
+		self.show_starmap = wx.CheckBox( self, -1, "StarMap", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.show_sizer.AddWindow( self.show_starmap, 0, wx.GROW|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+		self.Bind(wx.EVT_CHECKBOX, self.OnShowStarMap, self.show_starmap)
 
-		item7 = wx.CheckBox( self, ID_SYSTEM, "System", wx.DefaultPosition, wx.DefaultSize, 0 )
-		item2.AddWindow( item7, 0, wx.GROW|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-		self.obj['show_system'] = item7
-		wx.EVT_CHECKBOX(self, ID_SYSTEM, self.OnShowSystem)
+		self.show_system = wx.CheckBox( self, -1, "System", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.show_sizer.AddWindow( self.show_system, 0, wx.GROW|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+		self.Bind(wx.EVT_CHECKBOX, self.OnShowSystem, self.show_system)
 
-		item1.AddSizer( item2, 0, wx.GROW|wx.ALIGN_CENTER_HORIZONTAL|wx.ALL, 5 )
+		item1.AddSizer( self.show_sizer, 0, wx.GROW|wx.ALIGN_CENTER_HORIZONTAL|wx.ALL, 5 )
 
+		options = []
 		if wx.Platform == '__WXMSW__':
-			item8 = wx.RadioBox( self, ID_RAISE, "Raise", wx.DefaultPosition, wx.DefaultSize, 
-					["Individual", "All on Main"] , 1, wx.RA_SPECIFY_COLS )
+			options = ["Individual", "All on Main"]
+		elif wx.Platform == '__WXMAC__':
+			options = ["Individual", "All on All"]
 		else:
-			item8 = wx.RadioBox( self, ID_RAISE, "Raise", wx.DefaultPosition, wx.DefaultSize, 
-					["Individual", "All on Main", "All on All"] , 1, wx.RA_SPECIFY_COLS )
-			
-		item8.SetToolTip( wx.ToolTip("Choose a method for raising the windows.") )
-		item1.AddWindow( item8, 0, wx.GROW|wx.ALIGN_CENTER_HORIZONTAL|wx.ALL, 5 )
-		self.obj['raise'] = item8
-		wx.EVT_RADIOBOX(self, ID_RAISE, self.OnRaiseSelection)
+			options = ["Individual", "All on Main", "All on All"]
 
-		item9 = wx.RadioBox( self, ID_RADIOBOX, "Window", wx.DefaultPosition, wx.DefaultSize, 
-				["Main", "Info", "Message","Order","StarMap","System"] , 1, wx.RA_SPECIFY_COLS )
-		item1.AddWindow( item9, 0, wx.GROW|wx.ALIGN_CENTER_HORIZONTAL|wx.ALL, 5 )
-		self.obj['window'] = item9
-		wx.EVT_RADIOBOX(self, ID_RADIOBOX, self.OnWindowSelection)
+		self.raisebox = wx.RadioBox( self, -1, "Raise", wx.DefaultPosition, wx.DefaultSize, options, 1, wx.RA_SPECIFY_COLS )
+		self.raisebox.SetToolTip( wx.ToolTip("Choose a method for raising the windows.") )
+		item1.AddWindow( self.raisebox, 0, wx.GROW|wx.ALIGN_CENTER_HORIZONTAL|wx.ALL, 5 )
+		self.Bind(wx.EVT_RADIOBOX, self.OnRaiseSelection, self.raisebox)
+
+		self.windows = wx.RadioBox( self, -1, "Window", wx.DefaultPosition, wx.DefaultSize, 
+				["Main", "Info", "Order", "Message", "StarMap","System"] , 1, wx.RA_SPECIFY_COLS )
+		item1.AddWindow( self.windows, 0, wx.GROW|wx.ALIGN_CENTER_HORIZONTAL|wx.ALL, 5 )
+		self.Bind(wx.EVT_RADIOBOX, self.OnWindowSelection, self.windows)
 
 		item11 = wx.StaticBox( self, -1, "Attributes" )
 		item10 = wx.StaticBoxSizer( item11, wx.VERTICAL )
@@ -222,7 +122,7 @@ class panelConfigWindows(wx.Panel):
 		item12 = wx.FlexGridSizer( 0, 2, 0, 0 )
 		item12.AddGrowableCol( 1 )
 		
-		item13 = wx.StaticText( self, ID_TEXT, "X Position", wx.DefaultPosition, wx.DefaultSize, 0 )
+		item13 = wx.StaticText( self, -1, "X Position", wx.DefaultPosition, wx.DefaultSize, 0 )
 		item12.AddWindow( item13, 0, wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
 
 		item14 = wx.SpinCtrl( self, ID_XPOS, "0", wx.DefaultPosition, wx.Size(50,-1), 0, 0, 10000, 0 )
@@ -230,7 +130,7 @@ class panelConfigWindows(wx.Panel):
 		self.obj['xpos'] = item14
 		wx.EVT_SPINCTRL(self, ID_XPOS, self.OnXPos)
 
-		item15 = wx.StaticText( self, ID_TEXT, "Y Position", wx.DefaultPosition, wx.DefaultSize, 0 )
+		item15 = wx.StaticText( self, -1, "Y Position", wx.DefaultPosition, wx.DefaultSize, 0 )
 		item12.AddWindow( item15, 0, wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
 
 		item16 = wx.SpinCtrl( self, ID_YPOS, "0", wx.DefaultPosition, wx.Size(50,-1), 0, 0, 10000, 0 )
@@ -238,7 +138,7 @@ class panelConfigWindows(wx.Panel):
 		self.obj['ypos'] = item16
 		wx.EVT_SPINCTRL(self, ID_YPOS, self.OnYPos)
 
-		item17 = wx.StaticText( self, ID_TEXT, "Width", wx.DefaultPosition, wx.DefaultSize, 0 )
+		item17 = wx.StaticText( self, -1, "Width", wx.DefaultPosition, wx.DefaultSize, 0 )
 		item12.AddWindow( item17, 0, wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
 
 		item18 = wx.SpinCtrl( self, ID_WIDTH, "0", wx.DefaultPosition, wx.Size(50,-1), 0, 0, 10000, 0 )
@@ -246,7 +146,7 @@ class panelConfigWindows(wx.Panel):
 		self.obj['width'] = item18
 		wx.EVT_SPINCTRL(self, ID_WIDTH, self.OnWidth)
 
-		item19 = wx.StaticText( self, ID_TEXT, "Height", wx.DefaultPosition, wx.DefaultSize, 0 )
+		item19 = wx.StaticText( self, -1, "Height", wx.DefaultPosition, wx.DefaultSize, 0 )
 		item12.AddWindow( item19, 0, wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
 
 		item20 = wx.SpinCtrl( self, ID_HEIGHT, "0", wx.DefaultPosition, wx.Size(50,-1), 0, 0, 10000, 0 )
@@ -262,13 +162,13 @@ class panelConfigWindows(wx.Panel):
 
 		item21 = wx.BoxSizer( wx.HORIZONTAL )
 		
-		item22 = wx.Button( self, ID_SAVE, "Save", wx.DefaultPosition, wx.DefaultSize, 0 )
-		item21.AddWindow( item22, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
-		wx.EVT_BUTTON(self, ID_SAVE, self.OnSave)
+		save = wx.Button( self, -1, "Save", wx.DefaultPosition, wx.DefaultSize, 0 )
+		item21.AddWindow( save, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
+		self.Bind(wx.EVT_BUTTON, self.OnSave, save)
 
-		item23 = wx.Button( self, ID_REVERT, "Revert", wx.DefaultPosition, wx.DefaultSize, 0 )
-		item21.AddWindow( item23, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
-		wx.EVT_BUTTON(self, ID_REVERT, self.OnRevert)
+		revert = wx.Button( self, -1, "Revert", wx.DefaultPosition, wx.DefaultSize, 0 )
+		item21.AddWindow( revert, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
+		self.Bind(wx.EVT_BUTTON, self.OnRevert, revert)
 
 		item0.AddSizer( item21, 0, wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
 
@@ -277,20 +177,23 @@ class panelConfigWindows(wx.Panel):
 		
 		item0.Fit( self )
 		item0.SetSizeHints( self )
-		
-		wx.EVT_SET_FOCUS(parent, self.OnFocus) 
 
 	def OnFocus(self, evt):
+		self.OnWindowsShow(None)
 		self.OnWindowSelection(None)
 
-	def OnShowMessage(self, evt):
-		self.application.windows.config.message.show = not evt.Checked()
-		self.application.windows.message.Show(not evt.Checked())
-
+	def OnShowInfo(self, evt):
+		self.application.windows.config.info.show = not evt.Checked()
+		self.application.windows.info.Show(not evt.Checked())
+		
 	def OnShowOrder(self, evt):
 		self.application.windows.config.order.show = not evt.Checked()
 		self.application.windows.order.Show(not evt.Checked())
 		
+	def OnShowMessage(self, evt):
+		self.application.windows.config.message.show = not evt.Checked()
+		self.application.windows.message.Show(not evt.Checked())
+
 	def OnShowStarMap(self, evt):
 		self.application.windows.config.starmap.show = not evt.Checked()
 		self.application.windows.starmap.Show(not evt.Checked())
@@ -298,6 +201,14 @@ class panelConfigWindows(wx.Panel):
 	def OnShowSystem(self, evt):
 		self.application.windows.config.system.show = not evt.Checked()
 		self.application.windows.system.Show(not evt.Checked())
+
+	def OnWindowsShow(self, evt):
+		# Fill in the show settings
+		self.show_info.SetValue(not self.application.windows.config.info.show)
+		self.show_order.SetValue(not self.application.windows.config.order.show)
+		self.show_message.SetValue(not self.application.windows.config.message.show)
+		self.show_starmap.SetValue(not self.application.windows.config.starmap.show)
+		self.show_system.SetValue(not self.application.windows.config.system.show)
 		
 	def OnXPos(self, evt):
 		self.current_window.SetPosition((self.obj['xpos'].GetValue(), -1))
@@ -312,7 +223,7 @@ class panelConfigWindows(wx.Panel):
 		self.current_window.SetSize((-1, self.obj['height'].GetValue()))
 
 	def OnWindowSelection(self, evt):
-		window = self.obj['window'].GetStringSelection()
+		window = self.windows.GetStringSelection()
 		self.current_window = getattr(self.application.windows, window.lower())
 		pos = self.current_window.GetPosition()
 		size = self.current_window.GetSize()
@@ -323,17 +234,18 @@ class panelConfigWindows(wx.Panel):
 		self.obj['height'].SetValue(size[1])
 
 	def OnRaiseSelection(self, evt):
-		style = self.obj['raise'].GetStringSelection()
+		style = self.raisebox.GetStringSelection()
 		self.application.windows.config.raise_ = style
 
 	def OnSave(self, evt):
+		print "OnSave"
 		self.application.windows.ConfigSave()
 		self.frame.Show(False)
 		self.application.windows.Raise()
 
 	def OnRevert(self, evt):
-#		self.application.config = self.application.windows.ConfigLoad()
-		self.application.windows.ConfigActivate()
+		self.application.config = self.application.windows.ConfigLoad()
+		self.application.windows.ConfigActivate(show=True)
 		self.frame.Show(False)
 		self.application.windows.Raise()
 
