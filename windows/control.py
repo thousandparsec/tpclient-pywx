@@ -152,3 +152,9 @@ class MainControl:
 		self.starmap.Show(FALSE)
 		self.system.Show(FALSE)
 
+	def PostEvent(self, evt):
+		wxPostEvent(self.main, evt)
+		wxPostEvent(self.message, evt)
+		wxPostEvent(self.starmap, evt)
+		wxPostEvent(self.system, evt)
+

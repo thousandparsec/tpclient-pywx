@@ -15,7 +15,6 @@ from utils import *
 # Local imports
 from protocol import *
 from events import *
-from extra.evtmgr import eventManager
 
 class NetworkThread:
 	def __init__(self):
@@ -24,19 +23,19 @@ class NetworkThread:
 		self.socket = None
 		self.lock = allocate_lock()
 
-	def win_connect(self, window):
+	def WinConnect(self, window):
 		"""\
 		Starts a window recieving the events from the network thread.
 		"""
 		self.windows.append(window)
 
-	def win_disconnect(self, window):
+	def WinDisconnect(self, window):
 		"""\
 		Stops a window from recieving events from the network thread.
 		"""
 		self.windows.remove(window)
 
-	def connect(self, host, port):
+	def Connect(self, host, port):
 		"""\
 		Causes the network thread to connect to a host/port
 
@@ -52,7 +51,7 @@ class NetworkThread:
 
 		return self.socket
 
-	def disconnect(self):
+	def Disconnect(self):
 		"""\
 		Causes the network thread to disconnect.
 
@@ -67,7 +66,7 @@ class NetworkThread:
 		
 		self.socket = None
 
-	def send(self, object):
+	def Send(self, object):
 		"""\
 		Sends an object out onto the wire. 
 		
@@ -82,7 +81,7 @@ class NetworkThread:
 		else:
 			raise IOError("Trying to send an invalid object")
 
-	def next(self):
+	def Next(self):
 		"""\
 		This function will allow the network thread to process
 		the next packet. 
@@ -90,10 +89,10 @@ class NetworkThread:
 		It MUST be called after an event occurs or the thread will
 		block forever!!!!!!!!
 		"""
-		if self.locked():
+		if self.Locked():
 			self.lock.release()
 
-	def locked(self):
+	def Locked(self):
 		"""\
 		Find out if the network thread is currently locked because
 		it is processing a packet.
@@ -128,4 +127,3 @@ class NetworkThread:
 					self.lock.acquire()
 					debug(DEBUG_NETWORK, "Sending to window %s" % window)
 					wxPostEvent(window, evt)
-

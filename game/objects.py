@@ -13,18 +13,24 @@ class Universe:
 		# Register for object informations
 		self.map = {}
 
+	def ObjectIDs(self):
+		return self.map.keys()
+
+	def Objects(self):
+		return self.map.values()
+
 	def Add(self, object):
 		if isinstance(object, UniverseObject):
 
 			# Insert the object into map
-			container = self.GetParent(new.id)
-			if not container and new.id != 0:
+			container = self.GetParent(object.id)
+			if not container and object.id != 0:
 				# Ekk! we got a child object but no parent
-				raise ChildBeforeParent(repr(new.id))
+				raise ChildBeforeParent(repr(object.id))
 			else:
-				new.container = container
+				object.container = container
 			
-			self.map[new.id] = new
+			self.map[object.id] = object
 
 		else:
 			raise UnknownObject("Tried to insert unknown object (%s) into the Universe" % object)
@@ -35,6 +41,12 @@ class Universe:
 				if id in o.contains:
 					return o
 		return None
+
+	def Object(self, id):
+		try:
+			return self.map[id]
+		except:
+			return None
 
 class UniverseObject:
 	"""\

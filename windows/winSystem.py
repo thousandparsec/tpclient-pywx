@@ -3,18 +3,33 @@ This module contains the System window. The System window displays all objects
 at this current location and "quick" details about them.
 """
 
-from winBase import winBase
+# Python imports
 
+# wxPython imports
 from wxPython.wx import *
 from wxPython.gizmos import *
 
-# Show the currently selected system
+# Game imports
+from utils import *
+from game.events import *
+from game import objects
+
+# Local imports
+from winBase import winBase
+from events import *
+
+# Show the universe
 class winSystem(winBase):
 	title = "System"
 	
 	def __init__(self, application, parent, pos=wxDefaultPosition, size=wxDefaultSize, style=wxDEFAULT_FRAME_STYLE):
 		winBase.__init__(self, application, parent, pos, size, style)
-		
+
+		# Setup to recieve game events
+		self.app = application
+		self.app.game.WinConnect(self)
+		EVT_GAME_ARRIVEOBJ(self, self.OnGameArriveObj)
+
 		class systemTree(wxRemotelyScrolledTreeCtrl):
 			def __init__(self, parent, ID, pos=wxDefaultPosition, size=wxDefaultSize, style=wxTR_HAS_BUTTONS):
 				wxRemotelyScrolledTreeCtrl.__init__(self, parent, ID, pos, size, style)
@@ -26,7 +41,6 @@ class winSystem(winBase):
 				self.icons['Planet'] = wxImage("graphics/planet-icon.png").ConvertToBitmap()
 				self.icons['Link'] = wxImage("graphics/link-icon.png").ConvertToBitmap()
 
-
 				# make an image list
 				self.il = wxImageList(16, 16)
 				self.il.Add(wxImage("graphics/blank.png").ConvertToBitmap())
@@ -34,20 +48,6 @@ class winSystem(winBase):
 					self.icons[i] = self.il.Add(self.icons[i])
 
 				self.SetImageList(self.il)
-
-				# Add some items
-				root = self.AddRoot("Root")
-				item = self.AppendItem(root, "System", self.icons['System'])
-				child = self.AppendItem(item, "Planet 1", self.icons['Planet'])
-				child2 = self.AppendItem(child, "Starbase", self.icons['Starbase'])
-				child2 = self.AppendItem(child, "Ship 2", self.icons['Ship'])
-				child = self.AppendItem(item, "Free Ship", self.icons['Ship'])
-				child = self.AppendItem(item, "Link to ABC", self.icons['Link'])
-
-				for i in range(10):
-					item = self.AppendItem(root, "")
-				
-				self.Expand(root)
 
 		class systemValueWindow(wxTreeCompanionWindow):
 			def __init__(self, parent, ID, pos=wxDefaultPosition, size=wxDefaultSize, style=0):
@@ -94,4 +94,51 @@ class winSystem(winBase):
 
 		self.value.SetTreeCtrl(self.tree)
 		self.tree.SetCompanionWindow(self.value)
+
+		EVT_TREE_SEL_CHANGED(self.tree, -1, self.OnSelectItem)
+
+	def Update(self):
+
+		# Remove all the current items
+		self.tree.DeleteAllItems()
+
+		universe=self.app.game.universe.Object(0)
+		self.Add(None, universe)
 		
+		# Append some padding
+		#for i in range(10):
+		#	item = self.tree.AppendItem(root, "")
+	
+	def Add(self, root, object):
+		new_root = None
+		
+		if isinstance(object, objects.Actual):
+			new_root = self.tree.AppendItem(root, object.name, self.tree.icons['Planet'])
+		
+		elif isinstance(object, objects.Container):
+			if root == None:
+				new_root = self.tree.AddRoot("Known Universe")
+			else:
+				new_root = self.tree.AppendItem(root, object.name, self.tree.icons['System'])
+			
+			for id in object.contains:
+				new = self.app.game.universe.Object(id)
+				self.Add(new_root, new)
+			
+		else:
+			self.tree.AppendItem(root, "Unknown", self.tree.icons['Ship'])
+		
+		if new_root:
+			self.tree.SetPyData(new_root, object.id)
+
+	def OnGameArriveObj(self, evt):
+		# Okay lets rebuild our tree
+		self.Update()
+	
+	def OnSelectItem(self, evt):
+		# Figure out which item it is
+		id = self.tree.GetPyData(evt.GetItem())
+		
+		# Okay we need to post an event now
+		new_evt = WindowsSelectObj(id)
+		self.app.windows.PostEvent(new_evt)

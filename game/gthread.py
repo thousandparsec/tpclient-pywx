@@ -4,6 +4,7 @@ dispatchs events for incoming packets.
 """
 # Python imports
 import time
+import copy
 from thread import allocate_lock
 
 # wxWindows imports
@@ -11,48 +12,62 @@ from wxPython.wx import *
 
 # Game imports
 from utils import *
+from network import protocol
 
 # Local imports
-from network.protocol import *
 from events import *
-from extra.evtmgr import eventManager
+from objects import *
 
 class GameThread:
 	def __init__(self):
 		self.windows = []
 
-		self.universe = Universe
+		self.universe = Universe()
 
-	def win_connect(self, window):
+	def WinConnect(self, window):
 		"""\
 		Starts a window recieving the events from the game thread.
 		"""
 		self.windows.append(window)
 
-	def win_disconnect(self, window):
+	def WinDisconnect(self, window):
 		"""\
 		Stops a window from recieving events from the game thread.
 		"""
 		self.windows.remote(window)
 
 	def OnPacket(self, evt):	
-		if isinstance(packet, protocol.Object):
+		if isinstance(evt.value, protocol.Object):
 			# Okay, lets get a copy and then mutate this object into a UniverseObject
-			new = copy.deepcopy(packet)
+			new = copy.deepcopy(evt.value)
 
 			if new.type == 1 or new.type == 0:
 				new.__class__ = Container
 			elif new.type == 2:
 				new.__class__ = Actual
 			else:
-				raise UnknownObject("Unknown object recieved %r\n%s" % (packet, packet))
+				raise UnknownObject("Unknown object recieved %r\n%s" % (e.value, e.value))
+
+			self.universe.Add(new)
+
+			# Publish an object arrived event, dont post for the universe
+			if new.id != 0:
+				for window in self.windows:
+					nevt = GameArriveObjectEvent(new.id, new.name)
+					wxPostEvent(window, nevt)
 
 			if isinstance(new, Container):
 				# Request it's children
 				for id in new.contains:
-					if id not in self.universe.keys():
+					if id not in self.universe.ObjectIDs():
+
+						# Publish an object getting event
+						for window in self.windows:
+							nevt = GameGetObjectEvent(id, "")
+							wxPostEvent(window, nevt)
+					
 						g = protocol.GetObject(id=id)
-						network.send(g)
+						evt.network.Send(g)
 
 	def __call__(self):
 		"""\

@@ -47,7 +47,7 @@ class Header:
 		
 		self.data = None
 
-	def set_data(self, data=None):
+	def SetData(self, data=None):
 		"""\
 		Processes the data of the packet.
 		"""
@@ -56,7 +56,7 @@ class Header:
 		else:
 			self.length = len(data)
 
-	def process(self):
+	def Process(self):
 		"""\
 		Look at the packet type and muta this object into the
 		correct type.
@@ -89,7 +89,7 @@ class Processed(Header):
 	Basicly stops you processing an object twice.
 	"""
 
-	def process(self):
+	def Process(self):
 		raise Exception("Cannot reprocess an already processed packet")
 
 class Connect(Processed):
@@ -126,7 +126,7 @@ class GetObject(Processed):
 				raise Exception("ID cannot be set when you have given me a string!")
 			
 			Header.__init__(self, s[:Header.size])
-			set_data(self, s[Header.size:])
+			SetData(self, s[Header.size:])
 		else:
 			if id == None:
 				raise Exception("ID must be set if you don't set a string")
@@ -140,7 +140,7 @@ class GetObject(Processed):
 		output += pack(GetObject.struct, self.id)
 		return output
 	
-	def set_data(self, data):
+	def SetData(self, data):
 		self.id = unpack(GetObject.struct)
 
 class Object(Processed):
@@ -156,7 +156,7 @@ class Object(Processed):
 				raise Exception("ID cannot be set when you have given me a string!")
 			
 			Header.__init__(self, s[:Header.size])
-			set_data(self, s[Header.size:])
+			SetData(self, s[Header.size:])
 		else:
 			if id == None or type == None or type(name) == StringType or type(size) == LongType or \
 				type(pos) == TupleType or len(pos) == 3 or \
@@ -194,7 +194,7 @@ class Object(Processed):
 
 		return output
 
-	def set_data(self, data):
+	def SetData(self, data):
 		# First bit
 		struct1_data = data[0:calcsize(Object.struct1)]
 		self.id, self.type = unpack(Object.struct1, struct1_data)
@@ -232,7 +232,7 @@ class Login(Processed):
 			if username != None or password != None:
 				raise Exception("Username cannot be set when you have given me a string!")
 			Header.__init__(self, s[:Header.size])
-			set_data(self, s[Header.size:])
+			SetData(self, s[Header.size:])
 		else:
 			if username == None or password == None:
 				raise Exception("Username and password must be set if you don't set a string")
@@ -249,7 +249,7 @@ class Login(Processed):
 		
 		return output
 
-	def set_data(self, data):
+	def SetData(self, data):
 		username, data = unprep_string(data)
 		password, data = unprep_string(data)
 
@@ -259,13 +259,16 @@ def unprep_string(s):
 	"""
 	# Remove the length
 	l = int(unpack("!I", s[0:4])[0])
-	s = s[4:]
-	# Get the string, (we don't need the null terminator so nuke it)
-	output = s[:l-1]
-	s = s[l:]
-	# Remove anyremaining null terminators
-	s = s[4 - (l % 4):]
-	return string.strip(output), s
+	if l > 0:
+		s = s[4:]
+		# Get the string, (we don't need the null terminator so nuke it)
+		output = s[:l-1]
+		s = s[l:]
+		# Remove anyremaining null terminators
+		s = s[4 - (l % 4):]
+		return string.strip(output), s
+	else:
+		return "", s
 
 def prep_string(s):
 	"""\
@@ -290,10 +293,11 @@ def read_packet(s):
 	"""
 	string = s.recv(Header.size)
 	h = Header(string)
-	h.process()
+	h.Process()
 	
 	if h.length > 0:
-		h.set_data(s.recv(h.length))
+		data = s.recv(h.length)
+		h.SetData(data)
 
 	return h
 
@@ -322,13 +326,27 @@ def connect(address, port):
 
 	s.send(str(packet))
 
-	returns = readpacket(s)
+	returns = read_packet(s)
 	if isinstance(returns, Ok):
 		return s
 	else:
 		socket.close()
 		return None
 
+def get_contains(r):
+	import pprint
+
+	for i in r.contains:	
+		g = GetObject(id=i)
+		pprint.pprint(g)
+		pprint.pprint(str(g))
+		s.send(str(g))
+		r = read_packet(s)
+		pprint.pprint(r)
+		pprint.pprint(str(r))
+		
+		get_contains(r)
+		
 if __name__ == "__main__":
 	import pprint
 
@@ -352,7 +370,7 @@ if __name__ == "__main__":
 	pprint.pprint(l)
 	pprint.pprint(str(l))
 	s.send(str(l))
-	r = readpacket(s)
+	r = read_packet(s)
 	pprint.pprint(r)
 	pprint.pprint(str(r))
 
@@ -360,15 +378,9 @@ if __name__ == "__main__":
 	pprint.pprint(g)
 	pprint.pprint(str(g))
 	s.send(str(g))
-	r = readpacket(s)
+	r = read_packet(s)
 	pprint.pprint(r)
 	pprint.pprint(str(r))
 
-	for i in r.contains:	
-		g = GetObject(id=i)
-		pprint.pprint(g)
-		pprint.pprint(str(g))
-		s.send(str(g))
-		r = readpacket(s)
-		pprint.pprint(r)
-		pprint.pprint(str(r))
+	get_contains(r)
+

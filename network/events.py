@@ -29,6 +29,6 @@ class NetworkPacketEvent(wxPyEvent):
 		self.value = packet
 		self.network = network
 	
-	def next(self):
-		self.network.next()
+	def Next(self):
+		self.network.Next()
 

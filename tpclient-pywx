@@ -38,12 +38,6 @@ class AppTP(wxApp):
 		self.connected = FALSE
 		self.logined = FALSE
 		
-		# Start up the windows
-		try:
-			self.windows = MainControl(self)
-		except:
-			do_traceback()
-
 		# Startup the Game
 		try:
 			self.game = GameThread()
@@ -56,7 +50,13 @@ class AppTP(wxApp):
 			self.network = NetworkThread()
 			thread.start_new_thread(self.network, ())
 
-			self.network.win_connect(self)
+			self.network.WinConnect(self)
+		except:
+			do_traceback()
+
+		# Start up the windows
+		try:
+			self.windows = MainControl(self)
 		except:
 			do_traceback()
 
@@ -82,13 +82,13 @@ class AppTP(wxApp):
 			self.host = host
 			self.port = port
 
-			if not self.network.connect(self.host, self.port):
+			if not self.network.Connect(self.host, self.port):
 				self.windows.connect.OnConnection(None)
 				return
 
 			EVT_NETWORK_PACKET(self, self.OnPacket)
 
-			self.network.send(protocol.Connect())
+			self.network.Send(protocol.Connect())
 		
 		else:
 			# Just resend the username/password
@@ -97,7 +97,7 @@ class AppTP(wxApp):
 
 	def Login(self):
 		l = protocol.Login(username=self.username, password=self.password)
-		self.network.send(l)
+		self.network.Send(l)
 
 	def OnPacket(self, evt):
 		try:
@@ -128,7 +128,7 @@ class AppTP(wxApp):
 
 					# Okay now try to get the universe
 					g = protocol.GetObject(id=0)
-					evt.network.send(g)
+					evt.network.Send(g)
 					
 				else:
 					# We failed to login :( username/password is most proberly bad.
@@ -139,10 +139,10 @@ class AppTP(wxApp):
 				self.game.OnPacket(evt)
 		
 		finally:
-			evt.next()
+			evt.Next()
 
 	def Exit(self):
-		pprint.pprint(self.game.map)
+		pprint.pprint(self.game.universe.map)
 		sys.exit(1)
 
 if __name__ == '__main__':

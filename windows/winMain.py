@@ -2,7 +2,16 @@
 This module contains the main menu window.
 """
 
+# Python imports
+
+# wxPython imports
 from wxPython.wx import *
+
+# Game imports
+from utils import *
+from game.events import *
+
+# Local imports
 from winBase import winBase
 
 ID_MENU = 10042
@@ -33,6 +42,12 @@ class winMain(winBase):
 	
 	def __init__(self, application, pos=wxDefaultPosition, size=wxDefaultSize, style=wxDEFAULT_FRAME_STYLE):
 		winBase.__init__(self, application, None, pos, size, style)
+
+		# Setup to recieve game events
+		application.game.WinConnect(self)
+		EVT_GAME_GETOBJ(self, self.OnGameGetObj)
+		EVT_GAME_ARRIVEOBJ(self, self.OnGameArriveObj)
+		self.status = {}
 
 		item0 = wxMenuBar()
 
@@ -101,3 +116,26 @@ class winMain(winBase):
 
 	def OnProgramExit(self, evt):
 		self.application.Exit()
+
+	def UpdateStatus(self):
+		string = "Currently: "
+		for id,name in self.status.items():
+			if name:
+				string += "Getting %s (%i), " % (name, id)
+			else:
+				string += "Getting id %i, " % (id)
+
+		string = string[:-2]
+		debug(DEBUG_WINDOWS, "Setting main status to: " + string)
+		self.SetStatusText(string)
+
+
+	def OnGameGetObj(self, evt):
+		self.status[evt.id] = evt.name
+		# Get the status bar to update
+		self.UpdateStatus()
+	
+	def OnGameArriveObj(self, evt):
+		del self.status[evt.id]
+		# Get the status bar to update
+		self.UpdateStatus()

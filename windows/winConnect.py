@@ -126,7 +126,7 @@ class winConnect(wxFrame):
 					host, port = temp
 					port = int(port)
 
-				self.app.network.win_connect(self)
+				self.app.network.WinConnect(self)
 				eventManager.Register(self.OnConnection, EVT_NETWORK_PACKET, self)
 				
 				self.progress = wxProgressDialog("TP: Connecting to Server",
@@ -169,7 +169,7 @@ class winConnect(wxFrame):
 			debug(DEBUG_WINDOWS, "Connection Finishing")
 			debug(DEBUG_WINDOWS, evt)
 			if evt:
-				evt.next()
+				evt.Next()
 
 	def OnLogin(self, evt):
 		try:
@@ -178,7 +178,7 @@ class winConnect(wxFrame):
 			if isinstance(evt.value, protocol.Ok):
 				debug(DEBUG_WINDOWS, "Login Worked!")
 				eventManager.DeregisterListener(self.OnLogin)
-				self.app.network.win_disconnect(self)
+				self.app.network.WinDisconnect(self)
 			
 				self.progress.Update(4)
 			
@@ -208,4 +208,4 @@ class winConnect(wxFrame):
 			debug(DEBUG_WINDOWS, "Login Finishing")
 			debug(DEBUG_WINDOWS, evt)
 			if evt:
-				evt.next()
+				evt.Next()

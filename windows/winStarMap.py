@@ -3,13 +3,23 @@ This module contains the StarMap window. This window displays a view of the
 universe.
 """
 
+# Python imports
 import os
 from math import *
 
-from winBase import winBase
-
+# wxPython imports
 from wxPython.wx import *
 from wxPython.lib.floatbar import *
+
+# Game imports
+from utils import *
+from game.events import *
+from game import objects
+from network.protocol import X,Y,Z
+
+# Local imports
+from winBase import winBase
+from events import *
 
 #wxRED = wxColor()
 wxYELLOW = wxColor(0xD6, 0xDC, 0x2A)
@@ -21,8 +31,6 @@ sysOWNER = 2
 sysHAB = 3
 sysMIN = 4
 
-systems = []
-
 # Shows the main map of the universe.
 class winStarMap(winBase):
 	title = "StarMAP, The Known Universe"
@@ -30,12 +38,19 @@ class winStarMap(winBase):
 	def __init__(self, application, parent, pos=wxDefaultPosition, size=wxDefaultSize, style=wxDEFAULT_FRAME_STYLE):
 		winBase.__init__(self, application, parent, pos, size, style)
 
+		self.app = application
+		self.app.game.WinConnect(self)
+		EVT_GAME_ARRIVEOBJ(self, self.Update)
+
+		EVT_WINDOWS_SELECTOBJ(self, self.OnSelect)
+
 		self.config = {}
 		self.config['System'] = sysPLAIN
 		self.config['DrawNames'] = TRUE
 		self.config['Scanner'] = TRUE
 		self.config['Ships'] = TRUE
-		self.config['Zoom'] = 0.5
+		# Number of TP units per pixel
+		self.config['Zoom'] = 10000000
 
 		self.dragging = 0
 
@@ -101,8 +116,8 @@ class winStarMap(winBase):
 				self.parent.start = [0,0]
 				self.parent.end = [0,0]
 
-				self.maxWidth  = 10000/self.parent.config['Zoom']
-				self.maxHeight = 10000/self.parent.config['Zoom']
+				self.maxWidth  = 3000
+				self.maxHeight = 3000
 				
 				self.SetBackgroundColour(wxBLACK)
 				self.SetCursor(wxStockCursor(wxCURSOR_CROSS))
@@ -185,10 +200,9 @@ class winStarMap(winBase):
 				return (evt.GetX() + (xView * xDelta), evt.GetY() + (yView * yDelta))
 	
 
-		self.windowScroll = starCanvas(self)
-#		self.canvas = self.windowScroll.canvas
-		self.maxWidth = self.windowScroll.maxWidth
-		self.maxHeight = self.windowScroll.maxHeight
+		self.canvas = starCanvas(self)
+		self.maxWidth = self.canvas.maxWidth
+		self.maxHeight = self.canvas.maxHeight
 
 		# Load the graphics
 		self.graphics = {}
@@ -260,51 +274,52 @@ class winStarMap(winBase):
 
 		zoom = self.config['Zoom']
 		
-		for i in systems:
+		for object in self.app.game.universe.Objects():
 
-			if isinstance(i, System):
+			if isinstance(object, objects.Actual):
 
-				#print i.x/zoom, i.y/zoom
+				print object.pos[X]/zoom, object.pos[Y]/zoom
+#
+#				if self.config['Scanner']:
+#					scanner = object.GetScanner()
+#					if scanner is not None:
+#						p, s, a = scanner.GetRange()
+#
+#						#print "Topleft", i.pos[X], i.pos[Y], "Range", s, "Scanner topleft", i.pos[X]/zoom-s/2/zoom, i.pos[Y]/zoom-s/2/zoom
+#
+#						#dc.SetLogicalFunction(wxSET)
+#
+#						# Non-Penatrating Scanner
+#						dc.SetPen(wxPen(wxRED, 1, wxSOLID))
+#						dc.SetBrush(wxBrush(wxRED, wxSOLID))
+#						dc.DrawEllipse(object.pos[X]/zoom-s/2.0/zoom+POINT/2, object.pos[Y]/zoom-s/2.0/zoom+POINT/2, s/zoom, s/zoom)
+#
+#						# Penatrating Scanner
+#						dc.SetPen(wxPen(wxYELLOW, 1, wxSOLID))
+#						dc.SetBrush(wxBrush(wxYELLOW, wxSOLID))
+#						dc.DrawEllipse(object.pos[X]/zoom-p/2.0/zoom+POINT/2, object.pos[Y]/zoom-p/2.0/zoom+POINT/2, p/zoom, p/zoom)
+#
+#						#dc.SetLogicalFunction(wxSET)
 
-				if self.config['Scanner']:
-					scanner = i.getScanner()
-					if scanner is not None:
-						p, s, a = scanner.getRange()
-
-						#print "Topleft", i.x, i.y, "Range", s, "Scanner topleft", i.x/zoom-s/2/zoom, i.y/zoom-s/2/zoom
-
-						#dc.SetLogicalFunction(wxSET)
-
-						# Non-Penatrating Scanner
-						dc.SetPen(wxPen(wxRED, 1, wxSOLID))
-						dc.SetBrush(wxBrush(wxRED, wxSOLID))
-						dc.DrawEllipse(i.x/zoom-s/2.0/zoom+POINT/2, i.y/zoom-s/2.0/zoom+POINT/2, s/zoom, s/zoom)
-
-						# Penatrating Scanner
-						dc.SetPen(wxPen(wxYELLOW, 1, wxSOLID))
-						dc.SetBrush(wxBrush(wxYELLOW, wxSOLID))
-						dc.DrawEllipse(i.x/zoom-p/2.0/zoom+POINT/2, i.y/zoom-p/2.0/zoom+POINT/2, p/zoom, p/zoom)
-
-						#dc.SetLogicalFunction(wxSET)
+				pos = [ object.pos[X]/zoom + 1500, object.pos[Y]/zoom + 1500 ]
+				print pos
 
 				if self.config['DrawNames']:
-					#print "Drawing the name", i.name
-					tw, th = dc.GetTextExtent(i.name) 
-					dc.DrawText(i.name, i.x/zoom-tw/2+POINT/2, i.y/zoom+POINT+1)
+					tw, th = dc.GetTextExtent(object.name) 
+					dc.DrawText(object.name, pos[X]-tw/2+POINT/2, pos[Y]+POINT+1)
 
 				if self.config['System'] == sysOWNER:
 					pass
 
 				elif self.config['System'] == sysPLAIN:
 					dc.SetBrush(wxBrush(wxWHITE, wxSOLID))
-					dc.DrawEllipse(i.x/zoom, i.y/zoom, POINT, POINT)
+					dc.DrawEllipse(pos[X], pos[Y], POINT, POINT)
 
 				if self.config['Ships']:
 					# Draw an orbit circle if the ship exists
 					dc.SetPen(wxPen(wxWHITE, 1, wxSOLID))
 					dc.SetBrush(wxTRANSPARENT_BRUSH)
-					dc.DrawEllipse(i.x/zoom+POINT/2-POINT, i.y/zoom+POINT/2-POINT, POINT*2, POINT*2)
-
+					dc.DrawEllipse(pos[X]+POINT/2-POINT, pos[Y]+POINT/2-POINT, POINT*2, POINT*2)
 
 		if self.dragging:
 			self.RenderDrag(dc)
@@ -321,3 +336,27 @@ class winStarMap(winBase):
 			dc.SetBrush(wxTRANSPARENT_BRUSH)
 			dc.SetLogicalFunction(wxINVERT)
 			dc.DrawLine(self.start[0], self.start[1], self.end[0], self.end[1])
+
+	def Update(self, evt=None):
+		self.canvas.OnPaint(None)	
+		
+	# Recenter onto the selected object
+	def OnSelect(self, evt):
+		zoom = self.config['Zoom']
+		id = evt.value
+		
+		# The object that was selected.
+		object = self.app.game.universe.Object(id)
+
+		if object:
+			pos = [ object.pos[X]/zoom + 1500, object.pos[Y]/zoom + 1500 ]
+			
+			# Center on this position
+			cx, cy = self.canvas.GetClientSize()
+			px, py = self.canvas.GetScrollPixelsPerUnit()
+		
+			pos = [(pos[0] - cx/2)/px, (pos[1] - cy/2)/py]
+
+			print "---------->", pos, (cx, cy), (px, py)
+			self.canvas.Scroll(pos[0], pos[1])
+
