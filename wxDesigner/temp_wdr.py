@@ -374,56 +374,57 @@ def panelObject_Planet( parent, call_fit = true, set_sizer = true ):
 ID_TEXT = 10039
 ID_HOST = 10040
 ID_USERNAME = 10041
-ID_TEXTCTRL = 10042
+ID_PASSWORD = 10042
 ID_OK = 10043
 ID_CANCEL = 10044
 
 def panelConnect( parent, call_fit = true, set_sizer = true ):
-    item0 = wxFlexGridSizer( 0, 2, 0, 0 )
-    item0.AddGrowableCol( 1 )
+    item0 = wxBoxSizer( wxVERTICAL )
     
     item1 = wxBoxSizer( wxHORIZONTAL )
     
+    item2 = wxStaticText( parent, ID_TEXT, "Connect to a Thousand Parsec Server", wxDefaultPosition, wxDefaultSize, 0 )
+    item2.SetFont( wxFont( 16, wxROMAN, wxNORMAL, wxBOLD ) )
+    item1.AddWindow( item2, 0, wxALIGN_CENTRE|wxALL, 5 )
+
     item0.AddSizer( item1, 0, wxALIGN_CENTRE|wxALL, 5 )
 
-    item2 = wxStaticText( parent, ID_TEXT, "Thousand Parsec: Connect", wxDefaultPosition, wxDefaultSize, 0 )
-    item2.SetFont( wxFont( 16, wxSWISS, wxNORMAL, wxBOLD ) )
-    item0.AddWindow( item2, 0, wxALIGN_CENTRE|wxALL, 5 )
-
-    item3 = wxStaticText( parent, ID_TEXT, "Host", wxDefaultPosition, wxDefaultSize, 0 )
-    item0.AddWindow( item3, 0, wxALIGN_CENTRE|wxALL, 5 )
-
-    item4 = wxComboBox( parent, ID_HOST, "", wxDefaultPosition, wxSize(300,-1), 
-        ["Put host here"] , wxCB_DROPDOWN )
-    item0.AddWindow( item4, 0, wxALIGN_CENTRE|wxALL, 5 )
-
-    item5 = wxStaticText( parent, ID_TEXT, "Username", wxDefaultPosition, wxDefaultSize, 0 )
-    item0.AddWindow( item5, 0, wxALIGN_CENTRE|wxALL, 5 )
-
-    item6 = wxComboBox( parent, ID_USERNAME, "", wxDefaultPosition, wxSize(300,-1), 
-        ["Put Username here"] , wxCB_DROPDOWN )
-    item0.AddWindow( item6, 0, wxALIGN_CENTRE|wxALL, 5 )
-
-    item7 = wxStaticText( parent, ID_TEXT, "Password", wxDefaultPosition, wxDefaultSize, 0 )
-    item0.AddWindow( item7, 0, wxALIGN_CENTRE|wxALL, 5 )
-
-    item8 = wxTextCtrl( parent, ID_TEXTCTRL, "", wxDefaultPosition, wxSize(300,-1), wxTE_PASSWORD )
-    item0.AddWindow( item8, 0, wxALIGN_CENTRE|wxALL, 5 )
-
-    item9 = wxBoxSizer( wxHORIZONTAL )
+    item3 = wxFlexGridSizer( 0, 2, 0, 0 )
     
-    item0.AddSizer( item9, 0, wxALIGN_CENTRE|wxALL, 5 )
+    item4 = wxStaticText( parent, ID_TEXT, "Host", wxDefaultPosition, wxDefaultSize, 0 )
+    item3.AddWindow( item4, 0, wxALIGN_CENTRE|wxALL, 5 )
+
+    item5 = wxComboBox( parent, ID_HOST, "", wxDefaultPosition, wxSize(200,-1), 
+        ["code-bear.dyndns.org:6923"] , wxCB_DROPDOWN )
+    item3.AddWindow( item5, 0, wxALIGN_CENTRE|wxALL, 5 )
+
+    item6 = wxStaticText( parent, ID_TEXT, "Username", wxDefaultPosition, wxDefaultSize, 0 )
+    item3.AddWindow( item6, 0, wxALIGN_CENTRE|wxALL, 5 )
+
+    item7 = wxComboBox( parent, ID_USERNAME, "", wxDefaultPosition, wxSize(200,-1), [], wxCB_DROPDOWN )
+    item3.AddWindow( item7, 0, wxALIGN_CENTRE|wxALL, 5 )
+
+    item8 = wxStaticText( parent, ID_TEXT, "Password", wxDefaultPosition, wxDefaultSize, 0 )
+    item3.AddWindow( item8, 0, wxALIGN_CENTRE|wxALL, 5 )
+
+    item9 = wxTextCtrl( parent, ID_PASSWORD, "", wxDefaultPosition, wxSize(200,-1), wxTE_PASSWORD )
+    item3.AddWindow( item9, 0, wxALIGN_CENTRE|wxALL, 5 )
 
     item10 = wxBoxSizer( wxHORIZONTAL )
     
-    item11 = wxButton( parent, ID_OK, "OK", wxDefaultPosition, wxDefaultSize, 0 )
-    item11.SetDefault()
-    item10.AddWindow( item11, 0, wxALIGN_CENTRE|wxALL, 5 )
+    item3.AddSizer( item10, 0, wxALIGN_CENTRE|wxALL, 5 )
 
-    item12 = wxButton( parent, ID_CANCEL, "Cancel", wxDefaultPosition, wxDefaultSize, 0 )
-    item10.AddWindow( item12, 0, wxALIGN_CENTRE|wxALL, 5 )
+    item11 = wxBoxSizer( wxHORIZONTAL )
+    
+    item12 = wxButton( parent, ID_OK, "OK", wxDefaultPosition, wxDefaultSize, 0 )
+    item11.AddWindow( item12, 0, wxALIGN_CENTRE|wxALL, 5 )
 
-    item0.AddSizer( item10, 0, wxALIGN_CENTRE|wxALL, 5 )
+    item13 = wxButton( parent, ID_CANCEL, "Cancel", wxDefaultPosition, wxDefaultSize, 0 )
+    item11.AddWindow( item13, 0, wxALIGN_CENTRE|wxALL, 5 )
+
+    item3.AddSizer( item11, 0, wxALIGN_CENTRE|wxALL, 5 )
+
+    item0.AddSizer( item3, 0, wxALIGN_CENTRE|wxALL, 5 )
 
     if set_sizer == true:
         parent.SetAutoLayout( true )

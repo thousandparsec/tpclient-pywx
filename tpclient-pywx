@@ -54,12 +54,13 @@ if __name__ == '__main__':
 			##########
 			# Load the windows
 			##########
-			#from windows.winConnect import winConnect
+			from windows.winConnect import winConnect
 			from windows.winMain    import winMain
 			from windows.winStarMap import winStarMap
 			from windows.winMessage import winMessage
 			from windows.winSystem  import winSystem
-			
+		
+			self.connect = winConnect(app, -1, None)
 			self.main    = winMain(app, -1, None, (0,0), (1024-600-5,50))
 			self.map     = winStarMap(self.main, -1, None, (1024-600,0), (600-5,500))
 			self.message = winMessage(self.main, -1, None, (0,476), (1024-600-5,200))
@@ -94,5 +95,6 @@ if __name__ == '__main__':
 			
 
 	app = appTP()
+	app.windows.connect.Show(TRUE)
 	app.MainLoop()
 	

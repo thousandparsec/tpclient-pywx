@@ -4,9 +4,9 @@ from copy import deepcopy
 from wxPython.wx import *
 from wxPython.html import *
 
-from common.message import Message
+#from common.message import Message
 
-class wxMessage(Message):
+class wxMessage: #(Message):
 
 	def render(self):
 		# Render the message, first you need to convert the <link> to wx objects

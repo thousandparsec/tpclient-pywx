@@ -1,50 +1,94 @@
 
-import wxPython.wx import *
+from wxPython.wx import *
 
-ORDER_LIST = 10101
-ORDER_LINE = 10102
-ORDER_NEW = 10103
-ORDER_DELETE = 10104
-ORDER_EDIT = 10105
+defaultServers = ["code-bear.dyndns.org:6923"] 
 
-def panelOrders( parent, call_fit = true, set_sizer = true ):
-    item0 = wxFlexGridSizer( 0, 1, 0, 0 )
-    item0.AddGrowableCol( 0 )
-    item0.AddGrowableRow( 0 )
-    item0.AddGrowableRow( 4 )
-    
-    item1 = wxListCtrl( parent, ORDER_LIST, wxDefaultPosition, wxSize(160,120), wxLC_REPORT|wxSUNKEN_BORDER )
-    item0.AddWindow( item1, 0, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 5 )
+ID_TEXT = 10039
+ID_HOST = 10040
+ID_USERNAME = 10041
+ID_PASSWORD = 10042
+ID_OK = 10043
+ID_CANCEL = 10044
 
-    item2 = wxStaticLine( parent, ORDER_LINE, wxDefaultPosition, wxSize(20,-1), wxLI_HORIZONTAL )
-    item0.AddWindow( item2, 0, wxALIGN_CENTRE|wxALL, 5 )
+# Shows messages from the game system to the player.
+class winConnect(wxFrame):
+	def __init__(self, parent, ID, title=None, pos=wxDefaultPosition, size=wxDefaultSize, style=wxDEFAULT_FRAME_STYLE, message_list=[]):
+		wxFrame.__init__(self, None, ID, 'TP: Connect', pos, size, style)
 
-    item3 = wxFlexGridSizer( 1, 0, 0, 0 )
-    
-    item4 = wxButton( parent, ORDER_NEW, "New Order", wxDefaultPosition, wxDefaultSize, 0 )
-    item3.AddWindow( item4, 0, wxALIGN_CENTRE|wxALL, 5 )
+		self.obj = {}
 
-    item5 = wxButton( parent, ORDER_DELETE, "Delete Order", wxDefaultPosition, wxDefaultSize, 0 )
-    item3.AddWindow( item5, 0, wxALIGN_CENTRE|wxALL, 5 )
+		item0 = wxBoxSizer( wxVERTICAL )
+	
+		item1 = wxBoxSizer( wxHORIZONTAL )
+	
+		item2 = wxStaticText( self, ID_TEXT, "Connect to a Thousand Parsec Server", wxDefaultPosition, wxDefaultSize, 0 )
+		item2.SetFont( wxFont( 16, wxROMAN, wxNORMAL, wxBOLD ) )
+		item1.AddWindow( item2, 0, wxALIGN_CENTRE|wxALL, 5 )
 
-    item0.AddSizer( item3, 0, wxALIGN_CENTRE|wxALL, 5 )
+		item0.AddSizer( item1, 0, wxALIGN_CENTRE|wxALL, 5 )
 
-    item6 = wxStaticLine( parent, ORDER_LINE, wxDefaultPosition, wxSize(20,-1), wxLI_HORIZONTAL )
-    item0.AddWindow( item6, 0, wxALIGN_CENTRE|wxALL, 5 )
+		item3 = wxFlexGridSizer( 0, 2, 0, 0 )
+		
+		item4 = wxStaticText( self, ID_TEXT, "Host", wxDefaultPosition, wxDefaultSize, 0 )
+		item3.AddWindow( item4, 0, wxALIGN_CENTRE|wxALL, 5 )
 
-    item7 = wxFlexGridSizer( 0, 2, 0, 0 )
-    
-    item8 = parent.FindWindowById( ORDER_EDIT )
-    item7.AddWindow( item8, 0, wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 5 )
+		item5 = wxComboBox( self, ID_HOST, "", wxDefaultPosition, wxSize(200,-1), 
+			defaultServers, wxCB_DROPDOWN )
+		item3.AddWindow( item5, 0, wxALIGN_CENTRE|wxALL, 5 )
 
-    item0.AddSizer( item7, 0, wxGROW|wxALIGN_CENTER_HORIZONTAL|wxALL, 5 )
+		self.obj['host'] = item5
 
-    if set_sizer == true:
-        parent.SetAutoLayout( true )
-        parent.SetSizer( item0 )
-        if call_fit == true:
-            item0.Fit( parent )
-            item0.SetSizeHints( parent )
-    
-    return item0
+		item6 = wxStaticText( self, ID_TEXT, "Username", wxDefaultPosition, wxDefaultSize, 0 )
+		item3.AddWindow( item6, 0, wxALIGN_CENTRE|wxALL, 5 )
+
+		item7 = wxComboBox( self, ID_USERNAME, "", wxDefaultPosition, wxSize(200,-1), [], wxCB_DROPDOWN )
+		item3.AddWindow( item7, 0, wxALIGN_CENTRE|wxALL, 5 )
+
+		self.obj['username'] = item7
+
+		item8 = wxStaticText( self, ID_TEXT, "Password", wxDefaultPosition, wxDefaultSize, 0 )
+		item3.AddWindow( item8, 0, wxALIGN_CENTRE|wxALL, 5 )
+
+		item9 = wxTextCtrl( self, ID_PASSWORD, "", wxDefaultPosition, wxSize(200,-1), wxTE_PASSWORD )
+		item3.AddWindow( item9, 0, wxALIGN_CENTRE|wxALL, 5 )
+
+		self.obj['password'] = item9
+
+		item0.AddSizer( item3, 0, wxALIGN_CENTRE|wxALL, 5 )
+
+		item10 = wxBoxSizer( wxHORIZONTAL )
+
+		item3.AddSizer( item10, 0, wxALIGN_CENTRE|wxALL, 5 )
+
+		item11 = wxBoxSizer( wxHORIZONTAL )
+
+		item12 = wxButton( self, ID_OK, "OK", wxDefaultPosition, wxDefaultSize, 0 )
+		item11.AddWindow( item12, 0, wxALIGN_CENTRE|wxALL, 5 )
+
+		item13 = wxButton( self, ID_CANCEL, "Cancel", wxDefaultPosition, wxDefaultSize, 0 )
+		item11.AddWindow( item13, 0, wxALIGN_CENTRE|wxALL, 5 )
+
+		item3.AddSizer( item11, 0, wxALIGN_CENTRE|wxALL, 5 )
+
+		self.SetAutoLayout( true ) 
+		self.SetSizer( item0 )
+		#item0.Fit( self )
+		item0.SetSizeHints( self )
+
+		EVT_BUTTON(self, ID_OK, self.OnOkay)
+		EVT_BUTTON(self, ID_CANCEL, self.OnCancel)
+	
+	def OnOkay(self, event):
+		# Check the host and username arn't blank
+		pass	
+	
+	def OnCancel(self, event):
+		self.Show(FALSE)
+		self.parent.windows.show()
+
+	def OnExit(self, evt):
+		# Check if the server is connected
+
+		# Exit then
+		self.parent.exit()		
 

@@ -77,31 +77,6 @@ class winMain(wxFrame):
 		self.SetMenuBar(item0)
 		self.CreateStatusBar(1, wxST_SIZEGRIP)
 
-	def gameNew(self, evt):
-		if self.parent.game != None:
-			# Warn the user that creating a new game will stop the current one
-			okay = wxMessageDialog(self,
-								   "Creating a new game will erase the current game, do you want to continue?",
-								   "New Game",
-								   wxYES_NO)
-			
-			if okay.ShowModal() == wxID_NO:
-				okay.Destory()
-				return
-			
-			okay.Destroy()
-			
-		dlg = wxDirDialog(self, "Choose a place for the new game", ".", 0)
-
-		if dlg.ShowModal() == wxID_OK:
-			path = dlg.GetPath()
-			self.parent.newgame(path)
-		
-		dlg.Destroy()
-
-	def gameRevert(self, evt):
-		pass
-
 	def programExit(self, evt):
-		sys.exit(0)
+		self.parent.exit()
 	
