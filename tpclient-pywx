@@ -78,6 +78,9 @@ if __name__ == '__main__':
 			# Show the main window
 			##########
 			self.windows.main.Show(TRUE)
+			self.windows.map.Show(TRUE)
+			self.windows.message.Show(TRUE)
+			self.windows.system.Show(TRUE)
 			
 			return TRUE
 
