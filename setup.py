@@ -75,6 +75,7 @@ setup(
 		'extra.wxFloatCanvas',
 		],
 	data_files=[(".",			("LICENSE", "COPYING", "README")),
+				("doc",			("tips.txt")),
 				("graphics",	glob.glob("graphics/*.png")),
 				("graphics/media/planet-small",		glob.glob("graphics/media/planet-small/*.jpg")),
 				("graphics/media/star-small",		glob.glob("graphics/media/star-small/*.jpg")),
