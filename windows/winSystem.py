@@ -36,7 +36,7 @@ class winSystem(wxFrame):
 				child = self.AppendItem(item, "Link to ABC", self.icons['Link'])
 
 				for i in range(10):
-					item = self.AppendItem(root, "Filler")
+					item = self.AppendItem(root, "")
 				
 				self.Expand(root)
 

@@ -15,6 +15,8 @@ sysOWNER = 2
 sysHAB = 3
 sysMIN = 4
 
+systems = []
+
 # Shows the main map of the universe.
 class winStarMap(wxFrame):
 	def __init__(self, parent, ID, title=None, pos=wxDefaultPosition, size=wxDefaultSize, style=wxDEFAULT_FRAME_STYLE):
@@ -265,7 +267,7 @@ class winStarMap(wxFrame):
 
 						#dc.SetLogicalFunction(wxSET)
 
-						# None Penatrating Scanner
+						# Non-Penatrating Scanner
 						dc.SetPen(wxPen(wxRED, 1, wxSOLID))
 						dc.SetBrush(wxBrush(wxRED, wxSOLID))
 						dc.DrawEllipse(i.x/zoom-s/2.0/zoom+POINT/2, i.y/zoom-s/2.0/zoom+POINT/2, s/zoom, s/zoom)

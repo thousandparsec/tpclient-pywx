@@ -46,114 +46,52 @@ class NameMap(UserDict):
 
 if __name__ == '__main__':
 
-	class appTP(wxApp):
-		def OnInit(self):
-			wxInitAllImageHandlers()
-			
-			class temp:
-				pass
+	class mainControl:
+		def __init__(self, app):
 
-			self.windows = temp()
-			
-			##########
-			# Inits the game information
-			##########
-			self.game = temp()
-			self.closegame()
-			
+			self.app = app
+
 			##########
 			# Load the windows
 			##########
+			#from windows.winConnect import winConnect
 			from windows.winMain    import winMain
 			from windows.winStarMap import winStarMap
 			from windows.winMessage import winMessage
 			from windows.winSystem  import winSystem
 			
-			self.windows.main = winMain(self, -1, None, (0,0), (1024-600-5,50))
-			self.windows.map = winStarMap(self.windows.main, -1, None, (1024-600,0), (600-5,500))
-			self.windows.message = winMessage(self.windows.main, -1, None, (0,476), (1024-600-5,200))
-			self.windows.system = winSystem(self.windows.main, -1, None, (1024-600,523), (600-5,187))
+			self.main    = winMain(app, -1, None, (0,0), (1024-600-5,50))
+			self.map     = winStarMap(self.main, -1, None, (1024-600,0), (600-5,500))
+			self.message = winMessage(self.main, -1, None, (0,476), (1024-600-5,200))
+			self.system  = winSystem(self.main, -1, None, (1024-600,523), (600-5,187))
 
+		def show(self):
 			##########
 			# Show the main window
 			##########
-			self.windows.main.Show(TRUE)
-			self.windows.map.Show(TRUE)
-			self.windows.message.Show(TRUE)
-			self.windows.system.Show(TRUE)
+			self.main.Show(TRUE)
+			self.map.Show(TRUE)
+			self.message.Show(TRUE)
+			self.system.Show(TRUE)
+
+		def hide(self):
+			##########
+			# Show the main window
+			##########
+			self.main.Show(FALSE)
+			self.map.Show(FALSE)
+			self.message.Show(FALSE)
+			self.system.Show(FALSE)
 			
+
+	class appTP(wxApp):
+		def OnInit(self):
+			wxInitAllImageHandlers()
+
+			self.windows = mainControl(self)
+
 			return TRUE
-
-		def newgame(self, dir):
-			"""\
-			Start New game
-			"""
-			## Close the current game
-			self.closegame()
-
-			self.game.game = dir
 			
-			## Create a new name mapping
-			self.game.mapping = NameMap()
-			self.game.mapping.saveconfig(os.path.join(dir, "Mapping.current"))
-			
-			## Create a new known universe
-			self.game.universe = ()
-			
-
-		def closegame(self):
-			"""\
-			closes a game, no regard for saving
-			"""
-			self.game = None
-			self.turn = 0
-			self.universe = None
-			self.mapping = None
-		
-		def loadgame(self):
-			"""\
-			loads a game
-			"""
-			########
-			# Load the data files
-			########
-			# Need to load the "name mappings", ie ID to Name mappings, Name to ID
-
-			# Need to load the Known Universe
-
-			# Need to load the "current orders"
-			pass
-
-		def savegame(self):
-			"""\
-			saves a game
-			"""
-			#######
-			# Save the data files
-			#######
-			pass
-		
-		def genturn(self):
-			"""\
-			Generate a turn file
-			"""
-			pass
-		
-		def loadturn(self):
-			"""\
-			Updates the universe with the new information found in the <turn> file.
-			This also increases the known universe file to be KnownUniverse.t<no>
-			So as to not overwrite the information.
-			"""
-			pass
-
-		
-		def __del__(self):
-
-			# Save the "name mappings"
-
-			# Save the Known Universe
-			pass
 
 	app = appTP()
 	app.MainLoop()

@@ -1,16 +1,9 @@
 
 from wxPython.wx import *
 
-ID_NEW_GAME = 10039
-ID_NEW_RACE = 10040
-ID_NEW = 10041
 ID_MENU = 10042
 ID_OPEN = 10043
-ID_SAVE = 10044
-ID_CLOSE = 10045
 ID_REVERT = 10046
-ID_LOADTURN = 10047
-ID_GENTURN = 10048
 ID_EXIT = 10049
 ID_FILE = 10050
 ID_STAT_EAAG = 10051
@@ -37,27 +30,16 @@ class winMain(wxFrame):
 		wxFrame.__init__(self, None, ID, 'TP: Thousand Parsecs', pos, size, style)
 
 		self.parent = parent
+		print parent
 
 		item0 = wxMenuBar()
 
 		item1 = wxMenu() # wxMENU_TEAROFF )
 
-		item2 = wxMenu()
-		item2.Append( ID_NEW_GAME, "Game", "Start a new Game" )
-		EVT_MENU(self, ID_NEW_GAME, self.gameNew)
-		item2.Append( ID_NEW_RACE, "Race", "Start a new Race" )
-		EVT_MENU(self, ID_NEW_RACE, None)
-		item1.AppendMenu( ID_NEW, "New", item2 )
-
-		item1.AppendSeparator()
-		item1.Append( ID_OPEN,   "Open Game\tCtrl-O", "Open a diffrent Game" )
-		item1.Append( ID_SAVE,   "Save Game\tCtrl-S", "Save this Game" )
-		item1.Append( ID_CLOSE,  "Close Game\tCtrl-C", "Close this Game" )
+		item1.Append( ID_OPEN,   "Connect to Game\tCtrl-O", "Connect to a diffrent Game" )
+		#EVT_MENU(self, ID_OPEN, parent.app.connect)
 		item1.AppendSeparator()
 		item1.Append( ID_REVERT, "Revert Game", "Forget non-saved changes" )
-		item1.AppendSeparator()
-		item1.Append( ID_LOADTURN, "Load Turn File\tCtrl-L", "Load a turn file" )
-		item1.Append( ID_GENTURN,  "Generate Turn File\tCtrl-T", "Generate a turn file" )
 		item1.AppendSeparator()
 		item1.Append( ID_EXIT, "Exit", "Exit" )
 		EVT_MENU(self, ID_EXIT, self.programExit)
@@ -116,15 +98,6 @@ class winMain(wxFrame):
 			self.parent.newgame(path)
 		
 		dlg.Destroy()
-
-	def gameLoad(self, evt):
-		dlg = wxDirDialog(self, "Choose a new game", ".", 0)
-
-	def gameSave(self, evt):
-		self.parent.savegame()
-
-	def gameClose(self, evt):
-		pass
 
 	def gameRevert(self, evt):
 		pass
