@@ -14,9 +14,9 @@ from winBase import *
 from utils import *
 
 # Protocol Imports
-from netlib import failed
-from netlib import objects
-from netlib.objects import OrderDescs, constants
+from tp.netlib import failed
+from tp.netlib import objects
+from tp.netlib.objects import constants
 
 TURNS_COL = 0
 ORDERS_COL = 1
@@ -139,10 +139,10 @@ class winOrder(winBase):
 		self.type_list.Clear()
 		self.type_list.SetToolTipDefault("Order type to create")
 		for type in object.order_types:
-			if not OrderDescs().has_key(type):
+			if not objects.OrderDescs().has_key(type):
 				continue
 
-			od = OrderDescs()[type]
+			od = objects.OrderDescs()[type]
 			
 			self.type_list.Append(od.name, type)
 			if hasattr(od, "doc"):
@@ -181,7 +181,7 @@ class winOrder(winBase):
 			slot = 0
 			
 		try:
-			orderdesc = OrderDescs()[type]
+			orderdesc = objects.OrderDescs()[type]
 		except IndexError:
 			debug(DEBUG_WINDOWS, "OrderNew: Have not got OrderDesc yet (%i)" % type)
 			return
@@ -247,7 +247,7 @@ class winOrder(winBase):
 			return
 		
 		try:
-			orderdesc = OrderDescs()[order.type]
+			orderdesc = objects.OrderDescs()[order.type]
 		except IndexError:
 			debug(DEBUG_WINDOWS, "OrderSave: No order description. (%s)" % order.type)
 			return
@@ -323,7 +323,7 @@ class winOrder(winBase):
 
 		# Do we actually have an order
 		if isinstance(order, objects.Order):
-			orderdesc = OrderDescs()[order.type]
+			orderdesc = objects.OrderDescs()[order.type]
 			
 			# List for the argument subpanels
 			self.argument_subpanels = []

@@ -37,14 +37,17 @@ import string
 import pprint
 import thread
 
-import sys
-sys.path.append("..")
-
-from netlib import Connection
-from netlib import failed
+try:
+	import tp.netlib
+except ImportError:
+	import sys
+	sys.path.append("..")
+	import tp.netlib
 
 from utils import *
 from config import *
+
+from tp.netlib import Connection, failed
 
 from windows.control import MainControl
 

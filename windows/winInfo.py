@@ -10,9 +10,9 @@ from types import *
 import wx
 
 # Network imports
-from netlib.objects.ObjectExtra.StarSystem import StarSystem
-from netlib.objects.ObjectExtra.Planet import Planet
-from netlib.objects.ObjectExtra.Fleet import Fleet
+from tp.netlib.objects.ObjectExtra.StarSystem import StarSystem
+from tp.netlib.objects.ObjectExtra.Planet import Planet
+from tp.netlib.objects.ObjectExtra.Fleet import Fleet
 
 # Local imports
 from winBase import *

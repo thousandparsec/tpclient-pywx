@@ -10,7 +10,8 @@ import string
 import wx
 
 # Local Imports
-from netlib import failed
+from tp.netlib import failed
+
 from winBase import *
 from utils import *
 

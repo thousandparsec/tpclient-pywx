@@ -17,7 +17,7 @@ import wx.lib.anchors
 from winBase import *
 
 # Protocol Imports
-from netlib import failed
+from tp.netlib import failed
 
 MESSAGE_FILTER = 10000
 MESSAGE_TITLE = 10001
