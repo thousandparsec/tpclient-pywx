@@ -63,10 +63,10 @@ class GameThread:
 
 						# Publish an object getting event
 						for window in self.windows:
-							nevt = GameGetObjectEvent(id, "")
+							nevt = GameObjectGetEvent(id, "")
 							wxPostEvent(window, nevt)
 					
-						g = protocol.GetObject(id=id)
+						g = protocol.ObjectGet(id=id)
 						evt.network.Send(g)
 
 	def __call__(self):

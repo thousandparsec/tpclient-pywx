@@ -127,7 +127,7 @@ class AppTP(wxApp):
 					# Setup and register the universe
 
 					# Okay now try to get the universe
-					g = protocol.GetObject(id=0)
+					g = protocol.ObjectGet(id=0)
 					evt.network.Send(g)
 					
 				else:

@@ -28,7 +28,7 @@ def EVT_GAME_GETORDER(win, func):
 def UNEVT_GAME_GETORDER(win, func):
 	win.Disconnect(-1, wxEVT_GAME_GETORDER, -1)
 	
-class GameGetObjectEvent(wxPyEvent):
+class GameObjectGetEvent(wxPyEvent):
 	def __init__(self, id, name):
 		wxPyEvent.__init__(self)
 		self.SetEventType(wxEVT_GAME_GETOBJ)

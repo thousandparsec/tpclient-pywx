@@ -333,10 +333,11 @@ class OrderDesc(Processed):
 	
 	struct="L SS [SIS]"
 
-	COORD = 0
-	TIME = 1
-	OBJECT = 2
-	PLAYER = 3
+	orders = {}
+	ARG_COORD = 0
+	ARG_TIME = 1
+	ARG_OBJECT = 2
+	ARG_PLAYER = 3
 
 	def __init__(self, s=None, id=None):
 		if s != None:
@@ -366,6 +367,34 @@ class OrderDesc(Processed):
 		# Type
 		output, trash = unxpack(OrderDesc.struct, data)
 		self.type, self.name, self.desc, self.parameters = output
+
+		OrderDesc.orders[self.type] = self
+
+	def get_struct(self):
+		# Build a struct defenition for this order.
+		pass
+
+class OrderGet(Processed):
+	pass
+
+class Order(Processed):
+	"""\
+	An order object.
+	"""
+
+	struct = ""
+
+	def __init__(self, s=None, type=None, **kw):
+		pass
+
+
+	def check_type(self):
+		# Check that the type we have has been described.
+		pass
+		
+
+	def SetData(self, data):
+		pass		
 
 
 def read_packet(s):
