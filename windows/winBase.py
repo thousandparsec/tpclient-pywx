@@ -30,6 +30,8 @@ class winBase(wxFrame):
 		elif self.application.windows.config.raise_ == "All on Main":
 			if self.title == "Thousand Parsec":
 				self.application.windows.Raise()
+		elif self.application.windows.config.raise_ == "Individual":
+			pass
 		else:
 			print "Unknown raise method:", self.application.windows.config.raise_
 
