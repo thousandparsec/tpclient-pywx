@@ -140,17 +140,41 @@ class winStarMap(winBase):
 		return drawable
 
 	def OnLeftClick(self, evt):
-		self.application.windows.Post(wx.local.SelectObjectEvent(evt.data))
+		if self.mode == "Position":
+			pos = self.application.cache.objects[evt.obj.data].pos
+			self.application.windows.Post(wx.local.SelectPositionEvent(pos))
+			
+			self.SetMode("Normal")
+		else:
+			self.application.windows.Post(wx.local.SelectObjectEvent(evt.obj.data))
 
 	def OnRightClick(self, evt):
-		if self.mode == "Normal":
-			# Check if there are any other objects at this position 
-	
-			# If so display a pop-up menu with the objects to choose from...
-			print "Right click on", evt.data
-		elif self.mode == "Select":
-			# Cancel the mode
+		obj = self.application.cache.objects[evt.obj.data]
+		
+		menu = wx.Menu()
+		
+		def ac(objects, menu, obj):
+			menu.Append(obj.id, obj.name)
+			for id in obj.contains:
+				ac(objects, menu, objects[id])
+		
+		ac(self.application.cache.objects, menu, obj)
+
+		self.Bind(wx.EVT_MENU, self.OnOrderMenu)
+		self.PopupMenu(menu, evt.GetPosition())
+
+	def OnOrderMenu(self, evt):
+		menu = evt.GetEventObject()
+		item = menu.FindItemById(evt.GetId())
+
+		self.application.windows.Post(wx.local.SelectObjectEvent(evt.GetId()))
+		
+		if self.mode == "Position":
 			self.SetMode("Normal")
+
+	def SetMode(self, mode):
+		if mode in ("Normal", "Position"):
+			self.mode = mode
 
 	def OnSelectObject(self, evt):
 		object = self.application.cache.objects[evt.id]

@@ -150,6 +150,51 @@ class wxComboBox(wx.ComboBox, ToolTipItemMixIn):
 		slot = self.GetSelection()
 		self.SetToolTipCurrent(slot)
 
+wx.DIGIT_ONLY = 1
+wx.ALPHA_ONLY = 2
+class wxSimpleValidator(wx.PyValidator):
+	def __init__(self, flag=None, pyVar=None):
+		wx.PyValidator.__init__(self)
+		self.flag = flag
+		self.Bind(wx.EVT_CHAR, self.OnChar)
+
+	def Clone(self):
+		return MyValidator(self.flag)
+
+	def Validate(self, win):
+		tc = self.GetWindow()
+		val = tc.GetValue()
+		
+		if self.flag == wx.ALPHA_ONLY:
+			for x in val:
+				if x not in string.letters:
+					return False
+
+		elif self.flag == wx.DIGIT_ONLY:
+			for x in val:
+				if x not in string.digits:
+					return False
+
+		return True
+
+	def OnChar(self, event):
+		key = event.KeyCode()
+		if key < wx.WXK_SPACE or key == wx.WXK_DELETE or key > 255:
+			event.Skip()
+			return
+		if self.flag == wx.ALPHA_ONLY and chr(key) in string.letters:
+			event.Skip()
+			return
+		if self.flag == wx.DIGIT_ONLY and chr(key) in string.digits:
+			event.Skip()
+			return
+		if not wx.Validator_IsSilent():
+			wx.Bell()
+		# Returning without calling even.Skip eats the event before it
+		# gets to the text control
+		return
+
+wx.SimpleValidator = wxSimpleValidator
 wx.ListCtrl = wxListCtrl
 wx.Choice = wxChoice
 wx.ComboBox = wxComboBox

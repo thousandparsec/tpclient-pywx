@@ -1292,7 +1292,9 @@ class FloatCanvas(wx.Panel):
                     Object = self.HitDict[ HitEvent ][color]
                     ## Add the hit coords to the Object
                     Object.HitCoords = self.PixelToWorld( xy )
-                    Object.CallBackFuncs[HitEvent](Object)
+					# FIXME: Changed by Mithro 15 August
+                    event.obj = Object
+                    Object.CallBackFuncs[HitEvent](event)
                     return True
             return False
 

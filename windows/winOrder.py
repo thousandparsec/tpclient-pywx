@@ -812,7 +812,7 @@ def argCoordPanel(parent, parent_panel, args):
 	item1.SetFont(wx.local.normalFont)
 	item0.AddWindow( item1, 0, wx.ALIGN_CENTRE|wx.LEFT, 0 )
 
-	item2 = wx.SpinCtrl( panel, -1, str(args[X]), min=min, max=max, size=wx.local.spinSize )
+	item2 = wx.TextCtrl( panel, -1, str(args[X]), size=wx.local.spinSize, validator=wx.SimpleValidator(wx.DIGIT_ONLY) )
 	item2.SetFont(wx.local.tinyFont)
 	item0.AddWindow( item2, 0, wx.ALIGN_CENTRE|wx.LEFT, 1 )
 
@@ -820,7 +820,7 @@ def argCoordPanel(parent, parent_panel, args):
 	item3.SetFont(wx.local.normalFont)
 	item0.AddWindow( item3, 0, wx.ALIGN_CENTRE|wx.LEFT, 3 )
 
-	item4 = wx.SpinCtrl( panel, -1, str(args[Y]), min=min, max=max, size=wx.local.spinSize )
+	item4 = wx.TextCtrl( panel, -1, str(args[Y]), size=wx.local.spinSize, validator=wx.SimpleValidator(wx.DIGIT_ONLY) )
 	item4.SetFont(wx.local.tinyFont)
 	item0.AddWindow( item4, 0, wx.ALIGN_CENTRE|wx.LEFT, 1 )
 
@@ -828,7 +828,7 @@ def argCoordPanel(parent, parent_panel, args):
 	item5.SetFont(wx.local.normalFont)
 	item0.AddWindow( item5, 0, wx.ALIGN_CENTRE|wx.LEFT, 3 )
 
-	item6 = wx.SpinCtrl( panel, -1, str(args[Z]), min=min, max=max, size=wx.local.spinSize )
+	item6 = wx.TextCtrl( panel, -1, str(args[Z]), size=wx.local.spinSize, validator=wx.SimpleValidator(wx.DIGIT_ONLY) )
 	item6.SetFont(wx.local.tinyFont)
 	item0.AddWindow( item6, 0, wx.ALIGN_CENTRE|wx.LEFT, 1 )
 
@@ -836,9 +836,19 @@ def argCoordPanel(parent, parent_panel, args):
 	item7.SetFont(wx.local.normalFont)
 	item0.AddWindow( item7, 0, wx.ALIGN_CENTRE|wx.LEFT, 3 )
 
+	def OnSelectPosition(evt, x=item2, y=item4, z=item6):
+		x.SetValue(str(evt.x))
+		y.SetValue(str(evt.y))
+		z.SetValue(str(evt.z))
+	parent.OnSelectPosition = OnSelectPosition
+
+	def p(evt, starmap=parent.application.windows.starmap):
+		starmap.SetMode("Position")
+	parent.Bind(wx.EVT_BUTTON, p, item7)
+	
 	return panel
 
 def argCoordGet(panel):
 	windows = panel.GetChildren()
-	return [windows[1].GetValue(), windows[3].GetValue(), windows[5].GetValue()]
+	return [int(windows[1].GetValue()), int(windows[3].GetValue()), int(windows[5].GetValue())]
 	

@@ -180,5 +180,6 @@ class winSystem(winBase):
 		if item:
 			self.tree.CollapseAll()			# Collapse all the other stuff
 			self.tree.SelectItem(item)		# Select Item
+			if not self.tree.IsVisible(item):
+				self.tree.EnsureVisible(item)
 			self.tree.Expand(item)			# Expand the Item
-			self.tree.EnsureVisible(item)

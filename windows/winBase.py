@@ -20,6 +20,11 @@ class SelectObjectEvent(wx.PyEvent):
 		self.id = id
 wx.local.SelectObjectEvent = SelectObjectEvent
 
+class SelectPositionEvent(wx.PyEvent):
+	def __init__(self, pos):
+		self.x, self.y, self.z = pos
+wx.local.SelectPositionEvent = SelectPositionEvent
+
 class SelectOrderEvent(wx.PyEvent):
 	def __init__(self, id, slot, save=False):
 		self.id = id
