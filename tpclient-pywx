@@ -3,6 +3,7 @@ import sys
 
 # wxPython imports
 from wxPython.wx import *
+from extra import fixdc
 
 # Python Imports
 from math import *
@@ -32,12 +33,18 @@ class AppTP(wxApp):
 	
 	def OnInit(self):
 		try:
-			print "AppTp.OnInit"
+			print "AppTp.OnInit.AllImageHandlers"
 			wxInitAllImageHandlers()
+			
+			print "AppTp.OnInit.cache"
+			self.cache = {}
 
+			print "AppTp.OnInit.windows"
 			self.windows = MainControl(self)
-			self.connection = Connection()
 
+			print "AppTp.OnInit.connection"
+			self.connection = Connection()
+			
 			self.windows.connect.Show(TRUE)
 		except:
 			do_traceback()

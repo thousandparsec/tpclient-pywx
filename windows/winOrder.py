@@ -12,11 +12,6 @@ from wxPython.lib.anchors import LayoutAnchors
 # Local imports
 from winBase import winBase
 
-from events import *
-from game.events import *
-
-from network import protocol
-
 from extra.wxListCtrl import wxListCtrl
 from extra.wxPostEvent import *
 

@@ -7,7 +7,6 @@ All the windows are controlled by this class
 from wxPython.wx import *
 
 # Python Imports
-from extra.wxPostEvent import *
 from utils import *
 from config import *
 
@@ -63,9 +62,9 @@ class MainControl:
 		config.main.pos = self.main.GetPositionTuple()
 		config.main.size = self.main.GetSizeTuple()
 		config.main.show = self.main.IsShown()
-#		config.message.pos = self.message.GetPositionTuple()
-#		config.message.size = self.message.GetSizeTuple()
-#		config.message.show = self.message.IsShown()
+		config.message.pos = self.message.GetPositionTuple()
+		config.message.size = self.message.GetSizeTuple()
+		config.message.show = self.message.IsShown()
 #		config.order.pos = self.order.GetPositionTuple()
 #		config.order.size = self.order.GetSizeTuple()
 #		config.order.show = self.order.IsShown()
@@ -83,8 +82,8 @@ class MainControl:
 
 		self.main.SetPosition(config.main.pos)
 		self.main.SetSize(config.main.size)
-#		self.message.SetPosition(config.message.pos)
-#		self.message.SetSize(config.message.size)
+		self.message.SetPosition(config.message.pos)
+		self.message.SetSize(config.message.size)
 #		self.order.SetPosition(config.order.pos)
 #		self.order.SetSize(config.order.size)
 		self.starmap.SetPosition(config.starmap.pos)
@@ -94,7 +93,7 @@ class MainControl:
 		
 		if show:
 			self.main.Show(config.main.show)
-#			self.message.Show(config.message.show)
+			self.message.Show(config.message.show)
 #			self.order.Show(config.order.show)
 			self.starmap.Show(config.starmap.show)
 #			self.system.Show(config.system.show)
@@ -115,11 +114,11 @@ class MainControl:
 		from windows.winMain    import winMain
 		self.main = winMain(app, config.main.pos, config.main.size)
 
-#		from windows.winConfig  import winConfig
-#		self.winconfig = winConfig(app, self.main)
+		from windows.winConfig  import winConfig
+		self.winconfig = winConfig(app, self.main)
 
-#		from windows.winMessage import winMessage
-#		self.message = winMessage(app, self.main, config.message.pos, config.message.size)
+		from windows.winMessage import winMessage
+		self.message = winMessage(app, self.main, config.message.pos, config.message.size)
 
 #		from windows.winOrder   import winOrder
 #		self.order = winOrder(app, self.main, config.order.pos, config.order.size)
@@ -139,12 +138,12 @@ class MainControl:
 		self.connect.Raise()
 
 #		self.system.Raise()
-#		self.message.Raise()
+		self.message.Raise()
 #		self.order.Raise()
 		self.starmap.Raise()
 		self.main.Raise()
 
-#		self.winconfig.Raise()
+		self.winconfig.Raise()
 
 	def Show(self):
 		"""\
@@ -156,7 +155,7 @@ class MainControl:
 		self.ConfigActivate()
 
 		self.main.Show(config.main.show)
-#		self.message.Show(config.message.show)
+		self.message.Show(config.message.show)
 #		self.order.Show(config.order.show)
 		self.starmap.Show(config.starmap.show)
 #		self.system.Show(config.system.show)
@@ -168,7 +167,7 @@ class MainControl:
 		pass
 
 		self.main.Show(FALSE)
-#		self.message.Show(FALSE)
+		self.message.Show(FALSE)
 #		self.order.Show(FALSE)
 		self.starmap.Show(FALSE)
 #		self.system.Show(FALSE)

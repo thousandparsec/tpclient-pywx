@@ -8,9 +8,6 @@ from wxPython.lib.anchors import LayoutAnchors
 
 from utils import *
 
-from extra.wxProgressDialog import wxProgressDialog
-from extra.evtmgr import eventManager
-
 defaultServers = ["127.0.0.1:6923"]
 
 ID_OK = 10043
@@ -106,9 +103,11 @@ class winConnect(wxFrame):
 
 		progress = wxProgressDialog(TITLE_PROGRESS, TEXT_PROGRESS, 5, self, wxPD_APP_MODAL | wxPD_AUTO_HIDE)
 
+		print host, port, username, password
+
 		dlg = None
 		try:
-			application.connection.setup(host=host, port=port)
+			application.connection.setup(host=host, port=port, debug=True)
 			progress.Update(1)
 			
 			print "Connect...",
@@ -117,14 +116,15 @@ class winConnect(wxFrame):
 
 				print "Login...",
 				if not application.connection.login(username, password):
-					print "Failed"
+					print "Login Failed"
 					dlg = wxMessageDialog(self, TEXT_LOGIN, TITLE_LOGIN, wxOK | wxICON_INFORMATION)
 			else:
-				print "Failed"
+				print "Connect Failed"
 				dlg = wxMessageDialog(self, TEXT_CONNECT, TITLE_CONNECT, wxOK | wxICON_INFORMATION)
 
 		except:
-			print "Failed"
+			print "Exception Failed"
+			do_traceback()
 			dlg = wxMessageDialog(self, TEXT_CONNECT, TITLE_CONNECT, wxOK | wxICON_INFORMATION)
 
 		progress.Update(5)

@@ -7,20 +7,15 @@ at this current location and "quick" details about them.
 
 # wxPython imports
 from wxPython.wx import *
-from wxPython.gizmos import *
-
+from wxPython.gizmos.treelistctrl import wxTreeListCtrl
 
 # Game imports
 from utils import *
-from game.events import *
-from game import objects
 
 # Local imports
 from winBase import winBase
-from events import *
 
 # Program imports
-from extra.wxPostEvent import *
 
 # Show the universe
 class winSystem(winBase):
@@ -30,80 +25,37 @@ class winSystem(winBase):
 		winBase.__init__(self, application, parent, pos, size, style)
 
 		# Setup to recieve game events
-		self.app = application
-		self.app.game.WinConnect(self)
-		EVT_GAME_OBJ_ARRIVE(self, self.OnGameArriveObj)
+		self.application = application
 
-		class systemTree(wxRemotelyScrolledTreeCtrl):
-			def __init__(self, parent, ID, pos=wxDefaultPosition, size=wxDefaultSize, style=wxTR_HAS_BUTTONS):
-				wxRemotelyScrolledTreeCtrl.__init__(self, parent, ID, pos, size, style)
+		self.tree = wxTreeListCtrl(self, -1, style = wxTR_DEFAULT_STYLE | wxTR_TWIST_BUTTONS)
 
-				self.icons = {}
-				self.icons['Blank'] = wxImage("graphics/blank-icon.png").ConvertToBitmap()
-				self.icons['Container'] = wxImage("graphics/link-icon.png").ConvertToBitmap()
-				self.icons['StarSystem'] = wxImage("graphics/system-icon.png").ConvertToBitmap()
-				self.icons['Fleet'] = wxImage("graphics/ship-icon.png").ConvertToBitmap()
-				self.icons['Planet'] = wxImage("graphics/planet-icon.png").ConvertToBitmap()
-				self.icons['Unknown'] = wxImage("graphics/starbase-icon.png").ConvertToBitmap()
+		self.icons = {}
+		self.icons['Blank'] = wxImage("graphics/blank-icon.png").ConvertToBitmap()
+		self.icons['Container'] = wxImage("graphics/link-icon.png").ConvertToBitmap()
+		self.icons['StarSystem'] = wxImage("graphics/system-icon.png").ConvertToBitmap()
+		self.icons['Fleet'] = wxImage("graphics/ship-icon.png").ConvertToBitmap()
+		self.icons['Planet'] = wxImage("graphics/planet-icon.png").ConvertToBitmap()
+		self.icons['Unknown'] = wxImage("graphics/starbase-icon.png").ConvertToBitmap()
 
-				# make an image list
-				self.il = wxImageList(16, 16)
-				self.il.Add(wxImage("graphics/blank.png").ConvertToBitmap())
-				for i in self.icons.keys():
-					self.icons[i] = self.il.Add(self.icons[i])
-
-				self.SetImageList(self.il)
-
-		class systemValueWindow(wxTreeCompanionWindow):
-			def __init__(self, parent, ID, pos=wxDefaultPosition, size=wxDefaultSize, style=0):
-				wxTreeCompanionWindow.__init__(self, parent, ID, pos, size, style)
-				self.SetBackgroundColour("WHITE")
-				EVT_ERASE_BACKGROUND(self, self.OEB)
-
-			def OEB(self, evt):
-				pass
-
-			# This method is called to draw each item in the value window
-			def DrawItem(self, dc, itemId, rect):
-				tree = self.GetTreeCtrl()
-				if tree:
-
-					text = tree.GetItemText(itemId)
-
-					# Draw the seperator
-					dc.SetPen(wxPen(wxSystemSettings_GetSystemColour(wxSYS_COLOUR_3DLIGHT), 1, wxSOLID))
-					dc.SetBrush(wxBrush(self.GetBackgroundColour(), wxSOLID))
-					dc.DrawRectangle(rect.x, rect.y, rect.width+1, rect.height+1)
-
-					# Draw the text 
-					dc.SetTextForeground("BLACK")
-					dc.SetBackgroundMode(wxTRANSPARENT)
-					tw, th = dc.GetTextExtent(text)
-					x = 5
-					y = rect.y + max(0, (rect.height - th) / 2)
-					dc.DrawText(text, x, y)
-
-
-		scroller = wxSplitterScrolledWindow(self, -1, (50,50), (350, 250), style=wxNO_BORDER | wxCLIP_CHILDREN | wxVSCROLL)
-		splitter = wxThinSplitterWindow(scroller, -1, style=wxSP_3DBORDER | wxCLIP_CHILDREN)
-		splitter.SetSashSize(3)
+		self.il = wxImageList(16, 16)
+		self.il.Add(wxImage("graphics/blank.png").ConvertToBitmap())
+		for i in self.icons.keys():
+			self.icons[i] = self.il.Add(self.icons[i])
+		self.tree.SetImageList(self.il)
 		
-		self.tree = systemTree(splitter, -1, style = wxTR_HAS_BUTTONS | wxTR_NO_LINES | wxTR_ROW_LINES | wxNO_BORDER )
-		
-		self.value = systemValueWindow(splitter, -1, style=wxNO_BORDER)
+		# create some columns
+		self.tree.AddColumn("Object")
+		self.tree.AddColumn("Details")
+		self.tree.SetMainColumn(0)
+		self.tree.SetColumnWidth(0, 175)
 
-		# SET THE SPLITTER HERE!!! -> It's the last value
-		splitter.SplitVertically(self.tree, self.value, 250)
-		scroller.SetTargetWindow(self.tree)
-		scroller.EnableScrolling(FALSE, FALSE)
-
-		self.value.SetTreeCtrl(self.tree)
-		self.tree.SetCompanionWindow(self.value)
-
+		EVT_ACTIVATE(self, self.OnFocus)
 		EVT_TREE_SEL_CHANGED(self.tree, -1, self.OnSelectItem)
 
-	def Update(self):
+	def OnFocus(self, evt):
+		self.Update()
 
+	def Update(self):
 		selected_id = self.tree.GetPyData(self.tree.GetSelection())
 		if not selected_id:
 			selected_id = -1
@@ -113,32 +65,32 @@ class winSystem(winBase):
 		# Remove all the current items
 		self.tree.DeleteAllItems()
 
-		universe=self.app.game.universe.Object(0)
+		universe = self.application.cache[0]
 		selected = self.Add(None, universe, selected_id)
 	
 		if selected:
 			debug(DEBUG_WINDOWS, "Trying to reselect an object... %s" % self.tree.GetPyData(selected))
 			self.tree.SelectItem(selected)
 			self.tree.EnsureVisible(selected)
-			new_evt = WindowsObjSelect(self.tree.GetPyData(selected))
-			wxPostEvent(new_evt)
+#			new_evt = WindowsObjSelect(self.tree.GetPyData(selected))
+#			wxPostEvent(new_evt)
 		
 	def Add(self, root, object, selected_id=-1):
 		selected = None
 		new_root = None
 		
 		if root == None:
-			new_root = self.tree.AddRoot("Known Universe", self.tree.icons['Blank'])
+			new_root = self.tree.AddRoot("Known Universe", self.icons['Blank'])
 		else:
 			if object != None:
-				if self.tree.icons.has_key(object.__class__.__name__):
-					new_root = self.tree.AppendItem(root, object.name, self.tree.icons[object.__class__.__name__])
+				if self.icons.has_key(object.__class__.__name__):
+					new_root = self.tree.AppendItem(root, object.name, self.icons[object.__class__.__name__])
 				else:
-					new_root = self.tree.AppendItem(root, object.name, self.tree.icons['Unknown'])
+					new_root = self.tree.AppendItem(root, object.name, self.icons['Unknown'])
 		
-		if isinstance(object, objects.Container):
+		if hasattr(object, "contains"):
 			for id in object.contains:
-				new = self.app.game.universe.Object(id)
+				new = self.application.cache[id]
 				temp = self.Add(new_root, new, selected_id)
 
 				if temp:
@@ -157,7 +109,7 @@ class winSystem(winBase):
 	def OnGameArriveObj(self, evt):
 		self.Update()
 
-#		g = self.app.game
+#		g = self.application.game
 #		selected = self.tree.GetSelection()
 #		
 #		object = g.universe.Object(evt.id)
@@ -179,8 +131,8 @@ class winSystem(winBase):
 		id = self.tree.GetPyData(evt.GetItem())
 		
 		# Okay we need to post an event now
-		new_evt = WindowsObjSelect(id)
-		wxPostEvent(new_evt)
+		#new_evt = WindowsObjSelect(id)
+		#wxPostEvent(new_evt)
 
 
 
