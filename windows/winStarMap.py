@@ -1,4 +1,9 @@
 
+from wxPython.wx import *
+from wxPython.lib.floatbar import *
+
+#wxRED = wxColor()
+wxYELLOW = wxColor(0xD6, 0xDC, 0x2A)
 
 POINT = 4
 

@@ -1,5 +1,5 @@
 
-
+from wxPython.wx import *
 
 # Show the currently selected system
 class winSystem(wxFrame):

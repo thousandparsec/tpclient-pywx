@@ -1,15 +1,17 @@
 
 # wxPython imports
 from wxPython.wx import *
-from wxPython.html import *
-from wxPython.lib.floatbar import *
-from wxPython.gizmos import *
 
 # Python Imports
 from math import *
 from copy import *
+# setup the path for the common stuff
+import sys
+sys.path.append("..")
 
-wxYELLOW = wxColor(0xD6, 0xDC, 0x2A)
+from windows.winStarMap import winStarMap
+from windows.winMessage import winMessage
+from windows.winSystem  import winSystem
 
 if __name__ == '__main__':
 
@@ -20,11 +22,11 @@ if __name__ == '__main__':
 			map = winStarMap(None, -1, None, (1024-600,0), (600-5,500))
 			map.Show(TRUE)
 			
-			message = winMessage(map, -1, None, (0,476), (1024-600-5,200))
-			system = winSystem(map, -1, None, (1024-600,523), (600-5,187))
+#			message = winMessage(map, -1, None, (0,476), (1024-600-5,200))
+#			system = winSystem(map, -1, None, (1024-600,523), (600-5,187))
 			
-			message.Show(TRUE)
-			system.Show(TRUE)
+#			message.Show(TRUE)
+#			system.Show(TRUE)
 			
 			return TRUE
 

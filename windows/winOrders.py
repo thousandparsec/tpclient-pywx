@@ -1,5 +1,5 @@
 
-
+from wxPython.wx import *
 
 # Shows the currently selected object's orders
 class winOrders(wxFrame):

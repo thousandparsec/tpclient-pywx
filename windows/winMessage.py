@@ -1,5 +1,8 @@
 
+from wxPython.wx import *
+from wxPython.html import *
 
+from common.message import Message
 
 class wxMessage(Message):
 

@@ -1,4 +1,6 @@
 
+from wxPython.wx import *
+
 # Shows the currently selected objects's details
 class winCurrentObject(wxWindow):
 	pass
