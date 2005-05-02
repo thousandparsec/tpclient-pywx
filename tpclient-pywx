@@ -184,9 +184,9 @@ class AppTP(wx.App):
 			elif constants.FEATURE_ORDERED_OBJECT in features:
 				break
 
-		print "[",
-		for o in self.cache.objects:
-			print str(o),
+		print "Objects ["
+		for id,o in self.cache.objects.items():
+			print " %s : %s ," % (id, o)
 		print "]"
 
 		# Get all the boards 
@@ -219,9 +219,9 @@ class AppTP(wx.App):
 			elif constants.FEATURE_ORDERED_BOARD in features:
 				break
 
-		print "[",
-		for o in self.cache.boards:
-			print str(o),
+		print "Boards ["
+		for id,o in self.cache.boards.items():
+			print " %s : %s ," % (id, o)
 		print "]"
 		
 ##		# Get all the resource desciptions
@@ -247,6 +247,9 @@ class AppTP(wx.App):
 
 		# Get all the component
 		# -----------------------------------------------------------------------------------
+		progress.Update(100)
+		self.windows.Post(wx.local.CacheUpdateEvent())
+
 		return
 		
 
