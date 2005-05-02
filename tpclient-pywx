@@ -184,6 +184,11 @@ class AppTP(wx.App):
 			elif constants.FEATURE_ORDERED_OBJECT in features:
 				break
 
+		print "[",
+		for o in self.cache.objects:
+			print str(o),
+		print "]"
+
 		# Get all the boards 
 		# -----------------------------------------------------------------------------------
 		for time, id in self.connection.get_board_ids(iter=True):
@@ -214,6 +219,11 @@ class AppTP(wx.App):
 			elif constants.FEATURE_ORDERED_BOARD in features:
 				break
 
+		print "[",
+		for o in self.cache.boards:
+			print str(o),
+		print "]"
+		
 ##		# Get all the resource desciptions
 ##		# -----------------------------------------------------------------------------------
 ##		for time, id in self.connection.get_resource_ids(iter=True):
