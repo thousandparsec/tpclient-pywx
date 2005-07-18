@@ -177,7 +177,7 @@ class AppTP(wx.App):
 					self.cache.orders[id].append(order)
 
 				# Download the orders probes
-				self.cache.orders[id] = []
+				self.cache.orders_probe[id] = []
 				for otype in object.order_types:
 					pass
 
@@ -186,7 +186,7 @@ class AppTP(wx.App):
 
 		print "Objects ["
 		for id,o in self.cache.objects.items():
-			print " %s : %s ," % (id, o)
+			print " %s : %s ," % (id, o),
 		print "]"
 
 		# Get all the boards 
