@@ -32,12 +32,12 @@ class winDesign(winBase):
 		self.grid.AddGrowableCol(1)		# Middle Column is growable
 		self.grid.AddGrowableRow(1)		# Bottom row is growable
 
-		# The hulls which are avalible
-		self.hullscat = wx.Choice( panel, -1, choices=[], size=(-1,wx.local.buttonSize[1]))
-		self.hullscat.SetFont(wx.local.normalFont)
-		self.hullscat.Bind(wx.EVT_CHOICE, self.UpdateHullList)
-		self.hulls = wx.ListCtrl( panel, -1, wx.DefaultPosition, wx.DefaultSize, wx.LC_LIST|wx.LC_NO_HEADER|wx.SUNKEN_BORDER )
-		self.hulls.SetFont(wx.local.normalFont)
+		# The designs which are avalible
+		self.designscat = wx.Choice( panel, -1, choices=[], size=(-1,wx.local.buttonSize[1]))
+		self.designscat.SetFont(wx.local.normalFont)
+		self.designscat.Bind(wx.EVT_CHOICE, self.UpdateDesignList)
+		self.designs = wx.ListCtrl( panel, -1, wx.DefaultPosition, wx.DefaultSize, wx.LC_LIST|wx.LC_NO_HEADER|wx.SUNKEN_BORDER )
+		self.designs.SetFont(wx.local.normalFont)
 
 		self.top = wx.BoxSizer( wx.HORIZONTAL ) # The labels
 		
@@ -111,10 +111,10 @@ class winDesign(winBase):
 		self.parts = wx.ListCtrl( panel, -1, wx.DefaultPosition, wx.DefaultSize, wx.LC_LIST|wx.LC_NO_HEADER|wx.SUNKEN_BORDER|wx.LC_SINGLE_SEL )
 		self.parts.SetFont(wx.local.normalFont)
 
-		self.grid.Add(self.hullscat, 	0, wx.ALIGN_CENTRE|wx.ALL, 1 )
+		self.grid.Add(self.designscat, 	0, wx.ALIGN_CENTRE|wx.ALL, 1 )
 		self.grid.Add(self.top, 		0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
 		self.grid.Add(self.partscat,	0, wx.ALIGN_CENTRE|wx.ALL, 1 )
-		self.grid.Add(self.hulls, 	0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
+		self.grid.Add(self.designs, 	0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
 		self.grid.Add(self.middle, 	0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
 		self.grid.Add(self.parts, 	0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
 
@@ -127,8 +127,8 @@ class winDesign(winBase):
 		self.Bind(wx.EVT_BUTTON, self.OnEdit, self.edit)
 		self.Bind(wx.EVT_BUTTON, self.OnSelect, self.revert)
 
-		self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.OnSelectObject, self.hulls)
-		self.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.OnSelectObject, self.hulls)
+		self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.OnSelectObject, self.designs)
+		self.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.OnSelectObject, self.designs)
 
 		self.panel = panel
 		self.OnSelect()
@@ -136,8 +136,8 @@ class winDesign(winBase):
 	def OnEdit(self, evt=None):
 		print "OnEdit..."
 		# Disable the select side
-		self.hullscat.Disable()
-		self.hulls.Disable()
+		self.designscat.Disable()
+		self.designs.Disable()
 
 		# Show the component bar
 		self.grid.Show(self.partscat)
@@ -166,8 +166,8 @@ class winDesign(winBase):
 	def OnSelect(self, evt=None):
 		print "OnSelect..."
 		# Enable the selection side
-		self.hullscat.Enable()
-		self.hulls.Enable()
+		self.designscat.Enable()
+		self.designs.Enable()
 
 		# Hide the component bar
 		self.grid.Hide(self.partscat)
@@ -192,9 +192,9 @@ class winDesign(winBase):
 		self.OnSelectObject()
 
 	def OnSelectObject(self, evt=None):
-		s = self.hulls.GetSelected()
+		s = self.designs.GetSelected()
 		if len(s) > 0:
-			id = self.hulls.GetItemData(s[0])
+			id = self.designs.GetItemData(s[0])
 		else:
 			id = -1
 
@@ -216,48 +216,42 @@ class winDesign(winBase):
 			self.delete.Disable()
 			return
 		
-		component = self.application.cache.components[id]
+		design = self.application.cache.designs[id]
 		
-		# Does this object have any internal components
-		if len(component.contains) > 0:
-			# Enable the parts list
-			self.middle.Show(self.plan)
+		# Enable the parts list
+		self.middle.Show(self.plan)
 
-			# Populate the parts list
-			for number, id in component.contains:
-				pass
+		# Populate the parts list
+		for number, id in design.components:
+			pass
 			
-		else:
-			self.middle.Hide(self.plan)
 		self.middle.Layout()
 
 		# Set the title
-		self.title.SetLabel(component.name)
-		self.titleedit.SetValue(component.name)
-		if component.base == 0:
-			self.title.SetForegroundColour(wx.Color(0, 0, 255))
-		else:
-			self.title.SetForegroundColour(wx.Color(0, 0, 0))
+		self.title.SetLabel(design.name)
+		self.titleedit.SetValue(design.name)
 
 		# Set the used
-		self.used.SetLabel(str(component.used))
-		if component.used == 0 and component.base != 0:
+		self.used.SetLabel(str(design.used))
+		if design.used == -1:
 			self.used.SetForegroundColour(wx.Color(255, 0, 0))
+		elif design.used == 0:
+			self.used.SetForegroundColour(wx.Color(0, 255, 0))
 		else:
 			self.used.SetForegroundColour(wx.Color(0, 0, 0))
 
 		# Set the categories
 		c = ""
-		for id in component.types:
+		for id in design.categories:
 			c += self.application.cache.categories[id].name + ", "
 		c = c[:-2]
 		self.categories.SetLabel(c)
 
 		# Set the description
-		self.desc.SetValue(str(component.description))
+		self.desc.SetValue(str(design.description))
 
 		# Set if edit can work
-		if component.used == 0 and component.base != 0:
+		if design.used <= 0:
 			self.edit.Enable()
 			self.edit.SetDefault()
 
@@ -267,55 +261,51 @@ class winDesign(winBase):
 			self.edit.Disable()
 			self.delete.Disable()
 
-			print component.language
-			if len(component.language) > 0:
-				self.duplicate.Enable()
-				self.duplicate.SetDefault()
-			else:
-				self.duplicate.Disable()
-	
+			self.duplicate.Enable()
+			self.duplicate.SetDefault()
 
 	def OnCacheUpdate(self, evt=None):
 		print "OnCacheUpdate of winDesign..."
 
 		# Update the categories
-		hulls = self.hullscat.GetClientData(self.hullscat.GetSelection())
+		designs = self.designscat.GetClientData(self.designscat.GetSelection())
 		comps = self.partscat.GetClientData(self.partscat.GetSelection())
 		
-		self.hullscat.Clear()
+		self.designscat.Clear()
 		self.partscat.Clear()
 		for category in self.application.cache.categories.values():
-			slot = self.hullscat.GetCount()
+			slot = self.designscat.GetCount()
 
-			self.hullscat.Append(category.name, category.id)
+			self.designscat.Append(category.name, category.id)
 			self.partscat.Append(category.name, category.id)
 
-			self.hullscat.SetToolTipItem(slot, category.desc)
-			self.partscat.SetToolTipItem(slot, category.desc)
+			self.designscat.SetToolTipItem(slot, category.description)
+			self.partscat.SetToolTipItem(slot, category.description)
 
-			if category.id == hulls:
-				self.hullscat.SetSelection(slot)
+			if category.id == designs:
+				self.designscat.SetSelection(slot)
 
 			if category.id == comps:
 				self.partscat.SetSelection(slot)
 
-		self.UpdateHullList()
+		self.UpdateDesignList()
 		self.UpdateCompList()
 
-	def UpdateHullList(self, evt=None):
-		print "Updating the Hulls List"
-		# Update the 
-		hulls = self.hullscat.GetClientData(self.hullscat.GetSelection())
-		print "Currently selected category", hulls
+	def UpdateDesignList(self, evt=None):
+		print "Updating the Designs List"
+		
+		des = self.designscat.GetClientData(self.designscat.GetSelection())
+		print "Currently selected category", des
 
-		self.hulls.ClearAll()
-		for component in self.application.cache.components.values():
-			slot = self.hulls.GetItemCount()
+		self.designs.ClearAll()
+		for design in self.application.cache.designs.values():
+			slot = self.designs.GetItemCount()
 
-			print "Component", component.id, component.name, component.types
-			if hulls in component.types:
-				self.hulls.InsertStringItem(slot, component.name)
-				self.hulls.SetItemData(slot, component.id)
+			print "Design", design.id, design.name, design.categories
+			if des in design.categories:
+				print "Adding to ", slot
+				self.designs.InsertStringItem(slot, design.name)
+				self.designs.SetItemData(slot, design.id)
 
 	def UpdateCompList(self, evt=None):
 		print "Updating the Comps List"
@@ -326,8 +316,8 @@ class winDesign(winBase):
 		for component in self.application.cache.components.values():
 			slot = self.parts.GetItemCount()
 
-			print "Component", component.id, component.name, component.types
-			if comps in component.types:
+			print "Component", component.id, component.name, component.categories
+			if comps in component.categories:
 				print "Adding to ", slot
 				self.parts.InsertStringItem(slot, component.name)
 				self.parts.SetItemData(slot, component.id)

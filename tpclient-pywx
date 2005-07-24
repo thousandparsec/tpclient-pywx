@@ -131,8 +131,11 @@ class AppTP(wx.App):
 				self.boards			= ChangeDict()
 				self.messages		= ChangeDict()
 
+				# Design stuff
 				self.categories		= ChangeDict()
+				self.designs		= ChangeDict()
 				self.components		= ChangeDict()
+				self.properties		= ChangeDict()
 
 				self.players		= ChangeDict()
 				self.resources		= ChangeDict()
@@ -146,7 +149,9 @@ class AppTP(wx.App):
 		# Get the features this server support
 		features = self.connection.features()
 		print "Features:", features
-		
+	
+		# Boards and objects are special cases in which we have a sub-object to get
+	
 		# Get all the objects
 		# -----------------------------------------------------------------------------------
 		for id, time in self.connection.get_object_ids(iter=True):
@@ -191,10 +196,10 @@ class AppTP(wx.App):
 
 		# Get all the boards 
 		# -----------------------------------------------------------------------------------
-		for time, id in self.connection.get_board_ids(iter=True):
+		for id, time in self.connection.get_board_ids(iter=True):
 
 			if not self.cache.boards.has_key(id) or time > self.cache.boards.times[id]:
-				board = self.connection.get_boards(id=id)
+				board = self.connection.get_boards(id=id)[0]
 
 				# Did we download the board okay?
 				if failed(board):
@@ -223,128 +228,58 @@ class AppTP(wx.App):
 		for id,o in self.cache.boards.items():
 			print " %s : %s ," % (id, o)
 		print "]"
-		
-##		# Get all the resource desciptions
-##		# -----------------------------------------------------------------------------------
-##		for time, id in self.connection.get_resource_ids(iter=True):
-##
-##			if not self.cache.resources.has_key(id) or time > self.cache.resources.times[id]:
-##				resource = self.connection.get_resources(id=id)
-##
-##				# Did we download the object okay?
-##				if failed(resource):
-##
-##					# Clean up the resource
-##					if self.cache.resources.has_key(id):
-##						del self.cache.resources[id]
-##					continue
-##
-##				self.cache.resources[id] = (time, resource)
-##
-##			elif constants.FEATURE_ORDERED_RESOURCE in features:
-##				break
-##
 
-		# Get all the component
+
+		# Get all the order descriptions
 		# -----------------------------------------------------------------------------------
-		progress.Update(100)
-		self.windows.Post(wx.local.CacheUpdateEvent())
+		for id, time in self.connection.get_orderdesc_ids(iter=True):
+##			if not self.cache..has_key(id) or time > self.cache.boards.times[id]:
+				desc = self.connection.get_orderdescs(id=id)[0]
 
-		return
+				# Did we download the board okay?
+				if failed(desc):
+					desc.register()
+
+		def get_all(get_ids, get, cache, feature):
+			for id, time in get_ids(iter=True):
+				if not cache.has_key(id) or time > cache.times[id]:
+					frame = get(id=id)[0]
+
+					# Did we download the board okay?
+					if failed(frame):
+						print "Failed to get %i removing" % id
+						if cache.has_key(id):
+							del cache[id]
+						continue
+
+					cache[id] = (time, frame)
+
+				elif feature in features:
+					break
+
+			print "[",
+			for object in cache.values():
+				print " <'%s' %i>" % (object.name, object.id)
+			print "]"
+
+		get_all(self.connection.get_resource_ids, self.connection.get_resources, 
+					self.cache.resources, constants.FEATURE_ORDERED_RESOURCE)
+
+		get_all(self.connection.get_category_ids, self.connection.get_categories, 
+					self.cache.categories, constants.FEATURE_ORDERED_CATEGORY)
+
+		get_all(self.connection.get_design_ids, self.connection.get_designs, 
+					self.cache.designs, constants.FEATURE_ORDERED_DESIGN)
+					
+		get_all(self.connection.get_component_ids, self.connection.get_components, 
+					self.cache.components, constants.FEATURE_ORDERED_COMPONENT)
 		
-
-
-		# Download any order descriptions not already downloaded
-		descs = []
-		while True:
-			r = self.connection.get_orderdescs(len(descs))[0]
-			if not failed(r):
-				descs.append(r)
-				descs[-1].register()
-			else:
-				break
-
-		# Download the categories
-		for category in self.connection.get_categories([]):
-			if failed(category):
-				continue
-
-			self.cache.categories[category.id] = category
-
-		# Download the components
-		for component in self.connection.get_components([]):
-			if failed(component):
-				continue
-			
-			self.cache.components[component.id] = component
-
+		get_all(self.connection.get_property_ids, self.connection.get_properties, 
+					self.cache.properties, constants.FEATURE_ORDERED_PROPERTY)
+				
 		progress.Update(100)
 		self.windows.Post(wx.local.CacheUpdateEvent())
-
-		# Get the time remaining
-		seconds = self.connection.time()
-		print seconds
-		if not failed(seconds):
-			import time
-			self.windows.main.statusbar.SetEndTime(time.time() + seconds[1] - 5)
-
-##		# Download objects
-##		objects = self.connection.get_objects(0)
-##		while len(objects) > 0:
-##			object = objects.pop(0)
-##			
-##			if failed(object):
-##				print object
-##				continue
-##			
-##			self.cache.objects[object.id] = object
-##			
-##			# Download the objects inside this object
-##			if len(object.contains) > 0:
-##				# Set the parent relationship
-##				nobjects = self.connection.get_objects(object.contains)
-##				for nobject in nobjects:
-##					if failed(nobject):
-##						print nobject
-##						continue
-##					else:
-##						nobject.parent = object.id
-##					objects.append(nobject)
-##
-##			# Download the orders from this object
-##			self.cache.orders[object.id] = []
-##			if object.order_number != 0:
-##				for order in self.connection.get_orders(object.id, range(0, object.order_number)):
-##					if failed(order):
-##						break
-##					self.cache.orders[object.id].append(order)
-##
-##			# Download the orders probes
-##			self.cache.orders[object.id] = []
-##			for type in object.order_types:
-##				pass
-##
-##			progress.Update(len(self.cache.objects.keys()))
-##
-##
-##		# Download message boards
-##		for board in self.connection.get_boards([]):
-##			if failed(board):
-##				continue
-##
-##			# Download the messages from this board
-##			if board.number == 0:
-##				messages = []
-##			elif board.number == 1:
-##				messages = self.connection.get_messages(board.id, range(0, board.number))
-##				if not hasattr(messages, "__getitem__"):
-##					messages = [messages]
-##				else:
-##					messages = list(messages)
-##			else:
-##				messages = self.connection.get_messages(board.id, range(0, board.number))
-##
-##			self.cache.messages[board.id] = list(messages)
+		return
 
 	def Exit(self):
 		print "AppTp.exit"
