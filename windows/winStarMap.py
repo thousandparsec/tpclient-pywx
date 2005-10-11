@@ -60,10 +60,10 @@ def scale(value):
 
 # Shows the main map of the universe.
 class winStarMap(winBase):
-	title = _("StarMAP, The Known Universe")
+	title = _("StarMap")
 
-	def __init__(self, application, parent, pos=wx.DefaultPosition, size=wx.DefaultSize, style=wx.DEFAULT_FRAME_STYLE):
-		winBase.__init__(self, application, parent, pos, size, style)
+	def __init__(self, application, parent):
+		winBase.__init__(self, application, parent)
 
 		self.application = application
 
@@ -144,11 +144,11 @@ class winStarMap(winBase):
 	def OnLeftClick(self, evt):
 		if self.mode == "Position":
 			pos = self.application.cache.objects[evt.obj.data].pos
-			self.application.windows.Post(wx.local.SelectPositionEvent(pos))
+			self.application.Post(self.application.gui.SelectPositionEvent(pos))
 			
 			self.SetMode("Normal")
 		else:
-			self.application.windows.Post(wx.local.SelectObjectEvent(evt.obj.data))
+			self.application.Post(self.application.gui.SelectObjectEvent(evt.obj.data))
 
 	def OnRightClick(self, evt):
 		obj = self.application.cache.objects[evt.obj.data]
@@ -171,11 +171,11 @@ class winStarMap(winBase):
 
 		if self.mode == "Position":
 			pos = self.application.cache.objects[evt.GetId()].pos
-			self.application.windows.Post(wx.local.SelectPositionEvent(pos))
+			self.application.Post(self.application.gui.SelectPositionEvent(pos))
 			
 			self.SetMode("Normal")
 		else:
-			self.application.windows.Post(wx.local.SelectObjectEvent(evt.GetId()))
+			self.application.Post(self.application.gui.SelectObjectEvent(evt.GetId()))
 
 	def SetMode(self, mode):
 		if mode in ("Normal", "Position"):

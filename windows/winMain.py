@@ -34,66 +34,10 @@ ID_WIN_SYSTEM = 11002
 ID_WIN_ORDERS = 11003
 ID_WIN_DESIGN = 11004
 ID_WIN_TIPS = 11005
+ID_WIN_INFO = 11006
 ID_WIN_HELP = 1105
 
 ID_HELP = 10057
-
-def create_menu(source, target):
-
-	# File Menu
-	file = wx.Menu()
-	file.Append( ID_OPEN, _("Connect to Game\tCtrl-O"), _("Connect to a diffrent Game") )
-	file.Append( ID_UNIV, _("Download the Universe\tCtrl-U"), _("Download the Universe") )
-	file.AppendSeparator()
-	file.Append( ID_CONFIG, _("Config"), _("Configure the Client") )
-	file.AppendSeparator()
-	file.Append( ID_EXIT, _("Exit"), _("Exit") )
-
-	# Statistics Menu
-	stat = wx.Menu()
-	stat.Append( ID_STAT_EAAG, _("Empire at a Glance"), _("") )
-	stat.AppendSeparator()
-	stat.Append( ID_STAT_SYSTEM, _("Systems"), _("") )
-	stat.Append( ID_STAT_PLANET, _("Planets"), _("") )
-	stat.Append( ID_STAT_FLEET,  _("Fleets"), _("") )
-	stat.AppendSeparator()
-	stat.Append( ID_STAT_BATTLE, _("Battles"), _("") )
-
-	# Windows Menu
-	win = wx.Menu()
-	win.Append(  ID_WIN_MESSAGES, _("Hide Messages"), _(""), True )
-	win.Append(  ID_WIN_ORDERS,   _("Hide Orders"), _(""), True )
-	win.Append(  ID_WIN_STARMAP,  _("Hide Starmap"), _(""), True )
-	win.Append(  ID_WIN_SYSTEM,   _("Hide System"), _(""), True )
-	win.AppendSeparator()
-	win.Append(  ID_WIN_DESIGN,   _("Hide Design"), _(""), True )
-	win.AppendSeparator()
-	win.Append(  ID_WIN_TIPS, _("Show Tips"), _(""), True )
-	win.Append(  ID_WIN_HELP, _("Help"), _(""), True)
-
-	help = wx.Menu()
-	
-	bar = wx.MenuBar()
-	bar.Append( file, _("File") )
-	bar.Append( stat, _("Statistics") )
-	bar.Append( win,  _("Windows") )
-	bar.Append( help, _("&Help") )
-
-	wx.EVT_MENU(source, ID_OPEN,	target.OnConnect)
-	wx.EVT_MENU(source, ID_UNIV,	target.UpdateCache)
-	wx.EVT_MENU(source, ID_CONFIG,	target.OnConfig)
-	wx.EVT_MENU(source, ID_EXIT,	target.OnProgramExit)
-
-	wx.EVT_MENU(source, ID_WIN_MESSAGES,	target.OnMessages)
-	wx.EVT_MENU(source, ID_WIN_ORDERS,		target.OnOrders)
-	wx.EVT_MENU(source, ID_WIN_STARMAP,		target.OnStarMap)
-	wx.EVT_MENU(source, ID_WIN_SYSTEM,		target.OnSystem)
-	wx.EVT_MENU(source, ID_WIN_DESIGN,		target.OnDesign)
-	wx.EVT_MENU(source, ID_WIN_TIPS,		target.ShowTips)
-#	wx.EVT_MENU(source, ID_WIN_HELP,		target.OnHelp)
-	return bar
-
-
 
 class TimeStatusBar(wx.StatusBar):
 	def __init__(self, parent):
@@ -126,41 +70,159 @@ class TimeStatusBar(wx.StatusBar):
 		self.endtime = endtime
 
 class winMain(winMainBase):
-	title = "Thousand Parsec"
+	title = _("Thousand Parsec")
 	
-	def __init__(self, application, pos=wx.DefaultPosition, size=wx.DefaultSize, style=wx.DEFAULT_FRAME_STYLE):
-		winMainBase.__init__(self, application, None, pos, size, style)
+	def __init__(self, application):
+		winMainBase.__init__(self, application)
 
-		self.menubar = create_menu(self, self)
-		self.SetMenuBar(self.menubar)
+		self.SetMenuBar(self.Menu(self))
 
 		self.statusbar = TimeStatusBar(self)
 		self.SetStatusBar(self.statusbar)
 
+		# Children Windows
+		from windows.winConfig import winConfig
+		winConfig(application, self)
+		self.children[_('Config')].Hide()
+
+		from windows.winDesign import winDesign
+		winDesign(application, self)
+		
+		from windows.winInfo import winInfo
+		winInfo(application, self)
+
+		from windows.winMessage import winMessage
+		winMessage(application, self)
+
+		from windows.winOrder import winOrder
+		winOrder(application, self)
+
+		from windows.winStarMap import winStarMap
+		winStarMap(application, self)
+
+		from windows.winSystem import winSystem
+		winSystem(application, self)
+
+		if wx.Platform != "__WXMSW__":
+			self.SetClientSize(wx.Size(-1,0))
+
+	def Menu(self, source):
+		# File Menu
+		file = wx.Menu()
+		file.Append( ID_OPEN, _("Connect to Game\tCtrl-O"), _("Connect to a diffrent Game") )
+		file.Append( ID_UNIV, _("Download the Universe\tCtrl-U"), _("Download the Universe") )
+		file.AppendSeparator()
+		file.Append( ID_CONFIG, _("Config"), _("Configure the Client") )
+		file.AppendSeparator()
+		file.Append( ID_EXIT, _("Exit"), _("Exit") )
+	
+		# Statistics Menu
+		stat = wx.Menu()
+		stat.Append( ID_STAT_EAAG, _("Empire at a Glance"), _("") )
+		stat.AppendSeparator()
+		stat.Append( ID_STAT_SYSTEM, _("Systems"), _("") )
+		stat.Append( ID_STAT_PLANET, _("Planets"), _("") )
+		stat.Append( ID_STAT_FLEET,  _("Fleets"), _("") )
+		stat.AppendSeparator()
+		stat.Append( ID_STAT_BATTLE, _("Battles"), _("") )
+	
+		# Windows Menu
+		win = wx.Menu()
+		win.Append(  ID_WIN_INFO,     _("Hide Information"), _(""), True )
+		win.Append(  ID_WIN_MESSAGES, _("Hide Messages"), _(""), True )
+		win.Append(  ID_WIN_ORDERS,   _("Hide Orders"), _(""), True )
+		win.Append(  ID_WIN_STARMAP,  _("Hide StarMap"), _(""), True )
+		win.Append(  ID_WIN_SYSTEM,   _("Hide System"), _(""), True )
+		win.AppendSeparator()
+		win.Append(  ID_WIN_DESIGN,   _("Hide Design"), _(""), True )
+		win.AppendSeparator()
+		win.Append(  ID_WIN_TIPS, _("Show Tips"), _(""), True )
+		win.Append(  ID_WIN_HELP, _("Help"), _(""), True)
+	
+		help = wx.Menu()
+		
+		bar = wx.MenuBar()
+		bar.Append( file, _("File") )
+		bar.Append( stat, _("Statistics") )
+		bar.Append( win,  _("Windows") )
+		bar.Append( help, _("&Help") )
+	
+		wx.EVT_MENU(source, ID_OPEN,	self.OnConnect)
+		wx.EVT_MENU(source, ID_UNIV,	self.UpdateCache)
+		wx.EVT_MENU(source, ID_CONFIG,	self.OnConfig)
+		wx.EVT_MENU(source, ID_EXIT,	self.OnProgramExit)
+	
+		wx.EVT_MENU(source, ID_WIN_INFO,        self.OnInformation)
+		wx.EVT_MENU(source, ID_WIN_MESSAGES,	self.OnMessages)
+		wx.EVT_MENU(source, ID_WIN_ORDERS,		self.OnOrders)
+		wx.EVT_MENU(source, ID_WIN_STARMAP,		self.OnStarMap)
+		wx.EVT_MENU(source, ID_WIN_SYSTEM,		self.OnSystem)
+		wx.EVT_MENU(source, ID_WIN_DESIGN,		self.OnDesign)
+		wx.EVT_MENU(source, ID_WIN_TIPS,		self.ShowTips)
+		
+#		wx.EVT_MENU(source, ID_WIN_HELP,		self.OnHelp)
+		return bar
+
+	def ConfigDisplay(self, panel, sizer):
+		
+		notebook = wx.Notebook(panel, -1)
+		
+		cpanel = wx.Panel(notebook, -1)
+		csizer = wx.BoxSizer(wx.HORIZONTAL)
+		winMainBase.ConfigDisplay(self, cpanel, csizer)
+
+		x_text = wx.StaticText(cpanel, -1, _("X Pos"))
+		csizer.Add( x_text, 0, wx.GROW|wx.ALL, 5 )
+
+		cpanel.SetSizer( csizer )	
+
+		cpanel.Layout()
+
+		notebook.AddPage(cpanel, "Menubar")
+
+		for name, window in self.children.items():
+			cpanel = wx.Panel(notebook, -1)
+			csizer = wx.BoxSizer(wx.HORIZONTAL)
+
+			window.ConfigDisplay(cpanel, csizer)
+
+			cpanel.SetAutoLayout( True )
+			cpanel.SetSizer( csizer )	
+			csizer.Fit( cpanel )
+			csizer.SetSizeHints( cpanel )
+				
+			notebook.AddPage(cpanel, name)
+
+		sizer.Add(notebook, 0, wx.EXPAND|wx.ALL, 5 )
+
+	# Menu bar options
+	##################################################################
 	def OnConnect(self, evt):
-		self.application.windows.Hide()
-		self.application.windows.connect.Show(True)
+		self.application.connect()
 
 	def OnConfig(self, evt):
-		self.application.windows.winconfig.Show(True)
+		self.children[_('Config')].Show(True)
 		
 	def OnDesign(self, evt):
-		self.application.windows.design.Show(not evt.Checked())
+		self.children[_('Design')].Show(not evt.Checked())
 
+	def OnInformation(self, evt):
+		self.children[_('Information')].Show(not evt.Checked())
+		
 	def OnMessages(self, evt):
-		self.application.windows.message.Show(not evt.Checked())
+		self.children[_('Messages')].Show(not evt.Checked())
 		
 	def OnOrders(self, evt):
-		self.application.windows.order.Show(not evt.Checked())
+		self.children[_('Windows')].Show(not evt.Checked())
 		
 	def OnStarMap(self, evt):
-		self.application.windows.starmap.Show(not evt.Checked())
+		self.children[_('StarMap')].Show(not evt.Checked())
 
 	def OnSystem(self, evt):
-		self.application.windows.system.Show(not evt.Checked())
+		self.children[_('System')].Show(not evt.Checked())
 
 	def OnProgramExit(self, evt):
-		self.application.Exit()
+		self.application.exit()
 
 	def ShowTips(self, override=None):
 		config = load_data("pywx_tips")
@@ -177,5 +239,4 @@ class winMain(winMainBase):
 	def UpdateCache(self, evt=None):
 		self.application.windows.Hide()
 		self.application.CacheUpdate()
-		self.application.windows.Show()
 

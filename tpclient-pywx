@@ -1,76 +1,142 @@
 #! /usr/bin/env python
 
-# Version check
-try:
-	import wxPython
-	import string
-	
-	version = string.split(wxPython.__version__, '.')
-	intversion = int(version[0])*1000000+int(version[1])*10000+int(version[2])*100
-
-except ImportError:
-	intversion = 0
-
-if intversion < 2050000:
-	print "Your version of wxPython is too old. You will not be able to run pywx-client."
-	print "You have version", intversion
-	print "You need version atleast", [2, 5, 0, 0]
-	import sys
-	sys.exit(1)
-else:
-	del wxPython
-	del string
-
+import requirements
 import sys
-
-import gettext
-gettext.install("pywx-client")
 
 # wx.Python imports
 import wx
 import extra
-#import extra.fixdc
 
 # Python Imports
 import time
-from math import *
-from copy import *
+import threading
 from types import *
 
-import string
-import pprint
-import thread
-
-try:
-	import tp.netlib
-except ImportError:
-	import sys
-	sys.path.append("..")
-	import tp.netlib
-
+# Local imports
 from utils import *
 from tp.netlib import Connection, failed, constants
 
-from windows.control import MainControl
+def make(thread, method):
+	def t(*args, **kw):
+		thread.Call(method, *args, **kw)
+	return t
 
-class Splash(wx.SplashScreen):
-	def __init__(self, application):
-		image = wx.Image("graphics/splash.png").ConvertToBitmap()
-		wx.SplashScreen.__init__(self, image, wx.SPLASH_CENTRE_ON_SCREEN | wx.SPLASH_TIMEOUT, 3000, None, -1)
-
-		self.application = application
-		
-		self.Bind(wx.EVT_CLOSE, self.OnClose)
-
-	def OnClose(self, evt):
-		self.Hide()
-		time.sleep(1)
-		self.application.windows.connect.Show(True)
-
-class AppTP(wx.App):
+class Cache(object):
 	def __init__(self):
-		wx.App.__init__(self)
+		class ChangeDict(dict):
+			def __init__(self):
+				dict.__init__(self)
+				self.times = {}
+			
+			def __setitem__(self, key, value):
+				if type(value) is TupleType and len(value) == 2:
+					self.times[key] = value[0]
+					value = value[1]
+				else:
+					self.times[key] = -1
+				dict.__setitem__(self, key, value)
+		
+			def __delitem__(self, key):
+				del self.times[key]
+				dict.__delitem__(self, key)
 
+		# Features
+		self.features		= []
+
+		# The object stuff
+		self.objects		= ChangeDict()
+		self.orders			= ChangeDict()
+		self.orders_probe	= ChangeDict()
+
+		# The message boards
+		self.boards			= ChangeDict()
+		self.messages		= ChangeDict()
+
+		# Design stuff
+		self.categories		= ChangeDict()
+		self.designs		= ChangeDict()
+		self.components		= ChangeDict()
+		self.properties		= ChangeDict()
+
+		self.players		= ChangeDict()
+		self.resources		= ChangeDict()
+		
+class Application(object):
+	"""
+	Container for all the applications threads.
+
+	Calling accross threads requires you to use the .Call method on each thread - DONOT call directly!
+	"""
+	
+	def __init__(self):
+		self.gui = GUI(self)
+		self.network = Network(self)
+
+		self.cache = Cache()
+
+	def run(self):
+		self.init = True
+
+		self.gui.start()
+		self.network.start()
+
+	def Post(self, event):
+		self.gui.Call(self.gui.Post, event)
+		self.network.Call(self.network.Post, event)
+
+	def exit(self):
+		sys.exit()	
+
+class GUI(wx.App, threading.Thread):
+	## These are window events
+	class ShowWindowEvent(wx.PyEvent):
+		"""\
+		Raised when the the windows are showed.
+		"""
+		pass
+
+	class SelectObjectEvent(wx.PyEvent):
+		"""\
+		Raised when an object is selected.
+		"""
+		def __init__(self, id):
+			self.id = id
+	
+	class SelectPositionEvent(wx.PyEvent):
+		"""\
+		Raised when a position is selected.
+		"""
+		def __init__(self, pos):
+			self.x, self.y, self.z = pos
+	
+	class SelectOrderEvent(wx.PyEvent):
+		"""\
+		Raised when an order is selected.
+		"""
+		def __init__(self, id, slots):
+			self.id = id
+			self.slots = slots
+	
+	class DirtyOrderEvent(wx.PyEvent):
+		"""\
+		Raised when an order has been changed but not yet saved.
+		"""
+		def __init__(self, order):
+			self.id = order.id
+			self.slot = order.slot
+			self.order = order
+	######################################
+
+	def __init__(self, application):
+		threading.Thread.__init__(self)
+		wx.App.__init__(self)
+		
+		self.application = application
+		self.exit = False
+
+		self.current = None
+
+		# Don't want to show the stdin/stdout stuff
 		if wx.Platform in ('__WXMSW__', '__WXMAC__'):
 			class Null(object):
 				def write(self, *args, **kw):
@@ -81,167 +147,249 @@ class AppTP(wx.App):
 
 		try:
 			wx.InitAllImageHandlers()
-			self.config = self.ConfigLoad()
-			self.windows = MainControl(self)
-			self.connection = Connection()
-			splash = Splash(self)
-			splash.Show()
+			
+			# Show the splash screen
+			from windows.winSplash import winSplash
+			self.splash = winSplash(application)
+			self.Show(self.splash)
+			
+			# Load the other main windows
+			from windows.winMain import winMain
+			self.main = winMain(application)
 
+			from windows.winConnect import winConnect
+			self.connectto = winConnect(application)
+
+			from windows.winUpdate import winUpdate
+			self.update = winUpdate(application)
+
+			from windows.winDebug import winDebug
+			self.debug = winDebug(application)
 		except:
 			do_traceback()
 
-	def ConfigLoad(self):
+	def run(self):
+		self.MainLoop()
+
+	def Call(self, method, *args, **kw):
+		wx.CallAfter(method, *args, **kw)
+
+	def Post(self, event):
+		"""
+		Post an Event the current window.
+		"""
+		func = 'On' + event.__class__.__name__[:-5]	
+		if hasattr(self, func):
+			getattr(self, func)(event)
+
+		self.current.Post(event)
+
+	def Show(self, window):
+		"""
+		Change to a certain main window.
+		"""
+		if window == self.current:
+			return
+
+		if self.current != None:
+			self.current.Hide()
+
+		self.current = window
+		r = self.current.Show()
+
+		self.Post(self.ShowWindowEvent())
+		return r
+
+class Network(threading.Thread):
+	## Network events that can occur
+	class CacheUpdateEvent(object):
+		"""\
+		Raised when the game cache is changed.
+		"""
 		pass
 
-	def ConfigSave(self):
+	class UpdateOrderEvent(object):
+		"""\
+		Raised when an order has been saved, created or deleted.
+		(Hence can be accessed from the cache.)
+		"""
+		def __init__(self, id, slot):
+			self.id = id
+			self.slot = slot
+	######################################
+
+	def __init__(self, application):
+		threading.Thread.__init__(self)
+		self.application = application
+		self.exit = False
+
+		self.tocall = []
+		self.connection = Connection()
+	
+	def run(self):
+		while not self.exit:
+			if len(self.tocall) <= 0:
+				if hasattr(time, 'sleep'):
+					time.sleep(0.1)
+				continue
+			
+			method, args, kw = self.tocall.pop()
+			print "Now running %s..." % method
+			method(*args, **kw)
+
+	def Call(self, method, *args, **kw):
+		self.tocall.append((method, args, kw))
+
+	def Post(self, event):
 		pass
 
-	def CacheLoad(self):
-		pass
+	def ConnectTo(self, host, port, username, password):
+		gui = self.application.gui
+		up = make(gui, gui.update.Update)
+	
+		# Show the Update window
+		gui.Call(gui.Show, gui.update)
+		
+		up("Connecting...", mode="connecting")
+		if self.connection.setup(host=host, port=port, debug=False):
+			# FIXME: Show error message
+			self.Connection()
+			return
+			
+		up("Looking for Thousand Parsec Server...")
+		if failed(self.connection.connect()):
+			# FIXME: Show error message
+			self.Connection()
+			return
 
-	def CacheSave(self):
-		pass
+		up("Logining In")
+		if failed(self.connection.login(username, password)):
+			# FIXME: Show error message
+			self.Connection()
+			return
+
+		self.CacheUpdate()
 
 	def CacheUpdate(self):
-		class Cache:
-			def __init__(self):
-				class ChangeDict(dict):
-					def __init__(self):
-						dict.__init__(self)
-						self.times = {}
-					
-					def __setitem__(self, key, value):
-						if type(value) is TupleType and len(value) == 2:
-							self.times[key] = value[0]
-							value = value[1]
-						else:
-							self.times[key] = -1
-						dict.__setitem__(self, key, value)
-				
-					def __delitem__(self, key):
-						del self.times[key]
-						dict.__delitem__(self, key)
-				
-				# The object stuff
-				self.objects		= ChangeDict()
-				self.orders			= ChangeDict()
-				self.orders_probe	= ChangeDict()
+		gui = self.application.gui
+		up = make(gui, gui.update.Update)
 
-				# The message boards
-				self.boards			= ChangeDict()
-				self.messages		= ChangeDict()
-
-				# Design stuff
-				self.categories		= ChangeDict()
-				self.designs		= ChangeDict()
-				self.components		= ChangeDict()
-				self.properties		= ChangeDict()
-
-				self.players		= ChangeDict()
-				self.resources		= ChangeDict()
+		# Show the update window
+		gui.Call(gui.Show, gui.update)
 		
-		progress = wx.ProgressDialog("TP: Downloading Universe", "pywx-client is now downloading the Universe.", \
-			100, self.windows.connect, wx.PD_APP_MODAL | wx.PD_AUTO_HIDE | wx.PD_ELAPSED_TIME | wx.PD_REMAINING_TIME)
-
 		# Create the cache
-		self.cache = Cache()
+		cache = Cache()
 
 		# Get the features this server support
-		features = self.connection.features()
-		print "Features:", features
+		up("Looking for supported features...", mode="connecting")
+		cache.features = self.connection.features()
+		print "Features:", cache.features
 	
 		# Boards and objects are special cases in which we have a sub-object to get
 	
 		# Get all the objects
 		# -----------------------------------------------------------------------------------
-		for id, time in self.connection.get_object_ids(iter=True):
-			print "ID %i modified at %s" % (id, time)
+		up("Getting objects...", mode="objects")
+		iter = self.connection.get_object_ids(iter=True)
+		
+		for id, time in iter:
+			up("Getting object with id of %i (last modified at %s)..." % (id, time), of=iter.total)
 
-			if not self.cache.objects.has_key(id) or time > self.cache.objects.times[id]:
+			if not cache.objects.has_key(id) or time > cache.objects.times[id]:
 				object = self.connection.get_objects(id=id)[0]
-				print "Object:", object
 			
 				# Did we download the object okay?
 				if failed(object):
 
 					# Clean up the object
-					if self.cache.objects.has_key(id):
-						del self.cache.objects[id]
+					if cache.objects.has_key(id):
+						del cache.objects[id]
 
-						if self.cache.orders.has_key(id):
-							del self.cache.orders[id]
+						if cache.orders.has_key(id):
+							del cache.orders[id]
 					continue
 
-				self.cache.objects[id] = (time, object)
+				cache.objects[id] = (time, object)
 
 				# Download the orders from this object
-				self.cache.orders[id] = []
+				cache.orders[id] = []
 				for order in self.connection.get_orders(id, range(0, object.order_number)):
 					if failed(order):
 						break
-					self.cache.orders[id].append(order)
+					cache.orders[id].append(order)
 
-				# Download the orders probes
-				self.cache.orders_probe[id] = []
-				for otype in object.order_types:
-					pass
-
-			elif constants.FEATURE_ORDERED_OBJECT in features:
+			elif constants.FEATURE_ORDERED_OBJECT in cache.features:
+				up("Skipping remaining as already cached!")
 				break
+			
+			up("Got object with id of %i (last modified at %s)..." % (id, time), add=1)
 
 		print "Objects ["
-		for id,o in self.cache.objects.items():
+		for id,o in cache.objects.items():
 			print " %s : %s ," % (id, o),
 		print "]"
 
 		# Get all the boards 
 		# -----------------------------------------------------------------------------------
-		for id, time in self.connection.get_board_ids(iter=True):
+		up("Getting boards...", mode="boards")
+		iter = self.connection.get_board_ids(iter=True)
+		
+		for id, time in iter:
+			up("Getting board with id of %i (last modified at %s)..." % (id, time), of=iter.total)
 
-			if not self.cache.boards.has_key(id) or time > self.cache.boards.times[id]:
+			if not cache.boards.has_key(id) or time > cache.boards.times[id]:
 				board = self.connection.get_boards(id=id)[0]
 
 				# Did we download the board okay?
 				if failed(board):
 					
 					# Clean up the board
-					if self.cache.boards.has_key(id):
-						del self.cache.boards[id]
+					if cache.boards.has_key(id):
+						del cache.boards[id]
 
-						if self.cache.messages.has_key(id):
-							del self.cache.messages[id]
+						if cache.messages.has_key(id):
+							del cache.messages[id]
 					continue
 
-				self.cache.boards[id] = (time, board)
+				cache.boards[id] = (time, board)
 
 				# Download the orders from this object
-				self.cache.messages[id] = []
+				cache.messages[id] = []
 				for message in self.connection.get_messages(id, range(0, board.number)):
 					if failed(message):
 						break
-					self.cache.messages[id].append(message)
+					cache.messages[id].append(message)
 
-			elif constants.FEATURE_ORDERED_BOARD in features:
+			elif constants.FEATURE_ORDERED_BOARD in cache.features:
+				up("Skipping remaining as already cached!")
 				break
+				
+			up("Got board with id of %i (last modified at %s)..." % (id, time), add=1)
 
 		print "Boards ["
-		for id,o in self.cache.boards.items():
+		for id,o in cache.boards.items():
 			print " %s : %s ," % (id, o)
 		print "]"
 
-
 		# Get all the order descriptions
 		# -----------------------------------------------------------------------------------
+		up("Getting design objects...", mode="order_descs")
 		for id, time in self.connection.get_orderdesc_ids(iter=True):
-##			if not self.cache..has_key(id) or time > self.cache.boards.times[id]:
+##			if not cache..has_key(id) or time > cache.boards.times[id]:
 				desc = self.connection.get_orderdescs(id=id)[0]
 
 				# Did we download the board okay?
 				if failed(desc):
 					desc.register()
 
-		def get_all(get_ids, get, cache, feature):
-			for id, time in get_ids(iter=True):
+		def get_all(name, get_ids, get, cache, feature, up=up):
+
+			up("Getting %s..." % name, of=0)
+			iter = get_ids(iter=True)
+			
+			for id, time in iter:
+				up("Getting %s with id of %i (last modified at %s)..." % (name, id, time), of=iter.total)
+
 				if not cache.has_key(id) or time > cache.times[id]:
 					frame = get(id=id)[0]
 
@@ -254,42 +402,44 @@ class AppTP(wx.App):
 
 					cache[id] = (time, frame)
 
-				elif feature in features:
+				elif feature in cache.features:
+					up("Skipping remaining as already cached!")
 					break
+				
+				up("Got %s with id of %i (last modified at %s)..." % (name, id, time), add=1)
 
-			print "[",
+			print name, "[",
 			for object in cache.values():
 				print " <'%s' %i>" % (object.name, object.id)
 			print "]"
 
-		get_all(self.connection.get_resource_ids, self.connection.get_resources, 
-					self.cache.resources, constants.FEATURE_ORDERED_RESOURCE)
+		up("Getting design objects...", mode="designs")
+		get_all("Categories", self.connection.get_category_ids, self.connection.get_categories, 
+					cache.categories, constants.FEATURE_ORDERED_CATEGORY)
 
-		get_all(self.connection.get_category_ids, self.connection.get_categories, 
-					self.cache.categories, constants.FEATURE_ORDERED_CATEGORY)
-
-		get_all(self.connection.get_design_ids, self.connection.get_designs, 
-					self.cache.designs, constants.FEATURE_ORDERED_DESIGN)
+		get_all("Designs", self.connection.get_design_ids, self.connection.get_designs, 
+					cache.designs, constants.FEATURE_ORDERED_DESIGN)
 					
-		get_all(self.connection.get_component_ids, self.connection.get_components, 
-					self.cache.components, constants.FEATURE_ORDERED_COMPONENT)
+		get_all("Components", self.connection.get_component_ids, self.connection.get_components, 
+					cache.components, constants.FEATURE_ORDERED_COMPONENT)
 		
-		get_all(self.connection.get_property_ids, self.connection.get_properties, 
-					self.cache.properties, constants.FEATURE_ORDERED_PROPERTY)
+		get_all("Properties", self.connection.get_property_ids, self.connection.get_properties, 
+					cache.properties, constants.FEATURE_ORDERED_PROPERTY)
 				
-		progress.Update(100)
-		self.windows.Post(wx.local.CacheUpdateEvent())
-		return
+		up("Getting all other objects...", mode="remaining")
+		get_all("Resources", self.connection.get_resource_ids, self.connection.get_resources, 
+					cache.resources, constants.FEATURE_ORDERED_RESOURCE)
 
-	def Exit(self):
-		print "AppTp.exit"
-		sys.exit(1)
+		gui.Call(gui.Show, gui.main)
+
+		# Update the cache
+		self.application.cache = cache
+		self.application.Post(self.CacheUpdateEvent())
+		return
 
 if __name__ == '__main__':
 	try:
-		app = AppTP()
-		app.MainLoop()
+		app = Application()
+		app.run()
 	finally:
 		do_traceback()
-		sys.stdin.read(1)
-	

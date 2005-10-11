@@ -10,9 +10,7 @@ import string
 import wx
 
 # Local Imports
-from tp.netlib import failed
-
-from winBase import winBaseMixIn
+from winBase import winMainBase
 from utils import *
 
 defaultServers = ["mithro.dyndns.org", "code-bear.dyndns.org", "llnz.dyndns.org", "127.0.0.1:6923"]
@@ -20,40 +18,11 @@ defaultServers = ["mithro.dyndns.org", "code-bear.dyndns.org", "llnz.dyndns.org"
 ID_OK = 10043
 ID_CANCEL = 10044
 
-TITLE_PROGRESS = _("TP: Connecting to Server")
-TEXT_PROGRESS = _("""\
-pywx-client is now attempting to connect to the specified server.
-""")
-
-TITLE_CONNECT = _("TP: Login Failed")
-TEXT_CONNECT = _("""\
-Failed to connect.
-This could be because, the server is busy or the server doesn't exist.
-Please try again later.
-""")
-
-TITLE_LOGIN = _("TP: Connection Failed")
-TEXT_LOGIN = _("""\
-Failed to login.
-This could be because, the server could be busy or your username and password could be incorrect.
-Please try again later.
-""")
-
-TITLE_DOWNLOAD = _("TP: Downloding Universe...")
-TEXT_DOWNLOAD = _("""\
-pywx-client is now downloading the Universe.
-""")
-
-# Shows messages from the game system to the player.
-class winConnect(wx.Frame, winBaseMixIn):
+class winConnect(winMainBase):
 	title = _("Connect")
-
-	def __init__(self, application, 
-			pos=wx.DefaultPosition, size=wx.DefaultSize, style=wx.DEFAULT_FRAME_STYLE):
-		wx.Frame.__init__(self, None, -1, 'TP: ' + self.title, pos, size, style)
-		winBaseMixIn.__init__(self, application, None, pos, size, style)
-
-		self.application = application
+	
+	def __init__(self, application):
+		winMainBase.__init__(self, application)
 
 		panel = wx.Panel(self, -1)
 
@@ -74,7 +43,7 @@ class winConnect(wx.Frame, winBaseMixIn):
 		text_password = wx.StaticText( panel, -1, _("Password"), wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.password = wx.TextCtrl( panel, -1, "", wx.DefaultPosition, wx.Size(200,-1), wx.TE_PASSWORD )
 
-		grid = wx.FlexGridSizer( 0, 2, 0, 0 )
+		grid = wx.FlexGridSizer( 0, 2, 10, 10 )
 		grid.Add( text_host, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
 		grid.Add( self.host, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
 		grid.Add( text_username, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
@@ -102,6 +71,8 @@ class winConnect(wx.Frame, winBaseMixIn):
 		panel.SetSizer( sizer )
 		sizer.Fit( panel )
 		sizer.SetSizeHints( self )
+		
+		self.CenterOnScreen()
 
 		# Hook up the events
 		self.Bind(wx.EVT_BUTTON, self.OnOkay,   button_ok)
@@ -112,12 +83,9 @@ class winConnect(wx.Frame, winBaseMixIn):
 		self.OnExit(evt)
 
 	def OnExit(self, evt):
-		application = self.application
-		application.Exit()
+		self.application.exit()
 			
 	def OnOkay(self, evt):
-		application = self.application
-
 		# Pull out the values
 		host = self.host.GetValue()
 		username = self.username.GetValue()
@@ -134,39 +102,5 @@ class winConnect(wx.Frame, winBaseMixIn):
 			host, port = temp
 			port = int(port)
 
-		progress = wx.ProgressDialog(TITLE_PROGRESS, TEXT_PROGRESS, 5, self, wx.PD_APP_MODAL | wx.PD_AUTO_HIDE)
+		self.application.network.Call(self.application.network.ConnectTo, host, port, username, password)
 
-		print host, port, username, password
-
-		dlg = None
-		try:
-			application.connection.setup(host=host, port=port, debug=False)
-			progress.Update(1)
-			
-			print "Connect...",
-			if not failed(application.connection.connect()):
-				progress.Update(3)
-
-				print "Login...",
-				if failed(application.connection.login(username, password)):
-					print "Login Failed"
-					dlg = wx.MessageDialog(self, TEXT_LOGIN, TITLE_LOGIN, wx.OK | wx.ICON_INFORMATION)
-			else:
-				print "Connect Failed"
-				dlg = wx.MessageDialog(self, TEXT_CONNECT, TITLE_CONNECT, wx.OK | wx.ICON_INFORMATION)
-
-		except:
-			print "Exception Failed"
-			do_traceback()
-			dlg = wx.MessageDialog(self, TEXT_CONNECT, TITLE_CONNECT, wx.OK | wx.ICON_INFORMATION)
-
-		progress.Update(5)
-		if dlg == None:
-			print "Success"
-			self.Hide()
-			application.CacheUpdate()
-			application.windows.Show()
-			self.Hide()
-		else:
-			dlg.ShowModal()
-			dlg.Destroy()

@@ -23,8 +23,8 @@ class winDesign(winBase):
 
 	modes = ["Select", "Edit"]
 
-	def __init__(self, application, parent, pos=wx.DefaultPosition, size=wx.DefaultSize, style=wx.DEFAULT_FRAME_STYLE):
-		winBase.__init__(self, application, parent, pos, size, style)
+	def __init__(self, application, parent):
+		winBase.__init__(self, application, parent)
 
 		panel = wx.Panel(self, -1)
 
@@ -46,9 +46,9 @@ class winDesign(winBase):
 		self.titleedit.SetFont(wx.local.normalFont)
 		self.top.Add( self.titleedit, 1, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
 		
-		self.title = wx.StaticText( panel, -1, "Title", size=(-1,wx.local.buttonSize[1]), style=wx.ALIGN_CENTRE|wx.ST_NO_AUTORESIZE)
-		self.title.SetFont(wx.local.normalFont)
-		self.top.Add( self.title, 1, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1)
+		self.titletext = wx.StaticText( panel, -1, "Title", size=(-1,wx.local.buttonSize[1]), style=wx.ALIGN_CENTRE|wx.ST_NO_AUTORESIZE)
+		self.titletext.SetFont(wx.local.normalFont)
+		self.top.Add( self.titletext, 1, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1)
 
 		# The number of uses
 		self.used = wx.StaticText( panel, -1, "0000", size=(-1,wx.local.buttonSize[1]), style=wx.ALIGN_RIGHT|wx.ST_NO_AUTORESIZE)
@@ -146,7 +146,7 @@ class winDesign(winBase):
 		
 		# Make the title and description editable
 		self.top.Show(self.titleedit)
-		self.top.Hide(self.title)
+		self.top.Hide(self.titletext)
 		self.top.Layout()
 
 #		self.middle.Show(self.descedit)
@@ -178,7 +178,7 @@ class winDesign(winBase):
 
 		# Make the title and description uneditable
 		self.top.Hide(self.titleedit)
-		self.top.Show(self.title)
+		self.top.Show(self.titletext)
 		self.top.Layout()
 
 #		self.middle.Hide(self.descedit)
@@ -201,7 +201,7 @@ class winDesign(winBase):
 		print "OnSelectObject", id
 		if not id or id == -1:
 			# Clear the title
-			self.title.SetLabel("")
+			self.titletext.SetLabel("")
 
 			# Hide the plan
 			self.middle.Hide(self.plan)
@@ -228,7 +228,7 @@ class winDesign(winBase):
 		self.middle.Layout()
 
 		# Set the title
-		self.title.SetLabel(design.name)
+		self.titletext.SetLabel(design.name)
 		self.titleedit.SetValue(design.name)
 
 		# Set the used

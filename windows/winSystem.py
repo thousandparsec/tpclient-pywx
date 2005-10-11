@@ -21,8 +21,8 @@ DESC = 1
 class winSystem(winBase):
 	title = _("System")
 	
-	def __init__(self, application, parent, pos=wx.DefaultPosition, size=wx.DefaultSize, style=wx.DEFAULT_FRAME_STYLE):
-		winBase.__init__(self, application, parent, pos, size, style)
+	def __init__(self, application, parent):
+		winBase.__init__(self, application, parent)
 
 		# Setup to recieve game events
 		self.application = application
@@ -126,7 +126,7 @@ class winSystem(winBase):
 		id = self.tree.GetPyData(evt.GetItem())
 		
 		# Okay we need to post an event now
-		self.application.windows.Post(wx.local.SelectObjectEvent(id))
+		self.application.Post(self.application.gui.SelectObjectEvent(id))
 
 	####################################################
 	# Remote Event Handlers

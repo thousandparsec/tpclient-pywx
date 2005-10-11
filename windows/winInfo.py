@@ -21,17 +21,15 @@ from utils import *
 class winInfo(winBase):
 	title = _("Information")
 
-	def __init__(self, application, parent, pos=wx.DefaultPosition, size=wx.DefaultSize, style=wx.DEFAULT_FRAME_STYLE):
-		winBase.__init__(self, application, parent, pos, size, style)
+	def __init__(self, application, parent):
+		winBase.__init__(self, application, parent)
 
-		self.application = application
-
-		self.title = wx.StaticText(self, -1, _("No Object Selected."))
+		self.titletext = wx.StaticText(self, -1, _("No Object Selected."))
 		self.picture = wx.StaticBitmap(self, -1, wx.BitmapFromImage(wx.EmptyImage(128, 128)))
 		self.text = wx.TextCtrl(self, -1, "", style=wx.TE_MULTILINE|wx.TE_READONLY)
 
 		top = wx.BoxSizer(wx.VERTICAL)
-		top.Add(self.title, 0, wx.BOTTOM|wx.TOP|wx.ALIGN_CENTER, 3)
+		top.Add(self.titletext, 0, wx.BOTTOM|wx.TOP|wx.ALIGN_CENTER, 3)
 
 		information = wx.BoxSizer(wx.VERTICAL)
 		information.Add(self.text, 1, wx.EXPAND, 0)
@@ -58,7 +56,7 @@ class winInfo(winBase):
 			debug(DEBUG_WINDOWS, "SelectObject: No such object.")
 			return
 
-		self.title.SetLabel(object.name)
+		self.titletext.SetLabel(object.name)
 
 		# Figure out the right graphic
 		path = os.path.join(".", "graphics", "media")

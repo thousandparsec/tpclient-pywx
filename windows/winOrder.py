@@ -35,8 +35,8 @@ defaults = {
 class winOrder(winBase):
 	title = _("Orders")
 	
-	def __init__(self, application, parent, pos=wx.DefaultPosition, size=wx.DefaultSize, style=wx.DEFAULT_FRAME_STYLE):
-		winBase.__init__(self, application, parent, pos, size, style)
+	def __init__(self, application, parent):
+		winBase.__init__(self, application, parent)
 
 		self.application = application
 		self.clipboard = None
@@ -115,9 +115,6 @@ class winOrder(winBase):
 		self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.OnOrderSelect, order_list)
 		self.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.OnOrderSelect, order_list)
 		order_list.Bind(wx.EVT_RIGHT_UP, self.OnRightClick)
-
-		self.SetSize(size)
-		self.SetPosition(pos)
 
 	def BuildMenu(self, menu):
 		object = self.application.cache.objects[self.oid]
@@ -338,7 +335,7 @@ class winOrder(winBase):
 				order = _("Object has been removed.")
 
 		self.BuildPanel(order)
-		self.application.windows.Post(wx.local.SelectOrderEvent(self.oid, slots))
+		self.application.Post(self.application.gui.SelectOrderEvent(self.oid, slots))
 
 	def OnOrderNew(self, evt, after=True):
 		"""\
@@ -386,8 +383,8 @@ class winOrder(winBase):
 		self.OnSelectObject(wx.local.SelectObjectEvent(self.oid), force=True)
 		self.order_list.SetSelected([slot])
 		self.OnOrderSelect(None)
-#		self.application.windows.Post(wx.local.UpdateOrderEvent(self.oid, slot))
-#		self.application.windows.Post(wx.local.SelectOrderEvent(self.oid, slot))
+#		self.application.Post(self.application.gui.UpdateOrderEvent(self.oid, slot))
+#		self.application.Post(self.application.gui.SelectOrderEvent(self.oid, slot))
 
 	def OnOrderDelete(self, evt):
 		"""\
@@ -404,7 +401,7 @@ class winOrder(winBase):
 
 		self.OnSelectObject(wx.local.SelectObjectEvent(self.oid), force=True)
 		self.OnOrderSelect(None)
-		self.application.windows.Post(wx.local.SelectOrderEvent(self.oid, -1))
+		self.application.Post(self.application.gui.SelectOrderEvent(self.oid, -1))
 
 	def OnOrderSave(self, evt):
 		"""\
@@ -447,7 +444,7 @@ class winOrder(winBase):
 		# Update the turns field
 		self.order_list.SetStringItem(slot, TURNS_COL, str(self.application.cache.orders[self.oid][slot].turns))
 
-		self.application.windows.Post(wx.local.UpdateOrderEvent(self.oid, slot))
+		self.application.Post(self.application.gui.UpdateOrderEvent(self.oid, slot))
 
 	def OnOrderUpdate(self, evt):
 		"""\
@@ -467,7 +464,7 @@ class winOrder(winBase):
 		order.slot = slot
 		order = self.FromPanel(order)
 
-		self.application.windows.Post(wx.local.DirtyOrderEvent(order))
+		self.application.Post(self.application.gui.DirtyOrderEvent(order))
 		
 	####################################################
 	# Panel Functions

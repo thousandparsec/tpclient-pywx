@@ -34,8 +34,8 @@ MESSAGE_DEL = 10009
 class winMessage(winBase):
 	title = _("Messages")
 	
-	def __init__(self, application, parent, pos=wx.DefaultPosition, size=wx.DefaultSize, style=wx.DEFAULT_FRAME_STYLE):
-		winBase.__init__(self, application, parent, pos, size, style|wx.TAB_TRAVERSAL)
+	def __init__(self, application, parent):
+		winBase.__init__(self, application, parent)
 
 		panel = wx.Panel(self, -1)
 		panel.SetConstraints(wx.lib.anchors.LayoutAnchors(self, 1, 1, 1, 1))
@@ -52,9 +52,9 @@ class winMessage(winBase):
 		self.filter.SetFont(wx.local.normalFont)
 		item1.Add( self.filter, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 1 )
 
-		self.title = wx.StaticText( panel, MESSAGE_TITLE, _("Title"), wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_CENTRE|wx.ST_NO_AUTORESIZE )
-		self.title.SetFont(wx.local.normalFont)
-		item1.Add( self.title, 0, wx.GROW|wx.ALIGN_CENTRE_HORIZONTAL|wx.ALL, 1 )
+		self.titletext = wx.StaticText( panel, MESSAGE_TITLE, _("Title"), wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_CENTRE|wx.ST_NO_AUTORESIZE )
+		self.titletext.SetFont(wx.local.normalFont)
+		item1.Add( self.titletext, 0, wx.GROW|wx.ALIGN_CENTRE_HORIZONTAL|wx.ALL, 1 )
 
 		self.counter = wx.StaticText( panel, MESSAGE_ID, _("# of #"), wx.DefaultPosition, wx.local.buttonSize, 0 )
 		self.counter.SetFont(wx.local.normalFont)
@@ -117,9 +117,6 @@ class winMessage(winBase):
 		item0.Fit( panel )
 		item0.SetSizeHints( panel )
 		
-		self.SetSize(size)
-		self.SetPosition(pos)
-
 		# The current message slot
 		self.slot = 0
 
@@ -253,7 +250,7 @@ class winMessage(winBase):
 			message_body = html % message.__dict__
 
 		self.filter.SetValue(message_filter)
-		self.title.SetLabel(message_subject)
+		self.titletext.SetLabel(message_subject)
 		self.counter.SetLabel(_("%i of %i") % (self.slot+1, len(messages)))
 		self.html.SetPage(message_body)
 

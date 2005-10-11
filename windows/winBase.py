@@ -11,8 +11,6 @@ class Blank:
 	pass
 wx.local = Blank()
 
-import events
-
 if wx.Platform == "__WXMAC__":
 	wx.local.smallSize  = wx.Size(25,25)
 	wx.local.buttonSize = wx.Size(60,30)
@@ -37,18 +35,19 @@ else:
 	    wx.local.tinyFont   = wx.Font(6,  wx.DEFAULT, wx.NORMAL, wx.NORMAL)    
 	wx.local.largeFont  = wx.Font(12, wx.DEFAULT, wx.NORMAL, wx.NORMAL)
 
-class winBaseMixIn:
-	def __init__(self, application, parent, 
-			pos=wx.DefaultPosition, 
-			size=wx.DefaultSize, 
-			style=wx.DEFAULT_FRAME_STYLE):
-
+class winBaseMixIn(object):
+	def __init__(self, application, parent, config=None):
 		self.application = application
 		self.parent = parent
+		self.children = {}
+		self.config = {}
+	
+		if hasattr(parent, 'children'):
+			self.parent.children[self.title] = self
 
-		_icon = wx.EmptyIcon()
-		_icon.CopyFromBitmap(wx.Bitmap(os.path.join("graphics", "icon.ico"), wx.BITMAP_TYPE_ANY))
-		self.SetIcon(_icon)
+		icon = wx.EmptyIcon()
+		icon.CopyFromBitmap(wx.Bitmap(os.path.join("graphics", "icon.ico"), wx.BITMAP_TYPE_ANY))
+		self.SetIcon(icon)
 
 		self.Bind(wx.EVT_ACTIVATE, self.OnRaise)
 		self.Bind(wx.EVT_CLOSE, self.OnProgramExit)
@@ -61,56 +60,132 @@ class winBaseMixIn:
 			return
 		
 		if wx.Platform != '__WXMSW__':
-			if self.application.windows.config.raise_ == "All on All" or self.application.windows.config.raise_ == "All on Main":
-				if self.title == "Thousand Parsec":
-					self.application.windows.Raise()
-			elif self.application.windows.config.raise_ == "Individual":
-				pass
-			else:
-				print "Unknown raise method:", self.application.windows.config.raise_
+			if not self.config.has_key('raise') or self.config['raise'] == "All on All" or self.config['raise'] == "All on Main":
+				if hasattr(self, "children"):
+					for window in self.children.values():
+						window.Raise()
+
+	def ConfigSave(self):
+		"""
+		Returns the configuration of the Window (and it's children).
+		"""
+		# Save position, size, other config information
+		
+		config = self.config
+		config['position'] = self.GetPositionTuple()
+		config['size'] = self.GetSizeTuple()
+		config['shown'] = self.IsShown()
+		
+		for name, window in self.children.items():
+			config['name'] = window.ConfigSave()
+		
+		return config
+
+	def ConfigLoad(self, config):
+		"""
+		Loads the configuration of the Window (and it's children).
+		"""
+		self.config = config
+		self.SetPosition(config['position'])
+		self.SetSize(config['size'])
+		self.Show(config['shown'])
+
+		for name, window in self.children.items():
+			window.ConfigLoad(config[name])
+
+	def ConfigDisplay(self, panel, sizer):
+		"""
+		"""
+		box = wx.StaticBox(panel, -1, self.title)
+		box_sizer = wx.StaticBoxSizer(box, wx.VERTICAL)
+		
+		sizer.Add(box_sizer, 0, wx.GROW|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+	
+		# Checkbox for "Show"
+		show = wx.CheckBox(panel, -1, _("Show?"), wx.DefaultPosition, wx.DefaultSize, 0 )
+		box_sizer.Add(show, 0, wx.GROW|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+		#self.Bind(wx.EVT_CHECKBOX, self.OnShowInfo, self.show_info)
+
+		# Location Boxes
+		location = wx.FlexGridSizer( 0, 2, 0, 0 )
+		location.AddGrowableCol( 1 )
+	
+		x_text = wx.StaticText(panel, -1, _("X Pos"), wx.DefaultPosition, wx.DefaultSize, 0 )
+		location.Add( x_text, 0, wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+		x = wx.SpinCtrl(panel, -1, "0", wx.DefaultPosition, wx.Size(50,-1), 0, 0, 10000, 0 )
+		location.Add( x, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
+		#wx.EVT_SPINCTRL(self, ID_XPOS, self.OnXPos)
+
+		y_text = wx.StaticText(panel, -1, _("Y Pos"), wx.DefaultPosition, wx.DefaultSize, 0 )
+		location.Add( y_text, 0, wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+		y = wx.SpinCtrl(panel, -1, "0", wx.DefaultPosition, wx.Size(50,-1), 0, 0, 10000, 0 )
+		location.Add( y, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
+		#wx.EVT_SPINCTRL(self, ID_XPOS, self.OnXPos)
+
+		width_text = wx.StaticText(panel, -1, _("Width"), wx.DefaultPosition, wx.DefaultSize, 0 )
+		location.Add( width_text, 0, wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+		width = wx.SpinCtrl(panel, -1, "0", wx.DefaultPosition, wx.Size(50,-1), 0, 0, 10000, 0 )
+		location.Add( width, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
+		#wx.EVT_SPINCTRL(self, ID_XPOS, self.OnXPos)
+
+		height_text = wx.StaticText(panel, -1, _("Height"), wx.DefaultPosition, wx.DefaultSize, 0 )
+		location.Add( height_text, 0, wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+		height = wx.SpinCtrl(panel, -1, "0", wx.DefaultPosition, wx.Size(50,-1), 0, 0, 10000, 0 )
+		location.Add( height, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
+		#wx.EVT_SPINCTRL(self, ID_XPOS, self.OnXPos)
+
+		box_sizer.Add(location, 0, wx.GROW|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5)
+
+	def Post(self, event):
+		func = 'On' + event.__class__.__name__[:-5]	
+		if hasattr(self, func):
+			getattr(self, func)(event)
+
+		for window in self.children.values():
+			window.Post(event)
+
+	def Show(self, show=True):
+		if not show:
+			return self.Hide()
+		
+		for window in self.children.values():
+			window.Show()
+
+			if wx.Platform == "__WXMAC__":
+				value.SetMenuBar(self.current.Menu())
+		return super(winBaseMixIn, self).Show()
+
+	def Hide(self):
+		for window in self.children.values():
+			window.Hide()
+		return super(winBaseMixIn, self).Hide()
+
+	def Raise(self):
+		for window in self.children.values():
+			window.Raise()
+		return super(winBaseMixIn, self).Raise()
 
 # These give a MDI interface under windows
-class winMDIBase(wx.MDIParentFrame, winBaseMixIn):
-	def __init__(self, application, parent, 
-			pos=wx.DefaultPosition, size=wx.DefaultSize, style=wx.DEFAULT_FRAME_STYLE):
-		wx.MDIParentFrame.__init__(self, None, -1, 'TP: ' + self.title, pos, size, style)
-		winBaseMixIn.__init__(self, application, parent, pos, size, style)
+class winMDIBase(winBaseMixIn, wx.MDIParentFrame):
+	def __init__(self, application):
+		wx.MDIParentFrame.__init__(self, None, -1, 'TP: ' + self.title, wx.DefaultPosition, wx.DefaultSize, wx.DEFAULT_FRAME_STYLE)
+		winBaseMixIn.__init__(self, application, None)
 
-class winMDISubBase(wx.MDIChildFrame, winBaseMixIn):
-	def __init__(self, application, parent, 
-			pos=wx.DefaultPosition, size=wx.DefaultSize, style=wx.DEFAULT_FRAME_STYLE):
-		wx.MDIChildFrame.__init__(self, parent, -1, 'TP: ' + self.title, pos, size, style)
-		winBaseMixIn.__init__(self, application, parent, pos, size, style)
+class winMDISubBase(winBaseMixIn, wx.MDIChildFrame):
+	def __init__(self, application, parent):
+		wx.MDIChildFrame.__init__(self, parent, -1, 'TP: ' + self.title, wx.DefaultPosition, wx.DefaultSize, wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL)
+		winBaseMixIn.__init__(self, application, parent)
 
 # These give a non-MDI interface under other operating systems
-class winNormalBase(wx.Frame, winBaseMixIn):
-	def __init__(self, application, parent, 
-			pos=wx.DefaultPosition, size=wx.DefaultSize, style=wx.DEFAULT_FRAME_STYLE):
-		wx.Frame.__init__(self, parent, -1, 'TP: ' + self.title, pos, size, style)
-		winBaseMixIn.__init__(self, application, parent, pos, size, style)
+class winNormalBase(winBaseMixIn, wx.Frame):
+	def __init__(self, application):
+		wx.Frame.__init__(self, None, -1, 'TP: ' + self.title, wx.DefaultPosition, wx.DefaultSize, wx.DEFAULT_FRAME_STYLE)
+		winBaseMixIn.__init__(self, application, None)
 
-class winNormalSubBase(wx.MiniFrame, winBaseMixIn):
-	def __init__(self, application, parent, 
-			pos=wx.DefaultPosition, size=wx.DefaultSize, style=wx.DEFAULT_FRAME_STYLE):
-		wx.MiniFrame.__init__(self, parent, -1, 'TP: ' + self.title, pos, size, style + wx.FRAME_NO_TASKBAR)
-		winBaseMixIn.__init__(self, application, parent, pos, size, style)
-
-		self.Bind(wx.EVT_WINDOW_CREATE, self.OnCreate)
-
-	def OnCreate(self, evt):
-		pass
-# This code is no longer needed as latest wx works properly
-#		if wx.Platform == '__WXGTK__':
-#			try:
-#				import pygtk
-#				pygtk.require("2.0")
-#				
-#				import gtk
-#				window = gtk.gdk.window_lookup(long(self.GetHandle())).get_toplevel()
-#				window.set_skip_taskbar_hint(True)
-#			except:
-#				print "WARNING: You don't have pygtk (>2.2) installed - I won't be able to hide windows under linux."
-
+class winNormalSubBase(winBaseMixIn, wx.MiniFrame):
+	def __init__(self, application, parent):
+		wx.MiniFrame.__init__(self, parent, -1, 'TP: ' + self.title, wx.DefaultPosition, wx.DefaultSize, wx.DEFAULT_FRAME_STYLE|wx.FRAME_NO_TASKBAR|wx.TAB_TRAVERSAL)
+		winBaseMixIn.__init__(self, application, parent)
 
 if wx.Platform == '__WXMSW__':
 	winMainBase = winMDIBase
