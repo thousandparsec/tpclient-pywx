@@ -8,13 +8,11 @@ import string
 
 # wxPython Imports
 import wx
+import wx.gizmos
 
 # Local Imports
 from winBase import winMainBase
 from utils import *
-
-defaultServers = ["mithro.dyndns.org", "code-bear.dyndns.org", "llnz.dyndns.org", "127.0.0.1:6923"]
-
 
 class winConnect(winMainBase):
 	title = _("Connect")
@@ -23,6 +21,14 @@ class winConnect(winMainBase):
 		winMainBase.__init__(self, application)
 
 		panel = wx.Panel(self, -1)
+
+		# Default configuration
+		self.config = { \
+			"servers": ["mithro.dyndns.org", "code-bear.dyndns.org", "llnz.dyndns.org", "127.0.0.1:6923"],
+			"username": "",
+			"password": "",
+			"auto": False,
+			"debug": False }
 
 		# The title
 		text_top = wx.StaticText( panel, -1, _("Connect to a Thousand Parsec Server"), wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -33,7 +39,7 @@ class winConnect(winMainBase):
 		sizer_top.Add( text_top, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
 
 		text_host = wx.StaticText( panel, -1, _("Host"))
-		self.host = wx.ComboBox( panel, -1, "", wx.DefaultPosition, wx.Size(200,-1), defaultServers, wx.CB_DROPDOWN )
+		self.host = wx.ComboBox( panel, -1, "", wx.DefaultPosition, wx.Size(200,-1), [""], wx.CB_DROPDOWN )
 
 		text_username = wx.StaticText( panel, -1, _("Username"))
 		self.username = wx.ComboBox( panel, -1, "", wx.DefaultPosition, wx.Size(200,-1), [""], wx.CB_DROPDOWN )
@@ -110,5 +116,108 @@ class winConnect(winMainBase):
 			host, port = temp
 			port = int(port)
 
-		self.application.network.Call(self.application.network.ConnectTo, host, port, username, password)
+		self.application.network.Call(self.application.network.ConnectTo, host, port, username, password, debug=self.config['debug'])
+	
+	# Config Functions -----------------------------------------------------------------------------
+	def ConfigLoad(self, config):
+		self.config = config
 
+		self.host.Clear()
+		self.host.AppendItems(self.config['servers'])
+		self.host.SetValue(self.config['servers'][0])
+		
+		self.username.SetValue(self.config['username'])
+		self.password.SetValue(self.config['password'])
+
+		self.ConfigDisplayUpdate(None)
+
+	def ConfigUpdate(self):
+		pass
+
+	def ConfigDisplay(self, panel, sizer):
+		SIZER_FLAGS = wx.GROW|wx.ALIGN_CENTER_VERTICAL|wx.ALL
+		TEXT_FLAGS = wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL
+	
+		# List of Servers to Choose From
+		servers = wx.gizmos.EditableListBox(panel, -1, "Server List")
+		servers.SetStrings([""])
+
+		def OnConfigDisplayServers(evt, f=self.OnConfigDisplayServers, servers=servers):
+			return f(evt, servers)
+		panel.Bind(wx.EVT_TEXT, OnConfigDisplayServers, servers)
+
+		sizer.Add(servers, 1, SIZER_FLAGS)
+
+		# Username and Password Field
+		main = wx.BoxSizer(wx.VERTICAL)
+		sizer.Add(main, 1, SIZER_FLAGS, 5)
+		
+		grid = wx.FlexGridSizer( 0, 2, 1, 5 )
+		grid.AddGrowableCol(1)	
+		main.Add(grid, 2, SIZER_FLAGS, 5)
+	
+		# Username Box
+		text_username = wx.StaticText( panel, -1, _("Username"))
+		grid.Add( text_username, 0, TEXT_FLAGS)
+		
+		username = wx.TextCtrl( panel, -1, "")
+		grid.Add( username, 1, SIZER_FLAGS)
+		
+		panel.Bind(wx.EVT_TEXT, self.OnConfigDisplayUsername, username)
+
+		# Password Box
+		text_password = wx.StaticText( panel, -1, _("Password"))
+		grid.Add( text_password, 0, TEXT_FLAGS)
+		
+		password = wx.TextCtrl( panel, -1, "", style=wx.TE_PASSWORD )
+		grid.Add( password, 1, SIZER_FLAGS)
+
+		panel.Bind(wx.EVT_TEXT, self.OnConfigDisplayPassword, password)
+		
+		# The check boxes
+		checks = wx.BoxSizer(wx.HORIZONTAL)
+		main.Add(checks, 1, SIZER_FLAGS)
+		
+		# Autoconnect Checkbox
+		auto = wx.CheckBox(panel, -1, _("Autoconnect?"))
+		checks.Add(auto, 0, SIZER_FLAGS, 5 )
+		panel.Bind(wx.EVT_CHECKBOX, self.OnConfigDisplayAuto, auto)
+
+		# Print debug	
+		debug = wx.CheckBox(panel, -1, _("Debug Output?"))
+		checks.Add(debug, 0, SIZER_FLAGS, 5 )
+		panel.Bind(wx.EVT_CHECKBOX, self.OnConfigDisplayDebug, debug)
+	
+		# FIXME: This is bad too!
+		self.ConfigWidgets = [servers, username, password, auto, debug]
+		self.Bind(wx.EVT_ACTIVATE, self.ConfigDisplayUpdate)
+
+	def ConfigDisplayUpdate(self, evt):
+		"""\
+		Update the Display because it's changed externally
+		"""
+		if not hasattr(self, 'ConfigWidgets'):
+			return
+		
+		servers, username, password, auto, debug = self.ConfigWidgets
+		servers.SetStrings(self.config['servers'])
+		username.SetValue(self.config['username'])
+		password.SetValue(self.config['password'])
+		auto.SetValue(self.config['auto'])
+		debug.SetValue(self.config['debug'])
+	
+	def OnConfigDisplayServers(self, evt, servers):
+		self.config['servers'] = servers.GetStrings()
+		print self.config['servers']
+
+	def OnConfigDisplayDebug(self, evt):
+		self.config['debug'] = evt.Checked()
+	
+	def OnConfigDisplayAuto(self, evt):
+		self.config['auto'] = evt.Checked()
+
+	def OnConfigDisplayUsername(self, evt):
+		self.config['username'] = evt.GetString()
+		
+	def OnConfigDisplayPassword(self, evt):
+		self.config['password'] = evt.GetString()

@@ -158,6 +158,7 @@ class winMain(winMainBase):
 #		wx.EVT_MENU(source, ID_WIN_HELP,		self.OnHelp)
 		return bar
 
+	# Config Functions -----------------------------------------------------------------------------
 	def ConfigDisplay(self, panel, sizer):
 	
 		notebook = wx.Choicebook(panel, -1)

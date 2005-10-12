@@ -2,6 +2,7 @@
 This file contains useful utilities for useage in the program.
 """
 
+import pprint
 import sys
 import string
 import traceback
@@ -54,57 +55,22 @@ def load_data(file):
 	"""\
 	Loads preference data from a file.
 	"""
-	global cache
-	
-	if file not in cache.keys():
-		try:
-			f = open(os.path.join(configpath(), file), "r")
-			cache[file] = pickle.load(f)
-		except IOError:
-			return None
-		
-	return cache[file]
+	try:
+		f = open(os.path.join(configpath(), file), "r")
+		data = pickle.load(f)
+	except IOError:
+		return None
+	return data
 	
 def save_data(file, data):
 	"""\
 	Saves preference data to a file.
 	"""
-	global cache
-
-	print "Saving", file, data
+	print "Saving", file
+	pprint.pprint(data)
 
 	f = open(os.path.join(configpath(), file), "w")
 	pickle.dump(data, f)
-
-	cache[file] = data
-
-config = None
-def load_config():
-	"""\
-	Loads the config file.
-	"""
-	global config
-	
-	if not config:
-		class Config:
-			pass
-		
-		config = Config()
-		
-		try:
-			f = open(os.path.join(configpath(), "pywx_config"), "r")
-			
-			for line in f.readline():
-				if line[0] == '#':
-					continue
-				
-				else:
-					pass
-
-		except IOError:
-			return None
-		
-	return config
 
 __all__ = [
 	'Blank', 'save_data', 'load_data', 'configpath', # Config functions

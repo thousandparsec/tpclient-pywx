@@ -40,7 +40,10 @@ class winBaseMixIn(object):
 		self.application = application
 		self.parent = parent
 		self.children = {}
-		self.config = {}
+		self.config = { \
+			'show': True,
+			'position': (0,0),
+			'size': (100, 100) }
 	
 		if hasattr(parent, 'children'):
 			self.parent.children[self.title] = self
@@ -72,8 +75,7 @@ class winBaseMixIn(object):
 		"""
 		config = self.config
 		for name, window in self.children.items():
-			if config.has_key(name):
-				config[name] = window.ConfigSave()
+			config[name] = window.ConfigSave()
 		return config
 
 	def ConfigLoad(self, config):
@@ -83,14 +85,18 @@ class winBaseMixIn(object):
 		self.config = config
 		self.SetPosition(config['position'])
 		self.SetSize(config['size'])
-		self.Show(config['shown'])
+		if self.application.gui.current in (self, self.parent):
+			self.Show(config['show'])
 
 		for name, window in self.children.items():
-			window.ConfigLoad(config[name])
+			if config.has_key(name):
+				window.ConfigLoad(config[name])
+		
+		self.ConfigDisplayUpdate(None)
 
 	def ConfigUpdate(self):
 		"""
-		Saves the current active config.
+		Updates the config details using external sources.
 		"""
 		if self.application.gui.current in (self, self.parent):
 			self.config['show'] = self.IsShown()
@@ -160,19 +166,20 @@ class winBaseMixIn(object):
 
 		box_sizer.Add( location, 0, SIZER_FLAGS, 5)
 
-		# FIXME: This is bad too!
-		boxes = [show, x_box, y_box, width, height]
-		def ConfigDisplayUpdate(evt, f=self.ConfigDisplayUpdate, boxes=boxes):
-			return f(*boxes)
-		
-		self.Bind(wx.EVT_MOVE, ConfigDisplayUpdate)
+		self.ConfigWidgets = [show, x_box, y_box, width, height]
+		self.Bind(wx.EVT_MOVE, self.ConfigDisplayUpdate)
+		self.Bind(wx.EVT_ACTIVATE, self.ConfigDisplayUpdate)
 
-	def ConfigDisplayUpdate(self, show, x_box, y_box, width, height):
+	def ConfigDisplayUpdate(self, evt):
 		"""\
-		Update the Display because it's changed externally
+		Update the Display because it's changed externally.
 		"""
+		if not hasattr(self, 'ConfigWidgets'):
+			return
+			
 		self.ConfigUpdate()
 	
+		show, x_box, y_box, width, height = self.ConfigWidgets
 		show.SetValue(self.config['show'])
 		x_box.SetValue(self.config['position'][0])
 		y_box.SetValue(self.config['position'][1])

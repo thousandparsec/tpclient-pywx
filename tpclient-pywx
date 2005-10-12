@@ -14,7 +14,7 @@ import threading
 from types import *
 
 # Local imports
-from utils import *
+import utils
 from tp.netlib import Connection, failed, constants
 
 def make(thread, method):
@@ -106,6 +106,9 @@ class Application(object):
 		self.network = Network(self)
 
 		self.cache = Cache()
+		
+		# Load the Configuration
+		self.ConfigLoad()
 
 	def Run(self):
 		"""\
@@ -125,12 +128,18 @@ class Application(object):
 	def ConfigSave(self):
 		"""\
 		"""
-		pass
+		# FIXME: This should be fixed, utils needs to go away
+		config = self.gui.ConfigSave()
+		if config:
+			utils.save_data("pywx_preferences", config)
 
 	def ConfigLoad(self):
 		"""\
 		"""
-		pass
+		# FIXME: This should be fixed, utils needs to go away
+		config = utils.load_data("pywx_preferences")
+		if config:
+			self.gui.ConfigLoad(config)
 
 	def Post(self, event):
 		"""\
@@ -215,12 +224,14 @@ class GUI(wx.App, threading.Thread):
 
 			from windows.winDebug import winDebug
 			self.debug = winDebug(application)
-			
+		
+			self.windows = (self.main, self.connectto, self.update, self.debug)
+		
 			from windows.winConfig import winConfig
-			self.config = winConfig(application, (self.main, self.connectto, self.update, self.debug))
+			self.config = winConfig(application, self.windows)
 
 		except:
-			do_traceback()
+			utils.do_traceback()
 
 	def run(self):
 		self.MainLoop()
@@ -230,6 +241,22 @@ class GUI(wx.App, threading.Thread):
 		Display the configuration window.
 		"""
 		self.config.Show(True)
+
+	def ConfigSave(self):
+		"""\
+		Display the configuration window.
+		"""
+		config = {}
+		for window in self.windows:
+			config[window.title] = window.ConfigSave()
+		return config
+
+	def ConfigLoad(self, config):
+		"""\
+		Display the configuration window.
+		"""
+		for window in self.windows:
+			window.ConfigLoad(config[window.title])
 
 	def Call(self, method, *args, **kw):
 		"""\
@@ -303,7 +330,7 @@ class Network(threading.Thread):
 	def Post(self, event):
 		pass
 
-	def ConnectTo(self, host, port, username, password):
+	def ConnectTo(self, host, port, username, password, debug=False):
 		"""\
 		Connect to a given host using a certain username and password.
 		"""
@@ -315,7 +342,7 @@ class Network(threading.Thread):
 		gui.Call(gui.Show, gui.update)
 		
 		up("Connecting...", mode="connecting")
-		if self.connection.setup(host=host, port=port, debug=False):
+		if self.connection.setup(host=host, port=port, debug=debug):
 			# FIXME: Show error message
 			self.application.Post(self.FailureEvent(_("Could not connect to the host.")))
 			return
@@ -506,4 +533,4 @@ if __name__ == '__main__':
 		app = Application()
 		app.Run()
 	finally:
-		do_traceback()
+		utils.do_traceback()
