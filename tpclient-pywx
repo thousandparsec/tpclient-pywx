@@ -8,6 +8,7 @@ import wx
 import extra
 
 # Python Imports
+import socket
 import time
 import threading
 from types import *
@@ -22,13 +23,27 @@ def make(thread, method):
 	return t
 
 class Cache(object):
+	"""\
+	This is the a cache of the data downloaded from the network. 
+	
+	It can be pickled and restored at a later date to preserve the data accross application runs.
+	"""
 	def __init__(self):
 		class ChangeDict(dict):
+			"""\
+			A simple dictionary which also stores the "times" an object was last updated.
+
+			Used so that we only upload/download items which have changed.
+			"""
 			def __init__(self):
 				dict.__init__(self)
 				self.times = {}
 			
 			def __setitem__(self, key, value):
+				"""\
+				This set item is special, it only takes keys of the form,
+				(<last modified time>, <normal key>)
+				"""
 				if type(value) is TupleType and len(value) == 2:
 					self.times[key] = value[0]
 					value = value[1]
@@ -63,10 +78,28 @@ class Cache(object):
 		
 class Application(object):
 	"""
-	Container for all the applications threads.
+	Container for all the applications threads and the network cache.
 
-	Calling accross threads requires you to use the .Call method on each thread - DONOT call directly!
+	Calling accross threads requires you to use the .Call method on each thread - DO NOT call directly!
+	The cache can be accessed by either thread at any time - be careful.
 	"""
+	
+	# Global application events
+	class CacheDirtyEvent(object):
+		"""\
+		Raised when the game cache is made dirty. Contains a reference to what was updated.
+		"""
+		def __init__(self, reference):
+			self.reference = reference
+	
+	class CacheUpdateEvent(object):
+		"""\
+		Raised when the game cache is changed. Contains a reference to what was updated. 
+		If the reference is None a new cache has been created.
+		"""
+		def __init__(self, reference=None):
+			self.reference = reference
+
 	
 	def __init__(self):
 		self.gui = GUI(self)
@@ -74,17 +107,42 @@ class Application(object):
 
 		self.cache = Cache()
 
-	def run(self):
+	def Run(self):
+		"""\
+		Set the application running.
+		"""
 		self.init = True
 
 		self.gui.start()
 		self.network.start()
 
+	def ConfigDisplay(self):
+		"""\
+		Pop-up the configuration window.
+		"""
+		self.gui.ConfigDisplay()
+
+	def ConfigSave(self):
+		"""\
+		"""
+		pass
+
+	def ConfigLoad(self):
+		"""\
+		"""
+		pass
+
 	def Post(self, event):
+		"""\
+		Post an application wide event to every thread.
+		"""
 		self.gui.Call(self.gui.Post, event)
 		self.network.Call(self.network.Post, event)
 
-	def exit(self):
+	def Exit(self):
+		"""
+		Exit the program.
+		"""
 		sys.exit()	
 
 class GUI(wx.App, threading.Thread):
@@ -117,14 +175,6 @@ class GUI(wx.App, threading.Thread):
 			self.id = id
 			self.slots = slots
 	
-	class DirtyOrderEvent(wx.PyEvent):
-		"""\
-		Raised when an order has been changed but not yet saved.
-		"""
-		def __init__(self, order):
-			self.id = order.id
-			self.slot = order.slot
-			self.order = order
 	######################################
 
 	def __init__(self, application):
@@ -165,13 +215,26 @@ class GUI(wx.App, threading.Thread):
 
 			from windows.winDebug import winDebug
 			self.debug = winDebug(application)
+			
+			from windows.winConfig import winConfig
+			self.config = winConfig(application, (self.main, self.connectto, self.update, self.debug))
+
 		except:
 			do_traceback()
 
 	def run(self):
 		self.MainLoop()
 
+	def ConfigDisplay(self):
+		"""\
+		Display the configuration window.
+		"""
+		self.config.Show(True)
+
 	def Call(self, method, *args, **kw):
+		"""\
+		Call a method in this thread.
+		"""
 		wx.CallAfter(method, *args, **kw)
 
 	def Post(self, event):
@@ -201,21 +264,15 @@ class GUI(wx.App, threading.Thread):
 		return r
 
 class Network(threading.Thread):
-	## Network events that can occur
-	class CacheUpdateEvent(object):
-		"""\
-		Raised when the game cache is changed.
-		"""
-		pass
 
-	class UpdateOrderEvent(object):
+	## These are network events
+	class NetworkFailureEvent(object):
 		"""\
-		Raised when an order has been saved, created or deleted.
-		(Hence can be accessed from the cache.)
+		Raised when the network connection fails for what ever reason.
 		"""
-		def __init__(self, id, slot):
-			self.id = id
-			self.slot = slot
+		def __init__(self, reason):
+			self.reason = reason
+	
 	######################################
 
 	def __init__(self, application):
@@ -235,7 +292,10 @@ class Network(threading.Thread):
 			
 			method, args, kw = self.tocall.pop()
 			print "Now running %s..." % method
-			method(*args, **kw)
+			try:
+				method(*args, **kw)
+			except (IOError, socket.error):
+				self.application.Post(self.NetworkFailureEvent(""))
 
 	def Call(self, method, *args, **kw):
 		self.tocall.append((method, args, kw))
@@ -244,6 +304,10 @@ class Network(threading.Thread):
 		pass
 
 	def ConnectTo(self, host, port, username, password):
+		"""\
+		Connect to a given host using a certain username and password.
+		"""
+		# FIXME: This should be sending events really
 		gui = self.application.gui
 		up = make(gui, gui.update.Update)
 	
@@ -253,19 +317,19 @@ class Network(threading.Thread):
 		up("Connecting...", mode="connecting")
 		if self.connection.setup(host=host, port=port, debug=False):
 			# FIXME: Show error message
-			self.Connection()
+			self.application.Post(self.FailureEvent(_("Could not connect to the host.")))
 			return
 			
 		up("Looking for Thousand Parsec Server...")
 		if failed(self.connection.connect()):
 			# FIXME: Show error message
-			self.Connection()
+			self.application.Post(self.FailureEvent(_("Server does not seem to be a valid Thousand Parsec server.")))
 			return
 
 		up("Logining In")
 		if failed(self.connection.login(username, password)):
 			# FIXME: Show error message
-			self.Connection()
+			self.application.Post(self.FailureEvent(_("Username and Password where invalid.")))
 			return
 
 		self.CacheUpdate()
@@ -434,12 +498,12 @@ class Network(threading.Thread):
 
 		# Update the cache
 		self.application.cache = cache
-		self.application.Post(self.CacheUpdateEvent())
+		self.application.Post(self.application.CacheUpdateEvent())
 		return
 
 if __name__ == '__main__':
 	try:
 		app = Application()
-		app.run()
+		app.Run()
 	finally:
 		do_traceback()

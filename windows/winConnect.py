@@ -15,8 +15,6 @@ from utils import *
 
 defaultServers = ["mithro.dyndns.org", "code-bear.dyndns.org", "llnz.dyndns.org", "127.0.0.1:6923"]
 
-ID_OK = 10043
-ID_CANCEL = 10044
 
 class winConnect(winMainBase):
 	title = _("Connect")
@@ -34,31 +32,37 @@ class winConnect(winMainBase):
 		sizer_top = wx.BoxSizer( wx.HORIZONTAL )
 		sizer_top.Add( text_top, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
 
-		text_host = wx.StaticText( panel, -1, _("Host"), wx.DefaultPosition, wx.DefaultSize, 0 )
+		text_host = wx.StaticText( panel, -1, _("Host"))
 		self.host = wx.ComboBox( panel, -1, "", wx.DefaultPosition, wx.Size(200,-1), defaultServers, wx.CB_DROPDOWN )
 
-		text_username = wx.StaticText( panel, -1, _("Username"), wx.DefaultPosition, wx.DefaultSize, 0 )
+		text_username = wx.StaticText( panel, -1, _("Username"))
 		self.username = wx.ComboBox( panel, -1, "", wx.DefaultPosition, wx.Size(200,-1), [""], wx.CB_DROPDOWN )
 
-		text_password = wx.StaticText( panel, -1, _("Password"), wx.DefaultPosition, wx.DefaultSize, 0 )
+		text_password = wx.StaticText( panel, -1, _("Password"))
 		self.password = wx.TextCtrl( panel, -1, "", wx.DefaultPosition, wx.Size(200,-1), wx.TE_PASSWORD )
 
-		grid = wx.FlexGridSizer( 0, 2, 10, 10 )
-		grid.Add( text_host, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
-		grid.Add( self.host, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
-		grid.Add( text_username, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
-		grid.Add( self.username, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
-		grid.Add( text_password, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
-		grid.Add( self.password, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
+		TEXT_FLAGS = wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL
+
+		grid = wx.FlexGridSizer( 0, 2, 5, 5 )
+		grid.AddGrowableCol(1)
+		grid.Add( text_host, 0, TEXT_FLAGS, 5 )
+		grid.Add( self.host, 1, wx.GROW, 5 )
+		grid.Add( text_username, 0, TEXT_FLAGS, 5 )
+		grid.Add( self.username, 1, wx.GROW, 5 )
+		grid.Add( text_password, 0, TEXT_FLAGS, 5 )
+		grid.Add( self.password, 1, wx.GROW, 5 )
 
 		# The buttons
-		button_ok = wx.Button( panel, ID_OK, _("OK"), wx.DefaultPosition, wx.DefaultSize, 0 )
-		button_cancel = wx.Button( panel, ID_CANCEL, _("Cancel"), wx.DefaultPosition, wx.DefaultSize, 0 )
+		button_ok = wx.Button(panel, wx.ID_OK, _("&OK"))
+		button_cancel = wx.Button(panel, wx.ID_CANCEL, _("Cancel"))
+		button_config = wx.Button(panel, wx.ID_PREFERENCES, _("&Preferences"))
 		button_ok.SetDefault()
 
 		buttons = wx.BoxSizer( wx.HORIZONTAL )
-		buttons.Add( button_ok, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
-		buttons.Add( button_cancel, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
+		buttons.Add( button_ok, 0, wx.ALIGN_CENTRE)
+		buttons.Add( button_cancel, 0, wx.ALIGN_CENTRE)
+		buttons.AddSpacer(wx.Size(5, -1))
+		buttons.Add( button_config, 0, wx.ALIGN_CENTRE)
 
 		# The main sizer
 		sizer = wx.BoxSizer( wx.VERTICAL )
@@ -77,13 +81,17 @@ class winConnect(winMainBase):
 		# Hook up the events
 		self.Bind(wx.EVT_BUTTON, self.OnOkay,   button_ok)
 		self.Bind(wx.EVT_BUTTON, self.OnCancel, button_cancel)
+		self.Bind(wx.EVT_BUTTON, self.OnConfig, button_config)
 		self.Bind(wx.EVT_CLOSE,  self.OnExit)
+
+	def OnConfig(self, evt):
+		self.application.ConfigDisplay()
 
 	def OnCancel(self, evt):
 		self.OnExit(evt)
 
 	def OnExit(self, evt):
-		self.application.exit()
+		self.application.Exit()
 			
 	def OnOkay(self, evt):
 		# Pull out the values

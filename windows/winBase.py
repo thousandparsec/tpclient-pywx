@@ -65,20 +65,15 @@ class winBaseMixIn(object):
 					for window in self.children.values():
 						window.Raise()
 
+	# Config Functions -----------------------------------------------------------------------------
 	def ConfigSave(self):
 		"""
 		Returns the configuration of the Window (and it's children).
 		"""
-		# Save position, size, other config information
-		
 		config = self.config
-		config['position'] = self.GetPositionTuple()
-		config['size'] = self.GetSizeTuple()
-		config['shown'] = self.IsShown()
-		
 		for name, window in self.children.items():
-			config['name'] = window.ConfigSave()
-		
+			if config.has_key(name):
+				config[name] = window.ConfigSave()
 		return config
 
 	def ConfigLoad(self, config):
@@ -93,48 +88,118 @@ class winBaseMixIn(object):
 		for name, window in self.children.items():
 			window.ConfigLoad(config[name])
 
+	def ConfigUpdate(self):
+		"""
+		Saves the current active config.
+		"""
+		if self.application.gui.current in (self, self.parent):
+			self.config['show'] = self.IsShown()
+			self.config['position'] = self.GetPosition()
+			self.config['size'] = self.GetSize()
+
 	def ConfigDisplay(self, panel, sizer):
 		"""
+		Display a config  panel with all the config options.
 		"""
+		
+		# Sizes we will need
+		SCREEN_X = wx.SystemSettings_GetMetric(wx.SYS_SCREEN_X)
+		SCREEN_Y = wx.SystemSettings_GetMetric(wx.SYS_SCREEN_Y)
+	
+		SIZER_FLAGS = wx.GROW|wx.ALIGN_CENTER_VERTICAL|wx.ALL
+		
+		# The box around the items
 		box = wx.StaticBox(panel, -1, self.title)
 		box_sizer = wx.StaticBoxSizer(box, wx.VERTICAL)
-		
-		sizer.Add(box_sizer, 0, wx.GROW|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+		sizer.Add(box_sizer, 1, SIZER_FLAGS, 5 )
 	
 		# Checkbox for "Show"
-		show = wx.CheckBox(panel, -1, _("Show?"), wx.DefaultPosition, wx.DefaultSize, 0 )
-		box_sizer.Add(show, 0, wx.GROW|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-		#self.Bind(wx.EVT_CHECKBOX, self.OnShowInfo, self.show_info)
+		show = wx.CheckBox(panel, -1, _("Show?"))
+		box_sizer.Add(show, 0, SIZER_FLAGS, 5 )
+		panel.Bind(wx.EVT_CHECKBOX, self.OnConfigDisplayDoShow, show)
 
 		# Location Boxes
 		location = wx.FlexGridSizer( 0, 2, 0, 0 )
 		location.AddGrowableCol( 1 )
-	
-		x_text = wx.StaticText(panel, -1, _("X Pos"), wx.DefaultPosition, wx.DefaultSize, 0 )
-		location.Add( x_text, 0, wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-		x = wx.SpinCtrl(panel, -1, "0", wx.DefaultPosition, wx.Size(50,-1), 0, 0, 10000, 0 )
-		location.Add( x, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
-		#wx.EVT_SPINCTRL(self, ID_XPOS, self.OnXPos)
 
-		y_text = wx.StaticText(panel, -1, _("Y Pos"), wx.DefaultPosition, wx.DefaultSize, 0 )
-		location.Add( y_text, 0, wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-		y = wx.SpinCtrl(panel, -1, "0", wx.DefaultPosition, wx.Size(50,-1), 0, 0, 10000, 0 )
-		location.Add( y, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
-		#wx.EVT_SPINCTRL(self, ID_XPOS, self.OnXPos)
+		# X Position
+		x_text = wx.StaticText(panel, -1, _("X Pos"))
+		location.Add( x_text, 0, SIZER_FLAGS, 5 )
+		
+		x_box = wx.SpinCtrl(panel, -1, "0", wx.DefaultPosition, wx.Size(50,-1), 0, 0, SCREEN_X, 0 )
+		location.Add( x_box, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
+		
+		panel.Bind(wx.EVT_SPINCTRL, self.OnConfigDisplayX, x_box)
 
-		width_text = wx.StaticText(panel, -1, _("Width"), wx.DefaultPosition, wx.DefaultSize, 0 )
-		location.Add( width_text, 0, wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-		width = wx.SpinCtrl(panel, -1, "0", wx.DefaultPosition, wx.Size(50,-1), 0, 0, 10000, 0 )
+		# Y Position
+		y_text = wx.StaticText(panel, -1, _("Y Pos"))
+		location.Add( y_text, 0, SIZER_FLAGS, 5 )
+		
+		y_box = wx.SpinCtrl(panel, -1, "0", wx.DefaultPosition, wx.Size(50,-1), 0, 0, SCREEN_Y, 0 )
+		location.Add( y_box, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
+
+		panel.Bind(wx.EVT_SPINCTRL, self.OnConfigDisplayY, y_box)
+
+		# Width
+		width_text = wx.StaticText(panel, -1, _("Width"))
+		location.Add( width_text, 0, SIZER_FLAGS, 5 )
+		
+		width = wx.SpinCtrl(panel, -1, "0", wx.DefaultPosition, wx.Size(50,-1), 0, 0, SCREEN_X, 0 )
 		location.Add( width, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
-		#wx.EVT_SPINCTRL(self, ID_XPOS, self.OnXPos)
+		
+		panel.Bind(wx.EVT_SPINCTRL, self.OnConfigDisplayWidth, width)
 
-		height_text = wx.StaticText(panel, -1, _("Height"), wx.DefaultPosition, wx.DefaultSize, 0 )
-		location.Add( height_text, 0, wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-		height = wx.SpinCtrl(panel, -1, "0", wx.DefaultPosition, wx.Size(50,-1), 0, 0, 10000, 0 )
+		# Height
+		height_text = wx.StaticText(panel, -1, _("Height"))
+		location.Add( height_text, 0, SIZER_FLAGS, 5 )
+		
+		height = wx.SpinCtrl(panel, -1, "0", wx.DefaultPosition, wx.Size(50,-1), 0, 0, SCREEN_Y, 0 )
 		location.Add( height, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
-		#wx.EVT_SPINCTRL(self, ID_XPOS, self.OnXPos)
 
-		box_sizer.Add(location, 0, wx.GROW|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5)
+		panel.Bind(wx.EVT_SPINCTRL, self.OnConfigDisplayHeight, height)
+
+		box_sizer.Add( location, 0, SIZER_FLAGS, 5)
+
+		# FIXME: This is bad too!
+		boxes = [show, x_box, y_box, width, height]
+		def ConfigDisplayUpdate(evt, f=self.ConfigDisplayUpdate, boxes=boxes):
+			return f(*boxes)
+		
+		self.Bind(wx.EVT_MOVE, ConfigDisplayUpdate)
+
+	def ConfigDisplayUpdate(self, show, x_box, y_box, width, height):
+		"""\
+		Update the Display because it's changed externally
+		"""
+		self.ConfigUpdate()
+	
+		show.SetValue(self.config['show'])
+		x_box.SetValue(self.config['position'][0])
+		y_box.SetValue(self.config['position'][1])
+		width.SetValue(self.config['size'][0])
+		height.SetValue(self.config['size'][1])
+
+	def OnConfigDisplayDoShow(self, evt):
+		self.Show(evt.Checked())
+		self.ConfigUpdate()
+	
+	def OnConfigDisplayX(self, evt):
+		self.SetPosition(wx.Point(evt.GetInt(), -1))
+		self.ConfigUpdate()
+
+	def OnConfigDisplayY(self, evt):
+		self.SetPosition(wx.Point(-1, evt.GetInt()))
+		self.ConfigUpdate()
+		
+	def OnConfigDisplayWidth(self, evt):
+		self.SetSize(wx.Size(evt.GetInt(), -1))
+		self.ConfigUpdate()
+
+	def OnConfigDisplayHeight(self, evt):
+		self.SetSize(wx.Size(-1, evt.GetInt()))
+		self.ConfigUpdate()
+		
+	#-----------------------------------------------------------------------------------------------
 
 	def Post(self, event):
 		func = 'On' + event.__class__.__name__[:-5]	

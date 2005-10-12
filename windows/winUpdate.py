@@ -9,7 +9,7 @@ import wx
 from winBase import winMainBase
 
 class winUpdate(winMainBase):
-	title = _("Thousand Parsec")
+	title = _("Updating")
 	
 	def __init__(self, application):
 		winMainBase.__init__(self, application)

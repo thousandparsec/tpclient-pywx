@@ -70,7 +70,7 @@ class TimeStatusBar(wx.StatusBar):
 		self.endtime = endtime
 
 class winMain(winMainBase):
-	title = _("Thousand Parsec")
+	title = _("Main Windows")
 	
 	def __init__(self, application):
 		winMainBase.__init__(self, application)
@@ -79,11 +79,6 @@ class winMain(winMainBase):
 
 		self.statusbar = TimeStatusBar(self)
 		self.SetStatusBar(self.statusbar)
-
-		# Children Windows
-		from windows.winConfig import winConfig
-		winConfig(application, self)
-		self.children[_('Config')].Hide()
 
 		from windows.winDesign import winDesign
 		winDesign(application, self)
@@ -112,7 +107,7 @@ class winMain(winMainBase):
 		file.Append( ID_OPEN, _("Connect to Game\tCtrl-O"), _("Connect to a diffrent Game") )
 		file.Append( ID_UNIV, _("Download the Universe\tCtrl-U"), _("Download the Universe") )
 		file.AppendSeparator()
-		file.Append( ID_CONFIG, _("Config"), _("Configure the Client") )
+		file.Append( wx.ID_PREFERENCES, _("Preferences"), _("Configure the Client") )
 		file.AppendSeparator()
 		file.Append( ID_EXIT, _("Exit"), _("Exit") )
 	
@@ -149,7 +144,7 @@ class winMain(winMainBase):
 	
 		wx.EVT_MENU(source, ID_OPEN,	self.OnConnect)
 		wx.EVT_MENU(source, ID_UNIV,	self.UpdateCache)
-		wx.EVT_MENU(source, ID_CONFIG,	self.OnConfig)
+		wx.EVT_MENU(source, wx.ID_PREFERENCES,	self.OnConfig)
 		wx.EVT_MENU(source, ID_EXIT,	self.OnProgramExit)
 	
 		wx.EVT_MENU(source, ID_WIN_INFO,        self.OnInformation)
@@ -164,18 +159,26 @@ class winMain(winMainBase):
 		return bar
 
 	def ConfigDisplay(self, panel, sizer):
-		
-		notebook = wx.Notebook(panel, -1)
-		
+	
+		notebook = wx.Choicebook(panel, -1)
 		cpanel = wx.Panel(notebook, -1)
 		csizer = wx.BoxSizer(wx.HORIZONTAL)
+		
 		winMainBase.ConfigDisplay(self, cpanel, csizer)
 
-		x_text = wx.StaticText(cpanel, -1, _("X Pos"))
-		csizer.Add( x_text, 0, wx.GROW|wx.ALL, 5 )
+		if wx.Platform == '__WXMSW__':
+			options = [_("Individual"), _("All on Main")]
+		elif wx.Platform == '__WXMAC__':
+			options = [_("Individual"), _("All on All")]
+		else:
+			options = [_("Individual"), _("All on Main"), _("All on All")]
+
+		raisebox = wx.RadioBox(cpanel, -1, _("Raise Mode"), choices=options, majorDimension=1, style=wx.RA_SPECIFY_COLS)
+		raisebox.SetToolTip( wx.ToolTip(_("Choose a method for raising the windows.")) )
+		csizer.Add( raisebox, 1, wx.GROW|wx.ALIGN_CENTER_HORIZONTAL|wx.ALL, 5 )
+		#panel.Bind(wx.EVT_RADIOBOX, self.OnConfigRaise, raisebox)
 
 		cpanel.SetSizer( csizer )	
-
 		cpanel.Layout()
 
 		notebook.AddPage(cpanel, "Menubar")
@@ -186,14 +189,10 @@ class winMain(winMainBase):
 
 			window.ConfigDisplay(cpanel, csizer)
 
-			cpanel.SetAutoLayout( True )
 			cpanel.SetSizer( csizer )	
-			csizer.Fit( cpanel )
-			csizer.SetSizeHints( cpanel )
-				
 			notebook.AddPage(cpanel, name)
 
-		sizer.Add(notebook, 0, wx.EXPAND|wx.ALL, 5 )
+		sizer.Add(notebook, 1, wx.EXPAND)
 
 	# Menu bar options
 	##################################################################
@@ -201,7 +200,7 @@ class winMain(winMainBase):
 		self.application.connect()
 
 	def OnConfig(self, evt):
-		self.children[_('Config')].Show(True)
+		self.application.ConfigDisplay()
 		
 	def OnDesign(self, evt):
 		self.children[_('Design')].Show(not evt.Checked())
@@ -222,7 +221,7 @@ class winMain(winMainBase):
 		self.children[_('System')].Show(not evt.Checked())
 
 	def OnProgramExit(self, evt):
-		self.application.exit()
+		self.application.Exit()
 
 	def ShowTips(self, override=None):
 		config = load_data("pywx_tips")

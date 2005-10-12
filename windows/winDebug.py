@@ -10,5 +10,5 @@ class winDebug(winMainBase):
 	def __init__(self, application):
 		winMainBase.__init__(self, application)
 
-		py.crust.Crust(self, locals=locals())
+		py.crust.Crust(self, locals=locals(), rootObject=application, rootLabel="Application")
 
