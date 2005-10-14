@@ -2,7 +2,7 @@ import wx
 
 if wx.Platform == '__WXMSW__':
 	winMainDefaultPosition = {(1024, 768): (0,0), }
-	winMainDefaultSize = {(1024, 768): (1024, 768), }
+	winMainDefaultWidth = {(1024, 768): 1024, }
 	winMainDefaultShow = {(1024, 768): True, }
 
 	winInfoDefaultPosition = {(1024, 768): (0,0), }
@@ -31,7 +31,7 @@ if wx.Platform == '__WXMSW__':
 	
 elif wx.Platform == '__WXMAC__':
 	winMainDefaultPosition = {(1024, 768): (0,38), }
-	winMainDefaultSize = {(1024, 768): (1024, 768), }
+	winMainDefaultWidth = {(1024, 768): 1024, }
 	winMainDefaultShow = {(1024, 768): False, }
 	
 	winInfoDefaultPosition = {(1024, 768): (3,38), }
@@ -61,7 +61,7 @@ elif wx.Platform == '__WXMAC__':
 else:
 	# Create some default Positioning, good for 1024x768 on linux
 	winMainDefaultPosition = {(1024, 768): (0,0), }
-	winMainDefaultSize = {(1024, 768): (419, 51), }
+	winMainDefaultWidth = {(1024, 768): 419, }
 	winMainDefaultShow = {(1024, 768): True, }
 	
 	winInfoDefaultPosition = {(1024, 768): (1,75), }

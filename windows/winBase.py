@@ -95,7 +95,6 @@ class winBaseMixIn(object):
 
 	def OnRaise(self, evt):
 		# Raise the other windows when we raise this window
-		
 		if not evt.GetActive():
 			return
 		
@@ -186,9 +185,6 @@ class winConfigMixIn(ConfigMixIn):
 		self.config = config
 		self.ConfigDefault(config)
 
-		print "ConfigLoad", self
-		print config
-		
 		self.SetPosition(config['position'])
 		self.SetSizeHard(config['size'])
 		if self.application.gui.current in (self, self.parent):

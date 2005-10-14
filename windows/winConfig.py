@@ -22,11 +22,8 @@ class winConfig(winMainBase):
 		main = wx.Panel(self, -1)
 		
 		base = wx.BoxSizer(wx.VERTICAL)
-		notebook = wx.Choicebook(main, -1)
+		notebook = wx.Notebook(main, -1)
 		base.Add(notebook, 1, wx.EXPAND)
-		butt = wx.BoxSizer(wx.HORIZONTAL)
-		base.Add(butt, 0, wx.ALIGN_RIGHT)
-
 		# Now add each window which can be configured
 		for window in windows:
 			panel = wx.Panel(notebook, -1)
@@ -39,6 +36,9 @@ class winConfig(winMainBase):
 			
 			notebook.AddPage(panel, window.title)
 
+		butt = wx.StdDialogButtonSizer()
+		base.Add(butt, 0, wx.ALIGN_RIGHT)
+
 		# Buttons for saving/reverting
 		save = wx.Button(main, wx.ID_SAVE)
 		self.Bind(wx.EVT_BUTTON, self.OnConfigSave, save)
@@ -47,8 +47,9 @@ class winConfig(winMainBase):
 		self.Bind(wx.EVT_BUTTON, self.OnConfigRevert, revert)
 		revert.SetDefault()
 		
-		butt.Add(save), butt.Add(revert)
-		
+		butt.AddButton(save), butt.SetCancelButton(revert)
+		butt.Realize()
+	
 		main.SetAutoLayout(True)
 		main.SetSizer(base)
 		

@@ -133,6 +133,8 @@ class winSystem(winBase):
 		# Okay we need to post an event now
 		self.application.Post(self.application.gui.SelectObjectEvent(id))
 
+		self.Refresh()
+
 	####################################################
 	# Remote Event Handlers
 	####################################################

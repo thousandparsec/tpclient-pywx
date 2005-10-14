@@ -276,6 +276,7 @@ class GUI(wx.App, threading.Thread):
 		Post an Event the current window.
 		"""
 		func = 'On' + event.__class__.__name__[:-5]	
+		print "Posting", func
 		if hasattr(self, func):
 			getattr(self, func)(event)
 
@@ -297,16 +298,23 @@ class GUI(wx.App, threading.Thread):
 		self.Post(self.ShowWindowEvent())
 		return r
 
+	def OnNetworkFailure(self, evt):
+		self.Show(self.connectto)
+
+		# When the network fails pop-up a dialog then go to the connectto screen
+		dlg = wx.MessageDialog(self.current, str(evt), _("Network Error"), wx.OK|wx.ICON_ERROR)
+		dlg.ShowModal()
+		dlg.Destroy()
+
 class Network(threading.Thread):
 
 	## These are network events
-	class NetworkFailureEvent(object):
+	class NetworkFailureEvent(Exception):
 		"""\
 		Raised when the network connection fails for what ever reason.
 		"""
-		def __init__(self, reason):
-			self.reason = reason
-	
+		pass
+
 	######################################
 
 	def __init__(self, application):
@@ -328,8 +336,13 @@ class Network(threading.Thread):
 			print "Now running %s..." % method
 			try:
 				method(*args, **kw)
-			except (IOError, socket.error):
-				self.application.Post(self.NetworkFailureEvent(""))
+			except (IOError, socket.error), e:
+				s  = _("There was an unknown network error.\n")
+				s += _("Any changes since last save have been lost.\n")
+				if getattr(self.connection, 'debug', False):
+					s += _("A traceback of the error was printed to the console.\n")
+					do_traceback()
+				self.application.Post(self.NetworkFailureEvent(s))
 
 	def Call(self, method, *args, **kw):
 		self.tocall.append((method, args, kw))
@@ -350,20 +363,23 @@ class Network(threading.Thread):
 		
 		up("Connecting...", mode="connecting")
 		if self.connection.setup(host=host, port=port, debug=debug):
-			# FIXME: Show error message
-			self.application.Post(self.FailureEvent(_("Could not connect to the host.")))
+			s  = _("The client was unable to connect to the host.\n")
+			s += _("This could be because the server is down or there is a problem with the network.\n")
+			self.application.Post(self.NetworkFailureEvent(s))
 			return
 			
 		up("Looking for Thousand Parsec Server...")
 		if failed(self.connection.connect()):
-			# FIXME: Show error message
-			self.application.Post(self.FailureEvent(_("Server does not seem to be a valid Thousand Parsec server.")))
+			s  = _("The client connected to the host but it did not appear to be a Thousand Parsec server.\n")
+			s += _("This could be because the server is down or the connection details are incorrect.\n")
+			self.application.Post(self.NetworkFailureEvent(s))
 			return
 
 		up("Logining In")
 		if failed(self.connection.login(username, password)):
-			# FIXME: Show error message
-			self.application.Post(self.FailureEvent(_("Username and Password where invalid.")))
+			s  = _("The client connected to the host but could not login because the username of password was incorrect.\n")
+			s += _("This could be because you are connecting to the wrong server or mistyped the username or password.\n")
+			self.application.Post(self.NetworkFailureEvent(s))
 			return
 
 		self.CacheUpdate()

@@ -72,6 +72,10 @@ class TimeStatusBar(wx.StatusBar):
 class winMain(winMainBase):
 	title = _("Main Windows")
 
+	from defaults import winMainDefaultPosition as DefaultPosition
+	from defaults import winMainDefaultWidth as DefaultWidth
+	from defaults import winMainDefaultShow as DefaultShow
+
 	def __init__(self, application):
 		winMainBase.__init__(self, application)
 
@@ -174,18 +178,53 @@ class winMain(winMainBase):
 				value.SetMenuBar(self.current.Menu())
 
 		winMainBase.Show(self)
+		
+		wx.CallAfter(self.ShowTips)
 
 	# Config Functions -----------------------------------------------------------------------------
 	def ConfigDefault(self, config=None):
 		"""\
 		Fill out the config with defaults (if the options are not valid or nonexistant).
 		"""
+		SCREEN_X = wx.SystemSettings_GetMetric(wx.SYS_SCREEN_X)
+		SCREEN_Y = wx.SystemSettings_GetMetric(wx.SYS_SCREEN_Y)
+
 		if config == None:
 			config = {}
-		
-		config['raise'] = 'Individual'
-		return config
 	
+		# Raise mode
+		try:
+			if not config['raise'] in ("Individual", "All on Main", "All on All"):
+				raise ValueError('Config-%s: a raise value of %s is not valid' % (self, config['raise']))
+		except (ValueError, KeyError), e:
+			config['raise'] = "Individual"
+
+		# Where is the window position
+		try:
+			if not isinstance(config['position'][0], int) or not isinstance(config['position'][1], int):
+				raise ValueError('Config-%s: position %s is not valid' % (self, config['position']))
+			if config['position'][0] > SCREEN_X or config['position'][1] > SCREEN_Y:
+				raise ValueError('Config-%s: position %s is off the screen' % (self, config['position']))
+		except (ValueError, KeyError), e:
+			if self.DefaultPosition.has_key((SCREEN_X, SCREEN_Y)):
+				config['position'] = self.DefaultPosition[(SCREEN_X, SCREEN_Y)]
+			else:
+				print "Config-%s: Did not find a default position for your resolution" % (self,)
+				config['position'] = (0,0)
+
+		# How big is the window
+		try:
+			if not isinstance(config['width'], int):
+				raise ValueError('Config-%s: width %s is not valid' % (self, config['width']))
+		except (ValueError, KeyError), e:
+			if self.DefaultWidth.has_key((SCREEN_X, SCREEN_Y)):
+				config['width'] = self.DefaultWidth[(SCREEN_X, SCREEN_Y)]
+			else:
+				print "Config-%s: Did not find a default width for your resolution" % (self,)
+				config['width'] = (100,)
+
+		return config
+
 	def ConfigSave(self):
 		"""\
 		Returns the configuration of the Window (and it's children).
@@ -205,20 +244,28 @@ class winMain(winMainBase):
 
 		for name, window in self.children.items():
 			window.ConfigLoad(config.get(name, {}))
-	
-		self.ConfigDefault(config)
+
+		self.SetPosition(config['position'])
+
+		self.SetSize((config['width'], -1))
+		if wx.Platform != "__WXMSW__":
+			self.SetClientSize(wx.Size(-1,0))
+
 		self.ConfigDisplayUpdate(None)
 	
 	def ConfigUpdate(self):
 		"""\
 		Updates the config details using external sources.
 		"""
-		pass
+		if self.application.gui.current is self:
+			self.config['show'] = self.IsShown()
+			self.config['position'] = self.GetPosition()
+			self.config['width'] = self.GetSize()[0]
 	
 	def ConfigDisplay(self, panel, sizer):
 		"""\
 		Display a config panel with all the config options.
-		"""		
+		"""
 		notebook = wx.Choicebook(panel, -1)
 		cpanel = wx.Panel(notebook, -1)
 		csizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -230,10 +277,56 @@ class winMain(winMainBase):
 		else:
 			options = [_("Individual"), _("All on Main"), _("All on All")]
 
+		# Sizes we will need
+		SCREEN_X = wx.SystemSettings_GetMetric(wx.SYS_SCREEN_X)
+		SCREEN_Y = wx.SystemSettings_GetMetric(wx.SYS_SCREEN_Y)
+		SIZER_FLAGS = wx.GROW|wx.ALIGN_CENTER_VERTICAL|wx.ALL
+		
+		# The box around the position
+		box = wx.StaticBox(cpanel, -1, self.title)
+		box_sizer = wx.StaticBoxSizer(box, wx.VERTICAL)
+		csizer.Add(box_sizer, 1, SIZER_FLAGS, 5 )
+	
+		# Location Boxes
+		location = wx.FlexGridSizer( 0, 2, 0, 0 )
+		location.AddGrowableCol( 1 )
+
+		# X Position
+		x_text = wx.StaticText(cpanel, -1, _("X Pos"))
+		location.Add( x_text, 0, SIZER_FLAGS, 5 )
+		
+		x_box = wx.SpinCtrl(cpanel, -1, "0", wx.DefaultPosition, wx.Size(50,-1), 0, 0, SCREEN_X, 0 )
+		location.Add( x_box, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
+		
+		cpanel.Bind(wx.EVT_SPINCTRL, self.OnConfigDisplayX, x_box)
+
+		# Y Position
+		y_text = wx.StaticText(cpanel, -1, _("Y Pos"))
+		location.Add( y_text, 0, SIZER_FLAGS, 5 )
+		
+		y_box = wx.SpinCtrl(cpanel, -1, "0", wx.DefaultPosition, wx.Size(50,-1), 0, 0, SCREEN_Y, 0 )
+		location.Add( y_box, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
+
+		cpanel.Bind(wx.EVT_SPINCTRL, self.OnConfigDisplayY, y_box)
+
+		# Width
+		width_text = wx.StaticText(cpanel, -1, _("Width"))
+		location.Add( width_text, 0, SIZER_FLAGS, 5 )
+		
+		width = wx.SpinCtrl(cpanel, -1, "0", wx.DefaultPosition, wx.Size(50,-1), 0, 0, SCREEN_X, 0 )
+		location.Add( width, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
+		
+		cpanel.Bind(wx.EVT_SPINCTRL, self.OnConfigDisplayWidth, width)
+
+		box_sizer.Add( location, 0, SIZER_FLAGS, 5)
+
+		self.Bind(wx.EVT_MOVE, self.OnConfigDisplayMove)
+		self.Bind(wx.EVT_ACTIVATE, self.ConfigDisplayUpdate)
+
 		raisebox = wx.RadioBox(cpanel, -1, _("Raise Mode"), choices=options, majorDimension=1, style=wx.RA_SPECIFY_COLS)
 		raisebox.SetToolTip( wx.ToolTip(_("Choose a method for raising the windows.")) )
 		csizer.Add( raisebox, 1, wx.GROW|wx.ALIGN_CENTER_HORIZONTAL|wx.ALL, 5 )
-		#panel.Bind(wx.EVT_RADIOBOX, self.OnConfigRaise, raisebox)
+		#cpanel.Bind(wx.EVT_RADIOBOX, self.OnConfigRaise, raisebox)
 
 		cpanel.SetSizer( csizer )	
 		cpanel.Layout()
@@ -249,7 +342,7 @@ class winMain(winMainBase):
 			cpanel.SetSizer( csizer )	
 			notebook.AddPage(cpanel, name)
 
-		self.ConfigWidgets = [raisebox]
+		self.ConfigWidgets = [raisebox, x_box, y_box, width]
 
 		sizer.Add(notebook, 1, wx.EXPAND)
 
@@ -260,8 +353,27 @@ class winMain(winMainBase):
 		if not hasattr(self, 'ConfigWidgets'):
 			return
 		
-		raisebox, = self.ConfigWidgets
+		raisebox, x_box, y_box, width = self.ConfigWidgets
 		raisebox.SetStringSelection(self.config['raise'])
+	
+		x_box.SetValue(self.config['position'][0])
+		y_box.SetValue(self.config['position'][1])
+		width.SetValue(self.config['width'])
+
+	def OnConfigDisplayX(self, evt):
+		self.SetPosition(wx.Point(evt.GetInt(), -1))
+		self.ConfigUpdate()
+
+	def OnConfigDisplayY(self, evt):
+		self.SetPosition(wx.Point(-1, evt.GetInt()))
+		self.ConfigUpdate()
+		
+	def OnConfigDisplayWidth(self, evt):
+		self.SetSize(wx.Size(evt.GetInt(), -1))
+		self.ConfigUpdate()
+
+	def OnConfigDisplayMove(self, evt):
+		self.ConfigUpdate()
 
 	# Menu bar options
 	##################################################################
