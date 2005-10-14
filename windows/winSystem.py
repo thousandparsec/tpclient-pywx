@@ -11,6 +11,7 @@ import wx
 import wx.gizmos
 
 # Local imports
+import defaults
 from winBase import *
 from utils import *
 
@@ -20,6 +21,10 @@ DESC = 1
 # Show the universe
 class winSystem(winBase):
 	title = _("System")
+	
+	from defaults import winSystemDefaultPosition as DefaultPosition
+	from defaults import winSystemDefaultSize as DefaultSize
+	from defaults import winSystemDefaultShow as DefaultShow
 	
 	def __init__(self, application, parent):
 		winBase.__init__(self, application, parent)

@@ -21,6 +21,10 @@ from utils import *
 class winInfo(winBase):
 	title = _("Information")
 
+	from defaults import winInfoDefaultPosition as DefaultPosition
+	from defaults import winInfoDefaultSize as DefaultSize
+	from defaults import winInfoDefaultShow as DefaultShow
+
 	def __init__(self, application, parent):
 		winBase.__init__(self, application, parent)
 
@@ -40,13 +44,7 @@ class winInfo(winBase):
 
 		top.Add(middle, 1, wx.EXPAND, 0)
 
-		self.SetAutoLayout(1)
 		self.SetSizer(top)
-		
-		top.Fit(self)
-		top.SetSizeHints(self)
-
-		self.Layout()
 
 	def OnSelectObject(self, evt):
 		try:

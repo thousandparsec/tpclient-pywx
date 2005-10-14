@@ -20,6 +20,10 @@ DESC = 1
 # Show the universe
 class winDesign(winBase):
 	title = _("Design")
+	
+	from defaults import winDesignDefaultPosition as DefaultPosition
+	from defaults import winDesignDefaultSize as DefaultSize
+	from defaults import winDesignDefaultShow as DefaultShow
 
 	modes = ["Select", "Edit"]
 

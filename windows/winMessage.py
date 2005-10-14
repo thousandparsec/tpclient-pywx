@@ -33,6 +33,10 @@ MESSAGE_DEL = 10009
 # Shows messages from the game system to the player.
 class winMessage(winBase):
 	title = _("Messages")
+
+	from defaults import winMessageDefaultPosition as DefaultPosition
+	from defaults import winMessageDefaultSize as DefaultSize
+	from defaults import winMessageDefaultShow as DefaultShow
 	
 	def __init__(self, application, parent):
 		winBase.__init__(self, application, parent)

@@ -66,9 +66,6 @@ def save_data(file, data):
 	"""\
 	Saves preference data to a file.
 	"""
-	print "Saving", file
-	pprint.pprint(data)
-
 	f = open(os.path.join(configpath(), file), "w")
 	pickle.dump(data, f)
 

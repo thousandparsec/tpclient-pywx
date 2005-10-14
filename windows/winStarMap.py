@@ -62,6 +62,10 @@ def scale(value):
 class winStarMap(winBase):
 	title = _("StarMap")
 
+	from defaults import winStarMapDefaultPosition as DefaultPosition
+	from defaults import winStarMapDefaultSize as DefaultSize
+	from defaults import winStarMapDefaultShow as DefaultShow
+
 	def __init__(self, application, parent):
 		winBase.__init__(self, application, parent)
 

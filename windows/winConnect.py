@@ -22,14 +22,6 @@ class winConnect(winMainBase):
 
 		panel = wx.Panel(self, -1)
 
-		# Default configuration
-		self.config = { \
-			"servers": ["mithro.dyndns.org", "code-bear.dyndns.org", "llnz.dyndns.org", "127.0.0.1:6923"],
-			"username": "",
-			"password": "",
-			"auto": False,
-			"debug": False }
-
 		# The title
 		text_top = wx.StaticText( panel, -1, _("Connect to a Thousand Parsec Server"), wx.DefaultPosition, wx.DefaultSize, 0 )
 		text_top.SetFont( wx.Font( 16, wx.ROMAN, wx.NORMAL, wx.BOLD ) )
@@ -100,7 +92,6 @@ class winConnect(winMainBase):
 		self.application.Exit()
 			
 	def OnOkay(self, evt):
-		# Pull out the values
 		host = self.host.GetValue()
 		username = self.username.GetValue()
 		password = self.password.GetValue()
@@ -119,8 +110,66 @@ class winConnect(winMainBase):
 		self.application.network.Call(self.application.network.ConnectTo, host, port, username, password, debug=self.config['debug'])
 	
 	# Config Functions -----------------------------------------------------------------------------
+	def ConfigDefault(self, config=None):
+		"""\
+		Fill out the config with defaults (if the options are not valid or nonexistant).
+		"""
+		if config is None:
+			config = {}
+
+		try:
+			if not isinstance(config['servers'], list):
+				raise ValueError('Config-%s: a servers value of %s is not valid' % (self, config['servers']))
+
+			for server in config['servers']:
+				if not isinstance(server, str):
+					config['servers'].remove(server)
+
+			if len(config['servers']) <= 0:
+				raise ValueError('Config-%s: the servers list was empty' % (self,))
+
+		except (ValueError, KeyError), e:
+			print e
+			config['servers'] = ["127.0.0.1:6923", "mithro.dyndns.org", "code-bear.dyndns.org", "llnz.dyndns.org"]
+
+		try:
+			print config['username']
+			if not isinstance(config['username'], (unicode, str)):
+				raise ValueError('Config-%s: a username value of %s is not valid' % (self, config['username']))
+		except (ValueError, KeyError), e:
+			print e
+			config['username'] = "@tp"
+
+		try:
+			print config['password']
+			if not isinstance(config['password'], (unicode, str)):
+				raise ValueError('Config-%s: a password value of %s is not valid' % (self, config['password']))
+		except (ValueError, KeyError), e:
+			print e
+			config['password'] = ""
+
+		try:
+			if not isinstance(config['auto'], bool):
+				raise ValueError('Config-%s: a auto value of %s is not valid' % (self, config['auto']))
+		except (ValueError, KeyError), e:
+			print e
+			config['auto'] = False
+
+		try:
+			if not isinstance(config['debug'], bool):
+				raise ValueError('Config-%s: a debug value of %s is not valid' % (self, config['debug']))
+		except (ValueError, KeyError), e:
+			print e
+			config['debug'] = False
+
+		return config
+
 	def ConfigLoad(self, config):
+		"""\
+		Loads the configuration of the Window (and it's children).
+		"""
 		self.config = config
+		self.ConfigDefault(config)
 
 		self.host.Clear()
 		self.host.AppendItems(self.config['servers'])
@@ -132,9 +181,15 @@ class winConnect(winMainBase):
 		self.ConfigDisplayUpdate(None)
 
 	def ConfigUpdate(self):
+		"""\
+		Updates the config details using external sources.
+		"""
 		pass
-
+	
 	def ConfigDisplay(self, panel, sizer):
+		"""\
+		Display a config panel with all the config options.
+		"""
 		SIZER_FLAGS = wx.GROW|wx.ALIGN_CENTER_VERTICAL|wx.ALL
 		TEXT_FLAGS = wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL
 	
@@ -144,7 +199,7 @@ class winConnect(winMainBase):
 
 		def OnConfigDisplayServers(evt, f=self.OnConfigDisplayServers, servers=servers):
 			return f(evt, servers)
-		panel.Bind(wx.EVT_TEXT, OnConfigDisplayServers, servers)
+		panel.Bind(wx.EVT_LISTBOX, OnConfigDisplayServers, servers)
 
 		sizer.Add(servers, 1, SIZER_FLAGS)
 
@@ -194,7 +249,7 @@ class winConnect(winMainBase):
 
 	def ConfigDisplayUpdate(self, evt):
 		"""\
-		Update the Display because it's changed externally
+		Updates the config details using external sources.
 		"""
 		if not hasattr(self, 'ConfigWidgets'):
 			return
@@ -208,7 +263,6 @@ class winConnect(winMainBase):
 	
 	def OnConfigDisplayServers(self, evt, servers):
 		self.config['servers'] = servers.GetStrings()
-		print self.config['servers']
 
 	def OnConfigDisplayDebug(self, evt):
 		self.config['debug'] = evt.Checked()

@@ -71,9 +71,11 @@ class TimeStatusBar(wx.StatusBar):
 
 class winMain(winMainBase):
 	title = _("Main Windows")
-	
+
 	def __init__(self, application):
 		winMainBase.__init__(self, application)
+
+		print "main", self.config
 
 		self.SetMenuBar(self.Menu(self))
 
@@ -158,15 +160,69 @@ class winMain(winMainBase):
 #		wx.EVT_MENU(source, ID_WIN_HELP,		self.OnHelp)
 		return bar
 
+	def Show(self, show=True):
+		# Show this window and it's children - also fixes menus for MacOS
+		if not show:
+			return self.Hide()
+		
+		for window in self.children.values():
+			# FIXME: This is a bit bad
+			if window.config['show']:
+				window.Show()
+
+			if wx.Platform == "__WXMAC__":
+				value.SetMenuBar(self.current.Menu())
+
+		winMainBase.Show(self)
+
 	# Config Functions -----------------------------------------------------------------------------
-	def ConfigDisplay(self, panel, sizer):
+	def ConfigDefault(self, config=None):
+		"""\
+		Fill out the config with defaults (if the options are not valid or nonexistant).
+		"""
+		if config == None:
+			config = {}
+		
+		config['raise'] = 'Individual'
+		return config
 	
+	def ConfigSave(self):
+		"""\
+		Returns the configuration of the Window (and it's children).
+		"""
+		# Get the details from there children
+		for window in self.children.values():
+			self.config[window.title] = window.ConfigSave()
+		
+		return self.config
+		
+	def ConfigLoad(self, config={}):
+		"""\
+		Loads the configuration of the Window (and it's children).
+		"""
+		self.config = config
+		self.ConfigDefault(config)
+
+		for name, window in self.children.items():
+			window.ConfigLoad(config.get(name, {}))
+	
+		self.ConfigDefault(config)
+		self.ConfigDisplayUpdate(None)
+	
+	def ConfigUpdate(self):
+		"""\
+		Updates the config details using external sources.
+		"""
+		pass
+	
+	def ConfigDisplay(self, panel, sizer):
+		"""\
+		Display a config panel with all the config options.
+		"""		
 		notebook = wx.Choicebook(panel, -1)
 		cpanel = wx.Panel(notebook, -1)
 		csizer = wx.BoxSizer(wx.HORIZONTAL)
 		
-		winMainBase.ConfigDisplay(self, cpanel, csizer)
-
 		if wx.Platform == '__WXMSW__':
 			options = [_("Individual"), _("All on Main")]
 		elif wx.Platform == '__WXMAC__':
@@ -193,7 +249,19 @@ class winMain(winMainBase):
 			cpanel.SetSizer( csizer )	
 			notebook.AddPage(cpanel, name)
 
+		self.ConfigWidgets = [raisebox]
+
 		sizer.Add(notebook, 1, wx.EXPAND)
+
+	def ConfigDisplayUpdate(self, evt):
+		"""\
+		Update the Display because it's changed externally.
+		"""
+		if not hasattr(self, 'ConfigWidgets'):
+			return
+		
+		raisebox, = self.ConfigWidgets
+		raisebox.SetStringSelection(self.config['raise'])
 
 	# Menu bar options
 	##################################################################

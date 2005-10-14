@@ -18,9 +18,9 @@ if wx.Platform == "__WXMAC__":
 
 	wx.local.normalFont = wx.Font(12,  wx.DEFAULT, wx.NORMAL, wx.NORMAL)
 	try:
-	    wx.local.tinyFont   = wx.Font(10,  wx.DEFAULT, wx.LIGHT, wx.NORMAL)
+		wx.local.tinyFont   = wx.Font(10,  wx.DEFAULT, wx.LIGHT, wx.NORMAL)
 	except:
-	    wx.local.tinyFont   = wx.Font(10,  wx.DEFAULT, wx.NORMAL, wx.NORMAL)    
+		wx.local.tinyFont   = wx.Font(10,  wx.DEFAULT, wx.NORMAL, wx.NORMAL)	
 	wx.local.largeFont  = wx.Font(16, wx.DEFAULT, wx.NORMAL, wx.NORMAL)
 
 else:
@@ -30,20 +30,54 @@ else:
 
 	wx.local.normalFont = wx.Font(7,  wx.DEFAULT, wx.NORMAL, wx.NORMAL)
 	try:
-	    wx.local.tinyFont   = wx.Font(6,  wx.DEFAULT, wx.LIGHT, wx.NORMAL)
+		wx.local.tinyFont   = wx.Font(6,  wx.DEFAULT, wx.LIGHT, wx.NORMAL)
 	except:
-	    wx.local.tinyFont   = wx.Font(6,  wx.DEFAULT, wx.NORMAL, wx.NORMAL)    
+		wx.local.tinyFont   = wx.Font(6,  wx.DEFAULT, wx.NORMAL, wx.NORMAL)	
 	wx.local.largeFont  = wx.Font(12, wx.DEFAULT, wx.NORMAL, wx.NORMAL)
+
+class ConfigMixIn(object):
+	def ConfigDefault(self, config=None):
+		"""\
+		Fill out the config with defaults (if the options are not valid or nonexistant).
+		"""
+		raise AssertionError("ConfigSave not implimented")
+
+	def ConfigSave(self):
+		"""\
+		Returns the configuration of the Window (and it's children).
+		"""
+		return self.config
+		
+	def ConfigLoad(self, config={}):
+		"""\
+		Loads the configuration of the Window (and it's children).
+		"""
+		raise AssertionError("ConfigLoad not implimented")
+
+	def ConfigUpdate(self):
+		"""\
+		Updates the config details using external sources.
+		"""
+		raise AssertionError("ConfigUpdate not implimented")
+
+	def ConfigDisplay(self, panel, sizer):
+		"""\
+		Display a config panel with all the config options.
+		"""
+		raise AssertionError("ConfigDisplay not implimented")
+	
+	def ConfigDisplayUpdate(self, evt):
+		"""\
+		Update the Display because it's changed externally.
+		"""
+		raise AssertionError("ConfigDisplayUpdate not implimented")
 
 class winBaseMixIn(object):
 	def __init__(self, application, parent, config=None):
 		self.application = application
 		self.parent = parent
 		self.children = {}
-		self.config = { \
-			'show': True,
-			'position': (0,0),
-			'size': (100, 100) }
+		self.config = self.ConfigDefault()
 	
 		if hasattr(parent, 'children'):
 			self.parent.children[self.title] = self
@@ -56,9 +90,12 @@ class winBaseMixIn(object):
 		self.Bind(wx.EVT_CLOSE, self.OnProgramExit)
 
 	def OnProgramExit(self, evt):
+		# Ignore close events
 		evt.Veto(True)
 
 	def OnRaise(self, evt):
+		# Raise the other windows when we raise this window
+		
 		if not evt.GetActive():
 			return
 		
@@ -68,34 +105,99 @@ class winBaseMixIn(object):
 					for window in self.children.values():
 						window.Raise()
 
-	# Config Functions -----------------------------------------------------------------------------
-	def ConfigSave(self):
+	def Post(self, event):
+		# Post an event to this window and it's children
+		func = 'On' + event.__class__.__name__[:-5]	
+		if hasattr(self, func):
+			getattr(self, func)(event)
+
+		for window in self.children.values():
+			window.Post(event)
+
+	def Hide(self):
+		# Hide this window and it's children
+		for window in self.children.values():
+			window.Hide()
+		return super(winBaseMixIn, self).Hide()
+
+	def Raise(self):
+		# Raise this window and it's children
+		for window in self.children.values():
+			window.Raise()
+		return super(winBaseMixIn, self).Raise()
+	
+	def SetSizeHard(self, pos):
+		self.SetMinSize(pos)
+		self.SetMaxSize(pos)
+		self.SetSize(pos)
+
+class winConfigMixIn(ConfigMixIn):
+	def ConfigDefault(self, config=None):
+		"""\
+		Fill out the config with defaults (if the options are not valid or nonexistant).
 		"""
-		Returns the configuration of the Window (and it's children).
-		"""
-		config = self.config
-		for name, window in self.children.items():
-			config[name] = window.ConfigSave()
+		if config == None:
+			config = {}
+
+		SCREEN_X = wx.SystemSettings_GetMetric(wx.SYS_SCREEN_X)
+		SCREEN_Y = wx.SystemSettings_GetMetric(wx.SYS_SCREEN_Y)
+		
+		# Is the window shown?
+		try:
+			if not isinstance(config['show'], bool):
+				raise ValueError('Config-%s: a show value of %s is not valid' % (self, config['position']))
+		except (ValueError, KeyError), e:
+			if self.DefaultShow.has_key((SCREEN_X, SCREEN_Y)):
+				config['show'] = self.DefaultShow[(SCREEN_X, SCREEN_Y)]
+			else:
+				print "Config-%s: Did not find a default show for your resolution" % (self,)
+				config['show'] = True
+
+		# Where is the window position
+		try:
+			if not isinstance(config['position'][0], int) or not isinstance(config['position'][1], int):
+				raise ValueError('Config-%s: position %s is not valid' % (self, config['position']))
+			if config['position'][0] > SCREEN_X or config['position'][1] > SCREEN_Y:
+				raise ValueError('Config-%s: position %s is off the screen' % (self, config['position']))
+		except (ValueError, KeyError), e:
+			if self.DefaultPosition.has_key((SCREEN_X, SCREEN_Y)):
+				config['position'] = self.DefaultPosition[(SCREEN_X, SCREEN_Y)]
+			else:
+				print "Config-%s: Did not find a default position for your resolution" % (self,)
+				config['position'] = (0,0)
+
+		# How big is the window
+		try:
+			if not isinstance(config['size'][0], int) or not isinstance(config['size'][1], int):
+				raise ValueError('Config-%s: size %s is not valid' % (self, config['size']))
+		except (ValueError, KeyError), e:
+			if self.DefaultSize.has_key((SCREEN_X, SCREEN_Y)):
+				config['size'] = self.DefaultSize[(SCREEN_X, SCREEN_Y)]
+			else:
+				print "Config-%s: Did not find a default size for your resolution" % (self,)
+				config['size'] = (100, 100)
+
 		return config
 
 	def ConfigLoad(self, config):
-		"""
+		"""\
 		Loads the configuration of the Window (and it's children).
 		"""
 		self.config = config
+		self.ConfigDefault(config)
+
+		print "ConfigLoad", self
+		print config
+		
 		self.SetPosition(config['position'])
-		self.SetSize(config['size'])
+		self.SetSizeHard(config['size'])
 		if self.application.gui.current in (self, self.parent):
 			self.Show(config['show'])
 
-		for name, window in self.children.items():
-			if config.has_key(name):
-				window.ConfigLoad(config[name])
-		
 		self.ConfigDisplayUpdate(None)
-
+		
 	def ConfigUpdate(self):
-		"""
+		"""\
 		Updates the config details using external sources.
 		"""
 		if self.application.gui.current in (self, self.parent):
@@ -104,10 +206,9 @@ class winBaseMixIn(object):
 			self.config['size'] = self.GetSize()
 
 	def ConfigDisplay(self, panel, sizer):
+		"""\
+		Display a config panel with all the config options.
 		"""
-		Display a config  panel with all the config options.
-		"""
-		
 		# Sizes we will need
 		SCREEN_X = wx.SystemSettings_GetMetric(wx.SYS_SCREEN_X)
 		SCREEN_Y = wx.SystemSettings_GetMetric(wx.SYS_SCREEN_Y)
@@ -167,7 +268,7 @@ class winBaseMixIn(object):
 		box_sizer.Add( location, 0, SIZER_FLAGS, 5)
 
 		self.ConfigWidgets = [show, x_box, y_box, width, height]
-		self.Bind(wx.EVT_MOVE, self.ConfigDisplayUpdate)
+		self.Bind(wx.EVT_MOVE, self.OnConfigDisplayMove)
 		self.Bind(wx.EVT_ACTIVATE, self.ConfigDisplayUpdate)
 
 	def ConfigDisplayUpdate(self, evt):
@@ -176,9 +277,7 @@ class winBaseMixIn(object):
 		"""
 		if not hasattr(self, 'ConfigWidgets'):
 			return
-			
-		self.ConfigUpdate()
-	
+		
 		show, x_box, y_box, width, height = self.ConfigWidgets
 		show.SetValue(self.config['show'])
 		x_box.SetValue(self.config['position'][0])
@@ -199,62 +298,37 @@ class winBaseMixIn(object):
 		self.ConfigUpdate()
 		
 	def OnConfigDisplayWidth(self, evt):
-		self.SetSize(wx.Size(evt.GetInt(), -1))
+		self.SetSizeHard(wx.Size(evt.GetInt(), -1))
 		self.ConfigUpdate()
 
 	def OnConfigDisplayHeight(self, evt):
-		self.SetSize(wx.Size(-1, evt.GetInt()))
+		self.SetSizeHard(wx.Size(-1, evt.GetInt()))
 		self.ConfigUpdate()
-		
+	
+	def OnConfigDisplayMove(self, evt):
+		self.ConfigUpdate()
+		self.ConfigDisplayUpdate(None)
+
 	#-----------------------------------------------------------------------------------------------
 
-	def Post(self, event):
-		func = 'On' + event.__class__.__name__[:-5]	
-		if hasattr(self, func):
-			getattr(self, func)(event)
-
-		for window in self.children.values():
-			window.Post(event)
-
-	def Show(self, show=True):
-		if not show:
-			return self.Hide()
-		
-		for window in self.children.values():
-			window.Show()
-
-			if wx.Platform == "__WXMAC__":
-				value.SetMenuBar(self.current.Menu())
-		return super(winBaseMixIn, self).Show()
-
-	def Hide(self):
-		for window in self.children.values():
-			window.Hide()
-		return super(winBaseMixIn, self).Hide()
-
-	def Raise(self):
-		for window in self.children.values():
-			window.Raise()
-		return super(winBaseMixIn, self).Raise()
-
 # These give a MDI interface under windows
-class winMDIBase(winBaseMixIn, wx.MDIParentFrame):
+class winMDIBase(ConfigMixIn, winBaseMixIn, wx.MDIParentFrame):
 	def __init__(self, application):
 		wx.MDIParentFrame.__init__(self, None, -1, 'TP: ' + self.title, wx.DefaultPosition, wx.DefaultSize, wx.DEFAULT_FRAME_STYLE)
 		winBaseMixIn.__init__(self, application, None)
 
-class winMDISubBase(winBaseMixIn, wx.MDIChildFrame):
+class winMDISubBase(winConfigMixIn, winBaseMixIn, wx.MDIChildFrame):
 	def __init__(self, application, parent):
 		wx.MDIChildFrame.__init__(self, parent, -1, 'TP: ' + self.title, wx.DefaultPosition, wx.DefaultSize, wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL)
 		winBaseMixIn.__init__(self, application, parent)
 
 # These give a non-MDI interface under other operating systems
-class winNormalBase(winBaseMixIn, wx.Frame):
+class winNormalBase(ConfigMixIn, winBaseMixIn, wx.Frame):
 	def __init__(self, application):
 		wx.Frame.__init__(self, None, -1, 'TP: ' + self.title, wx.DefaultPosition, wx.DefaultSize, wx.DEFAULT_FRAME_STYLE)
 		winBaseMixIn.__init__(self, application, None)
 
-class winNormalSubBase(winBaseMixIn, wx.MiniFrame):
+class winNormalSubBase(winConfigMixIn, winBaseMixIn, wx.MiniFrame):
 	def __init__(self, application, parent):
 		wx.MiniFrame.__init__(self, parent, -1, 'TP: ' + self.title, wx.DefaultPosition, wx.DefaultSize, wx.DEFAULT_FRAME_STYLE|wx.FRAME_NO_TASKBAR|wx.TAB_TRAVERSAL)
 		winBaseMixIn.__init__(self, application, parent)

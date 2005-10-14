@@ -35,6 +35,10 @@ defaults = {
 class winOrder(winBase):
 	title = _("Orders")
 	
+	from defaults import winOrderDefaultPosition as DefaultPosition
+	from defaults import winOrderDefaultSize as DefaultSize
+	from defaults import winOrderDefaultShow as DefaultShow
+	
 	def __init__(self, application, parent):
 		winBase.__init__(self, application, parent)
 

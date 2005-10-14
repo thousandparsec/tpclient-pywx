@@ -8,6 +8,7 @@ import wx
 import extra
 
 # Python Imports
+import pprint
 import socket
 import time
 import threading
@@ -130,16 +131,22 @@ class Application(object):
 		"""
 		# FIXME: This should be fixed, utils needs to go away
 		config = self.gui.ConfigSave()
-		if config:
-			utils.save_data("pywx_preferences", config)
+		utils.save_data("pywx_preferences", config)
+		
+		print "Saving the following config..."
+		pprint.pprint(config)
 
 	def ConfigLoad(self):
 		"""\
 		"""
-		# FIXME: This should be fixed, utils needs to go away
 		config = utils.load_data("pywx_preferences")
-		if config:
-			self.gui.ConfigLoad(config)
+		if config is None:
+			config = {}
+	
+		print "Loading the following config..."
+		pprint.pprint(config)
+		
+		self.gui.ConfigLoad(config)
 
 	def Post(self, event):
 		"""\
@@ -256,7 +263,7 @@ class GUI(wx.App, threading.Thread):
 		Display the configuration window.
 		"""
 		for window in self.windows:
-			window.ConfigLoad(config[window.title])
+			window.ConfigLoad(config.get(window.title, {}))
 
 	def Call(self, method, *args, **kw):
 		"""\
