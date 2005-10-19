@@ -221,7 +221,7 @@ class winMain(winMainBase):
 				config['width'] = self.DefaultWidth[(SCREEN_X, SCREEN_Y)]
 			else:
 				print "Config-%s: Did not find a default width for your resolution" % (self,)
-				config['width'] = (100,)
+				config['width'] = 100
 
 		return config
 
