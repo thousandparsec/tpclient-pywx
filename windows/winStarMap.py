@@ -206,16 +206,21 @@ class winStarMap(winBase):
 		object = self.application.cache.objects[evt.id]
 
 		self.arrow.Move(scale(object.pos))
-		if self.path:
-			self.Canvas.RemoveObject(self.path)
+		if self.path != None:
+			path = self.path
 			self.path = None
+			self.Canvas.RemoveObject(path)
 
 		if isinstance(object, Fleet):
 			points = getpath(self.application, object)
 			if points:
-				self.path = self.Create(object, Line(scale(points), LineColor="Blue", InForeground=True))
+				path = self.Create(object, Line(scale(points), LineColor="Blue", InForeground=True))
+				self.Canvas.AddObject(path)
+				self.path = path
 			elif object.vel != (0, 0, 0): 
-				self.path = self.Create(object, CrossLine(scale((object.pos[0:2], object.vel[0:2])), 2, LineColor="Blue", InForeground=True))
+				path = self.Create(object, CrossLine(scale((object.pos[0:2], object.vel[0:2])), 2, LineColor="Blue", InForeground=True))
+				self.Canvas.AddObject(path)
+				self.path = path
 				
 		self.Canvas.Draw()
 
@@ -227,9 +232,11 @@ class winStarMap(winBase):
 
 		dirty = False
 
-		if self.path:
-			self.Canvas.RemoveObject(self.path)
+		if self.path != None:
+			path = self.path
 			self.path = None
+			self.Canvas.RemoveObject(path)
+
 			dirty = True
 			
 		if isinstance(object, Fleet):
@@ -241,8 +248,10 @@ class winStarMap(winBase):
 			# Update the lines
 			if points:
 				self.Create(object, Line(scale(points), LineColor="Grey", InForeground=True), as="path")
-				self.path = self.Create(object, Line(scale(points), LineColor="Blue", InForeground=True))
-		
+				path = self.Create(object, Line(scale(points), LineColor="Blue", InForeground=True))
+				self.Canvas.AddObject(path)
+				self.path = path
+				
 			# Put the Icon ontop
 			if self.cache.has_key(evt.id) and self.cache[evt.id].has_key("icon"):
 				self.Canvas.RemoveObject(self.cache[evt.id]["icon"])
@@ -269,7 +278,9 @@ class winStarMap(winBase):
 				return
 			
 			self.Canvas.RemoveObject(self.path)
-			self.path = self.Create(object, Line(scale(points), LineColor="Blue", InForeground=True))
-		
+			path = self.Create(object, Line(scale(points), LineColor="Blue", InForeground=True))
+			self.Canvas.AddObject(path)
+			self.path = path
+			
 			self.Canvas.Draw()
 			

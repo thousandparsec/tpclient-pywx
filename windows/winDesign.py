@@ -138,7 +138,6 @@ class winDesign(winBase):
 		self.OnSelect()
 
 	def OnEdit(self, evt=None):
-		print "OnEdit..."
 		# Disable the select side
 		self.designscat.Disable()
 		self.designs.Disable()
@@ -168,7 +167,6 @@ class winDesign(winBase):
 		self.save.Enable()
 
 	def OnSelect(self, evt=None):
-		print "OnSelect..."
 		# Enable the selection side
 		self.designscat.Enable()
 		self.designs.Enable()
@@ -202,7 +200,6 @@ class winDesign(winBase):
 		else:
 			id = -1
 
-		print "OnSelectObject", id
 		if not id or id == -1:
 			# Clear the title
 			self.titletext.SetLabel("")
@@ -269,6 +266,7 @@ class winDesign(winBase):
 			self.duplicate.SetDefault()
 
 	def OnCacheUpdate(self, evt=None):
+		return
 		print "OnCacheUpdate of winDesign..."
 
 		# Update the categories

@@ -72,7 +72,7 @@ class winSystem(winBase):
 		if not selected_id:
 			selected_id = -1
 			
-		debug(DEBUG_WINDOWS, "Selecting object... %i" % selected_id)
+		debug(DEBUG_GUI, "Selecting object... %i" % selected_id)
 		
 		# Remove all the current items
 		self.tree.DeleteAllItems()
@@ -81,7 +81,7 @@ class winSystem(winBase):
 		selected = self.Add(None, universe, selected_id)
 	
 		if selected:
-			debug(DEBUG_WINDOWS, "Trying select object... %i" % self.tree.GetPyData(selected))
+			debug(DEBUG_GUI, "Trying select object... %i" % self.tree.GetPyData(selected))
 			self.tree.SelectItem(selected)
 			self.tree.EnsureVisible(selected)
 		
@@ -133,7 +133,6 @@ class winSystem(winBase):
 		# Okay we need to post an event now
 		self.application.Post(self.application.gui.SelectObjectEvent(id))
 
-		self.Refresh()
 
 	####################################################
 	# Remote Event Handlers
@@ -161,3 +160,4 @@ class winSystem(winBase):
 
 			self.ignore = False
 	
+		self.Refresh()

@@ -3,6 +3,8 @@ TODO
 =======================================================
 Short Term
 
+	* Remove all the print states - make debug output go to the debug window
+
 	* Add more Order Argument panel types
 		* ARG_ABS_COORD (DONE)
 			* Get the P button to work

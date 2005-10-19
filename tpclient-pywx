@@ -16,6 +16,7 @@ from types import *
 
 # Local imports
 import utils
+from utils import debug, DEBUG_MAIN, DEBUG_GUI, DEBUG_NETWORK
 from tp.netlib import Connection, failed, constants
 
 def make(thread, method):
@@ -29,6 +30,73 @@ class Cache(object):
 	
 	It can be pickled and restored at a later date to preserve the data accross application runs.
 	"""
+
+	class CacheEvent(object):
+		"""\
+		Raised when the game cache is made dirty. Contains a reference to what was updated.
+		"""
+		def __init__(self, what, action, id, *args, **kw):
+			print what, action, id, args, kw, what in Cache.compound, len(args)
+			if what in Cache.readonly:
+				raise ValueError("Can not change that!")
+			elif not what in Cache.readwrite:
+				raise ValueError("Invalid value (%s) for what" % (what,))
+			else:
+				self.what = what
+
+			if not action in Cache.actions:
+				raise ValueError("Invalid action (%s)" % (action,))
+			else:
+				self.action = action
+
+			self.id = id
+
+			args = list(args)	
+			if what in Cache.compound:
+				if len(args) == 2:
+					self.slot = args.pop(0)
+				elif kw.has_key('slot'):
+					self.slot = kw['slot']
+				else:
+					raise TypeError("A slot value is required for compound types.")
+			
+			if len(args) == 1:
+				self.change = args.pop(0)
+			elif kw.has_key('change'):
+				self.change = kw['change']
+			else:
+				raise TypeError("The actual change needs to be added.")
+
+		def __str__(self):
+			if not self.what:
+				return "<%s full-update>" % (self.__class__,)
+			elif hasattr(self, 'slot'):
+				return "<%s %s %s id=%i slot=%i>" % (self.__class__, self.what, self.action, self.id, self.slot)
+			else:
+				return "<%s %s %s id=%i>" % (self.__class__, self.what, self.action, self.id)
+		
+	class CacheDirtyEvent(CacheEvent):
+		"""\
+		Raised when the game cache is made dirty. Contains a reference to what was updated.
+		"""
+		pass
+
+	class CacheUpdateEvent(CacheEvent):
+		"""\
+		Raised when the game cache is changed. Contains a reference to what was updated. 
+		If the what is None a new cache has been created.
+		"""
+		def __init__(self, what, *args, **kw):
+			if what == None:
+				self.what = None
+			else:
+				CacheEvent.__init__(self, what, *args, **kw)
+
+	readonly = ("features", "objects", "orders_probe", "boards", "resources", "components", "properties", "players", "resources")
+	readwrite = ("orders", "messages", "categories", "designs")
+	actions = ("create", "remove", "change")
+	compound = ("orders", "messages")
+	
 	def __init__(self):
 		class ChangeDict(dict):
 			"""\
@@ -76,7 +144,31 @@ class Cache(object):
 
 		self.players		= ChangeDict()
 		self.resources		= ChangeDict()
+
+	def apply(self, evt):
+		if not isinstance(evt, self.CacheDirtyEvent):
+			raise TypeError("I can only accept CacheDirtyEvents")
 		
+		if not evt.what in Cache.compound:
+			if evt.action == "create" or evt.action == "change":
+				getattr(self, evt.what)[evt.id] = (-1, evt.change)
+			elif evt.action == "remove":
+				del getattr(self, evt.what)[evt.id]
+		else:
+			d = getattr(self, evt.what)[evt.id]
+			if evt.action == "create":
+				if evt.slot == -1:
+					d.append(evt.change)
+				else:
+					d.insert(evt.slot, evt.change)
+					
+			elif evt.action == "change":
+				d[evt.slot] = evt.change
+			elif evt.action == "remove":
+				del d[evt.slot]
+
+		evt.__class__ = self.CacheUpdateEvent
+
 class Application(object):
 	"""
 	Container for all the applications threads and the network cache.
@@ -84,23 +176,6 @@ class Application(object):
 	Calling accross threads requires you to use the .Call method on each thread - DO NOT call directly!
 	The cache can be accessed by either thread at any time - be careful.
 	"""
-	
-	# Global application events
-	class CacheDirtyEvent(object):
-		"""\
-		Raised when the game cache is made dirty. Contains a reference to what was updated.
-		"""
-		def __init__(self, reference):
-			self.reference = reference
-	
-	class CacheUpdateEvent(object):
-		"""\
-		Raised when the game cache is changed. Contains a reference to what was updated. 
-		If the reference is None a new cache has been created.
-		"""
-		def __init__(self, reference=None):
-			self.reference = reference
-
 	
 	def __init__(self):
 		self.gui = GUI(self)
@@ -133,8 +208,7 @@ class Application(object):
 		config = self.gui.ConfigSave()
 		utils.save_data("pywx_preferences", config)
 		
-		print "Saving the following config..."
-		pprint.pprint(config)
+		debug(DEBUG_MAIN, "Saving the config...\n" + pprint.pformat(config))
 
 	def ConfigLoad(self):
 		"""\
@@ -143,8 +217,7 @@ class Application(object):
 		if config is None:
 			config = {}
 	
-		print "Loading the following config..."
-		pprint.pprint(config)
+		debug(DEBUG_MAIN, "Loading the config...\n" + pprint.pformat(config))
 		
 		self.gui.ConfigLoad(config)
 
@@ -176,12 +249,18 @@ class GUI(wx.App, threading.Thread):
 		def __init__(self, id):
 			self.id = id
 	
+		def __str__(self):
+			return "<SelectObjectEvent id=%s>" % self.id
+	
 	class SelectPositionEvent(wx.PyEvent):
 		"""\
 		Raised when a position is selected.
 		"""
 		def __init__(self, pos):
 			self.x, self.y, self.z = pos
+		
+		def __str__(self):
+			return "<SelectPositionEvent (%s, %s %s)>" % (self.x, self.y, self.z)
 	
 	class SelectOrderEvent(wx.PyEvent):
 		"""\
@@ -190,7 +269,22 @@ class GUI(wx.App, threading.Thread):
 		def __init__(self, id, slots):
 			self.id = id
 			self.slots = slots
-	
+		
+		def __str__(self):
+			return "<SelectOrderEvent id=%s slots=%s>" % (self.id, self.slots)
+
+	class DirtyOrderEvent(wx.PyEvent):
+		"""\
+		Raised when an order is selected.
+		"""
+		def __init__(self, order):
+			self.id = order.id
+			self.slot = order.slot
+			self.order = order
+		
+		def __str__(self):
+			return "<SelectOrderEvent id=%s slots=%s>" % (self.id, self.slots)
+
 	######################################
 
 	def __init__(self, application):
@@ -243,6 +337,7 @@ class GUI(wx.App, threading.Thread):
 	def run(self):
 		self.MainLoop()
 
+	# Config Functions ------------------------------------------------
 	def ConfigDisplay(self):
 		"""\
 		Display the configuration window.
@@ -265,6 +360,7 @@ class GUI(wx.App, threading.Thread):
 		for window in self.windows:
 			window.ConfigLoad(config.get(window.title, {}))
 
+	# Inter-Thread Functions ------------------------------------------------
 	def Call(self, method, *args, **kw):
 		"""\
 		Call a method in this thread.
@@ -275,8 +371,8 @@ class GUI(wx.App, threading.Thread):
 		"""
 		Post an Event the current window.
 		"""
-		func = 'On' + event.__class__.__name__[:-5]	
-		print "Posting", func
+		func = 'On' + event.__class__.__name__[:-5]
+		#debug(DEBUG_GUI, "Posting %s to %s" % (event, func))
 		if hasattr(self, func):
 			getattr(self, func)(event)
 
@@ -298,6 +394,7 @@ class GUI(wx.App, threading.Thread):
 		self.Post(self.ShowWindowEvent())
 		return r
 
+	# Event Handlers ------------------------------------------------
 	def OnNetworkFailure(self, evt):
 		self.Show(self.connectto)
 
@@ -332,8 +429,7 @@ class Network(threading.Thread):
 					time.sleep(0.1)
 				continue
 			
-			method, args, kw = self.tocall.pop()
-			print "Now running %s..." % method
+			method, args, kw = self.tocall.pop(0)
 			try:
 				method(*args, **kw)
 			except (IOError, socket.error), e:
@@ -348,7 +444,13 @@ class Network(threading.Thread):
 		self.tocall.append((method, args, kw))
 
 	def Post(self, event):
-		pass
+		"""
+		Post an Event the current window.
+		"""
+		func = 'On' + event.__class__.__name__[:-5]
+		debug(DEBUG_NETWORK, "Posting %s to %s" % (event, func))
+		if hasattr(self, func):
+			getattr(self, func)(event)
 
 	def ConnectTo(self, host, port, username, password, debug=False):
 		"""\
@@ -397,7 +499,7 @@ class Network(threading.Thread):
 		# Get the features this server support
 		up("Looking for supported features...", mode="connecting")
 		cache.features = self.connection.features()
-		print "Features:", cache.features
+		debug(DEBUG_NETWORK, "Features:", cache.features)
 	
 		# Boards and objects are special cases in which we have a sub-object to get
 	
@@ -414,7 +516,6 @@ class Network(threading.Thread):
 			
 				# Did we download the object okay?
 				if failed(object):
-
 					# Clean up the object
 					if cache.objects.has_key(id):
 						del cache.objects[id]
@@ -443,6 +544,14 @@ class Network(threading.Thread):
 			print " %s : %s ," % (id, o),
 		print "]"
 
+		print "Building two way Universe Tree for speed"
+		def build(object, parent=None, cache=cache):
+			if parent:
+				object.parent = parent.id
+			for id in object.contains:
+				build(cache.objects[id], object)
+		build(cache.objects[0])
+
 		# Get all the boards 
 		# -----------------------------------------------------------------------------------
 		up("Getting boards...", mode="boards")
@@ -456,7 +565,6 @@ class Network(threading.Thread):
 
 				# Did we download the board okay?
 				if failed(board):
-					
 					# Clean up the board
 					if cache.boards.has_key(id):
 						del cache.boards[id]
@@ -487,14 +595,21 @@ class Network(threading.Thread):
 
 		# Get all the order descriptions
 		# -----------------------------------------------------------------------------------
-		up("Getting design objects...", mode="order_descs")
-		for id, time in self.connection.get_orderdesc_ids(iter=True):
-##			if not cache..has_key(id) or time > cache.boards.times[id]:
-				desc = self.connection.get_orderdescs(id=id)[0]
+		up("Getting order descriptions...", mode="order_descs")
+		iter = self.connection.get_orderdesc_ids(iter=True)
+		
+		for id, time in iter:
+			up("Getting board with id of %i (last modified at %s)..." % (id, time), of=iter.total)
 
-				# Did we download the board okay?
-				if failed(desc):
-					desc.register()
+			desc = self.connection.get_orderdescs(id=id)[0]
+
+			# Did we download the board okay?
+			if not failed(desc):
+				desc.register()
+			else:
+				print "Warning: failed to get %i" % id, desc
+		
+			up("Got order description with id of %i (last modified at %s)..." % (id, time), add=1)
 
 		def get_all(name, get_ids, get, cache, feature, up=up):
 
@@ -548,8 +663,42 @@ class Network(threading.Thread):
 
 		# Update the cache
 		self.application.cache = cache
-		self.application.Post(self.application.CacheUpdateEvent())
+		self.application.Post(self.application.cache.CacheUpdateEvent(None))
 		return
+
+	def OnCacheDirty(self, evt):
+		"""\
+		When the cache gets dirty we have to push the changes to the server.
+		"""
+		try:
+			print evt
+			if evt.what == "orders":
+				if evt.action in ("remove", "change"):
+					if failed(self.connection.remove_orders(evt.id, evt.slot)):
+						raise NetworkError("Unable to remove the order...")
+				
+				if evt.action in ("create", "change"):
+					if failed(self.connection.insert_order(evt.id, evt.slot, evt.change)):
+						raise NetworkError("Unable to insert the order...")
+
+					if evt.slot == -1:
+						evt.slot = len(self.application.cache.orders[evt.id])
+						
+					o = self.connection.get_orders(evt.id, evt.slot)[0]
+					if failed(o):
+						raise NetworkError("Unable to get the order...")
+
+					evt.change = o
+			else:
+				raise ValueError("Can't deal with that yet!")
+			self.application.cache.apply(evt)
+			self.application.Post(evt)
+
+		except Exception, e:
+			utils.do_traceback()
+			"There where the following errors when trying to send changes to the server:"
+			"The following updates could not be made:"
+
 
 if __name__ == '__main__':
 	try:

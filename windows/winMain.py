@@ -417,6 +417,5 @@ class winMain(winMainBase):
 			save_data("pywx_tips", config)
 
 	def UpdateCache(self, evt=None):
-		self.application.windows.Hide()
-		self.application.CacheUpdate()
+		self.application.network.Call(self.application.network.CacheUpdate)
 

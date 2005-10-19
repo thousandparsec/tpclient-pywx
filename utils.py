@@ -22,14 +22,19 @@ def do_traceback():
 
 DEBUG_NETWORK = "NETWORK:"
 DEBUG_MAIN = "MAIN:"
-DEBUG_WINDOWS = "WINDOWS:"
-DEBUG_GAME = "GAME:"
+DEBUG_GUI = "GUI:"
 
-DEBUGGING = [DEBUG_NETWORK, DEBUG_MAIN, DEBUG_WINDOWS, DEBUG_GAME]
+DEBUGGING = [DEBUG_MAIN, DEBUG_GUI, DEBUG_NETWORK]
 
-def debug(id, string):
+def warn(string):
+	print "WARNING:", string
+
+def debug(id, *strings):
 	if id in DEBUGGING:
-		print id, string
+		print id, 
+		for s in strings:
+			print s,
+		print
 
 class Blank:
 	pass
@@ -71,5 +76,5 @@ def save_data(file, data):
 
 __all__ = [
 	'Blank', 'save_data', 'load_data', 'configpath', # Config functions
-	'debug', 'do_traceback', 'DEBUG_NETWORK', 'DEBUG_MAIN', 'DEBUG_WINDOWS', 'DEBUG_GAME', # Debugging functions
+	'debug', 'do_traceback', 'DEBUG_NETWORK', 'DEBUG_MAIN', 'DEBUG_GUI', # Debugging functions
 	]
