@@ -36,7 +36,6 @@ class Cache(object):
 		Raised when the game cache is made dirty. Contains a reference to what was updated.
 		"""
 		def __init__(self, what, action, id, *args, **kw):
-			print what, action, id, args, kw, what in Cache.compound, len(args)
 			if what in Cache.readonly:
 				raise ValueError("Can not change that!")
 			elif not what in Cache.readwrite:
@@ -671,7 +670,6 @@ class Network(threading.Thread):
 		When the cache gets dirty we have to push the changes to the server.
 		"""
 		try:
-			print evt
 			if evt.what == "orders":
 				if evt.action in ("remove", "change"):
 					if failed(self.connection.remove_orders(evt.id, evt.slot)):
