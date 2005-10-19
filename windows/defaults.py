@@ -80,7 +80,7 @@ else:
 	}
 	winInfoDefaultSize = {
 		(1024, 768): (425, 176),
-		(1280,1024): (480, 285), 
+		(1280,1024): (480, 300), 
 	}
 	winInfoDefaultShow = {
 		(1024, 768): True, 
