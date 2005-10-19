@@ -129,37 +129,30 @@ class winConnect(winMainBase):
 				raise ValueError('Config-%s: the servers list was empty' % (self,))
 
 		except (ValueError, KeyError), e:
-			print e
 			config['servers'] = ["127.0.0.1:6923", "mithro.dyndns.org", "code-bear.dyndns.org", "llnz.dyndns.org"]
 
 		try:
-			print config['username']
 			if not isinstance(config['username'], (unicode, str)):
 				raise ValueError('Config-%s: a username value of %s is not valid' % (self, config['username']))
 		except (ValueError, KeyError), e:
-			print e
 			config['username'] = "@tp"
 
 		try:
-			print config['password']
 			if not isinstance(config['password'], (unicode, str)):
 				raise ValueError('Config-%s: a password value of %s is not valid' % (self, config['password']))
 		except (ValueError, KeyError), e:
-			print e
 			config['password'] = ""
 
 		try:
 			if not isinstance(config['auto'], bool):
 				raise ValueError('Config-%s: a auto value of %s is not valid' % (self, config['auto']))
 		except (ValueError, KeyError), e:
-			print e
 			config['auto'] = False
 
 		try:
 			if not isinstance(config['debug'], bool):
 				raise ValueError('Config-%s: a debug value of %s is not valid' % (self, config['debug']))
 		except (ValueError, KeyError), e:
-			print e
 			config['debug'] = False
 
 		return config

@@ -79,8 +79,6 @@ class winMain(winMainBase):
 	def __init__(self, application):
 		winMainBase.__init__(self, application)
 
-		print "main", self.config
-
 		self.SetMenuBar(self.Menu(self))
 
 		self.statusbar = TimeStatusBar(self)

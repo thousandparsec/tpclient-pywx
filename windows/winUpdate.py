@@ -69,7 +69,6 @@ class winUpdate(winMainBase):
 		self.Bind(wx.EVT_IDLE, self.IdleHandler)
 
 	def Show(self, show=True):
-		print "winUpdate show"
 		if not show:
 			return self.Hide()
 		
@@ -82,7 +81,6 @@ class winUpdate(winMainBase):
 				gauge.SetRange(0)
 			text.SetLabel("")
 		
-		print "winUpdate Show - end"
 		return winMainBase.Show(self)
 
 	def IdleHandler(self, event):

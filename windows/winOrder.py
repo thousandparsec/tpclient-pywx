@@ -28,8 +28,9 @@ defaults = {
 	constants.ARG_TIME: [0],
 	constants.ARG_OBJECT: [0],
 	constants.ARG_PLAYER: [0,0],
-	constants.ARG_LIST: [[], []],
 	constants.ARG_STRING: [0, ""],
+	constants.ARG_LIST: [[], []],
+	constants.ARG_RANGE: [-1, -1, -1, -1],
 }
 
 class winOrder(winBase):
@@ -334,7 +335,6 @@ class winOrder(winBase):
 			else:
 				slot = self.order_list.GetItemCount()
 
-			print self.clipboard
 			for i in xrange(0, len(self.clipboard)):
 				order = copy.copy(self.clipboard[i])
 				self.InsertOrder(slot+i, order)
