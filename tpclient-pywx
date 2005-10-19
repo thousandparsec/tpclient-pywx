@@ -673,18 +673,18 @@ class Network(threading.Thread):
 			if evt.what == "orders":
 				if evt.action in ("remove", "change"):
 					if failed(self.connection.remove_orders(evt.id, evt.slot)):
-						raise NetworkError("Unable to remove the order...")
+						raise IOError("Unable to remove the order...")
 				
 				if evt.action in ("create", "change"):
 					if failed(self.connection.insert_order(evt.id, evt.slot, evt.change)):
-						raise NetworkError("Unable to insert the order...")
+						raise IOError("Unable to insert the order...")
 
 					if evt.slot == -1:
 						evt.slot = len(self.application.cache.orders[evt.id])
 						
 					o = self.connection.get_orders(evt.id, evt.slot)[0]
 					if failed(o):
-						raise NetworkError("Unable to get the order...")
+						raise IOError("Unable to get the order...")
 
 					evt.change = o
 			else:
@@ -694,6 +694,7 @@ class Network(threading.Thread):
 
 		except Exception, e:
 			utils.do_traceback()
+			self.application.Post(self.NetworkFailureEvent(e))
 			"There where the following errors when trying to send changes to the server:"
 			"The following updates could not be made:"
 
