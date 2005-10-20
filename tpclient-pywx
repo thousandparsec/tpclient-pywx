@@ -231,7 +231,8 @@ class Application(object):
 		"""
 		Exit the program.
 		"""
-		sys.exit()	
+		self.gui.Call(self.gui.Cleanup)
+		self.network.Call(self.network.Cleanup)
 
 class GUI(wx.App, threading.Thread):
 	## These are window events
@@ -336,6 +337,13 @@ class GUI(wx.App, threading.Thread):
 	def run(self):
 		self.MainLoop()
 
+	def Cleanup(self):
+		for window in self.windows:
+			window.Close()
+		while self.application.network.isAlive():
+			time.sleep(0.1)
+		sys.exit()
+
 	# Config Functions ------------------------------------------------
 	def ConfigDisplay(self):
 		"""\
@@ -439,7 +447,13 @@ class Network(threading.Thread):
 					do_traceback()
 				self.application.Post(self.NetworkFailureEvent(s))
 
+	def Cleanup(self):
+		self.exit = True
+
 	def Call(self, method, *args, **kw):
+		"""\
+		Call a method in this thread.
+		"""
 		self.tocall.append((method, args, kw))
 
 	def Post(self, event):
