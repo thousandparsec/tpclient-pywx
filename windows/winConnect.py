@@ -122,7 +122,7 @@ class winConnect(winMainBase):
 				raise ValueError('Config-%s: a servers value of %s is not valid' % (self, config['servers']))
 
 			for server in config['servers']:
-				if not isinstance(server, str):
+				if not isinstance(server, (str, unicode)):
 					config['servers'].remove(server)
 
 			if len(config['servers']) <= 0:
@@ -157,6 +157,16 @@ class winConnect(winMainBase):
 
 		return config
 
+
+	def ConfigSave(self):
+		"""\
+		Returns the configuration of the Window (and it's children).
+		"""
+		if hasattr(self, 'ConfigWidgets'):
+			servers, username, password, auto, debug = self.ConfigWidgets
+			self.config['servers'] = servers.GetStrings()
+		return self.config
+
 	def ConfigLoad(self, config):
 		"""\
 		Loads the configuration of the Window (and it's children).
@@ -178,7 +188,7 @@ class winConnect(winMainBase):
 		Updates the config details using external sources.
 		"""
 		pass
-	
+
 	def ConfigDisplay(self, panel, sizer):
 		"""\
 		Display a config panel with all the config options.

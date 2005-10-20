@@ -144,7 +144,7 @@ class winOrder(winBase):
 			self.ColourListItem(slot, wx.BLACK)
 
 		self.order_list.SetItemPyData(slot, order)
-
+		
 	def RemoveListItem(self, slot):
 		"""\
 		Removes an order from a position in the list.
@@ -199,7 +199,7 @@ class winOrder(winBase):
 
 		# Update the list box
 		self.UpdateListItem(slot, order)
-
+		
 		# Tell everyone about the change
 		self.application.Post(self.application.cache.CacheDirtyEvent("orders", "change", self.oid, slot, order))
 
@@ -420,18 +420,22 @@ class winOrder(winBase):
 			
 		if evt.action in ("create", "change"):
 			self.UpdateListItem(evt.slot, evt.change)
+			
+			# Rebuild the panel
+			if evt.slot in self.order_list.GetSelected():
+				self.OnOrderSelect(None, force=True)
 		elif evt.action == "remove":
 			self.RemoveListItem(evt.slot)
 
 	####################################################
 	# Local Event Handlers
 	####################################################
-	def OnOrderSelect(self, evt):
+	def OnOrderSelect(self, evt, force=False):
 		"""\
 		Called when somebody selects an order.
 		"""
 		slots = self.order_list.GetSelected()
-		if self.slots == slots:
+		if self.slots == slots and not force:
 			return
 			
 		if len(slots) > 1:

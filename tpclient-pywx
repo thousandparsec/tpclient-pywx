@@ -684,7 +684,7 @@ class Network(threading.Thread):
 						
 					o = self.connection.get_orders(evt.id, evt.slot)[0]
 					if failed(o):
-						raise IOError("Unable to get the order...")
+						raise IOError("Unable to get the order..." + o[1])
 
 					evt.change = o
 			else:
