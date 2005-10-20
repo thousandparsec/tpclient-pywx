@@ -17,7 +17,7 @@ try:
 except ImportError:
 	intversion = 0
 
-if intversion < 2050000:
+if intversion < 2060000:
 	notfound.append("wxPython > 2.6.0")
 
 try:
