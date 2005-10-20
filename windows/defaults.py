@@ -63,11 +63,11 @@ else:
 	# Create some default Positioning, good for 1024x768 on linux
 	winMainDefaultPosition = {
 		(1024, 768): (0,0), 
-		(1280,1024): (0,31), 
+		(1280,1024): (-1,31), 
 	}
 	winMainDefaultWidth = {
 		(1024, 768): 419, 
-		(1280,1024): 100, 
+		(1280,1024): 1272, 
 	}
 	winMainDefaultShow = {
 		(1024, 768): True, 
