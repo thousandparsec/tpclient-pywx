@@ -701,6 +701,9 @@ class Network(threading.Thread):
 						raise IOError("Unable to get the order..." + o[1])
 
 					evt.change = o
+			elif evt.what == "messages" and evt.action == "remove":
+				if failed(self.connection.remove_messages(evt.id, evt.slot)):
+					raise IOError("Unable to remove the order...")
 			else:
 				raise ValueError("Can't deal with that yet!")
 			self.application.cache.apply(evt)

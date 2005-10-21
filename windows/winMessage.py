@@ -197,9 +197,21 @@ class winMessage(winBase):
 </html>"""
 
 	def OnCacheUpdate(self, evt=None):
-		self.BoardSet(0)
+		"""\
+		Called when the cache is updated.
+		"""
+		# If it's a full cache update
+		if evt.what == None:
+			self.BoardSet(0)
+			return
+		
+		# Only intrested in an order has been updated and we are currently looking at that
+		if evt.what != "messages" or evt.id != self.bid:
+			return
+			
+		self.BoardSet(evt.slot)
 
-	def BoardSet(self, id):
+	def BoardSet(self, id, slot=0):
 		self.bid = id
 		if self.application.cache.messages.has_key(self.bid):
 			messages = self.application.cache.messages[self.bid]
@@ -207,17 +219,16 @@ class winMessage(winBase):
 			messages = []
 
 		# Figure out the first non-filter message
-		slot = -1
-		for i in range(0, len(messages)):
+		for i in range(slot, len(messages)):
 			message = messages[i]
 			if self.filtered > Set(message.types):
 				continue
 			else:
-				slot = i
+				found = i
 				break
 
 		# Set that message as the current
-		self.MessageSet(slot)
+		self.MessageSet(found)
 	
 	def MessageSet(self, slot):
 		if self.application.cache.messages.has_key(self.bid):
@@ -301,16 +312,8 @@ class winMessage(winBase):
 		if slot == -1:
 			return
 
-		# Remove the order
-		r = self.application.connection.remove_messages(self.bid, slot)
-		if failed(r):
-			debug(DEBUG_WINDOWS, "MessageDelete: Remove failed!")
-			return
-
-		del self.application.cache.messages[self.bid][slot]
-		# FIXME: self.application.cache.boards[self.bid].number -= 1
-
-		self.MessagePrev()
+		# Tell everyone about the change
+		self.application.Post(self.application.cache.CacheDirtyEvent("messages", "remove", self.bid, slot, None))
 
 	def MessageGoto(self, slot):
 		messages = self.application.cache.messages[self.bid]
