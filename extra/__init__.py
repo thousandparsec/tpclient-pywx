@@ -246,10 +246,9 @@ class wxSimpleValidator(wx.PyValidator):
 		# Returning without calling even.Skip eats the event before it
 		# gets to the text control
 		return
-	
+
 wx.ListCtrl = wxListCtrl
 wx.Choice = wxChoice
 wx.ComboBox = wxComboBox
 wx.gizmos.TreeListCtrl = wxTreeListCtrl
 wx.SimpleValidator = wxSimpleValidator
-

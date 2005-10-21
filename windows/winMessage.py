@@ -43,8 +43,13 @@ class winMessage(winBase):
 
 		panel = wx.Panel(self, -1)
 		panel.SetConstraints(wx.lib.anchors.LayoutAnchors(self, 1, 1, 1, 1))
+		self.panel = panel
 		self.obj = {}
 
+		# Bits for doing the button changing on shift
+		self.timer = wx.Timer(self)
+		self.shift = False
+		
 		item0 = wx.FlexGridSizer( 0, 1, 0, 0 )
 		item0.AddGrowableCol( 0 )
 		item0.AddGrowableRow( 1 )
@@ -83,19 +88,31 @@ class winMessage(winBase):
 
 		item7 = wx.BoxSizer( wx.VERTICAL )
 
-		prev = wx.Button( panel, -1, _("Prev"), wx.DefaultPosition, wx.local.buttonSize)
-		prev.SetFont(wx.local.normalFont)
-		item7.Add( prev, 0, wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 1 )
-		self.Bind(wx.EVT_BUTTON, self.MessagePrev, prev)
+		self.prev = wx.Button( panel, -1, _("Prev"), wx.DefaultPosition, wx.local.buttonSize)
+		self.prev.SetFont(wx.local.normalFont)
+		item7.Add( self.prev, 0, wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 1 )
+		self.Bind(wx.EVT_BUTTON, self.MessagePrev, self.prev)
+
+		self.first = wx.Button( panel, -1, _("First"), wx.DefaultPosition, wx.local.buttonSize)
+		self.first.SetFont(wx.local.normalFont)
+		item7.Add( self.first, 0, wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 1 )
+		self.Bind(wx.EVT_BUTTON, self.MessageFirst, self.first)
+		self.first.Hide()
 
 		goto = wx.Button( panel, -1, _("Goto"), wx.DefaultPosition, wx.local.buttonSize)
 		goto.SetFont(wx.local.normalFont)
 		item7.Add( goto, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
 
-		next = wx.Button( panel, -1, _("Next"), wx.DefaultPosition, wx.local.buttonSize)
-		next.SetFont(wx.local.normalFont)
-		item7.Add( next, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
-		self.Bind(wx.EVT_BUTTON, self.MessageNext, next)
+		self.next = wx.Button( panel, -1, _("Next"), wx.DefaultPosition, wx.local.buttonSize)
+		self.next.SetFont(wx.local.normalFont)
+		item7.Add( self.next, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
+		self.Bind(wx.EVT_BUTTON, self.MessageNext, self.next)
+
+		self.last = wx.Button( panel, -1, _("Last"), wx.DefaultPosition, wx.local.buttonSize)
+		self.last.SetFont(wx.local.normalFont)
+		item7.Add( self.last, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
+		self.Bind(wx.EVT_BUTTON, self.MessageLast, self.last)
+		self.last.Hide()
 
 		item11 = wx.StaticLine( panel, MESSAGE_LINE, wx.DefaultPosition, wx.Size(20,-1), wx.LI_HORIZONTAL )
 		item11.Enable(False)
@@ -120,7 +137,7 @@ class winMessage(winBase):
 		
 		item0.Fit( panel )
 		item0.SetSizeHints( panel )
-		
+	
 		# The current message slot
 		self.slot = 0
 
@@ -196,6 +213,51 @@ class winMessage(winBase):
 </body>
 </html>"""
 
+	def Show(self, show=True):
+		if show:
+			self.timer.Start(50)
+			self.Bind(wx.EVT_TIMER, self.OnIdle, self.timer)
+			winBase.Show(self)
+		else:
+			self.Hide()
+
+	def Hide(self, hide=True):
+		if hide:
+			self.timer.Stop()
+			self.Unbind(wx.EVT_TIMER, self.timer)
+			winBase.Hide(self)
+		else:
+			self.Show()
+
+	def ShowPN(self):
+		self.first.Hide()
+		self.last.Hide()
+		
+		self.prev.Show()
+		self.next.Show()
+
+		self.panel.Layout()
+
+	def ShowFL(self):
+		self.prev.Hide()
+		self.next.Hide()
+
+		self.first.Show()
+		self.last.Show()
+		
+		self.panel.Layout()
+		
+	def OnIdle(self, evt):
+		shift = wx.GetKeyState(wx.WXK_SHIFT)
+		if self.shift == shift:
+			return
+		
+		self.shift = shift
+		if self.shift:
+			self.ShowFL()
+		else:
+			self.ShowPN()
+		
 	def OnCacheUpdate(self, evt=None):
 		"""\
 		Called when the cache is updated.
@@ -269,6 +331,10 @@ class winMessage(winBase):
 		self.counter.SetLabel(_("%i of %i") % (self.slot+1, len(messages)))
 		self.html.SetPage(message_body)
 
+	def MessageFirst(self, evt=None):
+		self.slot = -1
+		self.MessageNext()
+
 	def MessageNext(self, evt=None):
 		print "Going to next message..."
 		messages = self.application.cache.messages[self.bid]
@@ -287,6 +353,10 @@ class winMessage(winBase):
 
 		# Set that message as the current
 		self.MessageSet(slot)
+	
+	def MessageLast(self, evt=None):
+		self.slot = len(self.application.cache.messages[self.bid])
+		self.MessagePrev()
 
 	def MessagePrev(self, evt=None):
 		print "Going to previous message..."
