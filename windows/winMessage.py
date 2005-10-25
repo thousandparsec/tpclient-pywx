@@ -281,6 +281,7 @@ class winMessage(winBase):
 			messages = []
 
 		# Figure out the first non-filter message
+		found = slot
 		for i in range(slot, len(messages)):
 			message = messages[i]
 			if self.filtered > Set(message.types):

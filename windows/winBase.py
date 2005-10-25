@@ -282,7 +282,8 @@ class winConfigMixIn(ConfigMixIn):
 		height.SetValue(self.config['size'][1])
 
 	def OnConfigDisplayDoShow(self, evt):
-		self.Show(evt.Checked())
+		if self.application.gui.current in (self, self.parent):
+			self.Show(evt.Checked())
 		self.ConfigUpdate()
 	
 	def OnConfigDisplayX(self, evt):

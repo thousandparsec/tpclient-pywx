@@ -2,18 +2,18 @@
 The pywx-client for Thousand Parsec (TP)
 ============================================
 
-Requirements:
+Requirements (all versions must be greater):
 	python 2.2
-	wxPython 2.5.1
-	py-netlib 0.0.7
+	wxPython 2.6.0
+	libtpproto-py 0.1.0
 
 How to use
 ============================================
 
 Install python
 Install wxPython
-Install py-netlib
+Install libtpproto-py
 
-In windows, double click on main.py
-In linux, change to the pywx-client directory and run "python main.py"
+In windows, double click on tpclient-pywx
+In linux, change to the tpclient-pywx directory and run "tpclient-pywx"
 

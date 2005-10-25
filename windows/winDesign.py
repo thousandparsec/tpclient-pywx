@@ -4,7 +4,6 @@ at this current location and "quick" details about them.
 """
 
 # Python imports
-import random
 
 # wxPython imports
 import wx
@@ -43,42 +42,57 @@ class winDesign(winBase):
 		self.designs = wx.ListCtrl( panel, -1, wx.DefaultPosition, wx.DefaultSize, wx.LC_LIST|wx.LC_NO_HEADER|wx.SUNKEN_BORDER )
 		self.designs.SetFont(wx.local.normalFont)
 
-		self.top = wx.BoxSizer( wx.HORIZONTAL ) # The labels
+		# The labels
+		################################################################
+		self.top = wx.BoxSizer( wx.HORIZONTAL )
 		
-		# The title
+		# The title (editable version)
 		self.titleedit = wx.TextCtrl( panel, -1, "Title", size=(-1,wx.local.buttonSize[1]), style=wx.TE_CENTRE)
 		self.titleedit.SetFont(wx.local.normalFont)
 		self.top.Add( self.titleedit, 1, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
 		
+		# The title (noneditable version)
 		self.titletext = wx.StaticText( panel, -1, "Title", size=(-1,wx.local.buttonSize[1]), style=wx.ALIGN_CENTRE|wx.ST_NO_AUTORESIZE)
 		self.titletext.SetFont(wx.local.normalFont)
 		self.top.Add( self.titletext, 1, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1)
 
-		# The number of uses
+		# The number of times the design is in use
 		self.used = wx.StaticText( panel, -1, "0000", size=(-1,wx.local.buttonSize[1]), style=wx.ALIGN_RIGHT|wx.ST_NO_AUTORESIZE)
 		self.used.SetFont(wx.local.normalFont)
 		self.top.Add( self.used, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
 
 		self.middle = wx.BoxSizer( wx.VERTICAL )
 		
-		# The categories this component is in
+		# The categories this design is in
 		self.categories = wx.StaticText( panel, -1, "", size=(-1,wx.local.buttonSize[1]), style=wx.ALIGN_CENTRE|wx.ST_NO_AUTORESIZE)
 		self.categories.SetFont(wx.local.normalFont)
 		self.middle.Add( self.categories, 0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 0 )
 		
-		# The currently selected plan
-		self.plan = wx.ListCtrl( panel, -1, wx.DefaultPosition, wx.DefaultSize, wx.LC_REPORT|wx.SUNKEN_BORDER|wx.LC_EDIT_LABELS )
-		self.plan.InsertColumn(0, "#", format=wx.LIST_FORMAT_RIGHT, width=20)
-		self.plan.InsertColumn(1, "Component")
-		self.plan.SetFont(wx.local.normalFont)
+		# The currently selected design
+		self.design = wx.BoxSizer( wx.HORIZONTAL )
+		self.middle.Add(self.design, 2, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
+
+		# The components in the design
+		self.parts = wx.ListCtrl(panel, -1, wx.DefaultPosition, wx.DefaultSize, wx.LC_REPORT|wx.SUNKEN_BORDER|wx.LC_EDIT_LABELS )
+		self.parts.InsertColumn(0, "#", format=wx.LIST_FORMAT_RIGHT, width=20)
+		self.parts.InsertColumn(1, "Component")
+		self.parts.SetFont(wx.local.normalFont)
+		self.design.Add(self.parts, 2, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
+
+		# The properties of the design
+		self.design_ps = wx.BoxSizer(wx.HORIZONTAL)
+		self.design_pp = wx.Panel(panel, -1)
+		self.design_pp.SetSizer(self.design_ps)
+		self.design.Add(self.design_pp, 2, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
+
+		# The description of the current design
+		#self.desc = wx.TextCtrl( panel, -1, " ", style=wx.TE_RIGHT|wx.TE_MULTILINE|wx.TE_PROCESS_ENTER)
+		#self.desc.SetFont(wx.local.normalFont)
+		#self.middle.Add( self.desc, 1, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
 		
-		self.middle.Add(self.plan, 2, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
-	
-		# The description...
-		self.desc = wx.TextCtrl( panel, -1, " ", style=wx.TE_RIGHT|wx.TE_MULTILINE|wx.TE_PROCESS_ENTER)
-		self.desc.SetFont(wx.local.normalFont)
-		self.middle.Add( self.desc, 1, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
-		
+		# The "component description panel"
+		#self.middle.Add( self.desc, 1, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
+
 		# The buttons
 		self.buttons = wx.BoxSizer( wx.HORIZONTAL )
 		self.middle.Add(self.buttons, 0, wx.ALIGN_RIGHT|wx.ALL, 1 )
@@ -109,18 +123,18 @@ class winDesign(winBase):
 		self.buttons.Add( self.save, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
 		
 		# The components
-		self.partscat = wx.Choice( panel, -1, choices=[], size=(-1,wx.local.buttonSize[1]))
-		self.partscat.SetFont(wx.local.normalFont)
-		self.partscat.Bind(wx.EVT_CHOICE, self.UpdateCompList)
-		self.parts = wx.ListCtrl( panel, -1, wx.DefaultPosition, wx.DefaultSize, wx.LC_LIST|wx.LC_NO_HEADER|wx.SUNKEN_BORDER|wx.LC_SINGLE_SEL )
-		self.parts.SetFont(wx.local.normalFont)
+		self.compscat = wx.Choice( panel, -1, choices=[], size=(-1,wx.local.buttonSize[1]))
+		self.compscat.SetFont(wx.local.normalFont)
+		self.compscat.Bind(wx.EVT_CHOICE, self.UpdateCompList)
+		self.comps = wx.ListCtrl( panel, -1, wx.DefaultPosition, wx.DefaultSize, wx.LC_LIST|wx.LC_NO_HEADER|wx.SUNKEN_BORDER|wx.LC_SINGLE_SEL )
+		self.comps.SetFont(wx.local.normalFont)
 
 		self.grid.Add(self.designscat, 	0, wx.ALIGN_CENTRE|wx.ALL, 1 )
 		self.grid.Add(self.top, 		0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
-		self.grid.Add(self.partscat,	0, wx.ALIGN_CENTRE|wx.ALL, 1 )
+		self.grid.Add(self.compscat,	0, wx.ALIGN_CENTRE|wx.ALL, 1 )
 		self.grid.Add(self.designs, 	0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
 		self.grid.Add(self.middle, 	0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
-		self.grid.Add(self.parts, 	0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
+		self.grid.Add(self.comps, 	0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
 
 		panel.SetAutoLayout( True )
 		panel.SetSizer( self.grid )
@@ -143,18 +157,12 @@ class winDesign(winBase):
 		self.designs.Disable()
 
 		# Show the component bar
-		self.grid.Show(self.partscat)
-		self.grid.Show(self.parts)
-		self.grid.Layout()
+		self.grid.Show(self.compscat)
+		self.grid.Show(self.comps)
 		
 		# Make the title and description editable
 		self.top.Show(self.titleedit)
 		self.top.Hide(self.titletext)
-		self.top.Layout()
-
-#		self.middle.Show(self.descedit)
-#		self.middle.Hide(self.desc)
-#		self.middle.Layout()
 
 		# Disable edit, duplicate, delete
 		self.edit.Disable()
@@ -166,32 +174,86 @@ class winDesign(winBase):
 		self.revert.SetDefault()
 		self.save.Enable()
 
+		# Re-layout everything
+		self.grid.Layout()
+
 	def OnSelect(self, evt=None):
 		# Enable the selection side
 		self.designscat.Enable()
 		self.designs.Enable()
 
 		# Hide the component bar
-		self.grid.Hide(self.partscat)
-		self.grid.Hide(self.parts)
-		self.grid.SetSizeHints( self.panel )
-		self.grid.Layout()
-#		self.grid.Fit( self.panel )
+		self.grid.Hide(self.compscat)
+		self.grid.Hide(self.comps)
 
 		# Make the title and description uneditable
 		self.top.Hide(self.titleedit)
 		self.top.Show(self.titletext)
 		self.top.Layout()
 
-#		self.middle.Hide(self.descedit)
-#		self.middle.Show(self.desc)
-#		self.middle.Layout()
-
 		# Disable save, revert
 		self.revert.Disable()
 		self.save.Disable()
 
+		# Re-layout everything
+		self.grid.Layout()
+
 		self.OnSelectObject()
+
+	def BuildPropertiesPanel(self, design):
+		SIZER_FLAGS = wx.GROW|wx.ALIGN_CENTER_VERTICAL|wx.ALL
+		cache = self.application.cache
+
+		# Remove the previous panel and stuff
+		if hasattr(self, 'properties'):
+			self.properties.Hide()
+			self.design_ps.Remove(self.properties)
+			self.properties.Destroy()
+			del self.properties
+
+		# Create a new panel
+		panel = wx.Panel(self.design_pp, -1)
+		sizer = wx.BoxSizer(wx.VERTICAL) 
+		panel.SetSizer(sizer)
+
+		# Sort the properties into category groups
+		properties = {}
+		for pid, pstring in design.properties:
+			property = cache.properties[pid]
+			
+			for cid in property.categories:
+				if not properties.has_key(cid):
+					properties[cid] = []
+				properties[cid].append((property, pstring))
+				
+		for cid in properties.keys():
+			category = cache.categories[cid]
+
+			# The box around the properties in the category
+			box = wx.StaticBox(panel, -1, category.name)
+			box.SetFont(wx.local.normalFont)
+			box_sizer = wx.StaticBoxSizer(box, wx.VERTICAL)
+			sizer.Add(box_sizer, 1, SIZER_FLAGS, 5)
+
+			# The properties
+			prop_sizer = wx.FlexGridSizer( 0, 2, 0, 0 )
+			box_sizer.Add(prop_sizer, 1, SIZER_FLAGS, 5)
+
+			for property, pstring in properties[cid]:
+				# Property name
+				name = wx.StaticText(panel, -1, property.display_name)
+				name.SetFont(wx.local.normalFont)
+				prop_sizer.Add(name, 0, SIZER_FLAGS|wx.ALIGN_RIGHT, 5)
+
+				# Property value
+				value = wx.StaticText(panel, -1, pstring)
+				value.SetFont(wx.local.normalFont)
+				prop_sizer.Add(value, 1, SIZER_FLAGS|wx.ALIGN_RIGHT, 5)
+
+		self.design_ps.Add( panel, 1, SIZER_FLAGS, 5 )
+		self.design_ps.Layout()
+
+		self.properties = panel
 
 	def OnSelectObject(self, evt=None):
 		s = self.designs.GetSelected()
@@ -204,13 +266,10 @@ class winDesign(winBase):
 			# Clear the title
 			self.titletext.SetLabel("")
 
-			# Hide the plan
-			self.middle.Hide(self.plan)
+			# Hide the design
+			self.middle.Hide(self.design)
 			self.middle.Layout()
 			
-			# Set the description
-			self.desc.SetValue("No component selected...")
-		
 			# Disable the buttons
 			self.edit.Disable()
 			self.duplicate.Disable()
@@ -218,15 +277,6 @@ class winDesign(winBase):
 			return
 		
 		design = self.application.cache.designs[id]
-		
-		# Enable the parts list
-		self.middle.Show(self.plan)
-
-		# Populate the parts list
-		for number, id in design.components:
-			pass
-			
-		self.middle.Layout()
 
 		# Set the title
 		self.titletext.SetLabel(design.name)
@@ -248,8 +298,19 @@ class winDesign(winBase):
 		c = c[:-2]
 		self.categories.SetLabel(c)
 
-		# Set the description
-		self.desc.SetValue(str(design.description))
+		# Enable the parts list
+		self.middle.Show(self.design)
+
+		# Populate the parts list
+		self.parts.DeleteAllItems()
+		for id, number in design.components:
+			component = self.application.cache.components[id]
+		
+			self.parts.InsertStringItem(0, str(number))
+			self.parts.SetStringItem(0, 1, component.name)
+		
+		# Populate the properties
+		self.BuildPropertiesPanel(design)
 
 		# Set if edit can work
 		if design.used <= 0:
@@ -264,31 +325,40 @@ class winDesign(winBase):
 
 			self.duplicate.Enable()
 			self.duplicate.SetDefault()
+		
+		# Re-layout everything
+		self.grid.Layout()
 
 	def OnCacheUpdate(self, evt=None):
-		return
 		print "OnCacheUpdate of winDesign..."
 
 		# Update the categories
 		designs = self.designscat.GetClientData(self.designscat.GetSelection())
-		comps = self.partscat.GetClientData(self.partscat.GetSelection())
+		comps = self.compscat.GetClientData(self.compscat.GetSelection())
 		
 		self.designscat.Clear()
-		self.partscat.Clear()
+		self.compscat.Clear()
 		for category in self.application.cache.categories.values():
 			slot = self.designscat.GetCount()
 
-			self.designscat.Append(category.name, category.id)
-			self.partscat.Append(category.name, category.id)
+			for design in self.application.cache.designs.values():
+				if category.id in design.categories:
+					self.designscat.Append(category.name, category.id)
+					break
+
+			for component in self.application.cache.components.values():
+				if category.id in component.categories:
+					self.compscat.Append(category.name, category.id)
+					break
 
 			self.designscat.SetToolTipItem(slot, category.description)
-			self.partscat.SetToolTipItem(slot, category.description)
+			self.compscat.SetToolTipItem(slot, category.description)
 
 			if category.id == designs:
 				self.designscat.SetSelection(slot)
 
 			if category.id == comps:
-				self.partscat.SetSelection(slot)
+				self.compscat.SetSelection(slot)
 
 		self.UpdateDesignList()
 		self.UpdateCompList()
@@ -311,16 +381,16 @@ class winDesign(winBase):
 
 	def UpdateCompList(self, evt=None):
 		print "Updating the Comps List"
-		comps = self.partscat.GetClientData(self.partscat.GetSelection())
+		comps = self.compscat.GetClientData(self.compscat.GetSelection())
 		print "Currently selected category", comps
 
-		self.parts.ClearAll()
+		self.comps.ClearAll()
 		for component in self.application.cache.components.values():
-			slot = self.parts.GetItemCount()
+			slot = self.comps.GetItemCount()
 
 			print "Component", component.id, component.name, component.categories
 			if comps in component.categories:
 				print "Adding to ", slot
-				self.parts.InsertStringItem(slot, component.name)
-				self.parts.SetItemData(slot, component.id)
+				self.comps.InsertStringItem(slot, component.name)
+				self.comps.SetItemData(slot, component.id)
 

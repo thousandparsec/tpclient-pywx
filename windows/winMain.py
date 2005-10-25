@@ -87,6 +87,9 @@ class winMain(winMainBase):
 		from windows.winDesign import winDesign
 		winDesign(application, self)
 		
+		from windows.winDesignTemp import winDesignTemp
+		winDesignTemp(application, self)
+		
 		from windows.winInfo import winInfo
 		winInfo(application, self)
 
@@ -169,11 +172,11 @@ class winMain(winMainBase):
 		
 		for window in self.children.values():
 			# FIXME: This is a bit bad
-			if window.config['show']:
+			if window.config.has_key('show') and window.config['show']:
 				window.Show()
 
 			if wx.Platform == "__WXMAC__":
-				value.SetMenuBar(self.current.Menu())
+				window.SetMenuBar(self.current.Menu())
 
 		winMainBase.Show(self)
 		
