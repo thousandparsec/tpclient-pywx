@@ -87,9 +87,6 @@ class winMain(winMainBase):
 		from windows.winDesign import winDesign
 		winDesign(application, self)
 		
-		from windows.winDesignTemp import winDesignTemp
-		winDesignTemp(application, self)
-		
 		from windows.winInfo import winInfo
 		winInfo(application, self)
 
