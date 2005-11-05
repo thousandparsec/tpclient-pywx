@@ -189,7 +189,7 @@ class Application(object):
 		"""\
 		Set the application running.
 		"""
-		self.init = True
+		self.gui.Show(self.gui.connectto)
 
 		self.gui.start()
 		self.network.start()

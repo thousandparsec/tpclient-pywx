@@ -8,13 +8,5 @@ class winSplash(wx.SplashScreen):
 
 		self.application = application
 		
-		self.Bind(wx.EVT_CLOSE, self.OnClose)
-
 	def Post(self, event):
 		pass
-
-	def OnClose(self, evt):
-		if not hasattr(self.application, "init"):
-			evt.Veto(True)
-		else:
-			self.application.gui.Show(self.application.gui.connectto)
