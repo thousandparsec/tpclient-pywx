@@ -36,7 +36,11 @@ class winConfig(winMainBase):
 			
 			notebook.AddPage(panel, window.title)
 
-		butt = wx.StdDialogButtonSizer()
+		# FIXME: This is only temporary till they fix this on mac!
+		if wx.Platform != "__WXMAC__":
+			butt = wx.StdDialogButtonSizer()
+		else:
+			butt = wx.BoxSizer(wx.HORIZONTAL)
 		base.Add(butt, 0, wx.ALIGN_RIGHT)
 
 		# Buttons for saving/reverting
@@ -47,8 +51,12 @@ class winConfig(winMainBase):
 		self.Bind(wx.EVT_BUTTON, self.OnConfigRevert, revert)
 		revert.SetDefault()
 		
-		butt.AddButton(save), butt.SetCancelButton(revert)
-		butt.Realize()
+		if wx.Platform != "__WXMAC__":
+			butt.AddButton(save), butt.SetCancelButton(revert)
+			butt.Realize()
+		else:
+			butt.Add(save, 0, wx.ALIGN_RIGHT)
+			butt.Add(revert, 0, wx.ALIGN_RIGHT)
 	
 		main.SetAutoLayout(True)
 		main.SetSizer(base)
