@@ -271,7 +271,7 @@ class winMessage(winBase):
 		if evt.what != "messages" or evt.id != self.bid:
 			return
 			
-		self.BoardSet(evt.slot)
+		self.BoardSet(0, evt.slot)
 
 	def BoardSet(self, id, slot=0):
 		self.bid = id
