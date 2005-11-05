@@ -1560,8 +1560,6 @@ class FloatCanvas(wx.Panel):
     def MakeNewBuffers(self):
         self._BackgroundDirty = True
         # Make new offscreen bitmap:
-		if self.PanelSize[0] < 1 or self.PanelSize[0] < 1:
-			self.PanelSize = (1, 1)
         self._Buffer = wx.EmptyBitmap(*self.PanelSize)
         #dc = wx.MemoryDC()
         #dc.SelectObject(self._Buffer)
@@ -1597,11 +1595,16 @@ class FloatCanvas(wx.Panel):
     
     def OnSize(self,event):
         self.PanelSize  = array(self.GetClientSizeTuple(),Int32)
+			
         self.HalfPanelSize = self.PanelSize / 2 # lrk: added for speed in WorldToPixel
         if self.PanelSize[0] == 0 or self.PanelSize[1] == 0:
             self.AspectRatio = 1.0
         else:
             self.AspectRatio = float(self.PanelSize[0]) / self.PanelSize[1]
+		
+        if self.PanelSize[0] < 1 or self.PanelSize[0] < 1:
+            self.PanelSize = array((1, 1),Int32)
+		
         self.MakeNewBuffers()
         self.Draw()
         
