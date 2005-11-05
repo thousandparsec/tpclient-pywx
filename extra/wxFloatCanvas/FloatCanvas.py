@@ -1560,6 +1560,8 @@ class FloatCanvas(wx.Panel):
     def MakeNewBuffers(self):
         self._BackgroundDirty = True
         # Make new offscreen bitmap:
+		if self.PanelSize[0] < 1 or self.PanelSize[0] < 1:
+			self.PanelSize = (1, 1)
         self._Buffer = wx.EmptyBitmap(*self.PanelSize)
         #dc = wx.MemoryDC()
         #dc.SelectObject(self._Buffer)
