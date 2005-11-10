@@ -191,8 +191,8 @@ class Application(object):
 		"""
 		self.gui.Show(self.gui.connectto)
 
-		self.gui.start()
 		self.network.start()
+		self.gui.start()
 
 	def ConfigDisplay(self):
 		"""\
@@ -289,21 +289,17 @@ class GUI(wx.App, threading.Thread):
 
 	def __init__(self, application):
 		threading.Thread.__init__(self)
-		wx.App.__init__(self)
-		
+		if wx.Platform in ('__WXMSW__', '__WXMAC__'):
+			wx.App.__init__(self, redirect = 1, filename = 'errors')
+			
+			self.start = self.run
+		else:
+			wx.App.__init__(self)
+
 		self.application = application
 		self.exit = False
 
 		self.current = None
-
-		# Don't want to show the stdin/stdout stuff
-		if wx.Platform in ('__WXMSW__', '__WXMAC__'):
-			class Null(object):
-				def write(self, *args, **kw):
-					pass
-				def flush(self, *args, **kw):
-					pass
-			sys.stdout = Null()
 
 		try:
 			wx.InitAllImageHandlers()
