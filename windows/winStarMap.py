@@ -108,7 +108,7 @@ class winStarMap(winBase):
 					if points:
 						C(object, Line(scale(points), LineColor="Grey", InForeground=True), as="path")
 					elif object.vel != (0, 0, 0):
-						C(object, CrossLine(scale((object.pos[0:2], object.vel[0:2])), 2, LineColor="Grey"), as="path")
+						C(object, CrossLine(scale(object.pos[0:2]), scale(object.vel[0:2]), 3, LineColor="Grey"), as="path")
 						
 					parent = application.cache.objects[object.parent]
 					if parent.pos == object.pos:
@@ -218,7 +218,7 @@ class winStarMap(winBase):
 				self.Canvas.AddObject(path)
 				self.path = path
 			elif object.vel != (0, 0, 0): 
-				path = self.Create(object, CrossLine(scale((object.pos[0:2], object.vel[0:2])), 2, LineColor="Blue", InForeground=True))
+				path = self.Create(object, CrossLine(scale(object.pos[0:2]), scale(object.vel[0:2]), 3, LineColor="Blue", InForeground=True))
 				self.Canvas.AddObject(path)
 				self.path = path
 				
