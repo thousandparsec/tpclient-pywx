@@ -440,7 +440,7 @@ class Network(threading.Thread):
 				s += _("Any changes since last save have been lost.\n")
 				if getattr(self.connection, 'debug', False):
 					s += _("A traceback of the error was printed to the console.\n")
-					do_traceback()
+					utils.do_traceback()
 				self.application.Post(self.NetworkFailureEvent(s))
 
 	def Cleanup(self):
