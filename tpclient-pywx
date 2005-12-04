@@ -503,7 +503,7 @@ class Network(threading.Thread):
 		gui.Call(gui.Show, gui.update)
 		
 		# Create the cache
-		cache = Cache()
+		cache = self.application.cache #Cache()
 
 		# Get the features this server support
 		up("Looking for supported features...", mode="connecting")
@@ -620,7 +620,7 @@ class Network(threading.Thread):
 		
 			up("Got order description with id of %i (last modified at %s)..." % (id, time), add=1)
 
-		def get_all(name, get_ids, get, cache, feature, up=up):
+		def get_all(name, get_ids, get, cache, features, feature, up=up):
 
 			up("Getting %s..." % name, of=0)
 			iter = get_ids(iter=True)
@@ -640,7 +640,7 @@ class Network(threading.Thread):
 
 					cache[id] = (time, frame)
 
-				elif feature in cache.features:
+				elif feature in features:
 					up("Skipping remaining as already cached!")
 					break
 				
@@ -653,20 +653,20 @@ class Network(threading.Thread):
 
 		up("Getting design objects...", mode="designs")
 		get_all("Categories", self.connection.get_category_ids, self.connection.get_categories, 
-					cache.categories, constants.FEATURE_ORDERED_CATEGORY)
+					cache.categories, cache.features, constants.FEATURE_ORDERED_CATEGORY)
 
 		get_all("Designs", self.connection.get_design_ids, self.connection.get_designs, 
-					cache.designs, constants.FEATURE_ORDERED_DESIGN)
+					cache.designs, cache.features, constants.FEATURE_ORDERED_DESIGN)
 					
 		get_all("Components", self.connection.get_component_ids, self.connection.get_components, 
-					cache.components, constants.FEATURE_ORDERED_COMPONENT)
+					cache.components, cache.features, constants.FEATURE_ORDERED_COMPONENT)
 		
 		get_all("Properties", self.connection.get_property_ids, self.connection.get_properties, 
-					cache.properties, constants.FEATURE_ORDERED_PROPERTY)
+					cache.properties, cache.features, constants.FEATURE_ORDERED_PROPERTY)
 				
 		up("Getting all other objects...", mode="remaining")
 		get_all("Resources", self.connection.get_resource_ids, self.connection.get_resources, 
-					cache.resources, constants.FEATURE_ORDERED_RESOURCE)
+					cache.resources, cache.features, constants.FEATURE_ORDERED_RESOURCE)
 
 		gui.Call(gui.Show, gui.main)
 
