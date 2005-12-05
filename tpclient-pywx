@@ -461,7 +461,7 @@ class Network(threading.Thread):
 		if hasattr(self, func):
 			getattr(self, func)(event)
 
-	def ConnectTo(self, host, port, username, password, debug=False):
+	def ConnectTo(self, host, username, password, debug=False):
 		"""\
 		Connect to a given host using a certain username and password.
 		"""
@@ -473,7 +473,7 @@ class Network(threading.Thread):
 		gui.Call(gui.Show, gui.update)
 		
 		up("Connecting...", mode="connecting")
-		if self.connection.setup(host=host, port=port, debug=debug):
+		if self.connection.setup(host=host, debug=debug):
 			s  = _("The client was unable to connect to the host.\n")
 			s += _("This could be because the server is down or there is a problem with the network.\n")
 			self.application.Post(self.NetworkFailureEvent(s))

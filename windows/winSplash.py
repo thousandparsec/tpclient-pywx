@@ -8,5 +8,11 @@ class winSplash(wx.SplashScreen):
 
 		self.application = application
 		
-	def Post(self, event):
+		self.Bind(wx.EVT_CLOSE, self.OnClose)
+	
+	def Post(self, evt):
 		pass
+
+	def OnClose(self, evt):
+		if self.application.gui.current == self:
+			self.application.gui.current = None

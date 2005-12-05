@@ -99,15 +99,7 @@ class winConnect(winMainBase):
 		if host == "" or username == "":
 			return
 
-		temp = string.split(host, ":", 1)
-		if len(temp) == 1:
-			host = host
-			port = 6923
-		else:
-			host, port = temp
-			port = int(port)
-
-		self.application.network.Call(self.application.network.ConnectTo, host, port, username, password, debug=self.config['debug'])
+		self.application.network.Call(self.application.network.ConnectTo, host, username, password, debug=self.config['debug'])
 	
 	# Config Functions -----------------------------------------------------------------------------
 	def ConfigDefault(self, config=None):
