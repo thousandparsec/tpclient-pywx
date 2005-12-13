@@ -103,6 +103,8 @@ class winMain(winMDIBase):
 		winSystem(application, self)
 
 	def Menu(self, source):
+		bar = wx.MenuBar()
+
 		# File Menu
 		file = wx.Menu()
 		file.Append( ID_OPEN, _("Connect to Game\tCtrl-O"), _("Connect to a diffrent Game") )
@@ -137,11 +139,10 @@ class winMain(winMDIBase):
 	
 		help = wx.Menu()
 		
-		bar = wx.MenuBar()
 		bar.Append( file, _("File") )
 		bar.Append( stat, _("Statistics") )
 		bar.Append( win,  _("Windows") )
-		bar.Append( help, _("&Help") )
+		bar.Append( help, _("Help") )
 	
 		wx.EVT_MENU(source, ID_OPEN,	self.OnConnect)
 		wx.EVT_MENU(source, ID_UNIV,	self.UpdateCache)
@@ -170,7 +171,7 @@ class winMain(winMDIBase):
 				window.Show()
 
 			if wx.Platform == "__WXMAC__":
-				window.SetMenuBar(self.current.Menu())
+				window.SetMenuBar(self.Menu(window))
 
 		self.SetSizeHard(self.config['size'])
 		winMDIBase.Show(self)
@@ -352,6 +353,9 @@ class winMain(winMDIBase):
 		"""\
 		Update the Display because it's changed externally.
 		"""
+		if evt != None:
+			evt.Skip()
+
 		if not hasattr(self, 'ConfigWidgets'):
 			return
 		

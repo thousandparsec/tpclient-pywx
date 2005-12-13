@@ -94,6 +94,8 @@ class winBaseMixIn(object):
 		evt.Veto(True)
 
 	def OnRaise(self, evt):
+		evt.Skip()
+		
 		# Raise the other windows when we raise this window
 		if not evt.GetActive():
 			return
@@ -274,6 +276,9 @@ class winConfigMixIn(ConfigMixIn):
 		"""\
 		Update the Display because it's changed externally.
 		"""
+		if evt != None:
+			evt.Skip()
+
 		if not hasattr(self, 'ConfigWidgets'):
 			return
 		
@@ -325,15 +330,22 @@ class winMDISubBase(winConfigMixIn, winBaseMixIn, wx.MDIChildFrame):
 		winBaseMixIn.__init__(self, application, parent)
 
 # These give a non-MDI interface under other operating systems
+#class winNormalBase(ConfigMixIn, winBaseMixIn, wx.Frame):
 class winNormalBase(ConfigMixIn, winBaseMixIn, wx.Frame):
 	def __init__(self, application):
 		wx.Frame.__init__(self, None, -1, 'TP: ' + self.title, wx.DefaultPosition, wx.DefaultSize, \
 				wx.DEFAULT_FRAME_STYLE)
 		winBaseMixIn.__init__(self, application, None)
 
-class winNormalSubBase(winConfigMixIn, winBaseMixIn, wx.MiniFrame):
+class winMiniSubBase(winConfigMixIn, winBaseMixIn, wx.MiniFrame):
 	def __init__(self, application, parent):
 		wx.MiniFrame.__init__(self, parent, -1, 'TP: ' + self.title, wx.DefaultPosition, wx.DefaultSize, \
+				wx.DEFAULT_FRAME_STYLE|wx.FRAME_NO_TASKBAR|wx.TAB_TRAVERSAL)
+		winBaseMixIn.__init__(self, application, parent)
+
+class winNormalSubBase(winConfigMixIn, winBaseMixIn, wx.Frame):
+	def __init__(self, application, parent):
+		wx.Frame.__init__(self, parent, -1, 'TP: ' + self.title, wx.DefaultPosition, wx.DefaultSize, \
 				wx.DEFAULT_FRAME_STYLE|wx.FRAME_NO_TASKBAR|wx.TAB_TRAVERSAL)
 		winBaseMixIn.__init__(self, application, parent)
 
@@ -341,8 +353,12 @@ winMainBase = winNormalBase
 
 if wx.Platform != '__WXMSW__':
 	winMDIBase = winNormalBase
+
+if wx.Platform == '__WXMSW__':
+	winBase = winMDISubBase
+elif wx.Platform == '__WXMAC__':
 	winBase = winNormalSubBase
 else:
-	winBase = winMDISubBase
+	winBase = winMiniSubBase
 
 __all__ = ['winMainBase', 'winBase', 'winMDIBase', '__all__']

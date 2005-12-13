@@ -215,7 +215,8 @@ class winMessage(winBase):
 
 	def Show(self, show=True):
 		if show:
-			self.timer.Start(50)
+			if wx.Platform != '__WXMAC__':
+				self.timer.Start(50)
 			self.Bind(wx.EVT_TIMER, self.OnIdle, self.timer)
 			winBase.Show(self)
 		else:

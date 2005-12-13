@@ -286,12 +286,10 @@ class GUI(wx.App, threading.Thread):
 			return "<SelectOrderEvent id=%s slots=%s>" % (self.id, self.slots)
 
 	######################################
-
 	def __init__(self, application):
 		threading.Thread.__init__(self)
 		if wx.Platform in ('__WXMSW__', '__WXMAC__'):
 			wx.App.__init__(self, redirect = wx.Platform in ('__WXMAC__'), filename = 'errors')
-			
 			self.start = self.run
 		else:
 			wx.App.__init__(self)

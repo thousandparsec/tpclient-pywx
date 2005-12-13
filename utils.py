@@ -20,10 +20,6 @@ def do_traceback():
 	if hasattr(sys.stderr, "flush"):
 		sys.stderr.flush()
 
-	f = open("error", "a+")
-	f.write(string.join(traceback.format_exception(type, val, tb), ''))
-	f.close()
-
 DEBUG_NETWORK = "NETWORK:"
 DEBUG_MAIN = "MAIN:"
 DEBUG_GUI = "GUI:"

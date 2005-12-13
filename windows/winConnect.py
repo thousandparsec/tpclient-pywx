@@ -16,10 +16,12 @@ from utils import *
 
 class winConnect(winMainBase):
 	title = _("Connect")
+
+	def Post(*args):
+		pass
 	
 	def __init__(self, application):
 		winMainBase.__init__(self, application)
-
 		panel = wx.Panel(self, -1)
 
 		# The title
@@ -246,6 +248,9 @@ class winConnect(winMainBase):
 		"""\
 		Updates the config details using external sources.
 		"""
+		if evt != None:
+			evt.Skip()
+
 		if not hasattr(self, 'ConfigWidgets'):
 			return
 		
