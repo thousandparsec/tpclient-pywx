@@ -384,7 +384,7 @@ class winMain(winMDIBase):
 	# Menu bar options
 	##################################################################
 	def OnConnect(self, evt):
-		self.application.Show(self.application.connectto)
+		self.application.gui.Show(self.application.gui.connectto)
 
 	def OnConfig(self, evt):
 		self.application.ConfigDisplay()
