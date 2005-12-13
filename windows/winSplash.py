@@ -14,5 +14,8 @@ class winSplash(wx.SplashScreen):
 		pass
 
 	def OnClose(self, evt):
-		if self.application.gui.current == self:
-			self.application.gui.current = None
+		if hasattr(self.application, 'gui') and hasattr(self.application.gui, 'current'):
+			if self.application.gui.current == self:
+				self.application.gui.current = None
+		else:
+			evt.Veto(True)

@@ -111,7 +111,10 @@ class winBaseMixIn(object):
 			getattr(self, func)(event)
 
 		for window in self.children.values():
-			window.Post(event)
+			try:
+				window.Post(event)
+			except Exception, e:
+				print e
 
 	def Hide(self):
 		# Hide this window and it's children
@@ -338,6 +341,7 @@ winMainBase = winNormalBase
 
 if wx.Platform != '__WXMSW__':
 	winMDIBase = winNormalBase
+	winBase = winNormalSubBase
 else:
 	winBase = winMDISubBase
 

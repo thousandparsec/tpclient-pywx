@@ -73,7 +73,7 @@ class winMain(winMDIBase):
 	title = _("Main Windows")
 
 	from defaults import winMainDefaultPosition as DefaultPosition
-	from defaults import winMainDefaultWidth as DefaultWidth
+	from defaults import winMainDefaultSize as DefaultSize
 	from defaults import winMainDefaultShow as DefaultShow
 
 	def __init__(self, application):
@@ -172,16 +172,16 @@ class winMain(winMDIBase):
 			if wx.Platform == "__WXMAC__":
 				window.SetMenuBar(self.current.Menu())
 
+		self.SetSizeHard(self.config['size'])
 		winMDIBase.Show(self)
 		
 		wx.CallAfter(self.ShowTips)
 
 	def SetSizeHard(self, pos):
-		winMDIBase.SetSizeHard(self, pos)
+		winMDIBase.SetSize(self, pos)
 		if wx.Platform != "__WXMSW__":
 			self.SetClientSize(wx.Size(-1,0))
-			winMDIBase.SetSizeHard(self.GetSize())
-
+			winMDIBase.SetSizeHard(self, (-1, self.GetSize()[1]))
 
 	# Config Functions -----------------------------------------------------------------------------
 	def ConfigDefault(self, config=None):
@@ -219,8 +219,8 @@ class winMain(winMDIBase):
 			if not isinstance(config['size'], int):
 				raise ValueError('Config-%s: size %s is not valid' % (self, config['size']))
 		except (ValueError, KeyError), e:
-			if self.DefaultWidth.has_key((SCREEN_X, SCREEN_Y)):
-				config['size'] = self.DefaultWidth[(SCREEN_X, SCREEN_Y)]
+			if self.DefaultSize.has_key((SCREEN_X, SCREEN_Y)):
+				config['size'] = self.DefaultSize[(SCREEN_X, SCREEN_Y)]
 			else:
 				print "Config-%s: Did not find a default size for your resolution" % (self,)
 				if wx.Platform != "__WXMSW__":
@@ -262,8 +262,7 @@ class winMain(winMDIBase):
 		if self.application.gui.current is self:
 			self.config['show'] = self.IsShown()
 			self.config['position'] = self.GetPosition()
-			self.config['width'] = self.GetSize()
-
+			self.config['size'] = self.GetSize()
 	
 	def ConfigDisplay(self, panel, sizer):
 		"""\
@@ -361,7 +360,7 @@ class winMain(winMDIBase):
 	
 		x_box.SetValue(self.config['position'][0])
 		y_box.SetValue(self.config['position'][1])
-		width.SetValue(self.config['width'])
+		width.SetValue(self.config['size'][0])
 
 	def OnConfigDisplayX(self, evt):
 		self.SetPosition(wx.Point(evt.GetInt(), -1))
@@ -381,7 +380,7 @@ class winMain(winMDIBase):
 	# Menu bar options
 	##################################################################
 	def OnConnect(self, evt):
-		self.application.connect()
+		self.application.Show(self.application.connectto)
 
 	def OnConfig(self, evt):
 		self.application.ConfigDisplay()
