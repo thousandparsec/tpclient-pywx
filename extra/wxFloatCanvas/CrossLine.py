@@ -3,9 +3,11 @@ from FloatCanvas import Line
 import math
 
 try:
-	from Numeric import array, dot, sum, asarray
+	from Numeric import array, empty, dot, sum, asarray, Float
 except ImportError:
-	from numarray import array, dot, sum, asarray
+	from numarray import array, dot, sum, asarray, Float
+	def empty(shape, typecode):
+		return array(shape=shape, typecode=typecode)
 
 t = array([[0,-1],[1,0]])
 
@@ -17,9 +19,9 @@ class CrossLine(Line):
 				 InForeground = False):
 		self.Number = Number
 
-		Points = array(shape=(Number*4,2))
+		Points = empty((Number*4,2), Float)
 		Points[0] = start
-		Points[1] = array(start)+array(delta)
+		Points[1] = array(start,Float)+array(delta,Float)
 		Points[2] = Points[3] = Points[1]
 
 		for i in range(4, len(Points), 4):
@@ -35,8 +37,7 @@ class CrossLine(Line):
 		Line.__init__(self, Points, LineColor, LineStyle, LineWidth, InForeground)
 
 	def _Draw(self, dc, WorldToPixel, ScaleWorldToPixel, HTdc=None):
-	
-		Points = array(WorldToPixel(self.Points))
+		Points = WorldToPixel(self.Points)
 		
 		pslop = dot(Points[1]-Points[0], t)
 		length = math.sqrt(sum(pslop**2))
