@@ -69,7 +69,7 @@ class TimeStatusBar(wx.StatusBar):
 	def SetEndTime(self, endtime):
 		self.endtime = endtime
 
-class winMain(winMainBase):
+class winMain(winMDIBase):
 	title = _("Main Windows")
 
 	from defaults import winMainDefaultPosition as DefaultPosition
@@ -77,7 +77,7 @@ class winMain(winMainBase):
 	from defaults import winMainDefaultShow as DefaultShow
 
 	def __init__(self, application):
-		winMainBase.__init__(self, application)
+		winMDIBase.__init__(self, application)
 
 		self.SetMenuBar(self.Menu(self))
 
@@ -101,9 +101,6 @@ class winMain(winMainBase):
 
 		from windows.winSystem import winSystem
 		winSystem(application, self)
-
-		if wx.Platform != "__WXMSW__":
-			self.SetClientSize(wx.Size(-1,0))
 
 	def Menu(self, source):
 		# File Menu
@@ -175,9 +172,16 @@ class winMain(winMainBase):
 			if wx.Platform == "__WXMAC__":
 				window.SetMenuBar(self.current.Menu())
 
-		winMainBase.Show(self)
+		winMDIBase.Show(self)
 		
 		wx.CallAfter(self.ShowTips)
+
+	def SetSizeHard(self, pos):
+		winMDIBase.SetSizeHard(self, pos)
+		if wx.Platform != "__WXMSW__":
+			self.SetClientSize(wx.Size(-1,0))
+			winMDIBase.SetSizeHard(self.GetSize())
+
 
 	# Config Functions -----------------------------------------------------------------------------
 	def ConfigDefault(self, config=None):
@@ -212,14 +216,17 @@ class winMain(winMainBase):
 
 		# How big is the window
 		try:
-			if not isinstance(config['width'], int):
-				raise ValueError('Config-%s: width %s is not valid' % (self, config['width']))
+			if not isinstance(config['size'], int):
+				raise ValueError('Config-%s: size %s is not valid' % (self, config['size']))
 		except (ValueError, KeyError), e:
 			if self.DefaultWidth.has_key((SCREEN_X, SCREEN_Y)):
-				config['width'] = self.DefaultWidth[(SCREEN_X, SCREEN_Y)]
+				config['size'] = self.DefaultWidth[(SCREEN_X, SCREEN_Y)]
 			else:
-				print "Config-%s: Did not find a default width for your resolution" % (self,)
-				config['width'] = 100
+				print "Config-%s: Did not find a default size for your resolution" % (self,)
+				if wx.Platform != "__WXMSW__":
+					config['size'] = self.DefaultPosition[(1024, 768)]
+				else:
+					config['size'] = (SCREEN_X, SCREEN_Y)
 
 		return config
 
@@ -245,10 +252,7 @@ class winMain(winMainBase):
 
 		self.SetPosition(config['position'])
 
-		self.SetSize((config['width'], -1))
-		if wx.Platform != "__WXMSW__":
-			self.SetClientSize(wx.Size(-1,0))
-
+		self.SetSizeHard(config['size'])
 		self.ConfigDisplayUpdate(None)
 	
 	def ConfigUpdate(self):
@@ -258,7 +262,8 @@ class winMain(winMainBase):
 		if self.application.gui.current is self:
 			self.config['show'] = self.IsShown()
 			self.config['position'] = self.GetPosition()
-			self.config['width'] = self.GetSize()[0]
+			self.config['width'] = self.GetSize()
+
 	
 	def ConfigDisplay(self, panel, sizer):
 		"""\

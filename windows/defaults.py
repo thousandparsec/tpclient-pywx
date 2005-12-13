@@ -17,8 +17,8 @@ if wx.Platform == '__WXMSW__':
 	winMessageDefaultSize = {(1024, 768): (396, 163), }
 	winMessageDefaultShow = {(1024, 768): True, }
 	
-	winStarmapDefaultPosition = {(1024, 768): (426, 0), }
-	winStarmapDefaultSize = {(1024, 768): (600, 523), }
+	winStarMapDefaultPosition = {(1024, 768): (426, 0), }
+	winStarMapDefaultSize = {(1024, 768): (600, 523), }
 	winStarMapDefaultShow = {(1024, 768): True, }
 	
 	winSystemDefaultPosition = {(1024, 768): (769, 523), }

@@ -311,30 +311,34 @@ class winConfigMixIn(ConfigMixIn):
 # These give a MDI interface under windows
 class winMDIBase(ConfigMixIn, winBaseMixIn, wx.MDIParentFrame):
 	def __init__(self, application):
-		wx.MDIParentFrame.__init__(self, None, -1, 'TP: ' + self.title, wx.DefaultPosition, wx.DefaultSize, wx.DEFAULT_FRAME_STYLE)
+		wx.MDIParentFrame.__init__(self, None, -1, 'TP: ' + self.title, wx.DefaultPosition, wx.DefaultSize, \
+				wx.DEFAULT_FRAME_STYLE)
 		winBaseMixIn.__init__(self, application, None)
 
 class winMDISubBase(winConfigMixIn, winBaseMixIn, wx.MDIChildFrame):
 	def __init__(self, application, parent):
-		wx.MDIChildFrame.__init__(self, parent, -1, 'TP: ' + self.title, wx.DefaultPosition, wx.DefaultSize, wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL)
+		wx.MDIChildFrame.__init__(self, parent, -1, 'TP: ' + self.title, wx.DefaultPosition, wx.DefaultSize, \
+				wx.TAB_TRAVERSAL|wx.RESIZE_BORDER)
 		winBaseMixIn.__init__(self, application, parent)
 
 # These give a non-MDI interface under other operating systems
 class winNormalBase(ConfigMixIn, winBaseMixIn, wx.Frame):
 	def __init__(self, application):
-		wx.Frame.__init__(self, None, -1, 'TP: ' + self.title, wx.DefaultPosition, wx.DefaultSize, wx.DEFAULT_FRAME_STYLE)
+		wx.Frame.__init__(self, None, -1, 'TP: ' + self.title, wx.DefaultPosition, wx.DefaultSize, \
+				wx.DEFAULT_FRAME_STYLE)
 		winBaseMixIn.__init__(self, application, None)
 
 class winNormalSubBase(winConfigMixIn, winBaseMixIn, wx.MiniFrame):
 	def __init__(self, application, parent):
-		wx.MiniFrame.__init__(self, parent, -1, 'TP: ' + self.title, wx.DefaultPosition, wx.DefaultSize, wx.DEFAULT_FRAME_STYLE|wx.FRAME_NO_TASKBAR|wx.TAB_TRAVERSAL)
+		wx.MiniFrame.__init__(self, parent, -1, 'TP: ' + self.title, wx.DefaultPosition, wx.DefaultSize, \
+				wx.DEFAULT_FRAME_STYLE|wx.FRAME_NO_TASKBAR|wx.TAB_TRAVERSAL)
 		winBaseMixIn.__init__(self, application, parent)
 
-if wx.Platform == '__WXMSW__':
-	winMainBase = winMDIBase
-	winBase = winMDISubBase
-else:
-	winMainBase = winNormalBase
-	winBase = winNormalSubBase
+winMainBase = winNormalBase
 
-__all__ = ['winMainBase', 'winBase', '__all__']
+if wx.Platform != '__WXMSW__':
+	winMDIBase = winNormalBase
+else:
+	winBase = winMDISubBase
+
+__all__ = ['winMainBase', 'winBase', 'winMDIBase', '__all__']
