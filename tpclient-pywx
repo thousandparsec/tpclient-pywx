@@ -18,155 +18,12 @@ from types import *
 import utils
 from utils import debug, DEBUG_MAIN, DEBUG_GUI, DEBUG_NETWORK
 from tp.netlib import Connection, failed, constants
+from tp.client.cache import Cache
 
 def make(thread, method):
 	def t(*args, **kw):
 		thread.Call(method, *args, **kw)
 	return t
-
-class Cache(object):
-	"""\
-	This is the a cache of the data downloaded from the network. 
-	
-	It can be pickled and restored at a later date to preserve the data accross application runs.
-	"""
-
-	class CacheEvent(object):
-		"""\
-		Raised when the game cache is made dirty. Contains a reference to what was updated.
-		"""
-		def __init__(self, what, action, id, *args, **kw):
-			if what in Cache.readonly:
-				raise ValueError("Can not change that!")
-			elif not what in Cache.readwrite:
-				raise ValueError("Invalid value (%s) for what" % (what,))
-			else:
-				self.what = what
-
-			if not action in Cache.actions:
-				raise ValueError("Invalid action (%s)" % (action,))
-			else:
-				self.action = action
-
-			self.id = id
-
-			args = list(args)	
-			if what in Cache.compound:
-				if len(args) == 2:
-					self.slot = args.pop(0)
-				elif kw.has_key('slot'):
-					self.slot = kw['slot']
-				else:
-					raise TypeError("A slot value is required for compound types.")
-			
-			if len(args) == 1:
-				self.change = args.pop(0)
-			elif kw.has_key('change'):
-				self.change = kw['change']
-			else:
-				raise TypeError("The actual change needs to be added.")
-
-		def __str__(self):
-			if not self.what:
-				return "<%s full-update>" % (self.__class__,)
-			elif hasattr(self, 'slot'):
-				return "<%s %s %s id=%i slot=%i>" % (self.__class__, self.what, self.action, self.id, self.slot)
-			else:
-				return "<%s %s %s id=%i>" % (self.__class__, self.what, self.action, self.id)
-		
-	class CacheDirtyEvent(CacheEvent):
-		"""\
-		Raised when the game cache is made dirty. Contains a reference to what was updated.
-		"""
-		pass
-
-	class CacheUpdateEvent(CacheEvent):
-		"""\
-		Raised when the game cache is changed. Contains a reference to what was updated. 
-		If the what is None a new cache has been created.
-		"""
-		def __init__(self, what, *args, **kw):
-			if what == None:
-				self.what = None
-			else:
-				CacheEvent.__init__(self, what, *args, **kw)
-
-	readonly = ("features", "objects", "orders_probe", "boards", "resources", "components", "properties", "players", "resources")
-	readwrite = ("orders", "messages", "categories", "designs")
-	actions = ("create", "remove", "change")
-	compound = ("orders", "messages")
-	
-	def __init__(self):
-		class ChangeDict(dict):
-			"""\
-			A simple dictionary which also stores the "times" an object was last updated.
-
-			Used so that we only upload/download items which have changed.
-			"""
-			def __init__(self):
-				dict.__init__(self)
-				self.times = {}
-			
-			def __setitem__(self, key, value):
-				"""\
-				This set item is special, it only takes keys of the form,
-				(<last modified time>, <normal key>)
-				"""
-				if type(value) is TupleType and len(value) == 2:
-					self.times[key] = value[0]
-					value = value[1]
-				else:
-					self.times[key] = -1
-				dict.__setitem__(self, key, value)
-		
-			def __delitem__(self, key):
-				del self.times[key]
-				dict.__delitem__(self, key)
-
-		# Features
-		self.features		= []
-
-		# The object stuff
-		self.objects		= ChangeDict()
-		self.orders			= ChangeDict()
-		self.orders_probe	= ChangeDict()
-
-		# The message boards
-		self.boards			= ChangeDict()
-		self.messages		= ChangeDict()
-
-		# Design stuff
-		self.categories		= ChangeDict()
-		self.designs		= ChangeDict()
-		self.components		= ChangeDict()
-		self.properties		= ChangeDict()
-
-		self.players		= ChangeDict()
-		self.resources		= ChangeDict()
-
-	def apply(self, evt):
-		if not isinstance(evt, self.CacheDirtyEvent):
-			raise TypeError("I can only accept CacheDirtyEvents")
-		
-		if not evt.what in Cache.compound:
-			if evt.action == "create" or evt.action == "change":
-				getattr(self, evt.what)[evt.id] = (-1, evt.change)
-			elif evt.action == "remove":
-				del getattr(self, evt.what)[evt.id]
-		else:
-			d = getattr(self, evt.what)[evt.id]
-			if evt.action == "create":
-				if evt.slot == -1:
-					d.append(evt.change)
-				else:
-					d.insert(evt.slot, evt.change)
-					
-			elif evt.action == "change":
-				d[evt.slot] = evt.change
-			elif evt.action == "remove":
-				del d[evt.slot]
-
-		evt.__class__ = self.CacheUpdateEvent
 
 class Application(object):
 	"""
@@ -180,7 +37,7 @@ class Application(object):
 		self.gui = GUI(self)
 		self.network = Network(self)
 
-		self.cache = Cache()
+		self.cache = None
 		
 		# Load the Configuration
 		self.ConfigLoad()
@@ -494,185 +351,36 @@ class Network(threading.Thread):
 			self.application.Post(self.NetworkFailureEvent(s))
 			return
 
+		# Create a new cache
+		key = host
+
+		p = ['tp://', 'tps://', 'http://', 'https://']
+		found = False
+		for p in p:
+			if key.startswith(p):
+				found = True
+				break
+		if not found:
+			key = 'tp://' + key
+		if key.find('@') == -1:
+			p, s = key.split('//', 1)
+			key = "%s//%s@%s" % (p, username, s)
+
+		self.application.cache = Cache(key)
 		self.CacheUpdate()
 
 	def CacheUpdate(self):
 		gui = self.application.gui
-		up = make(gui, gui.update.Update)
+		callback = make(gui, gui.update.Update)
 
 		# Show the update window
 		gui.Call(gui.Show, gui.update)
 		
-		# Create the cache
-		cache = self.application.cache #Cache()
-
-		# Get the features this server support
-		up("Looking for supported features...", mode="connecting")
-		cache.features = self.connection.features()
-		debug(DEBUG_NETWORK, "Features:", cache.features)
+		self.application.cache.update(self.connection, callback)
+		# Save the cache now we have a consistant state
+		self.application.cache.save()
 	
-		# Boards and objects are special cases in which we have a sub-object to get
-	
-		# Get all the objects
-		# -----------------------------------------------------------------------------------
-		up("Getting objects...", mode="objects")
-		iter = self.connection.get_object_ids(iter=True)
-		
-		for id, time in iter:
-			up("Getting object with id of %i (last modified at %s)..." % (id, time), of=iter.total)
-
-			if not cache.objects.has_key(id) or time > cache.objects.times[id]:
-				object = self.connection.get_objects(id=id)[0]
-			
-				# Did we download the object okay?
-				if failed(object):
-					# Clean up the object
-					if cache.objects.has_key(id):
-						del cache.objects[id]
-
-						if cache.orders.has_key(id):
-							del cache.orders[id]
-					continue
-
-				cache.objects[id] = (time, object)
-
-				# Download the orders from this object
-				cache.orders[id] = []
-				for order in self.connection.get_orders(id, range(0, object.order_number)):
-					if failed(order):
-						break
-					cache.orders[id].append(order)
-
-			elif constants.FEATURE_ORDERED_OBJECT in cache.features:
-				up("Skipping remaining as already cached!")
-				break
-			
-			up("Got object with id of %i (last modified at %s)..." % (id, time), add=1)
-
-		print "Objects ["
-		for id,o in cache.objects.items():
-			print " %s : %s ," % (id, o),
-		print "]"
-
-		print "Building two way Universe Tree for speed"
-		def build(object, parent=None, cache=cache):
-			if parent:
-				object.parent = parent.id
-			for id in object.contains:
-				build(cache.objects[id], object)
-		build(cache.objects[0])
-
-		# Get all the boards 
-		# -----------------------------------------------------------------------------------
-		up("Getting boards...", mode="boards")
-		iter = self.connection.get_board_ids(iter=True)
-		
-		for id, time in iter:
-			up("Getting board with id of %i (last modified at %s)..." % (id, time), of=iter.total)
-
-			if not cache.boards.has_key(id) or time > cache.boards.times[id]:
-				board = self.connection.get_boards(id=id)[0]
-
-				# Did we download the board okay?
-				if failed(board):
-					# Clean up the board
-					if cache.boards.has_key(id):
-						del cache.boards[id]
-
-						if cache.messages.has_key(id):
-							del cache.messages[id]
-					continue
-
-				cache.boards[id] = (time, board)
-
-				# Download the orders from this object
-				cache.messages[id] = []
-				for message in self.connection.get_messages(id, range(0, board.number)):
-					if failed(message):
-						break
-					cache.messages[id].append(message)
-
-			elif constants.FEATURE_ORDERED_BOARD in cache.features:
-				up("Skipping remaining as already cached!")
-				break
-				
-			up("Got board with id of %i (last modified at %s)..." % (id, time), add=1)
-
-		print "Boards ["
-		for id,o in cache.boards.items():
-			print " %s : %s ," % (id, o)
-		print "]"
-
-		# Get all the order descriptions
-		# -----------------------------------------------------------------------------------
-		up("Getting order descriptions...", mode="order_descs")
-		iter = self.connection.get_orderdesc_ids(iter=True)
-		
-		for id, time in iter:
-			up("Getting board with id of %i (last modified at %s)..." % (id, time), of=iter.total)
-
-			desc = self.connection.get_orderdescs(id=id)[0]
-
-			# Did we download the board okay?
-			if not failed(desc):
-				desc.register()
-			else:
-				print "Warning: failed to get %i" % id, desc
-		
-			up("Got order description with id of %i (last modified at %s)..." % (id, time), add=1)
-
-		def get_all(name, get_ids, get, cache, features, feature, up=up):
-
-			up("Getting %s..." % name, of=0)
-			iter = get_ids(iter=True)
-			
-			for id, time in iter:
-				up("Getting %s with id of %i (last modified at %s)..." % (name, id, time), of=iter.total)
-
-				if not cache.has_key(id) or time > cache.times[id]:
-					frame = get(id=id)[0]
-
-					# Did we download the board okay?
-					if failed(frame):
-						print "Failed to get %i removing" % id
-						if cache.has_key(id):
-							del cache[id]
-						continue
-
-					cache[id] = (time, frame)
-
-				elif feature in features:
-					up("Skipping remaining as already cached!")
-					break
-				
-				up("Got %s with id of %i (last modified at %s)..." % (name, id, time), add=1)
-
-			print name, "[",
-			for object in cache.values():
-				print " <'%s' %i>" % (object.name, object.id)
-			print "]"
-
-		up("Getting design objects...", mode="designs")
-		get_all("Categories", self.connection.get_category_ids, self.connection.get_categories, 
-					cache.categories, cache.features, constants.FEATURE_ORDERED_CATEGORY)
-
-		get_all("Designs", self.connection.get_design_ids, self.connection.get_designs, 
-					cache.designs, cache.features, constants.FEATURE_ORDERED_DESIGN)
-					
-		get_all("Components", self.connection.get_component_ids, self.connection.get_components, 
-					cache.components, cache.features, constants.FEATURE_ORDERED_COMPONENT)
-		
-		get_all("Properties", self.connection.get_property_ids, self.connection.get_properties, 
-					cache.properties, cache.features, constants.FEATURE_ORDERED_PROPERTY)
-				
-		up("Getting all other objects...", mode="remaining")
-		get_all("Resources", self.connection.get_resource_ids, self.connection.get_resources, 
-					cache.resources, cache.features, constants.FEATURE_ORDERED_RESOURCE)
-
 		gui.Call(gui.Show, gui.main)
-
-		# Update the cache
-		self.application.cache = cache
 		self.application.Post(self.application.cache.CacheUpdateEvent(None))
 		return
 

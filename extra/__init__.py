@@ -224,10 +224,12 @@ class wxSimpleValidator(wx.PyValidator):
 					return False
 
 		elif self.flag == wx.DIGIT_ONLY:
-			for x in val:
-				if x not in string.digits:
-					return False
-
+			try:
+				if val != '-':
+					long(val)
+				return True
+			except TypeError:
+				return False
 		return True
 
 	def OnChar(self, event):
@@ -239,6 +241,9 @@ class wxSimpleValidator(wx.PyValidator):
 			event.Skip()
 			return
 		if self.flag == wx.DIGIT_ONLY and chr(key) in string.digits:
+			event.Skip()
+			return
+		if self.flag == wx.DIGIT_ONLY and chr(key) in '-+':
 			event.Skip()
 			return
 		if not wx.Validator_IsSilent():
