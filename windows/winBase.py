@@ -7,6 +7,8 @@ and raising all the other windows when one is clicked.
 import wx
 import os.path
 
+import utils
+
 class Blank:
 	pass
 wx.local = Blank()
@@ -116,7 +118,7 @@ class winBaseMixIn(object):
 			try:
 				window.Post(event)
 			except Exception, e:
-				print e
+				utils.do_traceback()
 
 	def Hide(self):
 		# Hide this window and it's children

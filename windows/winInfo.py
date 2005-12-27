@@ -47,6 +47,7 @@ class winInfo(winBase):
 		self.SetSizer(top)
 
 	def OnSelectObject(self, evt):
+		print "winInfo SelectObject", evt
 		try:
 			object = self.application.cache.objects[evt.id]
 		except:
@@ -87,7 +88,8 @@ class winInfo(winBase):
 			if key == "ships":
 				s += "ships: "
 				for t, number in value:
-					s += "%s %s" % (number, ("Scouts, ", "Frigates, ", "Battleships, ")[t])
+					design = self.application.cache.designs[t]
+					s += "%s %s, " % (number, design.name)
 				s = s[:-2] + "\n"
 				continue
 
