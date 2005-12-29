@@ -16,39 +16,6 @@ except ImportError:
 from __init__ import version
 version = "%s.%s.%s" % version
 
-def link(a, b):
-	if os.path.isdir(a):
-		if hasattr(os, "symlink"):
-			os.symlink(a, b)
-		else:
-			shutil.copytree(a, b)
-	else:
-		if hasattr(os, "symlink"):
-			os.link(a, b)
-		else:
-			shutil.copy(a, b)
-
-def unlink(a):
-	if os.path.isdir(a) and not os.path.islink(a):
-		shutil.rmtree(a)
-	else:
-		os.unlink(a)
-
-if os.path.exists('CVS'):
-	base = [ \
-		(os.path.join('..', 'LICENSE'), 'LICENSE'),
-		(os.path.join('..', 'COPYING'), 'COPYING'),
-		(os.path.join('..', 'media'), os.path.join('graphics', 'media')),
-	]
-
-	for afile, bfile in base:
-		afile, bfile = os.path.abspath(afile), os.path.abspath(bfile)
-		try:
-			unlink(bfile)
-		except OSError, e:
-			print e
-		link(afile, bfile)
-
 excludes = [\
 	"Tkconstants","Tkinter","tcl", # TK/TCL
 	"pydoc", "unittest"]
@@ -64,10 +31,10 @@ setup(
 	url="http://www.thousandparsec.net",
 # Files to include
 	windows=[{
-		"script": "main.py",
+		"script": "tpclient-pywx",
 		"icon_resources": [(1, "graphics/icon.ico")],
 	}],
-	scripts=["main.py"],
+	scripts=["tpclient-pywx"],
 	packages=[ \
 		'.',
 		'windows',

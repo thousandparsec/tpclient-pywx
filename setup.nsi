@@ -14,7 +14,7 @@
   CRCCheck On 
  
   ;Output File Name 
-  OutFile "tpclient-pywx-0.0.9-setup.exe" 
+  OutFile "tpclient-pywx-0.1.1-setup.exe" 
  
   ;The Default Installation Directory 
   InstallDir "$PROGRAMFILES\Thousand Parsec\tpclient-pywx" 
@@ -52,7 +52,7 @@
   !insertmacro MUI_PAGE_INSTFILES
 
   ;Finish Page Configuration
-  !define MUI_FINISHPAGE_RUN "$INSTDIR\main.exe"
+  !define MUI_FINISHPAGE_RUN "$INSTDIR\tpclient-pywx.exe"
   !define MUI_FINISHPAGE_RUN_NOTCHECKED
 ;  !define MUI_FINISHPAGE_SHOWREADME "$INSTDIR\README"
 ;  !define MUI_FINISHPAGE_SHOWREADME_NOTCHECKED
@@ -91,7 +91,7 @@ Section "Files" Files
     
     ;Create shortcuts
     CreateDirectory "$SMPROGRAMS\$STARTMENU_FOLDER"
-    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\tpclient-pywx.lnk" "$INSTDIR\main.exe" "" "$INSTDIR\main.exe" 0 
+    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\tpclient-pywx.lnk" "$INSTDIR\tpclient-pywx.exe" "" "$INSTDIR\tpclient-pywx.exe" 0 
     CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Uninstall.lnk" "$INSTDIR\Uninstall.exe"
   
   !insertmacro MUI_STARTMENU_WRITE_END
