@@ -352,21 +352,7 @@ class Network(threading.Thread):
 			return
 
 		# Create a new cache
-		key = host
-
-		p = ['tp://', 'tps://', 'http://', 'https://']
-		found = False
-		for p in p:
-			if key.startswith(p):
-				found = True
-				break
-		if not found:
-			key = 'tp://' + key
-		if key.find('@') == -1:
-			p, s = key.split('//', 1)
-			key = "%s//%s@%s" % (p, username, s)
-
-		self.application.cache = Cache(key)
+		self.application.cache = Cache(Cache.key(host, username))
 		self.CacheUpdate()
 
 	def CacheUpdate(self):
