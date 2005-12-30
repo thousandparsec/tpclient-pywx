@@ -83,7 +83,27 @@ Section "Files" Files
   
   ;Store installation folder
   WriteRegStr HKCU "Software\Thousand Parsec\tpclient-pywx" "" $INSTDIR
-  
+
+  ;Store uninstall information
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\tpclient-pywx" \
+                 "UninstallString" "$INSTDIR\uninstall.exe"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\tpclient-pywx" \
+                 "DisplayName" "Thousand Parsec Client pywx"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\tpclient-pywx" \
+                 "DisplayIcon" "$INSTDIR\tpclient-pywx.exe"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\tpclient-pywx" \
+                 "DisplayVersion" "0.1.1"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\tpclient-pywx" \
+                 "URLInfoAbout" "http://www.thousandparsec.net/tp/"
+  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\tpclient-pywx" \
+                 "NoModify" 1
+  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\tpclient-pywx" \
+                 "NoRepair" 1
+  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\tpclient-pywx" \
+                 "VersionMajor" 1
+  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\tpclient-pywx" \
+                 "VersionMinor" 1
+
   ;Create uninstaller
   WriteUninstaller "$INSTDIR\Uninstall.exe"
   
@@ -133,6 +153,7 @@ Section "Uninstall"
     StrCmp $MUI_TEMP $SMPROGRAMS startMenuDeleteLoopDone startMenuDeleteLoop
   startMenuDeleteLoopDone:
 
+  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\tpclient-pywx"
   DeleteRegKey /ifempty HKCU "Software\Thousand Parsec\Client pywx"
   DeleteRegKey /ifempty HKCU "Software\Thousand Parsec"
 SectionEnd
