@@ -333,8 +333,14 @@ class winDesign(winBase):
 		print "OnCacheUpdate of winDesign..."
 
 		# Update the categories
-		designs = self.designscat.GetClientData(self.designscat.GetSelection())
-		comps = self.compscat.GetClientData(self.compscat.GetSelection())
+		if self.designscat.GetSelection() == -1:
+			designs = 0
+		else:
+			designs = self.designscat.GetClientData(self.designscat.GetSelection())
+		if self.compscat.GetSelection() == -1:
+			comps = 0
+		else:
+			comps = self.compscat.GetClientData(self.compscat.GetSelection())
 		
 		self.designscat.Clear()
 		self.compscat.Clear()
@@ -366,7 +372,10 @@ class winDesign(winBase):
 	def UpdateDesignList(self, evt=None):
 		print "Updating the Designs List"
 		
-		des = self.designscat.GetClientData(self.designscat.GetSelection())
+		if self.designscat.GetSelection() == -1:
+			des = 0
+		else:
+			des = self.designscat.GetClientData(self.designscat.GetSelection())
 		print "Currently selected category", des
 
 		self.designs.ClearAll()
@@ -381,7 +390,10 @@ class winDesign(winBase):
 
 	def UpdateCompList(self, evt=None):
 		print "Updating the Comps List"
-		comps = self.compscat.GetClientData(self.compscat.GetSelection())
+		if self.compscat.GetSelection() == -1:
+			comps = 0
+		else:
+			comps = self.compscat.GetClientData(self.compscat.GetSelection())
 		print "Currently selected category", comps
 
 		self.comps.ClearAll()

@@ -116,7 +116,7 @@ class winUpdate(winMainBase):
 			if isinstance(of, long):
 				slider.SetRange(of)
 
-			if add:
+			if add and slider.GetValue()+add < slider.GetRange():
 				slider.SetValue(slider.GetValue()+add)
 
 			if of != None or add:
