@@ -22,6 +22,7 @@ from tp.netlib import Connection, failed, constants
 from tp.client.threads import Application, NetworkThread
 from tp.client.cache import Cache
 
+
 def make(thread, method):
 	def t(*args, **kw):
 		thread.Call(method, *args, **kw)
@@ -233,9 +234,24 @@ class Network(NetworkThread):
 		self.application.Post(self.application.cache.CacheUpdateEvent(None))
 		return
 
-Application.GUIClass = GUI
-Application.NetworkClass = Network
-Application.ConfigFile = "pywx_preferences"
+_Application = Application
+class Application(_Application):
+	def Run(self):
+		"""\
+		Set the application running.
+		"""
+		self.gui.Show(self.gui.connectto)
+		_Application.Run(self)
+
+	def ConfigDisplay(self):
+		"""\
+		Pop-up the configuration window.
+		"""
+		self.gui.ConfigDisplay()
+
+	GUIClass = GUI
+	NetworkClass = Network
+	ConfigFile = "pywx_preferences"
 
 if __name__ == '__main__':
 	try:
