@@ -217,6 +217,27 @@ class Network(NetworkThread):
 
 		# Show the Update window
 		gui.Call(gui.Show, gui.update)
+		
+		up("Connecting...", mode="connecting")
+		if self.connection.setup(host=host, debug=debug):
+			s  = _("The client was unable to connect to the host.\n")
+			s += _("This could be because the server is down or there is a problem with the network.\n")
+			self.application.Post(self.NetworkFailureEvent(s))
+			return
+			
+		up("Looking for Thousand Parsec Server...")
+		if failed(self.connection.connect()):
+			s  = _("The client connected to the host but it did not appear to be a Thousand Parsec server.\n")
+			s += _("This could be because the server is down or the connection details are incorrect.\n")
+			self.application.Post(self.NetworkFailureEvent(s))
+			return
+
+		up("Logining In")
+		if failed(self.connection.login(username, password)):
+			s  = _("The client connected to the host but could not login because the username of password was incorrect.\n")
+			s += _("This could be because you are connecting to the wrong server or mistyped the username or password.\n")
+			self.application.Post(self.NetworkFailureEvent(s))
+			return
 
 		NetworkThread.ConnectTo(self, host, username, password, up)
 		self.CacheUpdate()
