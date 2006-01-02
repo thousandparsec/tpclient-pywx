@@ -48,6 +48,7 @@ class TimeStatusBar(wx.StatusBar):
 
 		self.SetStatusText("", 0)
 		self.endtime = 0
+		self.parent = parent
 
 		self.timer = wx.PyTimer(self.Notify)
 		self.timer.Start(1000)
@@ -64,10 +65,14 @@ class TimeStatusBar(wx.StatusBar):
 			secs = math.floor((left - hours * sih - mins * sim))
 			self.SetStatusText("EOT: %02i:%02i:%02i" % (hours, mins, secs), 1)
 		else:
+			if self.endtime != 0:
+				self.parent.UpdateEOT()
+				self.endtime = 0
 			self.SetStatusText("EOT: Unknown", 1)
 
 	def SetEndTime(self, endtime):
-		self.endtime = endtime
+		print endtime
+		self.endtime = endtime + time.time()
 
 class winMain(winMDIBase):
 	title = _("Main Windows")
@@ -178,6 +183,8 @@ class winMain(winMDIBase):
 		
 		wx.CallAfter(self.ShowTips)
 
+		self.UpdateEOT()
+
 	def SetSizeHard(self, pos):
 		winMDIBase.SetSize(self, pos)
 		if wx.Platform != "__WXMSW__":
@@ -225,7 +232,7 @@ class winMain(winMDIBase):
 			else:
 				print "Config-%s: Did not find a default size for your resolution" % (self,)
 				if wx.Platform != "__WXMSW__":
-					config['size'] = self.DefaultPosition[(1024, 768)]
+					config['size'] = self.DefaultSize[(1024, 768)]
 				else:
 					config['size'] = (SCREEN_X, SCREEN_Y)
 
@@ -424,4 +431,7 @@ class winMain(winMDIBase):
 
 	def UpdateCache(self, evt=None):
 		self.application.network.Call(self.application.network.CacheUpdate)
+
+	def UpdateEOT(self):
+		self.application.network.Call(self.application.network.EOTUpdate)
 

@@ -232,7 +232,14 @@ class Network(NetworkThread):
 	
 		gui.Call(gui.Show, gui.main)
 		self.application.Post(self.application.cache.CacheUpdateEvent(None))
-		return
+
+	def EOTUpdate(self):
+		gui = self.application.gui
+		timeRemaining = self.connection.time()
+
+		if failed(timeRemaining):
+			return
+		gui.Call( gui.main.statusbar.SetEndTime, timeRemaining)
 
 _Application = Application
 class Application(_Application):
