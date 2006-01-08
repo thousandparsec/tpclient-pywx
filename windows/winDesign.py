@@ -4,6 +4,7 @@ at this current location and "quick" details about them.
 """
 
 # Python imports
+from types import TupleType
 
 # wxPython imports
 import wx
@@ -96,47 +97,55 @@ class winDesign(winReportBase):
 		#self.middle.Add( self.desc, 1, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
 
 		# The buttons
-		self.buttons = wx.BoxSizer( wx.HORIZONTAL )
-		self.middle.Add(self.buttons, 0, wx.ALIGN_RIGHT|wx.ALL, 1 )
+		buttons = wx.BoxSizer( wx.HORIZONTAL )
+		self.middle.Add(buttons, 0, wx.ALIGN_RIGHT|wx.ALL, 1 )
 
 		# The edit button
 		self.edit = wx.Button( panel, -1, _("Edit"), size=wx.local.buttonSize)
 		self.edit.SetFont(wx.local.normalFont)
-		self.buttons.Add( self.edit, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
+		buttons.Add( self.edit, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
 		
 		# The duplicate button
 		self.duplicate = wx.Button( panel, -1, _("Duplicate"), size=wx.local.buttonSize)
 		self.duplicate.SetFont(wx.local.normalFont)
-		self.buttons.Add( self.duplicate, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
+		buttons.Add( self.duplicate, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
 		
 		# The delete button
 		self.delete = wx.Button( panel, -1, _("Delete"), size=wx.local.buttonSize)
 		self.delete.SetFont(wx.local.normalFont)
-		self.buttons.Add( self.delete, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
+		buttons.Add( self.delete, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
 
 		# The revert button
 		self.revert = wx.Button( panel, -1, _("Revert"), size=wx.local.buttonSize)
 		self.revert.SetFont(wx.local.normalFont)
-		self.buttons.Add( self.revert, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
+		buttons.Add( self.revert, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
 
 		# The save button
 		self.save = wx.Button( panel, -1, _("Save"), size=wx.local.buttonSize)
 		self.save.SetFont(wx.local.normalFont)
-		self.buttons.Add( self.save, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
+		buttons.Add( self.save, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
 		
 		# The components
 		self.compscat = wx.Choice( panel, -1, choices=[], size=(COL_SIZE,wx.local.buttonSize[1]))
 		self.compscat.SetFont(wx.local.normalFont)
 		self.compscat.Bind(wx.EVT_CHOICE, self.UpdateCompList)
+
+		self.compssizer = wx.BoxSizer( wx.VERTICAL )
+		
 		self.comps = wx.ListCtrl( panel, -1, wx.DefaultPosition, wx.DefaultSize, wx.LC_LIST|wx.LC_NO_HEADER|wx.SUNKEN_BORDER|wx.LC_SINGLE_SEL )
 		self.comps.SetFont(wx.local.normalFont)
+		self.compssizer.Add(self.comps, 0, wx.GROW|wx.ALIGN_RIGHT|wx.ALL, 1 )
 
-		self.grid.Add(self.designscat, 	0, wx.ALIGN_CENTRE|wx.ALL, 1 )
-		self.grid.Add(self.top, 		0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
-		self.grid.Add(self.compscat,	0, wx.ALIGN_CENTRE|wx.ALL, 1 )
-		self.grid.Add(self.designs, 	0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
-		self.grid.Add(self.middle, 	0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
-		self.grid.Add(self.comps, 	0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
+		self.add = wx.Button( panel, -1, _("Add"), size=wx.local.buttonSize)
+		self.add.SetFont(wx.local.normalFont)
+		self.compssizer.Add(self.add, 0, wx.ALIGN_RIGHT|wx.ALL, 1 )
+
+		self.grid.Add(self.designscat,  0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
+		self.grid.Add(self.top,         0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
+		self.grid.Add(self.compscat,    0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
+		self.grid.Add(self.designs,     0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
+		self.grid.Add(self.middle,      0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
+		self.grid.Add(self.compssizer,  0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
 
 		panel.SetAutoLayout( True )
 		panel.SetSizer( self.grid )
@@ -146,6 +155,8 @@ class winDesign(winReportBase):
 
 		self.Bind(wx.EVT_BUTTON, self.OnEdit, self.edit)
 		self.Bind(wx.EVT_BUTTON, self.OnSelect, self.revert)
+		self.Bind(wx.EVT_BUTTON, self.OnSave, self.save)
+		self.Bind(wx.EVT_BUTTON, self.OnAdd, self.add)
 
 		self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.OnSelectObject, self.designs)
 		self.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.OnSelectObject, self.designs)
@@ -160,7 +171,7 @@ class winDesign(winReportBase):
 
 		# Show the component bar
 		self.grid.Show(self.compscat)
-		self.grid.Show(self.comps)
+		self.grid.Show(self.compssizer)
 		
 		# Make the title and description editable
 		self.top.Show(self.titleedit)
@@ -179,6 +190,73 @@ class winDesign(winReportBase):
 		# Re-layout everything
 		self.grid.Layout()
 
+		# Copy the design object to a temp location
+		self.designtemp = self.application.cache.designs[self.did]
+	
+	def OnAdd(self, evt):
+		if not hasattr(self, "designtemp"):
+			print "Sperious Add click!? No Design currently selected."
+			return
+		
+		design = self.designtemp
+		
+		# Figure out if a component is selected
+		s = self.comps.GetSelected()
+		if len(s) > 0:
+			cid = self.comps.GetItemData(s[0])
+		else:
+			cid = -1
+
+		if not cid or cid == -1:
+			print "Sperious Add click!? No Component currently selected."
+			return
+		
+		amount = 1
+		# Check for shifted selection
+		if False:
+			# Popup modal display asking how many to add
+			amount = many
+
+		# Add the componets to the design
+		print design.components
+
+		i = 0
+		while True:
+			if design.components[i][0] == cid:
+				if type(design.components[i]) == TupleType:
+					design.components[i] = list(design.components[i])
+				design.components[i][1] += amount
+				break
+			
+			if i >= len(s):
+				design.components.append([cid, amount])
+				break
+		
+			i += 1
+		
+		
+		print design.components
+		# Recalculate the design properties
+		pass
+
+		# Redisplay the panels
+		self.BuildPartsPanel(design)
+		self.BuildPropertiesPanel(design)
+
+	def OnSave(self, evt):
+		if not hasattr(self, "designtemp"):
+			print "Sperious Save click!? No Design currently selected."
+			return self.OnSelect(evt)
+
+		design = self.designtemp
+		del self.designtemp
+
+		# Create a cache event which updates that object
+		self.application.Post(self.application.cache.CacheDirtyEvent("designs", "change", design.id, design))
+
+		# FIXME: This should update the panel....
+		self.OnSelect()
+
 	def OnSelect(self, evt=None):
 		# Enable the selection side
 		self.designscat.Enable()
@@ -186,7 +264,7 @@ class winDesign(winReportBase):
 
 		# Hide the component bar
 		self.grid.Hide(self.compscat)
-		self.grid.Hide(self.comps)
+		self.grid.Hide(self.compssizer)
 
 		# Make the title and description uneditable
 		self.top.Hide(self.titleedit)
@@ -257,14 +335,23 @@ class winDesign(winReportBase):
 
 		self.properties = panel
 
+	def BuildPartsPanel(self, design):
+		# Populate the parts list
+		self.parts.DeleteAllItems()
+		for cid, number in design.components:
+			component = self.application.cache.components[cid]
+		
+			self.parts.InsertStringItem(0, str(number))
+			self.parts.SetStringItem(0, 1, component.name)
+
 	def OnSelectObject(self, evt=None):
 		s = self.designs.GetSelected()
 		if len(s) > 0:
-			id = self.designs.GetItemData(s[0])
+			did = self.designs.GetItemData(s[0])
 		else:
-			id = -1
+			did = -1
 
-		if not id or id == -1:
+		if not did or did == -1:
 			# Clear the title
 			self.titletext.SetLabel("")
 
@@ -276,9 +363,13 @@ class winDesign(winReportBase):
 			self.edit.Disable()
 			self.duplicate.Disable()
 			self.delete.Disable()
+
+			self.did = None
 			return
 		
-		design = self.application.cache.designs[id]
+		self.did = did
+
+		design = self.application.cache.designs[self.did]
 
 		# Set the title
 		self.titletext.SetLabel(design.name)
@@ -295,8 +386,8 @@ class winDesign(winReportBase):
 
 		# Set the categories
 		c = ""
-		for id in design.categories:
-			c += self.application.cache.categories[id].name + ", "
+		for cid in design.categories:
+			c += self.application.cache.categories[cid].name + ", "
 		c = c[:-2]
 		self.categories.SetLabel(c)
 
@@ -304,12 +395,7 @@ class winDesign(winReportBase):
 		self.middle.Show(self.design)
 
 		# Populate the parts list
-		self.parts.DeleteAllItems()
-		for id, number in design.components:
-			component = self.application.cache.components[id]
-		
-			self.parts.InsertStringItem(0, str(number))
-			self.parts.SetStringItem(0, 1, component.name)
+		self.BuildPartsPanel(design)
 		
 		# Populate the properties
 		self.BuildPropertiesPanel(design)
