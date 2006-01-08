@@ -16,8 +16,10 @@ from utils import *
 NAME = 0
 DESC = 1
 
+COL_SIZE=150
+
 # Show the universe
-class winDesign(winBase):
+class winDesign(winReportBase):
 	title = _("Design")
 	
 	from defaults import winDesignDefaultPosition as DefaultPosition
@@ -27,7 +29,7 @@ class winDesign(winBase):
 	modes = ["Select", "Edit"]
 
 	def __init__(self, application, parent):
-		winBase.__init__(self, application, parent)
+		winReportBase.__init__(self, application, parent)
 
 		panel = wx.Panel(self, -1)
 
@@ -36,7 +38,7 @@ class winDesign(winBase):
 		self.grid.AddGrowableRow(1)		# Bottom row is growable
 
 		# The designs which are avalible
-		self.designscat = wx.Choice( panel, -1, choices=[], size=(-1,wx.local.buttonSize[1]))
+		self.designscat = wx.Choice( panel, -1, choices=[], size=(COL_SIZE,wx.local.buttonSize[1]))
 		self.designscat.SetFont(wx.local.normalFont)
 		self.designscat.Bind(wx.EVT_CHOICE, self.UpdateDesignList)
 		self.designs = wx.ListCtrl( panel, -1, wx.DefaultPosition, wx.DefaultSize, wx.LC_LIST|wx.LC_NO_HEADER|wx.SUNKEN_BORDER )
@@ -123,7 +125,7 @@ class winDesign(winBase):
 		self.buttons.Add( self.save, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
 		
 		# The components
-		self.compscat = wx.Choice( panel, -1, choices=[], size=(-1,wx.local.buttonSize[1]))
+		self.compscat = wx.Choice( panel, -1, choices=[], size=(COL_SIZE,wx.local.buttonSize[1]))
 		self.compscat.SetFont(wx.local.normalFont)
 		self.compscat.Bind(wx.EVT_CHOICE, self.UpdateCompList)
 		self.comps = wx.ListCtrl( panel, -1, wx.DefaultPosition, wx.DefaultSize, wx.LC_LIST|wx.LC_NO_HEADER|wx.SUNKEN_BORDER|wx.LC_SINGLE_SEL )

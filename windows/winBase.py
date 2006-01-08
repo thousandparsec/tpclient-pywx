@@ -331,6 +331,16 @@ class winMDISubBase(winConfigMixIn, winBaseMixIn, wx.MDIChildFrame):
 				wx.TAB_TRAVERSAL|wx.RESIZE_BORDER)
 		winBaseMixIn.__init__(self, application, parent)
 
+class winMDIReportBase(winConfigMixIn, winBaseMixIn, wx.MDIChildFrame):
+	def __init__(self, application, parent):
+		wx.MDIChildFrame.__init__(self, parent, -1, 'TP: ' + self.title, wx.DefaultPosition, wx.DefaultSize, \
+				wx.TAB_TRAVERSAL|wx.DEFAULT_FRAME_STYLE)
+		winBaseMixIn.__init__(self, application, parent)
+
+	def OnProgramExit(self, evt):
+		self.Hide()
+		evt.Veto(True)
+
 # These give a non-MDI interface under other operating systems
 #class winNormalBase(ConfigMixIn, winBaseMixIn, wx.Frame):
 class winNormalBase(ConfigMixIn, winBaseMixIn, wx.Frame):
@@ -348,19 +358,55 @@ class winMiniSubBase(winConfigMixIn, winBaseMixIn, wx.MiniFrame):
 class winNormalSubBase(winConfigMixIn, winBaseMixIn, wx.Frame):
 	def __init__(self, application, parent):
 		wx.Frame.__init__(self, parent, -1, 'TP: ' + self.title, wx.DefaultPosition, wx.DefaultSize, \
-				wx.DEFAULT_FRAME_STYLE|wx.FRAME_NO_TASKBAR|wx.TAB_TRAVERSAL)
+				wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL)
 		winBaseMixIn.__init__(self, application, parent)
 
-winMainBase = winNormalBase
+	def OnProgramExit(self, evt):
+		self.Hide()
+		evt.Veto(True)
+		
+"""\
+There are 4 classes of windows in tpclient-pywx
+	- winMainBase, This is used for things like the config/connect window
+	- winMDIBase, The main container window for the sub windows
+	- winBase, Used by subwindows
+	- winReportBase, Used by windows which display reports etc
 
-if wx.Platform != '__WXMSW__':
-	winMDIBase = winNormalBase
+Under Windows they are mapped to the following
+	- winMainBase	-> Normal Windows Window
+	- winMDIBase	-> MDI Parent Window
+	- winBase		-> MDI Child Window with not title
+	- winReportBase	-> MDI Child window with title
+
+Under Mac they are mapped to the following
+	- winMainBase	-> Normal Mac Window
+	- winMDIBase	-> Normal Mac Window
+	- winBase		-> Normal Mac Window
+	- winReportBase -> Normal Mac Window
+
+Under Linux they are mapped to the following
+	- winMainBase	-> Normal Linux Window
+	- winMDIBase	-> Normal Linux Window
+	- winBase		-> MiniFrame Linux Window (not shown on task bar)
+	- winReportBase -> Normal Linux Window (shown on task bar)
+"""
 
 if wx.Platform == '__WXMSW__':
-	winBase = winMDISubBase
-elif wx.Platform == '__WXMAC__':
-	winBase = winNormalSubBase
-else:
-	winBase = winMiniSubBase
+	winMainBase		= winNormalBase
+	winMDIBase		= winMDIBase
+	winBase			= winMDISubBase
+	winReportBase 	= winMDIReportBase
 
-__all__ = ['winMainBase', 'winBase', 'winMDIBase', '__all__']
+elif wx.Platform == '__WXMAC__':
+	winMainBase		= winNormalBase
+	winMDIBase		= winNormalBase
+	winBase			= winNormalSubBase
+	winReportBase 	= winNormalSubBase
+
+else:
+	winMainBase		= winNormalBase
+	winMDIBase		= winNormalBase
+	winBase			= winMiniSubBase
+	winReportBase 	= winNormalSubBase
+
+__all__ = ['winMainBase', 'winBase', 'winMDIBase', 'winReportBase', '__all__']
