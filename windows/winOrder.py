@@ -528,7 +528,7 @@ class winOrder(winBase):
 		self.UpdateListItem(slot, order)
 
 		# Tell everyone about the change
-		self.application.Post(self.application.cache.CacheDirtyEvent("designs", "change", did, design))
+		self.application.Post(self.application.cache.CacheDirtyEvent("orders", "change", self.oid, slot, order))
 
 	def OnOrderUpdate(self, evt):
 		"""\
