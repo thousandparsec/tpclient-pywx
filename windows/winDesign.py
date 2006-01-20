@@ -14,10 +14,31 @@ import wx.gizmos
 from winBase import *
 from utils import *
 
+from tp.client.parser import DesignCalculator
+
 NAME = 0
 DESC = 1
 
 COL_SIZE=150
+
+def add(design, cid, amount):
+	i = 0
+	while True:
+		if design.components[i][0] == cid:
+			if type(design.components[i]) == TupleType:
+				design.components[i] = list(design.components[i])
+			design.components[i][1] += amount
+
+			if design.components[i][1] < 0:
+				del design.components[i]
+			break
+		
+		i += 1
+		
+		if i >= len(design.components):
+			design.components.append([cid, amount])
+			break
+	
 
 # Show the universe
 class winDesign(winReportBase):
@@ -219,25 +240,32 @@ class winDesign(winReportBase):
 
 		# Add the componets to the design
 		print design.components
-
-		i = 0
-		while True:
-			if design.components[i][0] == cid:
-				if type(design.components[i]) == TupleType:
-					design.components[i] = list(design.components[i])
-				design.components[i][1] += amount
-				break
-			
-			if i >= len(s):
-				design.components.append([cid, amount])
-				break
-		
-			i += 1
-		
-		
+		add(design, cid, amount)
 		print design.components
+		
 		# Recalculate the design properties
-		pass
+		dc = DesignCalculator(self.application.cache, design)
+		
+		i, d = dc.calculate()
+		okay, reason = dc.check(i, d)
+
+		if not okay:
+			if amount > 1:
+				reason += """
+Would you like to continue adding these components?"""
+			else:
+				reason += """
+Would you like to continue adding this component?"""
+			dlg = wx.MessageDialog(self, reason, 'Design Warning', wx.YES_NO|wx.NO_DEFAULT|wx.ICON_ERROR)
+			
+			if not dlg.ShowModal():
+				# FIXME: This should be 
+				# add(design, cid, -amount)
+				pass
+
+			dlg.Destroy()
+
+		dc.apply(d) 
 
 		# Redisplay the panels
 		self.BuildPartsPanel(design)
