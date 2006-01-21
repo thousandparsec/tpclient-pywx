@@ -31,7 +31,7 @@ MESSAGE_NEW = 10008
 MESSAGE_DEL = 10009
 
 # Shows messages from the game system to the player.
-class winMessage(winBase):
+class winMessage(winBase, winShiftMixIn):
 	title = _("Messages")
 
 	from defaults import winMessageDefaultPosition as DefaultPosition
@@ -40,16 +40,13 @@ class winMessage(winBase):
 	
 	def __init__(self, application, parent):
 		winBase.__init__(self, application, parent)
+		winShiftMixIn.__init__(self)
 
 		panel = wx.Panel(self, -1)
 		panel.SetConstraints(wx.lib.anchors.LayoutAnchors(self, 1, 1, 1, 1))
 		self.panel = panel
 		self.obj = {}
 
-		# Bits for doing the button changing on shift
-		self.timer = wx.Timer(self)
-		self.shift = False
-		
 		item0 = wx.FlexGridSizer( 0, 1, 0, 0 )
 		item0.AddGrowableCol( 0 )
 		item0.AddGrowableRow( 1 )
@@ -215,21 +212,24 @@ class winMessage(winBase):
 
 	def Show(self, show=True):
 		if show:
-			if wx.Platform != '__WXMAC__':
-				self.timer.Start(50)
-			self.Bind(wx.EVT_TIMER, self.OnIdle, self.timer)
+			self.ShiftStart()
 			winBase.Show(self)
 		else:
 			self.Hide()
 
 	def Hide(self, hide=True):
 		if hide:
-			self.timer.Stop()
-			self.Unbind(wx.EVT_TIMER, self.timer)
+			self.ShiftStop()
 			winBase.Hide(self)
 		else:
 			self.Show()
-
+		
+	def OnShiftDown(self, evt):
+		self.ShowFL()
+	
+	def OnShiftUp(self, evt):
+		self.ShowPN()
+	
 	def ShowPN(self):
 		self.first.Hide()
 		self.last.Hide()
@@ -247,17 +247,6 @@ class winMessage(winBase):
 		self.last.Show()
 		
 		self.panel.Layout()
-		
-	def OnIdle(self, evt):
-		shift = wx.GetKeyState(wx.WXK_SHIFT)
-		if self.shift == shift:
-			return
-		
-		self.shift = shift
-		if self.shift:
-			self.ShowFL()
-		else:
-			self.ShowPN()
 		
 	def OnCacheUpdate(self, evt=None):
 		"""\

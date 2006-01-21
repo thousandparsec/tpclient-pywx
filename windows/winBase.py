@@ -318,6 +318,34 @@ class winConfigMixIn(ConfigMixIn):
 
 	#-----------------------------------------------------------------------------------------------
 
+class winShiftMixIn(object):
+	def __init__(self):
+		# Bits for doing the button changing on shift
+		self.timer = wx.Timer(self)
+		self.shift = False
+
+	def ShiftStart(self):
+		if wx.Platform != '__WXMAC__':
+			self.timer.Start(50)
+		self.Bind(wx.EVT_TIMER, self.OnTimer, self.timer)
+
+	def ShiftStop(self):
+		if self.timer.Stop():
+			self.Unbind(wx.EVT_TIMER, self.timer)
+		
+	def OnTimer(self, evt):
+		shift = wx.GetKeyState(wx.WXK_SHIFT)
+		if self.shift == shift:
+			return
+		
+		self.shift = shift
+		if self.shift:
+			if hasattr(self, 'OnShiftDown'):
+				return self.OnShiftDown(evt)
+		else:
+			if hasattr(self, 'OnShiftUp'):
+				return self.OnShiftUp(evt)
+
 # These give a MDI interface under windows
 class winMDIBase(ConfigMixIn, winBaseMixIn, wx.MDIParentFrame):
 	def __init__(self, application):
@@ -409,4 +437,4 @@ else:
 	winBase			= winMiniSubBase
 	winReportBase 	= winNormalSubBase
 
-__all__ = ['winMainBase', 'winBase', 'winMDIBase', 'winReportBase', '__all__']
+__all__ = ['winMainBase', 'winBase', 'winMDIBase', 'winReportBase', 'winShiftMixIn', '__all__']
