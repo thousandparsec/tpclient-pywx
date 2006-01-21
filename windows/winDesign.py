@@ -5,6 +5,7 @@ at this current location and "quick" details about them.
 
 # Python imports
 from types import TupleType
+from copy import deepcopy
 
 # wxPython imports
 import wx
@@ -21,27 +22,8 @@ DESC = 1
 
 COL_SIZE=150
 
-def add(design, cid, amount):
-	i = 0
-	while True:
-		if design.components[i][0] == cid:
-			if type(design.components[i]) == TupleType:
-				design.components[i] = list(design.components[i])
-			design.components[i][1] += amount
-
-			if design.components[i][1] < 0:
-				del design.components[i]
-			break
-		
-		i += 1
-		
-		if i >= len(design.components):
-			design.components.append([cid, amount])
-			break
-	
-
 # Show the universe
-class winDesign(winReportBase):
+class winDesign(winReportBase, winShiftMixIn):
 	title = _("Design")
 	
 	from defaults import winDesignDefaultPosition as DefaultPosition
@@ -52,6 +34,7 @@ class winDesign(winReportBase):
 
 	def __init__(self, application, parent):
 		winReportBase.__init__(self, application, parent)
+		winShiftMixIn.__init__(self)
 
 		panel = wx.Panel(self, -1)
 
@@ -93,21 +76,21 @@ class winDesign(winReportBase):
 		self.middle.Add( self.categories, 0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 0 )
 		
 		# The currently selected design
-		self.design = wx.BoxSizer( wx.HORIZONTAL )
-		self.middle.Add(self.design, 2, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
+		self.designsizer = wx.BoxSizer( wx.HORIZONTAL )
+		self.middle.Add(self.designsizer, 2, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
 
 		# The components in the design
 		self.parts = wx.ListCtrl(panel, -1, wx.DefaultPosition, wx.DefaultSize, wx.LC_REPORT|wx.SUNKEN_BORDER|wx.LC_EDIT_LABELS )
 		self.parts.InsertColumn(0, "#", format=wx.LIST_FORMAT_RIGHT, width=20)
 		self.parts.InsertColumn(1, "Component")
 		self.parts.SetFont(wx.local.normalFont)
-		self.design.Add(self.parts, 2, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
+		self.designsizer.Add(self.parts, 2, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
 
 		# The properties of the design
 		self.design_ps = wx.BoxSizer(wx.HORIZONTAL)
 		self.design_pp = wx.Panel(panel, -1)
 		self.design_pp.SetSizer(self.design_ps)
-		self.design.Add(self.design_pp, 2, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
+		self.designsizer.Add(self.design_pp, 2, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
 
 		# The description of the current design
 		#self.desc = wx.TextCtrl( panel, -1, " ", style=wx.TE_RIGHT|wx.TE_MULTILINE|wx.TE_PROCESS_ENTER)
@@ -155,11 +138,18 @@ class winDesign(winReportBase):
 		
 		self.comps = wx.ListCtrl( panel, -1, wx.DefaultPosition, wx.DefaultSize, wx.LC_LIST|wx.LC_NO_HEADER|wx.SUNKEN_BORDER|wx.LC_SINGLE_SEL )
 		self.comps.SetFont(wx.local.normalFont)
-		self.compssizer.Add(self.comps, 0, wx.GROW|wx.ALIGN_RIGHT|wx.ALL, 1 )
+		self.compssizer.Add(self.comps, 1, wx.GROW|wx.ALIGN_RIGHT|wx.ALL, 1 )
+
+		self.addsizer = wx.BoxSizer( wx.HORIZONTAL )
+		self.compssizer.Add(self.addsizer, 0, wx.ALIGN_RIGHT|wx.ALL, 0)
 
 		self.add = wx.Button( panel, -1, _("Add"), size=wx.local.buttonSize)
 		self.add.SetFont(wx.local.normalFont)
-		self.compssizer.Add(self.add, 0, wx.ALIGN_RIGHT|wx.ALL, 1 )
+		self.addsizer.Add(self.add, 0, wx.ALIGN_RIGHT|wx.ALL, 1 )
+
+		self.addmany = wx.Button( panel, -1, _("Add Many"), size=wx.local.buttonSize)
+		self.addmany.SetFont(wx.local.normalFont)
+		self.addsizer.Add(self.addmany, 0, wx.ALIGN_RIGHT|wx.ALL, 1 )
 
 		self.grid.Add(self.designscat,  0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
 		self.grid.Add(self.top,         0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
@@ -177,7 +167,9 @@ class winDesign(winReportBase):
 		self.Bind(wx.EVT_BUTTON, self.OnEdit, self.edit)
 		self.Bind(wx.EVT_BUTTON, self.OnSelect, self.revert)
 		self.Bind(wx.EVT_BUTTON, self.OnSave, self.save)
+
 		self.Bind(wx.EVT_BUTTON, self.OnAdd, self.add)
+		self.Bind(wx.EVT_BUTTON, self.OnAddMany, self.addmany)
 
 		self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.OnSelectObject, self.designs)
 		self.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.OnSelectObject, self.designs)
@@ -185,7 +177,44 @@ class winDesign(winReportBase):
 		self.panel = panel
 		self.OnSelect()
 
+	def Change(self, cid, amount):
+		"""\
+		Changes the current design by adding/subtracting the certain amount of a component.
+		"""
+		design = self.design
+
+		i = 0
+		while True:
+			if design.components[i][0] == cid:
+				if type(design.components[i]) == TupleType:
+					design.components[i] = list(design.components[i])
+				design.components[i][1] += amount
+	
+				if design.components[i][1] < 0:
+					del design.components[i]
+				break
+			
+			i += 1
+			
+			if i >= len(design.components):
+				design.components.append([cid, amount])
+				break
+
+	def Recalculate(self):
+		"""\
+		Recalculates the designs properties.
+		"""
+		design = self.design
+		# Recalculate the design properties
+		dc = DesignCalculator(self.application.cache, design)
+		
+		i, d = dc.calculate()
+		okay, reason = dc.check(i, d)
+		dc.apply(d, okay, reason) 
+
 	def OnEdit(self, evt=None):
+		# FIXME: Check if we can modify this Design.
+	
 		# Disable the select side
 		self.designscat.Disable()
 		self.designs.Disable()
@@ -211,16 +240,19 @@ class winDesign(winReportBase):
 		# Re-layout everything
 		self.grid.Layout()
 
-		# Copy the design object to a temp location
-		self.designtemp = self.application.cache.designs[self.did]
+		# Start the timer so that Add -> Add Many
+		self.ShiftStart()
+
+	def OnAddMany(self, evt):
+		"""\
+		Pops up a selection box to ask for how many to add.
+		"""
+		self.OnAdd(evt, amount)
 	
-	def OnAdd(self, evt):
-		if not hasattr(self, "designtemp"):
-			print "Sperious Add click!? No Design currently selected."
-			return
-		
-		design = self.designtemp
-		
+	def OnAdd(self, evt, amount=1):
+		"""\
+		Adds components to the current design.
+		"""
 		# Figure out if a component is selected
 		s = self.comps.GetSelected()
 		if len(s) > 0:
@@ -232,52 +264,31 @@ class winDesign(winReportBase):
 			print "Sperious Add click!? No Component currently selected."
 			return
 		
-		amount = 1
-		# Check for shifted selection
-		if False:
-			# Popup modal display asking how many to add
-			amount = many
-
 		# Add the componets to the design
-		print design.components
-		add(design, cid, amount)
-		print design.components
-		
-		# Recalculate the design properties
-		dc = DesignCalculator(self.application.cache, design)
-		
-		i, d = dc.calculate()
-		okay, reason = dc.check(i, d)
-
-		if not okay:
+		self.Change(cid, amount)
+		self.Recalculate()
+	
+		if self.design.used == -1:
 			if amount > 1:
-				reason += """
+				reason = self.design.feedback + """
 Would you like to continue adding these components?"""
 			else:
-				reason += """
+				reason = self.design.feedback + """
 Would you like to continue adding this component?"""
 			dlg = wx.MessageDialog(self, reason, 'Design Warning', wx.YES_NO|wx.NO_DEFAULT|wx.ICON_ERROR)
 			
-			if not dlg.ShowModal():
-				# FIXME: This should be 
-				# add(design, cid, -amount)
-				pass
+			if dlg.ShowModal() == wx.ID_NO:
+				self.Change(cid, -amount)
+				self.Recalculate()
 
 			dlg.Destroy()
 
-		dc.apply(d) 
-
 		# Redisplay the panels
-		self.BuildPartsPanel(design)
-		self.BuildPropertiesPanel(design)
+		self.BuildPartsPanel(self.design)
+		self.BuildPropertiesPanel(self.design)
 
 	def OnSave(self, evt):
-		if not hasattr(self, "designtemp"):
-			print "Sperious Save click!? No Design currently selected."
-			return self.OnSelect(evt)
-
-		design = self.designtemp
-		del self.designtemp
+		design = self.design
 
 		# Create a cache event which updates that object
 		self.application.Post(self.application.cache.CacheDirtyEvent("designs", "change", design.id, design))
@@ -286,6 +297,9 @@ Would you like to continue adding this component?"""
 		self.OnSelect()
 
 	def OnSelect(self, evt=None):
+		# Stop any running Shift timers
+		self.ShiftStop()
+	
 		# Enable the selection side
 		self.designscat.Enable()
 		self.designs.Enable()
@@ -307,6 +321,85 @@ Would you like to continue adding this component?"""
 		self.grid.Layout()
 
 		self.OnSelectObject()
+
+	def OnSelectObject(self, evt=None):
+		s = self.designs.GetSelected()
+		if len(s) > 0:
+			did = self.designs.GetItemData(s[0])
+		else:
+			did = -1
+
+		if not did or did == -1:
+			# Clear the title
+			self.titletext.SetLabel("")
+
+			# Hide the design
+			self.middle.Hide(self.designsizer)
+			self.middle.Layout()
+			
+			# Disable the buttons
+			self.edit.Disable()
+			self.duplicate.Disable()
+			self.delete.Disable()
+
+			self.design = None
+			return
+		
+		self.design = deepcopy(self.application.cache.designs[did])
+
+		# Recalculate all the properties if they are empty
+		if len(self.design.properties) == 0:
+			self.Recalculate()
+
+		# Build the Header Panel
+		self.BuildHeaderPanel(self.design)
+
+		# Show the parts list
+		self.middle.Show(self.designsizer)
+
+		# Populate the parts list
+		self.BuildPartsPanel(self.design)
+		
+		# Populate the properties
+		self.BuildPropertiesPanel(self.design)
+
+		# Set if edit can work
+		if self.design.used <= 0:
+			self.edit.Enable()
+			self.edit.SetDefault()
+
+			self.duplicate.Enable()
+			self.delete.Enable()
+		else:
+			self.edit.Disable()
+			self.delete.Disable()
+
+			self.duplicate.Enable()
+			self.duplicate.SetDefault()
+		
+		# Re-layout everything
+		self.grid.Layout()
+
+	def BuildHeaderPanel(self, design):
+		# Set the title
+		self.titletext.SetLabel(design.name)
+		self.titleedit.SetValue(design.name)
+
+		# Set the used
+		self.used.SetLabel(str(design.used))
+		if design.used == -1:
+			self.used.SetForegroundColour(wx.Color(255, 0, 0))
+		elif design.used == 0:
+			self.used.SetForegroundColour(wx.Color(0, 255, 0))
+		else:
+			self.used.SetForegroundColour(wx.Color(0, 0, 0))
+
+		# Set the categories
+		c = ""
+		for cid in design.categories:
+			c += self.application.cache.categories[cid].name + ", "
+		c = c[:-2]
+		self.categories.SetLabel(c)
 
 	def BuildPropertiesPanel(self, design):
 		SIZER_FLAGS = wx.GROW|wx.ALIGN_CENTER_VERTICAL|wx.ALL
@@ -371,79 +464,6 @@ Would you like to continue adding this component?"""
 		
 			self.parts.InsertStringItem(0, str(number))
 			self.parts.SetStringItem(0, 1, component.name)
-
-	def OnSelectObject(self, evt=None):
-		s = self.designs.GetSelected()
-		if len(s) > 0:
-			did = self.designs.GetItemData(s[0])
-		else:
-			did = -1
-
-		if not did or did == -1:
-			# Clear the title
-			self.titletext.SetLabel("")
-
-			# Hide the design
-			self.middle.Hide(self.design)
-			self.middle.Layout()
-			
-			# Disable the buttons
-			self.edit.Disable()
-			self.duplicate.Disable()
-			self.delete.Disable()
-
-			self.did = None
-			return
-		
-		self.did = did
-
-		design = self.application.cache.designs[self.did]
-
-		# Set the title
-		self.titletext.SetLabel(design.name)
-		self.titleedit.SetValue(design.name)
-
-		# Set the used
-		self.used.SetLabel(str(design.used))
-		if design.used == -1:
-			self.used.SetForegroundColour(wx.Color(255, 0, 0))
-		elif design.used == 0:
-			self.used.SetForegroundColour(wx.Color(0, 255, 0))
-		else:
-			self.used.SetForegroundColour(wx.Color(0, 0, 0))
-
-		# Set the categories
-		c = ""
-		for cid in design.categories:
-			c += self.application.cache.categories[cid].name + ", "
-		c = c[:-2]
-		self.categories.SetLabel(c)
-
-		# Enable the parts list
-		self.middle.Show(self.design)
-
-		# Populate the parts list
-		self.BuildPartsPanel(design)
-		
-		# Populate the properties
-		self.BuildPropertiesPanel(design)
-
-		# Set if edit can work
-		if design.used <= 0:
-			self.edit.Enable()
-			self.edit.SetDefault()
-
-			self.duplicate.Enable()
-			self.delete.Enable()
-		else:
-			self.edit.Disable()
-			self.delete.Disable()
-
-			self.duplicate.Enable()
-			self.duplicate.SetDefault()
-		
-		# Re-layout everything
-		self.grid.Layout()
 
 	def OnCacheUpdate(self, evt=None):
 		print "OnCacheUpdate of winDesign..."
