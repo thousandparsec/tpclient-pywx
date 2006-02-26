@@ -155,6 +155,24 @@ class wxComboBox(wx.ComboBox, ToolTipItemMixIn):
 		slot = self.GetSelection()
 		self.SetToolTipCurrent(slot)
 
+class OrderedTreeCtrl(wx.TreeCtrl):
+	def __init__(self, *args, **kw):
+		wx.TreeCtrl.__init__(self, *args, **kw)
+		self.Bind(wx.EVT_TREE_ITEM_ACTIVATED, self.OnActivate, self)
+
+	def OnActivate(self, evt):
+		item = evt.GetItem()
+		self.Toggle(item)
+
+	def OnCompareItems(self, item1, item2):
+		t1 = self.GetItemText(item1)
+		t2 = self.GetItemText(item2)
+		if t1 < t2: return -1
+		if t1 == t2: return 0
+		return 1
+
+wx.OrderedTreeCtrl = OrderedTreeCtrl
+
 wx.gizmos.TreeListCtrlOrig = wx.gizmos.TreeListCtrl
 class wxTreeListCtrl(wx.gizmos.TreeListCtrlOrig):
 	"""\
