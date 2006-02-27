@@ -16,11 +16,15 @@ from winBase import *
 from utils import *
 
 from tp.client.parser import DesignCalculator
+from tp.netlib.objects import Design
 
 NAME = 0
 DESC = 1
 
 COL_SIZE=150
+
+Art = wx.ArtProvider_GetBitmap
+wx.ArtSize = (16, 16)
 
 # Show the universe
 class winDesign(winReportBase, winShiftMixIn):
@@ -37,17 +41,21 @@ class winDesign(winReportBase, winShiftMixIn):
 		winShiftMixIn.__init__(self)
 
 		panel = wx.Panel(self, -1)
+		
+		self.icons = wx.ImageList(*wx.ArtSize)
+		self.icons.Add(Art(wx.ART_FOLDER, wx.ART_OTHER, wx.ArtSize))
+		self.icons.Add(Art(wx.ART_FILE_OPEN, wx.ART_OTHER, wx.ArtSize))
+		self.icons.Add(Art(wx.ART_NORMAL_FILE, wx.ART_OTHER, wx.ArtSize))
 
 		self.grid = wx.FlexGridSizer(2, 3, 0, 0)
-		self.grid.AddGrowableCol(1)		# Middle Column is growable
-		self.grid.AddGrowableRow(1)		# Bottom row is growable
+		self.grid.AddGrowableCol(0, 15)		# Middle Column is growable
+		self.grid.AddGrowableCol(1, 50)		# Middle Column is growable
+		self.grid.AddGrowableCol(2, 15)		# Middle Column is growable
+		self.grid.AddGrowableRow(1)			# Bottom row is growable
 
-		# The designs which are avalible
-		self.designscat = wx.Choice( panel, -1, choices=[], size=(COL_SIZE,wx.local.buttonSize[1]))
-		self.designscat.SetFont(wx.local.normalFont)
-		self.designscat.Bind(wx.EVT_CHOICE, self.UpdateDesignList)
-		self.designs = wx.ListCtrl( panel, -1, wx.DefaultPosition, wx.DefaultSize, wx.LC_LIST|wx.LC_NO_HEADER|wx.SUNKEN_BORDER )
+		self.designs = wx.OrderedTreeCtrl( panel, -1, style=wx.TR_DEFAULT_STYLE | wx.TR_HAS_VARIABLE_ROW_HEIGHT)
 		self.designs.SetFont(wx.local.normalFont)
+		self.designs.SetImageList(self.icons)
 
 		# The labels
 		################################################################
@@ -130,14 +138,12 @@ class winDesign(winReportBase, winShiftMixIn):
 		buttons.Add( self.save, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
 		
 		# The components
-		self.compscat = wx.Choice( panel, -1, choices=[], size=(COL_SIZE,wx.local.buttonSize[1]))
-		self.compscat.SetFont(wx.local.normalFont)
-		self.compscat.Bind(wx.EVT_CHOICE, self.UpdateCompList)
-
+		
 		self.compssizer = wx.BoxSizer( wx.VERTICAL )
 		
-		self.comps = wx.ListCtrl( panel, -1, wx.DefaultPosition, wx.DefaultSize, wx.LC_LIST|wx.LC_NO_HEADER|wx.SUNKEN_BORDER|wx.LC_SINGLE_SEL )
+		self.comps = wx.OrderedTreeCtrl( panel, -1, style=wx.TR_DEFAULT_STYLE | wx.TR_HAS_VARIABLE_ROW_HEIGHT | wx.TR_MULTIPLE)
 		self.comps.SetFont(wx.local.normalFont)
+		self.comps.SetImageList(self.icons)
 		self.compssizer.Add(self.comps, 1, wx.GROW|wx.ALIGN_RIGHT|wx.ALL, 1 )
 
 		self.addsizer = wx.BoxSizer( wx.HORIZONTAL )
@@ -150,10 +156,12 @@ class winDesign(winReportBase, winShiftMixIn):
 		self.addmany = wx.Button( panel, -1, _("Add Many"), size=wx.local.buttonSize)
 		self.addmany.SetFont(wx.local.normalFont)
 		self.addsizer.Add(self.addmany, 0, wx.ALIGN_RIGHT|wx.ALL, 1 )
-
-		self.grid.Add(self.designscat,  0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
+		
+		blank = wx.Panel( panel, -1 )
+		
+		self.grid.Add(blank,    0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
 		self.grid.Add(self.top,         0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
-		self.grid.Add(self.compscat,    0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
+		self.grid.Add(blank,    0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
 		self.grid.Add(self.designs,     0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
 		self.grid.Add(self.middle,      0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
 		self.grid.Add(self.compssizer,  0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
@@ -171,8 +179,7 @@ class winDesign(winReportBase, winShiftMixIn):
 		self.Bind(wx.EVT_BUTTON, self.OnAdd, self.add)
 		self.Bind(wx.EVT_BUTTON, self.OnAddMany, self.addmany)
 
-		self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.OnSelectObject, self.designs)
-		self.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.OnSelectObject, self.designs)
+		self.Bind(wx.EVT_TREE_SEL_CHANGED, self.OnSelectObject, self.designs)
 
 		self.panel = panel
 		self.OnSelect()
@@ -216,11 +223,9 @@ class winDesign(winReportBase, winShiftMixIn):
 		# FIXME: Check if we can modify this Design.
 	
 		# Disable the select side
-		self.designscat.Disable()
 		self.designs.Disable()
 
 		# Show the component bar
-		self.grid.Show(self.compscat)
 		self.grid.Show(self.compssizer)
 		
 		# Make the title and description editable
@@ -254,22 +259,22 @@ class winDesign(winReportBase, winShiftMixIn):
 		Adds components to the current design.
 		"""
 		# Figure out if a component is selected
-		s = self.comps.GetSelected()
-		if len(s) > 0:
-			cid = self.comps.GetItemData(s[0])
-		else:
-			cid = -1
+		cids = []
+		for tid in self.comps.GetSelections():
+			cid = self.comps.GetPyData(tid)
+			if not cid is None and cid >= 0:
+				cids.append(cid)
 
-		if not cid or cid == -1:
-			print "Sperious Add click!? No Component currently selected."
-			return
-		
-		# Add the componets to the design
-		self.Change(cid, amount)
+		print "Adding", cids
+
+		for cid in cids:
+			# Add the componets to the design
+			self.Change(cid, amount)
+			
 		self.Recalculate()
 	
 		if self.design.used == -1:
-			if amount > 1:
+			if amount > 1 or len(cids) > 1:
 				reason = self.design.feedback + """
 Would you like to continue adding these components?"""
 			else:
@@ -278,7 +283,8 @@ Would you like to continue adding this component?"""
 			dlg = wx.MessageDialog(self, reason, 'Design Warning', wx.YES_NO|wx.NO_DEFAULT|wx.ICON_ERROR)
 			
 			if dlg.ShowModal() == wx.ID_NO:
-				self.Change(cid, -amount)
+				for cid in cids:
+					self.Change(cid, -amount)
 				self.Recalculate()
 
 			dlg.Destroy()
@@ -301,11 +307,9 @@ Would you like to continue adding this component?"""
 		self.ShiftStop()
 	
 		# Enable the selection side
-		self.designscat.Enable()
 		self.designs.Enable()
 
 		# Hide the component bar
-		self.grid.Hide(self.compscat)
 		self.grid.Hide(self.compssizer)
 
 		# Make the title and description uneditable
@@ -323,13 +327,16 @@ Would you like to continue adding this component?"""
 		self.OnSelectObject()
 
 	def OnSelectObject(self, evt=None):
-		s = self.designs.GetSelected()
-		if len(s) > 0:
-			did = self.designs.GetItemData(s[0])
-		else:
-			did = -1
+		s = self.designs.GetSelection()
 
-		if not did or did == -1:
+		if s < 0:
+			self.design = None
+		else:
+			self.design = deepcopy(self.designs.GetPyData(s))
+			if not isinstance(self.design, Design):
+				self.design = None
+
+		if self.design == None:
 			# Clear the title
 			self.titletext.SetLabel("")
 
@@ -341,11 +348,8 @@ Would you like to continue adding this component?"""
 			self.edit.Disable()
 			self.duplicate.Disable()
 			self.delete.Disable()
-
-			self.design = None
+			
 			return
-		
-		self.design = deepcopy(self.application.cache.designs[did])
 
 		# Recalculate all the properties if they are empty
 		if len(self.design.properties) == 0:
@@ -468,77 +472,83 @@ Would you like to continue adding this component?"""
 	def OnCacheUpdate(self, evt=None):
 		print "OnCacheUpdate of winDesign..."
 
-		# Update the categories
-		if self.designscat.GetSelection() == -1:
-			designs = 0
-		else:
-			designs = self.designscat.GetClientData(self.designscat.GetSelection())
-		if self.compscat.GetSelection() == -1:
-			comps = 0
-		else:
-			comps = self.compscat.GetClientData(self.compscat.GetSelection())
-		
-		self.designscat.Clear()
-		self.compscat.Clear()
-		for category in self.application.cache.categories.values():
-			slot = self.designscat.GetCount()
-
-			for design in self.application.cache.designs.values():
-				if category.id in design.categories:
-					self.designscat.Append(category.name, category.id)
-					break
-
-			for component in self.application.cache.components.values():
-				if category.id in component.categories:
-					self.compscat.Append(category.name, category.id)
-					break
-
-			self.designscat.SetToolTipItem(slot, category.description)
-			self.compscat.SetToolTipItem(slot, category.description)
-
-			if category.id == designs:
-				self.designscat.SetSelection(slot)
-
-			if category.id == comps:
-				self.compscat.SetSelection(slot)
-
 		self.UpdateDesignList()
 		self.UpdateCompList()
 
 	def UpdateDesignList(self, evt=None):
-		print "Updating the Designs List"
-		
-		if self.designscat.GetSelection() == -1:
-			des = 0
-		else:
-			des = self.designscat.GetClientData(self.designscat.GetSelection())
-		print "Currently selected category", des
+# FIXME: This is broken as it does not take into account the change of position of items
+#		selected = self.designs.GetSelection()
 
-		self.designs.ClearAll()
-		for design in self.application.cache.designs.values():
-			slot = self.designs.GetItemCount()
+		self.designs.DeleteAllItems()
 
-			print "Design", design.id, design.name, design.categories
-			if des in design.categories:
-				print "Adding to ", slot
-				self.designs.InsertStringItem(slot, design.name)
-				self.designs.SetItemData(slot, design.id)
+		root = self.designs.AddRoot("Designs")
+		self.designs.SetPyData(root, None)
+		self.designs.SetItemImage(root, 0, wx.TreeItemIcon_Normal)
+		self.designs.SetItemImage(root, 1, wx.TreeItemIcon_Expanded)
+
+		child = self.designs.AppendItem(root, "Blank Design")
+		self.designs.SetPyData(child, None)
+		self.designs.SetItemImage(child, 2, wx.TreeItemIcon_Normal)
+
+		cache = self.application.cache
+		for category in cache.categories.values():
+			child = self.designs.AppendItem(root, category.name)
+			self.designs.SetPyData(child, category)
+			self.designs.SetItemImage(child, 0, wx.TreeItemIcon_Normal)
+			self.designs.SetItemImage(child, 1, wx.TreeItemIcon_Expanded)
+
+			for design in cache.designs.values():
+				if category.id in design.categories:
+					last = self.designs.AppendItem(child, design.name)
+					self.designs.SetPyData(last, design)
+					self.designs.SetItemImage(last, 2, wx.TreeItemIcon_Normal)
+
+			if not self.designs.ItemHasChildren(child):
+				self.designs.Delete(child)
+
+		self.designs.SortChildren(self.designs.GetRootItem())
+
+		self.designs.Expand(root)
+# FIXME: This is broken as it does not take into account the change of position of items
+#		if selected:
+#			self.designs.SelectItem(selected)
+#			self.designs.EnsureVisible(selected)
+
+		self.designs.SetSize(self.designs.GetVirtualSize())
 
 	def UpdateCompList(self, evt=None):
-		print "Updating the Comps List"
-		if self.compscat.GetSelection() == -1:
-			comps = 0
-		else:
-			comps = self.compscat.GetClientData(self.compscat.GetSelection())
-		print "Currently selected category", comps
+# FIXME: This is broken as it does not take into account the change of position of items
+#		selected = self.comps.GetSelection()
 
-		self.comps.ClearAll()
-		for component in self.application.cache.components.values():
-			slot = self.comps.GetItemCount()
+		self.comps.DeleteAllItems()
 
-			print "Component", component.id, component.name, component.categories
-			if comps in component.categories:
-				print "Adding to ", slot
-				self.comps.InsertStringItem(slot, component.name)
-				self.comps.SetItemData(slot, component.id)
+		root = self.comps.AddRoot("Components")
+		self.comps.SetPyData(root, None)
+		self.comps.SetItemImage(root, 0, wx.TreeItemIcon_Normal)
+		self.comps.SetItemImage(root, 1, wx.TreeItemIcon_Expanded)
+
+		cache = self.application.cache
+		for category in cache.categories.values():
+			child = self.comps.AppendItem(root, category.name)
+			self.comps.SetPyData(child, category)
+			self.comps.SetItemImage(child, 0, wx.TreeItemIcon_Normal)
+			self.comps.SetItemImage(child, 1, wx.TreeItemIcon_Expanded)
+
+			for component in cache.components.values():
+				if category.id in component.categories:
+					last = self.comps.AppendItem(child, component.name)
+					self.comps.SetPyData(last, component.id)
+					self.comps.SetItemImage(last, 2, wx.TreeItemIcon_Normal)
+
+			if not self.comps.ItemHasChildren(child):
+				self.comps.Delete(child)
+
+		self.comps.SortChildren(self.comps.GetRootItem())
+
+		self.comps.Expand(root)
+	
+# FIXME: This is broken as it does not take into account the change of position of items
+#		if selected:
+#			self.comps.SelectItem(selected)
+#			self.comps.EnsureVisible(selected)
 
