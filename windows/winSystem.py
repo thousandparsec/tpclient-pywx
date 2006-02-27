@@ -33,7 +33,7 @@ class winSystem(winBase):
 		self.application = application
 		self.ignore = False
 
-		self.tree = wx.gizmos.TreeListCtrl(self, -1, style=wx.TR_DEFAULT_STYLE | wx.TR_HAS_VARIABLE_ROW_HEIGHT)
+		self.tree = wx.OrderedTreeCtrl(self, -1, style=wx.TR_DEFAULT_STYLE | wx.TR_HAS_VARIABLE_ROW_HEIGHT)
 
 		self.icons = {}
 		self.icons['Blank'] = wx.Image("graphics/blank-icon.png").ConvertToBitmap()
@@ -51,13 +51,6 @@ class winSystem(winBase):
 		self.tree.SetImageList(self.il)
 
 		self.tree.SetFont(wx.local.normalFont)
-
-		# create some columns
-		self.tree.AddColumn(_("Object"))
-#		self.tree.AddColumn("Details")
-		self.tree.SetMainColumn(0)
-		self.tree.SetColumnWidth(0, 225)
-
 		self.Bind(wx.EVT_TREE_SEL_CHANGED, self.OnSelectItem)
 
 	def Rebuild(self):
@@ -72,16 +65,15 @@ class winSystem(winBase):
 		if not selected_id:
 			selected_id = -1
 			
-		debug(DEBUG_GUI, "Selecting object... %i" % selected_id)
-		
 		# Remove all the current items
 		self.tree.DeleteAllItems()
 
 		universe = self.application.cache.objects[0]
 		selected = self.Add(None, universe, selected_id)
 	
+		self.tree.SortChildren(self.tree.GetRootItem())
+	
 		if selected:
-			debug(DEBUG_GUI, "Trying select object... %i" % self.tree.GetPyData(selected))
 			self.tree.SelectItem(selected)
 			self.tree.EnsureVisible(selected)
 		
