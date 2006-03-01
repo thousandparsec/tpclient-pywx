@@ -171,6 +171,29 @@ class OrderedTreeCtrl(wx.TreeCtrl):
 		if t1 == t2: return 0
 		return 1
 
+	def FindItemByData(self, pyData, item=None, compare=None):
+		if item == None:
+			item = self.GetRootItem()
+
+		if compare is None and self.GetPyData(item) == pyData:
+			return item
+		elif compare(self.GetPyData(item), pyData):
+			return item
+		else:
+			if self.ItemHasChildren(item):
+				cookieo = -1
+				child, cookie = self.GetFirstChild(item)
+
+				while cookieo != cookie:
+					r = self.FindItemByData(pyData, child)
+					if r:
+						return r
+					
+					cookieo = cookie
+					child, cookie = self.GetNextChild(item, cookie)
+
+		return None
+
 wx.OrderedTreeCtrl = OrderedTreeCtrl
 
 wx.gizmos.TreeListCtrlOrig = wx.gizmos.TreeListCtrl
@@ -178,11 +201,13 @@ class wxTreeListCtrl(wx.gizmos.TreeListCtrlOrig):
 	"""\
 	Modified object which includes the ability to get an object by the pyData
 	"""
-	def FindItemByData(self, pyData, item=None):
+	def FindItemByData(self, pyData, item=None, compare=None):
 		if item == None:
 			item = self.GetRootItem()
 
-		if self.GetPyData(item) == pyData:
+		if compare is None and self.GetPyData(item) == pyData:
+			return item
+		elif compare(self.GetPyData(item), pyData):
 			return item
 		else:
 			if self.ItemHasChildren(item):
