@@ -16,7 +16,7 @@ from winBase import *
 from utils import *
 
 from tp.client.parser import DesignCalculator
-from tp.netlib.objects import Design
+from tp.netlib.objects import Design, Component, Category
 
 NAME = 0
 DESC = 1
@@ -26,6 +26,17 @@ COL_SIZE=150
 Art = wx.ArtProvider_GetBitmap
 wx.ArtSize = (16, 16)
 
+def comparetoid(a, b):
+	if not b is None and a[0] == type(b) and a[1] == b.id:
+		return True
+	return False
+
+def comparebyid(a, b):
+	if not b is None and type(a) == type(b) and a.id == b.id:
+		return True
+	return False
+
+
 # Show the universe
 class winDesign(winReportBase, winShiftMixIn):
 	title = _("Design")
@@ -34,11 +45,12 @@ class winDesign(winReportBase, winShiftMixIn):
 	from defaults import winDesignDefaultSize as DefaultSize
 	from defaults import winDesignDefaultShow as DefaultShow
 
-	modes = ["Select", "Edit"]
-
 	def __init__(self, application, parent):
 		winReportBase.__init__(self, application, parent)
 		winShiftMixIn.__init__(self)
+		
+		self.selected = None	# Currently selected design
+		self.updating = []		# Designs which are been saved to the server
 
 		panel = wx.Panel(self, -1)
 		
@@ -184,205 +196,95 @@ class winDesign(winReportBase, winShiftMixIn):
 		self.panel = panel
 		self.OnSelect()
 
-	def Change(self, cid, amount):
-		"""\
-		Changes the current design by adding/subtracting the certain amount of a component.
-		"""
-		design = self.design
+	# Functions to manipulate the Tree controls....
+	# FIXME: These should be part of the tree controls themselves...
+	#################################################################################
+	def TreeAddCategory(self, tree, category):
+		child = tree.AppendItem(tree.GetRootItem(), category.name)
+		tree.SetPyData(child, category)
+		tree.SetItemImage(child, 0, wx.TreeItemIcon_Normal)
+		tree.SetItemImage(child, 1, wx.TreeItemIcon_Expanded)
+		return child
 
-		i = 0
-		while True:
-			if design.components[i][0] == cid:
-				if type(design.components[i]) == TupleType:
-					design.components[i] = list(design.components[i])
-				design.components[i][1] += amount
+	def TreeAddItem(self, tree, category, object):
+		child = tree.AppendItem(category, object.name)
+		tree.SetPyData(child, object)
+		tree.SetItemImage(child, 2, wx.TreeItemIcon_Normal)
+
+	def TreeColourItem(self, tree, item, mode):
+		if mode == "normal":
+			tree.SetItemTextColour(item, wx.Color(0, 0, 0))
+		elif mode == "updating":
+			tree.SetItemTextColour(item, wx.Color(0, 0, 255))
+		elif mode == "removing":
+			tree.SetItemTextColour(item, wx.Color(255, 0, 0))
+
+	def TreeSelectedData(self, tree, criteria):
+		selected = []
+		for tid in tree.GetSelections():
+			object = self.comps.GetPyData(tid)
+			if isinstance(object, criteria):
+				selected.append(object)
+		return selected
+
+	# Functions to build parts of the interface
+	#################################################################################
+	def BuildDesignList(self, evt=None):
+		self.designs.DeleteAllItems()
+
+		root = self.designs.AddRoot("Designs")
+		self.designs.SetPyData(root, None)
+		self.designs.SetItemImage(root, 0, wx.TreeItemIcon_Normal)
+		self.designs.SetItemImage(root, 1, wx.TreeItemIcon_Expanded)
+
+		blank = Design(-1, -1, -1, [1], "New Design", "", -1, -1, [], "", [])
+		self.TreeAddItem(self.designs, root, blank)
+
+		# FIXME: Designs which have no categories are not shown.
+
+		cache = self.application.cache
+		for category in cache.categories.values():
+			categoryitem = self.TreeAddCategory(self.designs, category)
+
+			for design in cache.designs.values():
+				if category.id in design.categories:
+					self.TreeAddItem(self.designs, categoryitem, design)
+
+			if not self.designs.ItemHasChildren(categoryitem):
+				self.designs.Delete(categoryitem)
+
+		self.designs.SortChildren(self.designs.GetRootItem())
+		self.designs.Expand(root)
+
+	def BuildCompList(self, evt=None):
+		#FIXME: This is broken as it does not take into account the change of position of items
+		#selected = self.comps.GetSelection()
+
+		self.comps.DeleteAllItems()
+
+		root = self.comps.AddRoot("Components")
+		self.comps.SetPyData(root, None)
+		self.comps.SetItemImage(root, 0, wx.TreeItemIcon_Normal)
+		self.comps.SetItemImage(root, 1, wx.TreeItemIcon_Expanded)
+
+		cache = self.application.cache
+		for category in cache.categories.values():
+			categoryitem = self.TreeAddCategory(self.comps, category)
+
+			for component in cache.components.values():
+				if category.id in component.categories:
+					self.TreeAddItem(self.comps, categoryitem, component)
+
+			if not self.comps.ItemHasChildren(categoryitem):
+				self.comps.Delete(categoryitem)
+
+		self.comps.SortChildren(self.comps.GetRootItem())
+		self.comps.Expand(root)
 	
-				if design.components[i][1] < 0:
-					del design.components[i]
-				break
-			
-			i += 1
-			
-			if i >= len(design.components):
-				design.components.append([cid, amount])
-				break
-
-	def Recalculate(self):
-		"""\
-		Recalculates the designs properties.
-		"""
-		design = self.design
-		# Recalculate the design properties
-		dc = DesignCalculator(self.application.cache, design)
-		
-		i, d = dc.calculate()
-		okay, reason = dc.check(i, d)
-		dc.apply(d, okay, reason) 
-
-	def OnEdit(self, evt=None):
-		# FIXME: Check if we can modify this Design.
-	
-		# Disable the select side
-		self.designs.Disable()
-
-		# Show the component bar
-		self.grid.Show(self.compssizer)
-		
-		# Make the title and description editable
-		self.top.Show(self.titleedit)
-		self.top.Hide(self.titletext)
-
-		# Disable edit, duplicate, delete
-		self.edit.Disable()
-		self.duplicate.Disable()
-		self.delete.Disable()
-
-		# Enable the save, revert
-		self.revert.Enable()
-		self.revert.SetDefault()
-		self.save.Enable()
-
-		# Re-layout everything
-		self.grid.Layout()
-
-		# Start the timer so that Add -> Add Many
-		self.ShiftStart()
-
-	def OnAddMany(self, evt):
-		"""\
-		Pops up a selection box to ask for how many to add.
-		"""
-		self.OnAdd(evt, amount)
-	
-	def OnAdd(self, evt, amount=1):
-		"""\
-		Adds components to the current design.
-		"""
-		# Figure out if a component is selected
-		cids = []
-		for tid in self.comps.GetSelections():
-			cid = self.comps.GetPyData(tid)
-			if not cid is None and cid >= 0:
-				cids.append(cid)
-
-		print "Adding", cids
-
-		for cid in cids:
-			# Add the componets to the design
-			self.Change(cid, amount)
-			
-		self.Recalculate()
-	
-		if self.design.used == -1:
-			if amount > 1 or len(cids) > 1:
-				reason = self.design.feedback + """
-Would you like to continue adding these components?"""
-			else:
-				reason = self.design.feedback + """
-Would you like to continue adding this component?"""
-			dlg = wx.MessageDialog(self, reason, 'Design Warning', wx.YES_NO|wx.NO_DEFAULT|wx.ICON_ERROR)
-			
-			if dlg.ShowModal() == wx.ID_NO:
-				for cid in cids:
-					self.Change(cid, -amount)
-				self.Recalculate()
-
-			dlg.Destroy()
-
-		# Redisplay the panels
-		self.BuildPartsPanel(self.design)
-		self.BuildPropertiesPanel(self.design)
-
-	def OnSave(self, evt):
-		design = self.design
-
-		# Create a cache event which updates that object
-		self.application.Post(self.application.cache.CacheDirtyEvent("designs", "change", design.id, design))
-
-		# FIXME: This should update the panel....
-		self.OnSelect()
-
-	def OnSelect(self, evt=None):
-		# Stop any running Shift timers
-		self.ShiftStop()
-	
-		# Enable the selection side
-		self.designs.Enable()
-
-		# Hide the component bar
-		self.grid.Hide(self.compssizer)
-
-		# Make the title and description uneditable
-		self.top.Hide(self.titleedit)
-		self.top.Show(self.titletext)
-		self.top.Layout()
-
-		# Disable save, revert
-		self.revert.Disable()
-		self.save.Disable()
-
-		# Re-layout everything
-		self.grid.Layout()
-
-		self.OnSelectObject()
-
-	def OnSelectObject(self, evt=None):
-		s = self.designs.GetSelection()
-
-		if s < 0:
-			self.design = None
-		else:
-			self.design = deepcopy(self.designs.GetPyData(s))
-			if not isinstance(self.design, Design):
-				self.design = None
-
-		if self.design == None:
-			# Clear the title
-			self.titletext.SetLabel("")
-
-			# Hide the design
-			self.middle.Hide(self.designsizer)
-			self.middle.Layout()
-			
-			# Disable the buttons
-			self.edit.Disable()
-			self.duplicate.Disable()
-			self.delete.Disable()
-			
-			return
-
-		# Recalculate all the properties if they are empty
-		if len(self.design.properties) == 0:
-			self.Recalculate()
-
-		# Build the Header Panel
-		self.BuildHeaderPanel(self.design)
-
-		# Show the parts list
-		self.middle.Show(self.designsizer)
-
-		# Populate the parts list
-		self.BuildPartsPanel(self.design)
-		
-		# Populate the properties
-		self.BuildPropertiesPanel(self.design)
-
-		# Set if edit can work
-		if self.design.used <= 0:
-			self.edit.Enable()
-			self.edit.SetDefault()
-
-			self.duplicate.Enable()
-			self.delete.Enable()
-		else:
-			self.edit.Disable()
-			self.delete.Disable()
-
-			self.duplicate.Enable()
-			self.duplicate.SetDefault()
-		
-		# Re-layout everything
-		self.grid.Layout()
+		# FIXME: This is broken as it does not take into account the change of position of items
+#		if selected:
+#			self.comps.SelectItem(selected)
+#			self.comps.EnsureVisible(selected)
 
 	def BuildHeaderPanel(self, design):
 		# Set the title
@@ -469,86 +371,218 @@ Would you like to continue adding this component?"""
 			self.parts.InsertStringItem(0, str(number))
 			self.parts.SetStringItem(0, 1, component.name)
 
-	def OnCacheUpdate(self, evt=None):
-		print "OnCacheUpdate of winDesign..."
-
-		self.UpdateDesignList()
-		self.UpdateCompList()
-
-	def UpdateDesignList(self, evt=None):
-# FIXME: This is broken as it does not take into account the change of position of items
-#		selected = self.designs.GetSelection()
-
-		self.designs.DeleteAllItems()
-
-		root = self.designs.AddRoot("Designs")
-		self.designs.SetPyData(root, None)
-		self.designs.SetItemImage(root, 0, wx.TreeItemIcon_Normal)
-		self.designs.SetItemImage(root, 1, wx.TreeItemIcon_Expanded)
-
-		child = self.designs.AppendItem(root, "Blank Design")
-		self.designs.SetPyData(child, None)
-		self.designs.SetItemImage(child, 2, wx.TreeItemIcon_Normal)
-
-		cache = self.application.cache
-		for category in cache.categories.values():
-			child = self.designs.AppendItem(root, category.name)
-			self.designs.SetPyData(child, category)
-			self.designs.SetItemImage(child, 0, wx.TreeItemIcon_Normal)
-			self.designs.SetItemImage(child, 1, wx.TreeItemIcon_Expanded)
-
-			for design in cache.designs.values():
-				if category.id in design.categories:
-					last = self.designs.AppendItem(child, design.name)
-					self.designs.SetPyData(last, design)
-					self.designs.SetItemImage(last, 2, wx.TreeItemIcon_Normal)
-
-			if not self.designs.ItemHasChildren(child):
-				self.designs.Delete(child)
-
-		self.designs.SortChildren(self.designs.GetRootItem())
-
-		self.designs.Expand(root)
-# FIXME: This is broken as it does not take into account the change of position of items
-#		if selected:
-#			self.designs.SelectItem(selected)
-#			self.designs.EnsureVisible(selected)
-
-		self.designs.SetSize(self.designs.GetVirtualSize())
-
-	def UpdateCompList(self, evt=None):
-# FIXME: This is broken as it does not take into account the change of position of items
-#		selected = self.comps.GetSelection()
-
-		self.comps.DeleteAllItems()
-
-		root = self.comps.AddRoot("Components")
-		self.comps.SetPyData(root, None)
-		self.comps.SetItemImage(root, 0, wx.TreeItemIcon_Normal)
-		self.comps.SetItemImage(root, 1, wx.TreeItemIcon_Expanded)
-
-		cache = self.application.cache
-		for category in cache.categories.values():
-			child = self.comps.AppendItem(root, category.name)
-			self.comps.SetPyData(child, category)
-			self.comps.SetItemImage(child, 0, wx.TreeItemIcon_Normal)
-			self.comps.SetItemImage(child, 1, wx.TreeItemIcon_Expanded)
-
-			for component in cache.components.values():
-				if category.id in component.categories:
-					last = self.comps.AppendItem(child, component.name)
-					self.comps.SetPyData(last, component.id)
-					self.comps.SetItemImage(last, 2, wx.TreeItemIcon_Normal)
-
-			if not self.comps.ItemHasChildren(child):
-				self.comps.Delete(child)
-
-		self.comps.SortChildren(self.comps.GetRootItem())
-
-		self.comps.Expand(root)
+	# Functions to update the component lists
+	#################################################################################
+	def OnAddMany(self, evt):
+		"""\
+		Pops up a selection box to ask for how many to add.
+		"""
+		self.OnAdd(evt, amount)
 	
-# FIXME: This is broken as it does not take into account the change of position of items
-#		if selected:
-#			self.comps.SelectItem(selected)
-#			self.comps.EnsureVisible(selected)
+	def OnAdd(self, evt, amount=1):
+		"""\
+		Adds components to the current design.
+		"""
+		# Figure out if a component is selected
+		components = self.TreeSelectedData(self.comps, Component)
+		
+		dc = DesignCalculator(self.application.cache, self.selected)
+		for component in components:
+			dc.change(component, amount)
+		dc.update()
+	
+		if self.selected.used == -1:
+			if amount > 1 or len(components) > 1:
+				reason = self.selected.feedback + "\nWould you like to continue adding these components?"
+			else:
+				reason = self.selected.feedback + "\nWould you like to continue adding this component?"
+			dlg = wx.MessageDialog(self, reason, 'Design Warning', wx.YES_NO|wx.NO_DEFAULT|wx.ICON_ERROR)
+			
+			if dlg.ShowModal() == wx.ID_NO:
+				for component in components:
+					dc.change(component, -amount)
+				dc.update()
 
+			dlg.Destroy()
+
+		# Redisplay the panels
+		self.BuildPartsPanel(self.selected)
+		self.BuildPropertiesPanel(self.selected)
+
+	# Functions to change the mode of the dialog
+	#################################################################################
+	def OnEdit(self, evt=None):
+		# FIXME: Check if we can modify this Design.
+	
+		# Disable the select side
+		self.designs.Disable()
+
+		# Show the component bar
+		self.grid.Show(self.compssizer)
+		
+		# Make the title and description editable
+		self.top.Show(self.titleedit)
+		self.top.Hide(self.titletext)
+
+		# Disable edit, duplicate, delete
+		self.edit.Disable()
+		self.duplicate.Disable()
+		self.delete.Disable()
+
+		# Enable the save, revert
+		self.revert.Enable()
+		self.revert.SetDefault()
+		self.save.Enable()
+
+		# Re-layout everything
+		self.grid.Layout()
+
+		# Start the timer so that Add -> Add Many
+		self.ShiftStart()
+
+	def OnSave(self, evt):
+		design = self.selected
+
+		# Is this a new design?
+		if design.id == -1:
+			self.application.Post(self.application.cache.CacheDirtyEvent("designs", "create", -1, design))
+			self.selected = None
+		else:
+			# Add the design to ones which are being updated
+			self.updating.append(design.id)
+
+			# Change the colour on the side
+			for item in self.designs.FindAllByData(design, comparebyid):
+				self.TreeColourItem(self.designs, item, "updating")
+	
+			# Tell the world about the change
+			self.application.Post(self.application.cache.CacheDirtyEvent("designs", "change", design.id, design))
+
+		self.OnSelect(None)
+
+	def OnRemove(self, evt):
+		design = self.selected
+
+		# Add the design to ones which are being updated
+		self.updating.append(design.id)
+		
+		# Change the colour on the side
+		for item in self.designs.FindAllByData(design, comparebyid):
+			self.TreeColourItem(self.designs, item, "removing")
+			
+		self.application.Post(self.application.cache.CacheDirtyEvent("designs", "remove", design.id, design))
+
+	def OnSelect(self, evt=None):
+		# Stop any running Shift timers
+		self.ShiftStop()
+	
+		# Enable the selection side
+		self.designs.Enable()
+
+		# Hide the component bar
+		self.grid.Hide(self.compssizer)
+
+		# Make the title and description uneditable
+		self.top.Hide(self.titleedit)
+		self.top.Show(self.titletext)
+		self.top.Layout()
+
+		# Disable save, revert
+		self.revert.Disable()
+		self.save.Disable()
+
+		# Re-layout everything
+		self.grid.Layout()
+
+		self.OnSelectObject()
+
+	def OnSelectObject(self, evt=None):
+		selected = self.TreeSelectedData(self.designs, Design)
+		if len(selected) != 1:
+			self.selected = None
+		else:
+			if selected[0].id in self.updating:
+				self.selected = None
+			else:
+				self.selected = deepcopy(selected[0])
+
+		if self.selected == None:
+			# Clear the title
+			self.titletext.SetLabel("")
+
+			# Hide the design
+			self.middle.Hide(self.designsizer)
+			self.middle.Layout()
+			
+			# Disable the buttons
+			self.edit.Disable()
+			self.duplicate.Disable()
+			self.delete.Disable()
+			return
+
+#		# Recalculate all the properties if they are empty
+#		if len(self.selected.properties) == 0:
+#			self.Recalculate()
+
+		# Build the Header Panel
+		self.BuildHeaderPanel(self.selected)
+
+		# Show the parts list
+		self.middle.Show(self.designsizer)
+
+		# Populate the parts list
+		self.BuildPartsPanel(self.selected)
+		
+		# Populate the properties
+		self.BuildPropertiesPanel(self.selected)
+
+		# Set if edit can work
+		if self.selected.used <= 0:
+			self.edit.Enable()
+			self.edit.SetDefault()
+
+			self.duplicate.Enable()
+			self.delete.Enable()
+		else:
+			self.edit.Disable()
+			self.delete.Disable()
+
+			self.duplicate.Enable()
+			self.duplicate.SetDefault()
+		
+		# Re-layout everything
+		self.grid.Layout()
+
+	def OnCacheUpdate(self, evt=None):
+		# Full cache update, rebuild everything
+		if evt.what is None:
+			self.BuildDesignList()
+			self.BuildCompList()
+
+		if evt.what is "designs":
+			design = evt.change
+		
+			if evt.action in ("change", "remove"):
+				for item in self.designs.FindAllByData(design, comparebyid):
+					categoryitem = self.designs.GetItemParent(item)
+					self.designs.Delete(item)
+					
+					# Remove the category if it will be empty
+					if self.designs.ItemHasChildren(categoryitem):
+						self.designs.Delete(categoryitem)
+				
+			if evt.action in ("change", "create"):
+				for categoryid in design.categories:
+					# Check the category exists
+					parent = self.designs.FindItemByData((Category, categoryid), comparetoid)
+					if parent is None:
+						parent = self.TreeAddCategory(self.designs, self.application.cache.categories[categoryid])
+					
+					# Add the new design under this category
+					self.TreeAddItem(self.designs, parent, design)
+
+			if design.id in self.updating:
+				self.updating.remove(design.id)
+
+			self.designs.SortChildren(self.designs.GetRootItem())
+	

@@ -145,7 +145,7 @@ class winSystem(winBase):
 		if item:
 			self.ignore = True
 			
-			self.tree.CollapseAll()			# Collapse all the other stuff
+			#self.tree.CollapseAll()			# Collapse all the other stuff
 			self.tree.SelectItem(item)		# Select Item
 			if not self.tree.IsVisible(item):
 				self.tree.EnsureVisible(item)
