@@ -171,80 +171,55 @@ class OrderedTreeCtrl(wx.TreeCtrl):
 		if t1 == t2: return 0
 		return 1
 
-	def FindItemByData(self, pyData, item=None, compare=None):
+	def FindItemByData(self, pyData, compare=None, item=None):
 		if item == None:
 			item = self.GetRootItem()
 
-		if compare is None and self.GetPyData(item) == pyData:
+		if not compare is None and compare(pyData, self.GetPyData(item)):
 			return item
-		elif compare(self.GetPyData(item), pyData):
+		elif self.GetPyData(item) == pyData:
 			return item
-		else:
-			if self.ItemHasChildren(item):
-				cookieo = -1
-				child, cookie = self.GetFirstChild(item)
-
-				while cookieo != cookie:
-					r = self.FindItemByData(pyData, child)
-					if r:
-						return r
-					
-					cookieo = cookie
-					child, cookie = self.GetNextChild(item, cookie)
-
-		return None
-
-wx.OrderedTreeCtrl = OrderedTreeCtrl
-
-wx.gizmos.TreeListCtrlOrig = wx.gizmos.TreeListCtrl
-class wxTreeListCtrl(wx.gizmos.TreeListCtrlOrig):
-	"""\
-	Modified object which includes the ability to get an object by the pyData
-	"""
-	def FindItemByData(self, pyData, item=None, compare=None):
-		if item == None:
-			item = self.GetRootItem()
-
-		if compare is None and self.GetPyData(item) == pyData:
-			return item
-		elif compare(self.GetPyData(item), pyData):
-			return item
-		else:
-			if self.ItemHasChildren(item):
-				cookieo = -1
-				child, cookie = self.GetFirstChild(item)
-
-				while cookieo != cookie:
-					r = self.FindItemByData(pyData, child)
-					if r:
-						return r
-					
-					cookieo = cookie
-					child, cookie = self.GetNextChild(item, cookie)
-
-		return None
-
-	def GetPyData(self, item):
-		try:
-			return wx.gizmos.TreeListCtrlOrig.GetPyData(self, item)
-		except:
-			return None
-
-	def CollapseAll(self, item=None):
-		if item == None:
-			item = self.GetRootItem()
-
+		
 		if self.ItemHasChildren(item):
 			cookieo = -1
 			child, cookie = self.GetFirstChild(item)
 
 			while cookieo != cookie:
-				self.CollapseAll(child)
-			
+				r = self.FindItemByData(pyData, compare, child)
+				if r:
+					return r
+					
 				cookieo = cookie
 				child, cookie = self.GetNextChild(item, cookie)
 
-		self.Collapse(item)
+		return None
+
+	def FindAllByData(self, pyData, compare=None, item=None, r=None):
+		if r == None:
+			r = []
+
+		if item == None:
+			item = self.GetRootItem()
+
+		if not compare is None:
+			if compare(pyData, self.GetPyData(item)):
+				r.append(item)
+		else:
+			if self.GetPyData(item) == pyData:
+				r.append(item)
+		
+		if self.ItemHasChildren(item):
+			cookieo = -1
+			child, cookie = self.GetFirstChild(item)
+
+			while cookieo != cookie:
+				self.FindAllByData(pyData, compare, child, r)
+				
+				cookieo = cookie
+				child, cookie = self.GetNextChild(item, cookie)
+		return r
+
+wx.OrderedTreeCtrl = OrderedTreeCtrl
 
 wx.DIGIT_ONLY = 1
 wx.ALPHA_ONLY = 2
@@ -298,5 +273,4 @@ class wxSimpleValidator(wx.PyValidator):
 wx.ListCtrl = wxListCtrl
 wx.Choice = wxChoice
 wx.ComboBox = wxComboBox
-wx.gizmos.TreeListCtrl = wxTreeListCtrl
 wx.SimpleValidator = wxSimpleValidator
