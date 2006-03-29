@@ -219,8 +219,8 @@ class Network(NetworkThread):
 
 		# Show the Update window
 		gui.Call(gui.Show, gui.update)
-		NetworkThread.ConnectTo(self, host, username, password, up, cs="tpclient-pywx/%i.%i.%i" % version)
-		self.CacheUpdate()
+		if NetworkThread.ConnectTo(self, host, username, password, up, cs="tpclient-pywx/%i.%i.%i" % version):
+			self.CacheUpdate()
 
 	def CacheUpdate(self):
 		gui = self.application.gui
