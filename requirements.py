@@ -42,6 +42,12 @@ except ImportError:
 		return s
 	__builtin__._ = _
 
+
+try:
+	import Image
+except ImportError:
+	print "It is highly recommended to install the PIL library, speed will be greatly improved."
+
 if len(notfound) > 0:
 	print "The following requirements where not met"
 	for module in notfound:

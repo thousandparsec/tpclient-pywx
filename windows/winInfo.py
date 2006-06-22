@@ -9,7 +9,14 @@ from types import *
 # wxPython imports
 import wx
 
+try:
+	from extra.GIFAnimationCtrl import GIFAnimationCtrl
+except ImportError:
+	from wx.animate import GIFAnimationCtrl
+
 # Network imports
+from tp.netlib.objects.ObjectExtra.Universe import Universe
+from tp.netlib.objects.ObjectExtra.Galaxy import Galaxy
 from tp.netlib.objects.ObjectExtra.StarSystem import StarSystem
 from tp.netlib.objects.ObjectExtra.Planet import Planet
 from tp.netlib.objects.ObjectExtra.Fleet import Fleet
@@ -29,7 +36,15 @@ class winInfo(winBase):
 		winBase.__init__(self, application, parent)
 
 		self.titletext = wx.StaticText(self, -1, _("No Object Selected."))
-		self.picture = wx.StaticBitmap(self, -1, wx.BitmapFromImage(wx.EmptyImage(128, 128)))
+
+		picture_still_panel = wx.Panel(self)
+		self.picture_still = wx.StaticBitmap(picture_still_panel, -1, wx.BitmapFromImage(wx.EmptyImage(128, 128)))
+		picture_still_panel.SetBackgroundColour(wx.Colour(0, 0, 0))
+
+		self.picture_animated = GIFAnimationCtrl(self, -1)
+		self.picture_animated.SetBackgroundColour(wx.Colour(0, 0, 0))
+		self.picture_animated.Stop(); self.picture_animated.Hide()
+
 		self.text = wx.TextCtrl(self, -1, "", style=wx.TE_MULTILINE|wx.TE_READONLY)
 
 		top = wx.BoxSizer(wx.VERTICAL)
@@ -39,12 +54,40 @@ class winInfo(winBase):
 		information.Add(self.text, 1, wx.EXPAND, 0)
 		
 		middle = wx.BoxSizer(wx.HORIZONTAL)
-		middle.Add(self.picture, 0, 0, 0)
+		middle.Add(picture_still_panel,    0, 0, 0)
+		middle.Add(self.picture_animated, 0, 0, 0)
 		middle.Add(information, 1, wx.EXPAND, 0)
 
 		top.Add(middle, 1, wx.EXPAND, 0)
 
 		self.SetSizer(top)
+
+		# Find the images
+		import os
+		self.images = {'nebula':[], 'star':[], 'planet':[]}
+		base = os.path.join(".", "media", "common-2d")
+
+		def li(root, dirs, files, images=self.images):
+			dir = os.path.split(root)[-1]
+			if not '-' in dir:
+				return
+			type, size = dir.split('-')
+			
+			if images.has_key(type) and size == "small":
+				images[type].extend([os.path.join(root, x) for x in files])
+
+				if "animation" in dirs and "still" in dirs:
+					for nroot, ndirs, nfiles in os.walk(os.path.join(root, "animation")):
+						images[type].extend([os.path.join(nroot, x) for x in nfiles])
+						
+					dirs.remove("animation")
+
+					#for t, ndirs, nfiles in os.walk(os.path.join(root, "still")):
+					#	li(root, ndirs, nfiles)
+					#dirs.remove("still")
+
+		for root, dirs, files in os.walk(base):
+			li(root, dirs, files)
 
 	def OnSelectObject(self, evt):
 		print "winInfo SelectObject", evt
@@ -58,25 +101,44 @@ class winInfo(winBase):
 		self.titletext.SetLabel(object.name)
 
 		# Figure out the right graphic
-		path = os.path.join(".", "graphics", "media")
-		if isinstance(object, StarSystem):
-			path = os.path.join(path, "star-small")
-
-			stars = ["blue.png", "purple-large.png", "purple-small.png", "rainbow.png",  "red.png",  "yellow.png"]
-			path = os.path.join(path, stars[object.id % len(stars)]+".jpg")
-
-			bitmap = wx.BitmapFromImage(wx.Image(path))
+		if isinstance(object, (Universe, Galaxy)):
+			images = self.images['nebula']
+		elif isinstance(object, StarSystem):
+			images = self.images['star']
 		elif isinstance(object, Planet):
-			path = os.path.join(path, "planet-small")
-
-			planets = ["earthlike-1.jpg",  "earthlike-2.jpg",  "gasgiant-1.jpg"]
-			path = os.path.join(path, planets[object.id % len(planets)])
-
-			bitmap = wx.BitmapFromImage(wx.Image(path))
+			images = self.images['planet']
 		else:
-			bitmap = wx.BitmapFromImage(wx.EmptyImage(128, 128))
+			images = []
 
-		self.picture.SetBitmap(bitmap)
+		try:
+			image = images[object.id % len(images)]
+		except:
+			image = ""
+
+		print "Choose:", image
+
+		if image.endswith(".gif"):
+			print "Animated image!"
+			self.picture_still.Hide()
+			print "Showing the Image"	
+			self.picture_animated.Show()
+			print "Loading Image"
+			self.picture_animated.LoadFile(image)
+			print "Playing the Image"
+			self.picture_animated.Play()
+		else:
+			print "Still image!"
+			self.picture_still.Show()
+			self.picture_animated.Stop()
+			self.picture_animated.Hide()
+
+			if image == "":
+				bitmap = wx.BitmapFromImage(wx.EmptyImage(128, 128))
+			else:
+				bitmap = wx.BitmapFromImage(wx.Image(image))
+			self.picture_still.SetBitmap(bitmap)
+
+		self.Layout()
 
 		# Add the object type specific information
 		s = ""
