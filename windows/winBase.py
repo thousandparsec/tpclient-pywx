@@ -88,25 +88,11 @@ class winBaseMixIn(object):
 		icon.CopyFromBitmap(wx.Bitmap(os.path.join("graphics", "icon.ico"), wx.BITMAP_TYPE_ANY))
 		self.SetIcon(icon)
 
-		self.Bind(wx.EVT_ACTIVATE, self.OnRaise)
 		self.Bind(wx.EVT_CLOSE, self.OnProgramExit)
 
 	def OnProgramExit(self, evt):
 		# Ignore close events
 		evt.Veto(True)
-
-	def OnRaise(self, evt):
-		evt.Skip()
-		
-		# Raise the other windows when we raise this window
-		if not evt.GetActive():
-			return
-		
-		if wx.Platform != '__WXMSW__':
-			if not self.config.has_key('raise') or self.config['raise'] == "All on All" or self.config['raise'] == "All on Main":
-				if hasattr(self, "children"):
-					for window in self.children.values():
-						window.Raise()
 
 	def Post(self, event):
 		# Post an event to this window and it's children
@@ -120,18 +106,6 @@ class winBaseMixIn(object):
 			except Exception, e:
 				utils.do_traceback()
 
-	def Hide(self):
-		# Hide this window and it's children
-		for window in self.children.values():
-			window.Hide()
-		return super(winBaseMixIn, self).Hide()
-
-	def Raise(self):
-		# Raise this window and it's children
-		for window in self.children.values():
-			window.Raise()
-		return super(winBaseMixIn, self).Raise()
-	
 	def SetSizeHard(self, pos):
 		self.SetMinSize(pos)
 		self.SetMaxSize(pos)
@@ -370,18 +344,47 @@ class winMDIReportBase(winConfigMixIn, winBaseMixIn, wx.MDIChildFrame):
 		evt.Veto(True)
 
 # These give a non-MDI interface under other operating systems
-#class winNormalBase(ConfigMixIn, winBaseMixIn, wx.Frame):
 class winNormalBase(ConfigMixIn, winBaseMixIn, wx.Frame):
 	def __init__(self, application):
 		wx.Frame.__init__(self, None, -1, 'TP: ' + self.title, wx.DefaultPosition, wx.DefaultSize, \
 				wx.DEFAULT_FRAME_STYLE)
 		winBaseMixIn.__init__(self, application, None)
 
+	def Hide(self):
+		# Hide this window and it's children
+		for window in self.children.values():
+			window.Hide()
+		return super(winBaseMixIn, self).Hide()
+
+	def Raise(self, notme=None):
+		print "Raise  ", self.title
+		for window in self.children.values():
+			if not window is notme and window.IsShown():
+				print "Raising", window.title
+				window.Raise()
+		return super(winBaseMixIn, self).Raise()
+
+
 class winMiniSubBase(winConfigMixIn, winBaseMixIn, wx.MiniFrame):
 	def __init__(self, application, parent):
 		wx.MiniFrame.__init__(self, parent, -1, 'TP: ' + self.title, wx.DefaultPosition, wx.DefaultSize, \
 				wx.DEFAULT_FRAME_STYLE|wx.FRAME_NO_TASKBAR|wx.TAB_TRAVERSAL)
 		winBaseMixIn.__init__(self, application, parent)
+
+		self.Bind(wx.EVT_ACTIVATE, self.OnRaise)
+
+	def Raise(self):
+		print "Raise  ", self.title
+		self.Unbind(wx.EVT_ACTIVATE)
+		r = super(wx.MiniFrame, self).Raise()
+		wx.CallAfter(self.Bind, wx.EVT_ACTIVATE, self.OnRaise)
+		return r
+
+	def OnRaise(self, evt):
+		if not evt.GetActive():
+			return
+		print "OnRaise", self.title
+		self.parent.Raise()
 
 class winNormalSubBase(winConfigMixIn, winBaseMixIn, wx.Frame):
 	def __init__(self, application, parent):

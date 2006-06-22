@@ -207,7 +207,7 @@ class winMain(winMDIBase):
 			if not config['raise'] in ("Individual", "All on Main", "All on All"):
 				raise ValueError('Config-%s: a raise value of %s is not valid' % (self, config['raise']))
 		except (ValueError, KeyError), e:
-			config['raise'] = "Individual"
+			config['raise'] = "All on Main"
 
 		# Where is the window position
 		try:
@@ -336,7 +336,7 @@ class winMain(winMDIBase):
 		raisebox = wx.RadioBox(cpanel, -1, _("Raise Mode"), choices=options, majorDimension=1, style=wx.RA_SPECIFY_COLS)
 		raisebox.SetToolTip( wx.ToolTip(_("Choose a method for raising the windows.")) )
 		csizer.Add( raisebox, 1, wx.GROW|wx.ALIGN_CENTER_HORIZONTAL|wx.ALL, 5 )
-		#cpanel.Bind(wx.EVT_RADIOBOX, self.OnConfigRaise, raisebox)
+		cpanel.Bind(wx.EVT_RADIOBOX, self.OnConfigRaise, raisebox)
 
 		cpanel.SetSizer( csizer )	
 		cpanel.Layout()
@@ -387,6 +387,9 @@ class winMain(winMDIBase):
 
 	def OnConfigDisplayMove(self, evt):
 		self.ConfigUpdate()
+
+	def OnConfigRaise(self, evt):
+		self.config['raise'] = evt.GetString()
 
 	# Menu bar options
 	##################################################################

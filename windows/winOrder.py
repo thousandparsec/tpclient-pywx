@@ -486,6 +486,7 @@ class winOrder(winBase):
 			args += defaults[type]
 
 		# Create the new order
+		print args
 		new = objects.Order(*args)
 		new._dirty = True
 
