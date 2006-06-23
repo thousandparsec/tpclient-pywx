@@ -37,11 +37,12 @@ class winInfo(winBase):
 
 		self.titletext = wx.StaticText(self, -1, _("No Object Selected."))
 
-		picture_still_panel = wx.Panel(self)
-		self.picture_still = wx.StaticBitmap(picture_still_panel, -1, wx.BitmapFromImage(wx.EmptyImage(128, 128)))
-		picture_still_panel.SetBackgroundColour(wx.Colour(0, 0, 0))
+		self.picture_panel = wx.Panel(self)
+		self.picture_panel.SetBackgroundColour(wx.Colour(0, 0, 0))
 
-		self.picture_animated = GIFAnimationCtrl(self, -1)
+		self.picture_still = wx.StaticBitmap(self.picture_panel, -1, wx.BitmapFromImage(wx.EmptyImage(128, 128)))
+
+		self.picture_animated = GIFAnimationCtrl(self.picture_panel, -1)
 		self.picture_animated.SetBackgroundColour(wx.Colour(0, 0, 0))
 		self.picture_animated.Stop(); self.picture_animated.Hide()
 
@@ -54,8 +55,7 @@ class winInfo(winBase):
 		information.Add(self.text, 1, wx.EXPAND, 0)
 		
 		middle = wx.BoxSizer(wx.HORIZONTAL)
-		middle.Add(picture_still_panel,    0, 0, 0)
-		middle.Add(self.picture_animated, 0, 0, 0)
+		middle.Add(self.picture_panel,    0, 0, 0)
 		middle.Add(information, 1, wx.EXPAND, 0)
 
 		top.Add(middle, 1, wx.EXPAND, 0)
