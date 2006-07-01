@@ -81,6 +81,7 @@ class winStarMap(winBase):
 
 	def Rebuild(self):
 		try:
+			self.RemovePath()
 			self.Canvas.ClearAll()
 		
 			application = self.application
@@ -119,7 +120,6 @@ class winStarMap(winBase):
 					ship.Move(scale(object.pos))
 
 					C(object, ship, as="icon")
-					
 
 			self.arrow = PolyNoSize([(0,0), (-5,-10), (0, -8), (5,-10)], LineWidth=1,LineColor="Red",FillColor="Red",InForeground=True)
 			self.Canvas.AddObject(self.arrow)
@@ -193,10 +193,23 @@ class winStarMap(winBase):
 	####################################################
 	# Remote Event Handlers
 	####################################################
+	def RemovePath(self):
+		if self.path != None:
+			print "Removing Path", self.path
+			self.Canvas.RemoveObject(self.path)
+			self.path = None
+
+	def SetPath(self, path):
+		self.RemovePath()
+
+		print "Setting path", path
+		self.path = path
+
 	def OnCacheUpdate(self, evt):
 		"""\
 		Called when the cache has been updated.
 		"""
+		
 		self.Rebuild()
 
 	def OnSelectObject(self, evt):
@@ -206,21 +219,15 @@ class winStarMap(winBase):
 		object = self.application.cache.objects[evt.id]
 
 		self.arrow.Move(scale(object.pos))
-		if self.path != None:
-			path = self.path
-			self.path = None
-			self.Canvas.RemoveObject(path)
 
 		if isinstance(object, Fleet):
 			points = getpath(self.application, object)
 			if points:
 				path = self.Create(object, Line(scale(points), LineColor="Blue", InForeground=True))
-				self.Canvas.AddObject(path)
-				self.path = path
+				self.SetPath(path)
 			elif object.vel != (0, 0, 0): 
 				path = self.Create(object, CrossLine(scale(object.pos[0:2]), scale(object.vel[0:2]), 3, LineColor="Blue", InForeground=True))
-				self.Canvas.AddObject(path)
-				self.path = path
+				self.SetPath(path)
 				
 		self.Canvas.Draw()
 
@@ -230,37 +237,27 @@ class winStarMap(winBase):
 		"""
 		object = self.application.cache.objects[evt.id]
 
-		dirty = False
-
-		if self.path != None:
-			path = self.path
-			self.path = None
-			self.Canvas.RemoveObject(path)
-
-			dirty = True
-			
+		self.RemovePath()
+		
 		if isinstance(object, Fleet):
 			points = getpath(self.application, object)
 
-			if self.cache.has_key(evt.id) and self.cache[evt.id].has_key("path"):
-				self.Canvas.RemoveObject(self.cache[evt.id]["path"])
+#			if self.cache.has_key(evt.id) and self.cache[evt.id].has_key("path"):
+#				self.Canvas.RemoveObject(self.cache[evt.id]["path"])
 
 			# Update the lines
 			if points:
 				self.Create(object, Line(scale(points), LineColor="Grey", InForeground=True), as="path")
+
 				path = self.Create(object, Line(scale(points), LineColor="Blue", InForeground=True))
-				self.Canvas.AddObject(path)
-				self.path = path
+				self.SetPath(path)
 				
 			# Put the Icon ontop
 			if self.cache.has_key(evt.id) and self.cache[evt.id].has_key("icon"):
 				self.Canvas.RemoveObject(self.cache[evt.id]["icon"])
 				self.Canvas.AddObject(self.cache[evt.id]["icon"])
 
-			dirty = True
-
-		if dirty:
-			self.Canvas.Draw()
+		self.Canvas.Draw()
 
 	def OnDirtyOrder(self, evt):
 		"""\
@@ -277,10 +274,8 @@ class winStarMap(winBase):
 			if not points:
 				return
 			
-			self.Canvas.RemoveObject(self.path)
 			path = self.Create(object, Line(scale(points), LineColor="Blue", InForeground=True))
-			self.Canvas.AddObject(path)
-			self.path = path
+			self.SetPath(path)
 			
 			self.Canvas.Draw()
 			
