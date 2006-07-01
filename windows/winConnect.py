@@ -156,9 +156,9 @@ class winConnect(winMainBase):
 		"""\
 		Returns the configuration of the Window (and it's children).
 		"""
-		if hasattr(self, 'ConfigWidgets'):
-			servers, username, password, auto, debug = self.ConfigWidgets
-			self.config['servers'] = servers.GetStrings()
+		self.ConfigUpdate()
+
+		self.ConfigLoad(self.config)
 		return self.config
 
 	def ConfigLoad(self, config):
@@ -181,7 +181,15 @@ class winConnect(winMainBase):
 		"""\
 		Updates the config details using external sources.
 		"""
-		pass
+		if hasattr(self, 'ConfigWidgets'):
+			servers, username, password, auto, debug = self.ConfigWidgets
+
+			self.config['servers']  = servers.GetStrings()
+			self.config['username'] = username.GetValue()
+			self.config['password'] = password.GetValue()
+
+			self.config['auto']  = auto.GetValue()
+			self.config['debug'] = debug.GetValue()
 
 	def ConfigDisplay(self, panel, sizer):
 		"""\
