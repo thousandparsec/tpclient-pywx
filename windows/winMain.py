@@ -28,16 +28,25 @@ ID_STAT_FLEET = 10054
 ID_STAT_BATTLE = 10055
 ID_STATS = 10056
 
-ID_WIN_STARMAP = 11000
-ID_WIN_MESSAGES = 11001
-ID_WIN_SYSTEM = 11002
-ID_WIN_ORDERS = 11003
-ID_WIN_DESIGN = 11004
-ID_WIN_TIPS = 11005
-ID_WIN_INFO = 11006
+ID_WINDOWS      = 11000
+ID_WIN_STARMAP  = 11001
+ID_WIN_MESSAGES = 11002
+ID_WIN_SYSTEM   = 11003
+ID_WIN_ORDERS   = 11004
+ID_WIN_DESIGN   = 11005
+ID_WIN_TIPS     = 11006
+ID_WIN_INFO     = 11007
+
 ID_WIN_HELP = 1105
 
 ID_HELP = 10057
+
+# FIXME: This shouldn't be needed
+TITLES = 0
+IDS    = 1
+menus = [ \
+	[_("Information"), _("Messages"), _("Orders"), _("StarMap"), _("System"), _("Design")],
+	[ID_WIN_INFO, ID_WIN_MESSAGES, ID_WIN_ORDERS, ID_WIN_STARMAP, ID_WIN_SYSTEM, ID_WIN_DESIGN]]
 
 class TimeStatusBar(wx.StatusBar):
 	def __init__(self, parent):
@@ -106,64 +115,6 @@ class winMain(winMDIBase):
 
 		from windows.winSystem import winSystem
 		winSystem(application, self)
-
-	def Menu(self, source):
-		bar = wx.MenuBar()
-
-		# File Menu
-		file = wx.Menu()
-		file.Append( ID_OPEN, _("Connect to Game\tCtrl-O"), _("Connect to a diffrent Game") )
-		file.Append( ID_UNIV, _("Download the Universe\tCtrl-U"), _("Download the Universe") )
-		file.AppendSeparator()
-		file.Append( wx.ID_PREFERENCES, _("Preferences"), _("Configure the Client") )
-		file.AppendSeparator()
-		file.Append( ID_EXIT, _("Exit"), _("Exit") )
-	
-		# Statistics Menu
-		stat = wx.Menu()
-		stat.Append( ID_STAT_EAAG, _("Empire at a Glance"), _("") )
-		stat.AppendSeparator()
-		stat.Append( ID_STAT_SYSTEM, _("Systems"), _("") )
-		stat.Append( ID_STAT_PLANET, _("Planets"), _("") )
-		stat.Append( ID_STAT_FLEET,  _("Fleets"), _("") )
-		stat.AppendSeparator()
-		stat.Append( ID_STAT_BATTLE, _("Battles"), _("") )
-	
-		# Windows Menu
-		win = wx.Menu()
-		win.Append(  ID_WIN_INFO,     _("Hide Information"), _(""), True )
-		win.Append(  ID_WIN_MESSAGES, _("Hide Messages"), _(""), True )
-		win.Append(  ID_WIN_ORDERS,   _("Hide Orders"), _(""), True )
-		win.Append(  ID_WIN_STARMAP,  _("Hide StarMap"), _(""), True )
-		win.Append(  ID_WIN_SYSTEM,   _("Hide System"), _(""), True )
-		win.AppendSeparator()
-		win.Append(  ID_WIN_DESIGN,   _("Hide Design"), _(""), True )
-		win.AppendSeparator()
-		win.Append(  ID_WIN_TIPS, _("Show Tips"), _(""), True )
-		win.Append(  ID_WIN_HELP, _("Help"), _(""), True)
-	
-		help = wx.Menu()
-		
-		bar.Append( file, _("File") )
-		bar.Append( stat, _("Statistics") )
-		bar.Append( win,  _("Windows") )
-		bar.Append( help, _("Help") )
-	
-		wx.EVT_MENU(source, ID_OPEN,	self.OnConnect)
-		wx.EVT_MENU(source, ID_UNIV,	self.UpdateCache)
-		wx.EVT_MENU(source, wx.ID_PREFERENCES,	self.OnConfig)
-		wx.EVT_MENU(source, ID_EXIT,	self.OnProgramExit)
-	
-		wx.EVT_MENU(source, ID_WIN_INFO,        self.OnInformation)
-		wx.EVT_MENU(source, ID_WIN_MESSAGES,	self.OnMessages)
-		wx.EVT_MENU(source, ID_WIN_ORDERS,		self.OnOrders)
-		wx.EVT_MENU(source, ID_WIN_STARMAP,		self.OnStarMap)
-		wx.EVT_MENU(source, ID_WIN_SYSTEM,		self.OnSystem)
-		wx.EVT_MENU(source, ID_WIN_DESIGN,		self.OnDesign)
-		wx.EVT_MENU(source, ID_WIN_TIPS,		self.ShowTips)
-		
-#		wx.EVT_MENU(source, ID_WIN_HELP,		self.OnHelp)
-		return bar
 
 	def Show(self, show=True):
 		# Show this window and it's children - also fixes menus for MacOS
@@ -393,29 +344,76 @@ class winMain(winMDIBase):
 
 	# Menu bar options
 	##################################################################
+	def Menu(self, source):
+		bar = wx.MenuBar()
+
+		# File Menu
+		file = wx.Menu()
+		file.Append( ID_OPEN, _("Connect to Game\tCtrl-O"), _("Connect to a diffrent Game") )
+		file.Append( ID_UNIV, _("Download the Universe\tCtrl-U"), _("Download the Universe") )
+		file.AppendSeparator()
+		file.Append( wx.ID_PREFERENCES, _("Preferences"), _("Configure the Client") )
+		file.AppendSeparator()
+		file.Append( ID_EXIT, _("Exit"), _("Exit") )
+
+		# Statistics Menu
+		stat = wx.Menu()
+		stat.Append( ID_STAT_EAAG, _("Empire at a Glance"), _("") )
+		stat.AppendSeparator()
+		stat.Append( ID_STAT_SYSTEM, _("Systems"), _("") )
+		stat.Append( ID_STAT_PLANET, _("Planets"), _("") )
+		stat.Append( ID_STAT_FLEET,  _("Fleets"),  _("") )
+		stat.AppendSeparator()
+		stat.Append( ID_STAT_BATTLE, _("Battles"), _("") )
+
+		# Windows Menu
+		win = wx.Menu()
+
+		for i in xrange(0, len(menus[IDS])):
+			win.Append(menus[IDS][i], _("Hide " + menus[TITLES][i]), _(""), True )
+
+		win.AppendSeparator()
+		win.Append(ID_WIN_TIPS, _("Show Tips"), _(""), True )
+		win.Append(ID_WIN_HELP, _("Help"),      _(""), True)
+
+		help = wx.Menu()
+
+		bar.Append( file, _("File") )
+		bar.Append( stat, _("Statistics") )
+		bar.Append( win,  _("Windows") )
+		bar.Append( help, _("Help") )
+
+		source.Bind(wx.EVT_MENU, self.OnConnect,     id=ID_OPEN)
+		source.Bind(wx.EVT_MENU, self.UpdateCache,   id=ID_UNIV)
+		source.Bind(wx.EVT_MENU, self.OnConfig,      id=wx.ID_PREFERENCES)
+		source.Bind(wx.EVT_MENU, self.OnProgramExit, id=ID_EXIT)
+
+		# FIXME: Hack!
+		def MenuWindowUpdate(evt, self=source, mainWin=self):
+			for title, window in mainWin.children.items():
+				bar = self.GetMenuBar()
+				menu = bar.FindItemById(menus[IDS][menus[TITLES].index(title)])
+
+				if menu.IsChecked() == window.IsShown():
+					menu.Toggle()
+
+		source.MenuWindowUpdate = MenuWindowUpdate
+		for menu in menus[IDS]:
+			source.Bind(wx.EVT_MENU, self.OnMenuWindowItem, id=menu)
+			wx.GetApp().Bind(wx.EVT_UPDATE_UI, source.MenuWindowUpdate, id=menu)
+
+		source.Bind(wx.EVT_MENU, self.ShowTips, id=ID_WIN_TIPS)
+		return bar
+
+	def OnMenuWindowItem(self, evt):
+		title = menus[TITLES][menus[IDS].index(evt.GetId())]
+		self.children[title].Show(not evt.Checked())
+
 	def OnConnect(self, evt):
 		self.application.gui.Show(self.application.gui.connectto)
 
 	def OnConfig(self, evt):
 		self.application.ConfigDisplay()
-		
-	def OnDesign(self, evt):
-		self.children[_('Design')].Show(not evt.Checked())
-
-	def OnInformation(self, evt):
-		self.children[_('Information')].Show(not evt.Checked())
-		
-	def OnMessages(self, evt):
-		self.children[_('Messages')].Show(not evt.Checked())
-		
-	def OnOrders(self, evt):
-		self.children[_('Windows')].Show(not evt.Checked())
-		
-	def OnStarMap(self, evt):
-		self.children[_('StarMap')].Show(not evt.Checked())
-
-	def OnSystem(self, evt):
-		self.children[_('System')].Show(not evt.Checked())
 
 	def OnProgramExit(self, evt):
 		self.application.Exit()
