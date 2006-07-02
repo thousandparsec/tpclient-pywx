@@ -21,6 +21,7 @@ ID_REVERT = 10046
 ID_CONFIG = 10047
 ID_EXIT = 10049
 ID_FILE = 10050
+
 ID_STAT_EAAG = 10051
 ID_STAT_SYSTEM = 10052
 ID_STAT_PLANET = 10053
@@ -66,7 +67,7 @@ class TimeStatusBar(wx.StatusBar):
 	def Notify(self):
 		sih = 60*60
 		sim = 60
-	
+
 		left = self.endtime - time.time()
 		if left > 0:
 			hours = math.floor(left / sih)
@@ -100,7 +101,7 @@ class winMain(winMDIBase):
 
 		from windows.winDesign import winDesign
 		winDesign(application, self)
-		
+
 		from windows.winInfo import winInfo
 		winInfo(application, self)
 
@@ -120,7 +121,7 @@ class winMain(winMDIBase):
 		# Show this window and it's children - also fixes menus for MacOS
 		if not show:
 			return self.Hide()
-		
+
 		for window in self.children.values():
 			# FIXME: This is a bit bad
 			if window.config.has_key('show') and window.config['show']:
@@ -131,7 +132,7 @@ class winMain(winMDIBase):
 
 		self.SetSizeHard(self.config['size'])
 		winMDIBase.Show(self)
-		
+
 		wx.CallAfter(self.ShowTips)
 
 		self.UpdateEOT()
@@ -152,7 +153,7 @@ class winMain(winMDIBase):
 
 		if config == None:
 			config = {}
-	
+
 		# Raise mode
 		try:
 			if not config['raise'] in ("Individual", "All on Main", "All on All"):
@@ -196,9 +197,9 @@ class winMain(winMDIBase):
 		# Get the details from there children
 		for window in self.children.values():
 			self.config[window.title] = window.ConfigSave()
-		
+
 		return self.config
-		
+
 	def ConfigLoad(self, config={}):
 		"""\
 		Loads the configuration of the Window (and it's children).
@@ -213,7 +214,7 @@ class winMain(winMDIBase):
 
 		self.SetSizeHard(config['size'])
 		self.ConfigDisplayUpdate(None)
-	
+
 	def ConfigUpdate(self):
 		"""\
 		Updates the config details using external sources.
@@ -222,7 +223,7 @@ class winMain(winMDIBase):
 			self.config['show'] = self.IsShown()
 			self.config['position'] = self.GetPosition()
 			self.config['size'] = self.GetSize()
-	
+
 	def ConfigDisplay(self, panel, sizer):
 		"""\
 		Display a config panel with all the config options.
@@ -230,7 +231,7 @@ class winMain(winMDIBase):
 		notebook = wx.Choicebook(panel, -1)
 		cpanel = wx.Panel(notebook, -1)
 		csizer = wx.BoxSizer(wx.HORIZONTAL)
-		
+
 		if wx.Platform == '__WXMSW__':
 			options = [_("Individual"), _("All on Main")]
 		elif wx.Platform == '__WXMAC__':
@@ -242,12 +243,12 @@ class winMain(winMDIBase):
 		SCREEN_X = wx.SystemSettings_GetMetric(wx.SYS_SCREEN_X)
 		SCREEN_Y = wx.SystemSettings_GetMetric(wx.SYS_SCREEN_Y)
 		SIZER_FLAGS = wx.GROW|wx.ALIGN_CENTER_VERTICAL|wx.ALL
-		
+
 		# The box around the position
 		box = wx.StaticBox(cpanel, -1, self.title)
 		box_sizer = wx.StaticBoxSizer(box, wx.VERTICAL)
 		csizer.Add(box_sizer, 1, SIZER_FLAGS, 5 )
-	
+
 		# Location Boxes
 		location = wx.FlexGridSizer( 0, 2, 0, 0 )
 		location.AddGrowableCol( 1 )
@@ -255,16 +256,16 @@ class winMain(winMDIBase):
 		# X Position
 		x_text = wx.StaticText(cpanel, -1, _("X Pos"))
 		location.Add( x_text, 0, SIZER_FLAGS, 5 )
-		
+
 		x_box = wx.SpinCtrl(cpanel, -1, "0", wx.DefaultPosition, wx.Size(50,-1), 0, 0, SCREEN_X, 0 )
 		location.Add( x_box, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
-		
+
 		cpanel.Bind(wx.EVT_SPINCTRL, self.OnConfigDisplayX, x_box)
 
 		# Y Position
 		y_text = wx.StaticText(cpanel, -1, _("Y Pos"))
 		location.Add( y_text, 0, SIZER_FLAGS, 5 )
-		
+
 		y_box = wx.SpinCtrl(cpanel, -1, "0", wx.DefaultPosition, wx.Size(50,-1), 0, 0, SCREEN_Y, 0 )
 		location.Add( y_box, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
 
@@ -273,10 +274,10 @@ class winMain(winMDIBase):
 		# Width
 		width_text = wx.StaticText(cpanel, -1, _("Width"))
 		location.Add( width_text, 0, SIZER_FLAGS, 5 )
-		
+
 		width = wx.SpinCtrl(cpanel, -1, "0", wx.DefaultPosition, wx.Size(50,-1), 0, 0, SCREEN_X, 0 )
 		location.Add( width, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
-		
+
 		cpanel.Bind(wx.EVT_SPINCTRL, self.OnConfigDisplayWidth, width)
 
 		box_sizer.Add( location, 0, SIZER_FLAGS, 5)
@@ -289,7 +290,7 @@ class winMain(winMDIBase):
 		csizer.Add( raisebox, 1, wx.GROW|wx.ALIGN_CENTER_HORIZONTAL|wx.ALL, 5 )
 		cpanel.Bind(wx.EVT_RADIOBOX, self.OnConfigRaise, raisebox)
 
-		cpanel.SetSizer( csizer )	
+		cpanel.SetSizer( csizer )
 		cpanel.Layout()
 
 		notebook.AddPage(cpanel, "Menubar")
@@ -300,7 +301,7 @@ class winMain(winMDIBase):
 
 			window.ConfigDisplay(cpanel, csizer)
 
-			cpanel.SetSizer( csizer )	
+			cpanel.SetSizer( csizer )
 			notebook.AddPage(cpanel, name)
 
 		self.ConfigWidgets = [raisebox, x_box, y_box, width]
@@ -316,10 +317,10 @@ class winMain(winMDIBase):
 
 		if not hasattr(self, 'ConfigWidgets'):
 			return
-		
+
 		raisebox, x_box, y_box, width = self.ConfigWidgets
 		raisebox.SetStringSelection(self.config['raise'])
-	
+
 		x_box.SetValue(self.config['position'][0])
 		y_box.SetValue(self.config['position'][1])
 		width.SetValue(self.config['size'][0])
@@ -331,7 +332,7 @@ class winMain(winMDIBase):
 	def OnConfigDisplayY(self, evt):
 		self.SetPosition(wx.Point(-1, evt.GetInt()))
 		self.ConfigUpdate()
-		
+
 	def OnConfigDisplayWidth(self, evt):
 		self.SetSize(wx.Size(evt.GetInt(), -1))
 		self.ConfigUpdate()
@@ -422,7 +423,7 @@ class winMain(winMDIBase):
 		config = load_data("pywx_tips")
 		if not config:
 			config = [True, 0]
-		
+
 		if config[0] or override != None:
 			tp = wx.CreateFileTipProvider(os.path.join("doc", "tips.txt"), config[1])
 			config[0] = wx.ShowTip(None, tp)
