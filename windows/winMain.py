@@ -102,20 +102,23 @@ class winMain(winMDIBase):
 
 		self.SetMenuBar(self.Menu(self))
 
+		if wx.Platform == "__WXMAC__":
+			for window in self.children.values():
+				window.SetMenuBar(self.Menu(window))
+
 	def Show(self, show=True):
 		# Show this window and it's children - also fixes menus for MacOS
 		if not show:
 			return self.Hide()
 
 		for window in self.children.values():
-			# FIXME: This is a bit bad
 			if window.config.has_key('show') and window.config['show']:
 				window.Show()
 
-			if wx.Platform == "__WXMAC__":
-				window.SetMenuBar(self.Menu(window))
+		# Lock the size for non-MDI platforms
+		if wx.Platform != "__WXMSW__":
+			self.SetSizeHard(self.config['size'])
 
-		self.SetSizeHard(self.config['size'])
 		winMDIBase.Show(self)
 
 		wx.CallAfter(self.ShowTips)

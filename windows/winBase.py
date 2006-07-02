@@ -350,41 +350,28 @@ class winNormalBase(ConfigMixIn, winBaseMixIn, wx.Frame):
 				wx.DEFAULT_FRAME_STYLE)
 		winBaseMixIn.__init__(self, application, None)
 
-	def Hide(self):
-		# Hide this window and it's children
-		for window in self.children.values():
-			window.Hide()
-		return super(winBaseMixIn, self).Hide()
+		self.Bind(wx.EVT_ACTIVATE, self.OnActivate)
 
-	def Raise(self, notme=None):
-		print "Raise  ", self.title
+	def OnActivate(self, evt):
+		if not evt.GetActive():
+			return
+		self.RaiseChildren()
+
+	def HideChildren(self):
 		for window in self.children.values():
-			if not window is notme and window.IsShown():
-				print "Raising", window.title
+			if isinstance(window, winBase):
+				window.Hide()
+
+	def RaiseChildren(self):
+		for window in self.children.values():
+			if isinstance(window, winBase):
 				window.Raise()
-		return super(winBaseMixIn, self).Raise()
-
 
 class winMiniSubBase(winConfigMixIn, winBaseMixIn, wx.MiniFrame):
 	def __init__(self, application, parent):
-		wx.MiniFrame.__init__(self, parent, -1, 'TP: ' + self.title, wx.DefaultPosition, wx.DefaultSize, \
+		wx.MiniFrame.__init__(self, None, -1, 'TP: ' + self.title, wx.DefaultPosition, wx.DefaultSize, \
 				wx.DEFAULT_FRAME_STYLE|wx.FRAME_NO_TASKBAR|wx.TAB_TRAVERSAL)
 		winBaseMixIn.__init__(self, application, parent)
-
-		self.Bind(wx.EVT_ACTIVATE, self.OnRaise)
-
-	def Raise(self):
-		print "Raise  ", self.title
-		self.Unbind(wx.EVT_ACTIVATE)
-		r = super(wx.MiniFrame, self).Raise()
-		wx.CallAfter(self.Bind, wx.EVT_ACTIVATE, self.OnRaise)
-		return r
-
-	def OnRaise(self, evt):
-		if not evt.GetActive():
-			return
-		print "OnRaise", self.title
-		self.parent.Raise()
 
 class winNormalSubBase(winConfigMixIn, winBaseMixIn, wx.Frame):
 	def __init__(self, application, parent):
@@ -407,7 +394,7 @@ Under Windows they are mapped to the following
 	- winMainBase	-> Normal Windows Window
 	- winMDIBase	-> MDI Parent Window
 	- winBase		-> MDI Child Window with not title
-	- winReportBase	-> MDI Child window with title
+	- winReportBase	-> MDI Child Window with title
 
 Under Mac they are mapped to the following
 	- winMainBase	-> Normal Mac Window
