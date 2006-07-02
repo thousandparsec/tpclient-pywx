@@ -29,25 +29,10 @@ ID_STAT_FLEET = 10054
 ID_STAT_BATTLE = 10055
 ID_STATS = 10056
 
-ID_WINDOWS      = 11000
-ID_WIN_STARMAP  = 11001
-ID_WIN_MESSAGES = 11002
-ID_WIN_SYSTEM   = 11003
-ID_WIN_ORDERS   = 11004
-ID_WIN_DESIGN   = 11005
 ID_WIN_TIPS     = 11006
-ID_WIN_INFO     = 11007
-
 ID_WIN_HELP = 1105
 
 ID_HELP = 10057
-
-# FIXME: This shouldn't be needed
-TITLES = 0
-IDS    = 1
-menus = [ \
-	[_("Information"), _("Messages"), _("Orders"), _("StarMap"), _("System"), _("Design")],
-	[ID_WIN_INFO, ID_WIN_MESSAGES, ID_WIN_ORDERS, ID_WIN_STARMAP, ID_WIN_SYSTEM, ID_WIN_DESIGN]]
 
 class TimeStatusBar(wx.StatusBar):
 	def __init__(self, parent):
@@ -94,8 +79,6 @@ class winMain(winMDIBase):
 	def __init__(self, application):
 		winMDIBase.__init__(self, application)
 
-		self.SetMenuBar(self.Menu(self))
-
 		self.statusbar = TimeStatusBar(self)
 		self.SetStatusBar(self.statusbar)
 
@@ -116,6 +99,8 @@ class winMain(winMDIBase):
 
 		from windows.winSystem import winSystem
 		winSystem(application, self)
+
+		self.SetMenuBar(self.Menu(self))
 
 	def Show(self, show=True):
 		# Show this window and it's children - also fixes menus for MacOS
@@ -346,6 +331,7 @@ class winMain(winMDIBase):
 	# Menu bar options
 	##################################################################
 	def Menu(self, source):
+		app = wx.GetApp()
 		bar = wx.MenuBar()
 
 		# File Menu
@@ -370,8 +356,29 @@ class winMain(winMDIBase):
 		# Windows Menu
 		win = wx.Menu()
 
-		for i in xrange(0, len(menus[IDS])):
-			win.Append(menus[IDS][i], _("Hide " + menus[TITLES][i]), _(""), True )
+		# FIXME: Hack!
+		def OnMenuWindowItem(evt, self=source, windows=self.children):
+			window = windows[self.menu_ids[evt.GetId()]]
+			window.Show(evt.Checked())
+		source.OnMenuWindowItem = OnMenuWindowItem
+
+		def OnMenuWindowUpdate(evt, self=source, windows=self.children):
+			menu = self.GetMenuBar().FindItemById(evt.GetId())
+			if menu.IsChecked() != windows[self.menu_ids[evt.GetId()]].IsShown():
+				menu.Toggle()
+		source.OnMenuWindowUpdate = OnMenuWindowUpdate
+
+		source.menu_ids = {}
+		for title in self.children.keys():
+			id = wx.NewId()
+			source.menu_ids[id] = title
+
+			# Add the menu item
+			win.Append(id, _("Show " + title), _(""), True )
+
+			# Bind the events
+			source.Bind(wx.EVT_MENU, source.OnMenuWindowItem, id=id)
+			app.Bind(wx.EVT_UPDATE_UI, source.OnMenuWindowUpdate, id=id)
 
 		win.AppendSeparator()
 		win.Append(ID_WIN_TIPS, _("Show Tips"), _(""), True )
@@ -389,26 +396,8 @@ class winMain(winMDIBase):
 		source.Bind(wx.EVT_MENU, self.OnConfig,      id=wx.ID_PREFERENCES)
 		source.Bind(wx.EVT_MENU, self.OnProgramExit, id=ID_EXIT)
 
-		# FIXME: Hack!
-		def MenuWindowUpdate(evt, self=source, mainWin=self):
-			for title, window in mainWin.children.items():
-				bar = self.GetMenuBar()
-				menu = bar.FindItemById(menus[IDS][menus[TITLES].index(title)])
-
-				if menu.IsChecked() == window.IsShown():
-					menu.Toggle()
-
-		source.MenuWindowUpdate = MenuWindowUpdate
-		for menu in menus[IDS]:
-			source.Bind(wx.EVT_MENU, self.OnMenuWindowItem, id=menu)
-			wx.GetApp().Bind(wx.EVT_UPDATE_UI, source.MenuWindowUpdate, id=menu)
-
 		source.Bind(wx.EVT_MENU, self.ShowTips, id=ID_WIN_TIPS)
 		return bar
-
-	def OnMenuWindowItem(self, evt):
-		title = menus[TITLES][menus[IDS].index(evt.GetId())]
-		self.children[title].Show(not evt.Checked())
 
 	def OnConnect(self, evt):
 		self.application.gui.Show(self.application.gui.connectto)
