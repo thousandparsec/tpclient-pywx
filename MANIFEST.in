@@ -3,9 +3,8 @@ include LICENSE
 include COPYING
 include AUTHORS
 include graphics/*.png
-include graphics/media/planet-small/*.jpg
-include graphics/media/star-small/*.jpg
 include doc/*.txt
+include media
 prune Makefile
 prune setup.py
 prune graphics/sidebar.bmp

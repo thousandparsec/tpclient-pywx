@@ -3,17 +3,22 @@ The pywx-client for Thousand Parsec (TP)
 ============================================
 
 Requirements (all versions must be greater):
-	python 2.2
-	wxPython 2.6.0
-	libtpproto-py 0.1.0
+	python			2.2
+	wxPython		2.6.0
+
+	python-numarray	1.4 
+	 or
+	python-numeric	23.0
+
+	libtpclient-py	0.1.0
+	libtpproto-py	0.1.0
+
+Recommendations:
+	Python Imaging Library 1.0.0
+
 
 How to use
 ============================================
-
-Install python
-Install wxPython
-Install libtpproto-py
-
 In windows, double click on tpclient-pywx
 In linux, change to the tpclient-pywx directory and run "tpclient-pywx"
 
