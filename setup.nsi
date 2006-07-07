@@ -14,7 +14,7 @@
   CRCCheck On 
  
   ;Output File Name 
-  OutFile "tpclient-pywx-0.1.1-setup.exe" 
+  OutFile "tpclient-pywx-0.2.0rc1-setup.exe" 
  
   ;The Default Installation Directory 
   InstallDir "$PROGRAMFILES\Thousand Parsec\tpclient-pywx" 
@@ -100,9 +100,9 @@ Section "Files" Files
   WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\tpclient-pywx" \
                  "NoRepair" 1
   WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\tpclient-pywx" \
-                 "VersionMajor" 1
+                 "VersionMajor" 2
   WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\tpclient-pywx" \
-                 "VersionMinor" 1
+                 "VersionMinor" 0
 
   ;Create uninstaller
   WriteUninstaller "$INSTDIR\Uninstall.exe"
