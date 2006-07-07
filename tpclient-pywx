@@ -21,7 +21,7 @@ import utils
 from utils import debug, DEBUG_MAIN, DEBUG_GUI, DEBUG_NETWORK
 
 from tp.netlib import Connection, failed, constants
-from tp.client.threads import Application, NetworkThread
+from tp.client.threads import Application, NetworkThread, MediaThread
 from tp.client.cache import Cache
 
 
@@ -203,7 +203,6 @@ class GUI(wx.App):
 		dlg.Destroy()
 
 class Network(NetworkThread):
-
 	## These are network events
 	class NetworkFailureEvent(Exception):
 		"""\
@@ -221,8 +220,11 @@ class Network(NetworkThread):
 
 		# Show the Update window
 		gui.Call(gui.Show, gui.update)
-		if NetworkThread.ConnectTo(self, host, username, password, debug, up, cs="tpclient-pywx/%i.%i.%i" % version):
+		if NetworkThread.ConnectTo(self, host, username, password, debug, up, cs="tpclient-pywx/%s.%s.%s" % version):
 			self.CacheUpdate()
+
+		media = self.application.media
+		media.Call(media.ConnectTo, host, username)
 
 	def CacheUpdate(self):
 		gui = self.application.gui
@@ -261,6 +263,7 @@ class Application(_Application):
 
 	GUIClass = GUI
 	NetworkClass = Network
+	MediaClass = MediaThread
 	ConfigFile = "pywx_preferences"
 
 if __name__ == '__main__':

@@ -4,7 +4,10 @@ displays all objects information.
 """
 
 import os
+import os.path
 from types import *
+
+import pprint
 
 # wxPython imports
 import wx
@@ -25,6 +28,19 @@ from tp.netlib.objects.ObjectExtra.Fleet import Fleet
 from winBase import *
 from utils import *
 
+def splitall(start):
+	bits = []
+
+	while True:
+		start, end = os.path.split(start)
+		if end is '':
+			break
+		bits.append(end)
+	bits.reverse()
+	return bits
+
+
+WAITING = os.path.join(".", "graphics", "loading.gif")
 class winInfo(winBase):
 	title = _("Information")
 
@@ -63,31 +79,36 @@ class winInfo(winBase):
 		self.SetSizer(top)
 
 		# Find the images
-		import os
-		self.images = {'nebula':[], 'star':[], 'planet':[]}
-		base = os.path.join(".", "media", "common-2d")
+		self.images = {'nebula':{'still':[]}, 'star':{'still':[]}, 'planet':{'still':[]}}
 
-		def li(root, dirs, files, images=self.images):
-			dir = os.path.split(root)[-1]
-			if not '-' in dir:
-				return
-			type, size = dir.split('-')
-			
-			if images.has_key(type) and size == "small":
-				images[type].extend([os.path.join(root, x) for x in files])
-
-				if "animation" in dirs and "still" in dirs:
-					for nroot, ndirs, nfiles in os.walk(os.path.join(root, "animation")):
-						images[type].extend([os.path.join(nroot, x) for x in nfiles])
-						
-					dirs.remove("animation")
-
-					#for t, ndirs, nfiles in os.walk(os.path.join(root, "still")):
-					#	li(root, ndirs, nfiles)
-					#dirs.remove("still")
-
-		for root, dirs, files in os.walk(base):
-			li(root, dirs, files)
+	def OnMediaUpdate(self, evt):
+		print
+		print "winInfo.OnMediaUpdate", evt
+		files = {}
+		for file, timestamp in evt.files:
+			bits = splitall(file)
+	
+			if bits[-2] in ['animation', 'still']:
+				type = bits[-2]
+				del bits[-2]
+			else:
+				type = 'still'
+	
+			if not bits[-2].endswith("-small"):
+				continue
+			else:
+				key = bits[-2][:-6]
+				if not files.has_key(key):
+					files[key] = {}
+				if not files[key].has_key(type):
+					files[key][type] = []
+				files[key][type].append((file, timestamp))
+		self.images = files
+	
+	def OnMediaDownloadDone(self, evt):
+		if evt.file == self.image_waiting:
+			# FIXME: Should load the image now...
+			pass	
 
 	def OnSelectObject(self, evt):
 		print "winInfo SelectObject", evt
@@ -108,34 +129,46 @@ class winInfo(winBase):
 		elif isinstance(object, Planet):
 			images = self.images['planet']
 		else:
-			images = []
+			images = {'still': []}
+
+		print
+		pprint.pprint(images)
+		print
+
+		if images.has_key("animation"):
+			images = images["animation"]
+		else:
+			images = images["still"]
+
+		print
+		pprint.pprint(images)
+		print
 
 		try:
 			image = images[object.id % len(images)]
-		except:
-			image = ""
-
-		print "Choose:", image
-
-		if image.endswith(".gif"):
-			print "Animated image!"
-			self.picture_still.Hide()
-			print "Showing the Image"	
-			self.picture_animated.Show()
-			print "Loading Image"
-			self.picture_animated.LoadFile(image)
-			print "Playing the Image"
-			self.picture_animated.Play()
-		else:
-			print "Still image!"
-			self.picture_still.Show()
-			self.picture_animated.Stop()
-			self.picture_animated.Hide()
-
-			if image == "":
-				bitmap = wx.BitmapFromImage(wx.EmptyImage(128, 128))
+			file = self.application.media.GetFile(*image)
+			if file is None:
+				self.image_waiting = image
+				file = WAITING
+		
+			if file.endswith(".gif"):
+				print "Animated image!"
+				self.picture_still.Hide()
+				print "Showing the Image"	
+				self.picture_animated.Show()
+				print "Loading Image"
+				self.picture_animated.LoadFile(file)
+				print "Playing the Image"
+				self.picture_animated.Play()
 			else:
-				bitmap = wx.BitmapFromImage(wx.Image(image))
+				print "Still image!"
+				self.picture_still.Show()
+				self.picture_animated.Stop()
+				self.picture_animated.Hide()
+
+			bitmap = wx.BitmapFromImage(wx.Image(file))
+		except:
+			bitmap = wx.BitmapFromImage(wx.EmptyImage(128, 128))
 			self.picture_still.SetBitmap(bitmap)
 
 		self.Layout()

@@ -102,6 +102,7 @@ class winConnect(winMainBase):
 			return
 
 		self.application.network.Call(self.application.network.ConnectTo, host, username, password, debug=self.config['debug'])
+		self.application.media.Call(self.application.media.ConnectTo, host, username, debug=self.config['debug'])
 	
 	# Config Functions -----------------------------------------------------------------------------
 	def ConfigDefault(self, config=None):
@@ -123,19 +124,19 @@ class winConnect(winMainBase):
 				raise ValueError('Config-%s: the servers list was empty' % (self,))
 
 		except (ValueError, KeyError), e:
-			config['servers'] = ["127.0.0.1:6923", "mithro.dyndns.org", "code-bear.dyndns.org", "llnz.dyndns.org"]
+			config['servers'] = ["thousandparsec.net", "127.0.0.1:6923", "mithro.dyndns.org", "code-bear.dyndns.org", "llnz.dyndns.org"]
 
 		try:
 			if not isinstance(config['username'], (unicode, str)):
 				raise ValueError('Config-%s: a username value of %s is not valid' % (self, config['username']))
 		except (ValueError, KeyError), e:
-			config['username'] = "@tp"
+			config['username'] = "guest@tp"
 
 		try:
 			if not isinstance(config['password'], (unicode, str)):
 				raise ValueError('Config-%s: a password value of %s is not valid' % (self, config['password']))
 		except (ValueError, KeyError), e:
-			config['password'] = ""
+			config['password'] = "guest"
 
 		try:
 			if not isinstance(config['auto'], bool):

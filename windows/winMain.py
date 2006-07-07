@@ -35,19 +35,45 @@ ID_WIN_HELP = 1105
 ID_HELP = 10057
 
 class TimeStatusBar(wx.StatusBar):
+	WIDGET_PROGRESS = 0
+	TEXT_PROGRESS = 1
+	TEXT_TIMER = 2	
+
 	def __init__(self, parent):
 		wx.StatusBar.__init__(self, parent, -1)
 
-		self.SetFieldsCount(2)
-		self.SetStatusWidths([-3, -1])
+		self.SetFieldsCount(3)
+		self.SetStatusWidths([-3, -3, -2])
 
-		self.SetStatusText("", 0)
+		self.Progress = wx.Gauge(self, -1, 1)
+
+		self.SetStatusText("", TimeStatusBar.TEXT_TIMER)
+		self.SetStatusText("", TimeStatusBar.TEXT_PROGRESS)
+
 		self.endtime = 0
 		self.parent = parent
 
 		self.timer = wx.PyTimer(self.Notify)
 		self.timer.Start(1000)
 		self.Notify()
+
+		self.Reposition()
+		self.Bind(wx.EVT_SIZE, self.OnSize)
+		self.Bind(wx.EVT_IDLE, self.OnIdle)
+
+	def OnSize(self, evt):
+		self.Reposition()
+		self.sizeChanged = True
+
+	def OnIdle(self, evt):
+		if self.sizeChanged:
+			self.Reposition()
+
+	def Reposition(self):
+		rect = self.GetFieldRect(TimeStatusBar.WIDGET_PROGRESS)
+		self.Progress.SetPosition((rect.x+4, rect.y+2))
+		self.Progress.SetSize((rect.width-6, rect.height-4))
+		self.sizeChanged = False
 
 	def Notify(self):
 		sih = 60*60
@@ -58,12 +84,23 @@ class TimeStatusBar(wx.StatusBar):
 			hours = math.floor(left / sih)
 			mins = math.floor((left - hours * sih) / sim)
 			secs = math.floor((left - hours * sih - mins * sim))
-			self.SetStatusText("EOT: %02i:%02i:%02i" % (hours, mins, secs), 1)
+			self.SetStatusText("EOT: %02i:%02i:%02i" % (hours, mins, secs), TimeStatusBar.TEXT_TIMER)
 		else:
 			if self.endtime != 0:
 				self.parent.UpdateEOT()
 				self.endtime = 0
-			self.SetStatusText("EOT: Unknown", 1)
+			self.SetStatusText("EOT: Unknown", TimeStatusBar.TEXT_TIMER)
+
+	def OnMediaDownloadStart(self, evt):
+		self.Progress.SetRange(evt.size)
+		self.SetStatusText("Dw: %s" % os.path.basename(evt.file), TimeStatusBar.TEXT_PROGRESS)
+
+	def OnMediaDownloadProgress(self, evt):
+		self.Progress.SetRange(evt.size)
+		self.Progress.SetValue(evt.progress)
+
+	def OnMediaDownloadDone(self, evt):
+		self.SetStatusText("", TimeStatusBar.TEXT_TIMER)
 
 	def SetEndTime(self, endtime):
 		print endtime
@@ -105,6 +142,13 @@ class winMain(winMDIBase):
 		if wx.Platform == "__WXMAC__":
 			for window in self.children.values():
 				window.SetMenuBar(self.Menu(window))
+
+	def OnMediaDownloadStart(self, evt):
+		self.statusbar.OnMediaDownloadStart(evt)
+	def OnMediaDownloadProgress(self, evt):
+		self.statusbar.OnMediaDownloadProgress(evt)
+	def OnMediaDownloadDone(self, evt):
+		self.statusbar.OnMediaDownloadDone(evt)		
 
 	def Show(self, show=True):
 		# Show this window and it's children - also fixes menus for MacOS
