@@ -45,16 +45,19 @@ def tos(n):
 
 class TimeStatusBar(wx.StatusBar):
 	WIDGET_PROGRESS = 0
-	TEXT_PROGRESS = 1
-	TEXT_TIMER = 2	
+	WIDGET_PROGRESS_CANCEL = 1
+	TEXT_PROGRESS = 2
+	TEXT_TIMER = 3
 
 	def __init__(self, parent):
 		wx.StatusBar.__init__(self, parent, -1)
 
-		self.SetFieldsCount(3)
-		self.SetStatusWidths([-3, -3, -2])
+		self.SetFieldsCount(4)
+		self.SetStatusWidths([-3, 20, -3, -2])
 
 		self.Progress = wx.Gauge(self, -1, 1)
+		self.ProgressCancel = wx.Button(self, -1, "X")
+		self.ProgressCancel.Enable(False)
 
 		self.SetStatusText("", TimeStatusBar.TEXT_TIMER)
 		self.SetStatusText("", TimeStatusBar.TEXT_PROGRESS)
@@ -69,20 +72,7 @@ class TimeStatusBar(wx.StatusBar):
 		self.Reposition()
 		self.Bind(wx.EVT_SIZE, self.OnSize)
 		self.Bind(wx.EVT_IDLE, self.OnIdle)
-
-	def OnSize(self, evt):
-		self.Reposition()
-		self.sizeChanged = True
-
-	def OnIdle(self, evt):
-		if self.sizeChanged:
-			self.Reposition()
-
-	def Reposition(self):
-		rect = self.GetFieldRect(TimeStatusBar.WIDGET_PROGRESS)
-		self.Progress.SetPosition((rect.x+4, rect.y+2))
-		self.Progress.SetSize((rect.width-6, rect.height-4))
-		self.sizeChanged = False
+		self.Bind(wx.EVT_BUTTON, self.OnButtonCancel, self.ProgressCancel)
 
 	def Notify(self):
 		sih = 60*60
@@ -99,10 +89,48 @@ class TimeStatusBar(wx.StatusBar):
 				self.parent.UpdateEOT()
 				self.endtime = 0
 			self.SetStatusText("EOT: Unknown", TimeStatusBar.TEXT_TIMER)
+	
+	def SetEndTime(self, endtime):
+		print endtime
+		self.endtime = endtime + time.time()
+
+	def Reposition(self):
+		rect = self.GetFieldRect(TimeStatusBar.WIDGET_PROGRESS)
+		self.Progress.SetPosition((rect.x+4, rect.y+2))
+		self.Progress.SetSize((rect.width-6, rect.height-4))
+
+		rect = self.GetFieldRect(TimeStatusBar.WIDGET_PROGRESS_CANCEL)
+		self.ProgressCancel.SetPosition((rect.x, rect.y))
+		self.ProgressCancel.SetSize((rect.width, rect.height))
+		
+		self.sizeChanged = False
+
+	def Clear(self):
+		self.Progress.SetValue(0)
+		self.Progress.SetRange(0)
+		self.ProgressCancel.Enable(False)
+
+		tt = wx.ToolTip("")
+		tt.Enable(False)
+		self.SetToolTip(tt)
+
+		self.SetStatusText("", TimeStatusBar.TEXT_PROGRESS)
+
+		del self.progress
+
+	def OnSize(self, evt):
+		self.Reposition()
+		self.sizeChanged = True
+
+	def OnIdle(self, evt):
+		if self.sizeChanged:
+			self.Reposition()
 
 	def OnMediaDownloadStart(self, evt):
+		self.progress = evt.file
 		self.Progress.SetRange(evt.size)
 		self.SetStatusText("Dw: %s" % os.path.basename(evt.file), TimeStatusBar.TEXT_PROGRESS)
+		self.ProgressCancel.Enable(True)
 
 	def OnMediaDownloadProgress(self, evt):
 		self.Progress.SetRange(evt.size)
@@ -113,18 +141,13 @@ class TimeStatusBar(wx.StatusBar):
 		self.SetToolTip(tt)
 
 	def OnMediaDownloadDone(self, evt):
-		self.Progress.SetValue(0)
-		self.Progress.SetRange(0)
+		self.Clear()
 
-		tt = wx.ToolTip("")
-		tt.Enable(False)
-		self.SetToolTip(tt)
+	def OnMediaDownloadAbort(self, evt):
+		self.Clear()
 
-		self.SetStatusText("", TimeStatusBar.TEXT_PROGRESS)
-
-	def SetEndTime(self, endtime):
-		print endtime
-		self.endtime = endtime + time.time()
+	def OnButtonCancel(self, evt):
+		self.parent.application.media.StopFile(self.progress)
 
 class winMain(winMDIBase):
 	title = _("Main Windows")
@@ -169,6 +192,8 @@ class winMain(winMDIBase):
 		self.statusbar.OnMediaDownloadProgress(evt)
 	def OnMediaDownloadDone(self, evt):
 		self.statusbar.OnMediaDownloadDone(evt)		
+	def OnMediaDownloadAbort(self, evt):
+		self.statusbar.OnMediaDownloadAbort(evt)		
 
 	def Show(self, show=True):
 		# Show this window and it's children - also fixes menus for MacOS
