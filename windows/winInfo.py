@@ -106,9 +106,35 @@ class winInfo(winBase):
 		self.images = files
 	
 	def OnMediaDownloadDone(self, evt):
+		print "winInfo.MediaDownloadDone - Finished D", evt.file, evt.localfile
+		print "winInfo.MediaDownloadDone - Waiting On", self.image_waiting
 		if evt.file == self.image_waiting:
 			# FIXME: Should load the image now...
-			pass	
+			self.DisplayImage(evt.localfile)
+
+	def DisplayImage(self, file):
+		print "Displaying", file
+		if file.endswith(".gif"):
+			print "Animated image!"
+			self.picture_still.Hide()
+			print "Showing the Image"	
+			self.picture_animated.Show()
+			print "Loading Image"
+			self.picture_animated.LoadFile(file)
+			print "Playing the Image"
+			self.picture_animated.Play()
+		else:
+			print "Still image!"
+			self.picture_still.Show()
+			self.picture_animated.Stop()
+			self.picture_animated.Hide()
+
+			if file != "":
+				bitmap = wx.BitmapFromImage(wx.Image(file))
+			else:
+				bitmap = wx.BitmapFromImage(wx.EmptyImage(128, 128))
+			self.picture_still.SetBitmap(bitmap)
+		self.Layout()
 
 	def OnSelectObject(self, evt):
 		print "winInfo SelectObject", evt
@@ -131,47 +157,24 @@ class winInfo(winBase):
 		else:
 			images = {'still': []}
 
-		print
-		pprint.pprint(images)
-		print
-
 		if images.has_key("animation"):
 			images = images["animation"]
 		else:
 			images = images["still"]
 
-		print
-		pprint.pprint(images)
-		print
-
 		try:
 			image = images[object.id % len(images)]
+			print "Choose:", image
+
 			file = self.application.media.GetFile(*image)
-			if file is None:
-				self.image_waiting = image
-				file = WAITING
-		
-			if file.endswith(".gif"):
-				print "Animated image!"
-				self.picture_still.Hide()
-				print "Showing the Image"	
-				self.picture_animated.Show()
-				print "Loading Image"
-				self.picture_animated.LoadFile(file)
-				print "Playing the Image"
-				self.picture_animated.Play()
-			else:
-				print "Still image!"
-				self.picture_still.Show()
-				self.picture_animated.Stop()
-				self.picture_animated.Hide()
-
-			bitmap = wx.BitmapFromImage(wx.Image(file))
 		except:
-			bitmap = wx.BitmapFromImage(wx.EmptyImage(128, 128))
-			self.picture_still.SetBitmap(bitmap)
+			file = ""
 
-		self.Layout()
+		if file is None:
+			self.image_waiting = image[0]
+			self.DisplayImage("")
+		else:
+			self.DisplayImage(file)
 
 		# Add the object type specific information
 		s = ""

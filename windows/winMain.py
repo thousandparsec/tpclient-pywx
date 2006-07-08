@@ -34,6 +34,15 @@ ID_WIN_HELP = 1105
 
 ID_HELP = 10057
 
+Mb = 1024*1024
+Kb = 1024
+def tos(n):
+	if n > Mb:
+		return "%.1fM" % (n/Mb)
+	if n > Kb:
+		return "%.1fK" % (n/Kb)
+	return "%sb" % n
+
 class TimeStatusBar(wx.StatusBar):
 	WIDGET_PROGRESS = 0
 	TEXT_PROGRESS = 1
@@ -98,9 +107,20 @@ class TimeStatusBar(wx.StatusBar):
 	def OnMediaDownloadProgress(self, evt):
 		self.Progress.SetRange(evt.size)
 		self.Progress.SetValue(evt.progress)
+		
+		tt = wx.ToolTip("%s of %s" % (tos(evt.progress), tos(evt.size)))
+		tt.Enable(True)
+		self.SetToolTip(tt)
 
 	def OnMediaDownloadDone(self, evt):
-		self.SetStatusText("", TimeStatusBar.TEXT_TIMER)
+		self.Progress.SetValue(0)
+		self.Progress.SetRange(0)
+
+		tt = wx.ToolTip("")
+		tt.Enable(False)
+		self.SetToolTip(tt)
+
+		self.SetStatusText("", TimeStatusBar.TEXT_PROGRESS)
 
 	def SetEndTime(self, endtime):
 		print endtime
