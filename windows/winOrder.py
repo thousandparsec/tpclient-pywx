@@ -135,7 +135,7 @@ class winOrder(winBase):
 		Updates an order at a certain position in the list.
 		"""
 		self.order_list.SetStringItem(slot, TURNS_COL, str(order.turns))
-		self.order_list.SetStringItem(slot, ORDERS_COL, order.name)
+		self.order_list.SetStringItem(slot, ORDERS_COL, order._name)
 		#self.order_list.SetToolTipItem(slot, _("Tip %s") % slot)
 
 		if hasattr(order, '_dirty'):
@@ -220,7 +220,7 @@ class winOrder(winBase):
 			else:
 				desc = od.__doc__
 			desc = desc.strip()
-			menu.Append(-1, od.name, desc)
+			menu.Append(-1, od._name, desc)
 
 	def CheckClipBoard(self):
 		"""\
@@ -231,7 +231,7 @@ class winOrder(winBase):
 				if not objects.OrderDescs().has_key(order.type):
 					return False
 
-				slot = self.type_list.FindString(objects.OrderDescs()[order.type].name)
+				slot = self.type_list.FindString(objects.OrderDescs()[order.type]._name)
 				if slot == wx.NOT_FOUND:
 					return False
 			return True
@@ -394,7 +394,7 @@ class winOrder(winBase):
 
 			od = objects.OrderDescs()[type]
 			
-			self.type_list.Append(od.name, type)
+			self.type_list.Append(od._name, type)
 			if hasattr(od, "doc"):
 				desc = od.doc
 			else:
