@@ -38,9 +38,9 @@ Mb = 1024*1024
 Kb = 1024
 def tos(n):
 	if n > Mb:
-		return "%.1fM" % (n/Mb)
+		return "%.1fM" % (float(n)/Mb)
 	if n > Kb:
-		return "%.1fK" % (n/Kb)
+		return "%.1fK" % (float(n)/Kb)
 	return "%sb" % n
 
 class TimeStatusBar(wx.StatusBar):
