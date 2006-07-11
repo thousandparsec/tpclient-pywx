@@ -298,8 +298,8 @@ class winMain(winMDIBase):
 		"""
 		if self.application.gui.current is self:
 			self.config['show'] = self.IsShown()
-			self.config['position'] = self.GetPosition()
-			self.config['size'] = self.GetSize()
+		self.config['position'] = self.GetPosition()
+		self.config['size'] = self.GetSize()
 
 	def ConfigDisplay(self, panel, sizer):
 		"""\
