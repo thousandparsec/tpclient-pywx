@@ -105,7 +105,10 @@ class wxListCtrl(wx.ListCtrlOrig, wx.lib.mixins.listctrl.ListCtrlAutoWidthMixin,
 			except wx.core.PyDeadObjectError:
 				pass
 		else:
-			wx.lib.mixins.listctrl.ListCtrlAutoWidthMixin._doResize(self)
+			try:
+				wx.lib.mixins.listctrl.ListCtrlAutoWidthMixin._doResize(self)
+			except wx.core.PyDeadObjectError:
+				pass
 	
 	def GetSelected(self):
 		slots = [-1,]

@@ -98,7 +98,10 @@ class winBaseMixIn(object):
 		# Post an event to this window and it's children
 		func = 'On' + event.__class__.__name__[:-5]	
 		if hasattr(self, func):
-			getattr(self, func)(event)
+			try:
+				getattr(self, func)(event)
+			except Exception, e:
+				utils.do_traceback()
 
 		for window in self.children.values():
 			try:
