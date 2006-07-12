@@ -3,6 +3,7 @@ This module contains the main menu window.
 """
 
 # Python imports
+import copy
 import time
 import math
 import os.path
@@ -214,8 +215,8 @@ class winMain(winMDIBase):
 
 		self.UpdateEOT()
 
-	def SetSizeHard(self, pos):
-		winMDIBase.SetSize(self, pos)
+	def SetSizeHard(self, size):
+		winMDIBase.SetSize(self, size)
 		if wx.Platform != "__WXMSW__":
 			self.SetClientSize(wx.Size(-1,0))
 			winMDIBase.SetSizeHard(self, (-1, self.GetSize()[1]))
@@ -281,15 +282,15 @@ class winMain(winMDIBase):
 		"""\
 		Loads the configuration of the Window (and it's children).
 		"""
-		self.config = config
 		self.ConfigDefault(config)
+		self.config = copy.copy(config)
 
 		for name, window in self.children.items():
 			window.ConfigLoad(config.get(name, {}))
-
+			
+		self.SetSizeHard(config['size'])
 		self.SetPosition(config['position'])
 
-		self.SetSizeHard(config['size'])
 		self.ConfigDisplayUpdate(None)
 
 	def ConfigUpdate(self):

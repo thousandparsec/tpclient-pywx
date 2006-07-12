@@ -43,7 +43,6 @@ class winOrder(winBase):
 	def __init__(self, application, parent):
 		winBase.__init__(self, application, parent)
 
-		self.application = application
 		self.clipboard = None
 		self.ignore = False
 
