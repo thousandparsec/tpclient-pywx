@@ -3,6 +3,7 @@ This module contains the Information window. The Information window
 displays all objects information.
 """
 
+# Python Imports
 import os
 import os.path
 from types import *
@@ -41,6 +42,7 @@ def splitall(start):
 
 
 WAITING = os.path.join(".", "graphics", "loading.gif")
+
 class winInfo(winBase):
 	title = _("Information")
 
@@ -51,32 +53,42 @@ class winInfo(winBase):
 	def __init__(self, application, parent):
 		winBase.__init__(self, application, parent)
 
-		self.titletext = wx.StaticText(self, -1, _("No Object Selected."))
+		# Create a base panel
+		base_panel = wx.Panel(self, -1)
+		base_panel.SetAutoLayout( True )
 
-		self.picture_panel = wx.Panel(self)
+		# Create a base sizer
+		base_sizer = wx.BoxSizer( wx.VERTICAL )
+		base_sizer.Fit( base_panel )
+		base_sizer.SetSizeHints( base_panel )
+
+		# Link the panel to the sizer
+		base_panel.SetSizer( base_sizer )
+
+		# Title Display
+		self.titletext = wx.StaticText(base_panel, -1, _("No Object Selected."))
+
+		# Picture Display
+		self.picture_panel = wx.Panel(base_panel)
 		self.picture_panel.SetBackgroundColour(wx.Colour(0, 0, 0))
-
 		self.picture_still = wx.StaticBitmap(self.picture_panel, -1, wx.BitmapFromImage(wx.EmptyImage(128, 128)))
-
 		self.picture_animated = GIFAnimationCtrl(self.picture_panel, -1)
 		self.picture_animated.SetBackgroundColour(wx.Colour(0, 0, 0))
 		self.picture_animated.Stop(); self.picture_animated.Hide()
 
-		self.text = wx.TextCtrl(self, -1, "", style=wx.TE_MULTILINE|wx.TE_READONLY)
+		# Property Display
+		self.text = wx.TextCtrl(base_panel, -1, "", style=wx.TE_MULTILINE|wx.TE_READONLY)
 
-		top = wx.BoxSizer(wx.VERTICAL)
-		top.Add(self.titletext, 0, wx.BOTTOM|wx.TOP|wx.ALIGN_CENTER, 3)
+		base_sizer.Add(self.titletext, 0, wx.BOTTOM|wx.TOP|wx.ALIGN_CENTER, 3)
 
-		information = wx.BoxSizer(wx.VERTICAL)
-		information.Add(self.text, 1, wx.EXPAND, 0)
+		#information = wx.BoxSizer(wx.VERTICAL)
+		#information.Add(self.text, 1, wx.EXPAND, 0)
 		
 		middle = wx.BoxSizer(wx.HORIZONTAL)
-		middle.Add(self.picture_panel,    0, 0, 0)
-		middle.Add(information, 1, wx.EXPAND, 0)
+		middle.Add(self.picture_panel, 0, 0, 0)
+		middle.Add(self.text, 1, wx.EXPAND, 0)
 
-		top.Add(middle, 1, wx.EXPAND, 0)
-
-		self.SetSizer(top)
+		base_sizer.Add(middle, 1, wx.EXPAND, 0)
 
 		# Find the images
 		self.images = {'nebula':{'still':[]}, 'star':{'still':[]}, 'planet':{'still':[]}}

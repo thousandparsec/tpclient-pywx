@@ -336,7 +336,7 @@ class winMDISubBase(winConfigMixIn, winBaseMixIn, wx.MDIChildFrame):
 class winMDIReportBase(winConfigMixIn, winBaseMixIn, wx.MDIChildFrame):
 	def __init__(self, application, parent):
 		wx.MDIChildFrame.__init__(self, parent, -1, 'TP: ' + self.title, wx.DefaultPosition, wx.DefaultSize, \
-				wx.TAB_TRAVERSAL|wx.DEFAULT_FRAME_STYLE)
+				wx.TAB_TRAVERSAL|wx.DEFAULT_FRAME_STYLE|wx.STAY_ON_TOP)
 		winBaseMixIn.__init__(self, application, parent)
 
 	def OnProgramExit(self, evt):
