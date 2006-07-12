@@ -169,10 +169,11 @@ class winDesign(winReportBase, winShiftMixIn):
 		self.addmany.SetFont(wx.local.normalFont)
 		self.addsizer.Add(self.addmany, 0, wx.ALIGN_RIGHT|wx.ALL, 1 )
 		
-		blank = wx.Panel( panel, -1 )
 		
+		blank = wx.Panel( panel, -1 )
 		self.grid.Add(blank,    0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
 		self.grid.Add(self.top,         0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
+		blank = wx.Panel( panel, -1 )
 		self.grid.Add(blank,    0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
 		self.grid.Add(self.designs,     0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
 		self.grid.Add(self.middle,      0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
