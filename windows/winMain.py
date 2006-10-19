@@ -10,6 +10,7 @@ import os.path
 
 # wxPython imports
 import wx
+import wx.lib.popupctl as pop
 
 # Local imports
 from winBase import *
@@ -30,7 +31,7 @@ ID_STAT_FLEET = 10054
 ID_STAT_BATTLE = 10055
 ID_STATS = 10056
 
-ID_WIN_TIPS     = 11006
+ID_WIN_TIPS	 = 11006
 ID_WIN_HELP = 1105
 
 ID_HELP = 10057
@@ -44,24 +45,51 @@ def tos(n):
 		return "%.1fK" % (float(n)/Kb)
 	return "%sb" % n
 
-class TimeStatusBar(wx.StatusBar):
+class MediaProgress(wx.PopupCtrl):
+	def __init__(self, parent, application, *args, **kw):
+		wx.PopupCtrl.__init__(self, parent, *args, **kw)
+		self.application = application
+
+		self.SetPopupCtrl(wx.Gauge(self))
+
+		self.win  = wx.Window(self,-1,pos = (0,0),style = 0)
+		self.list = wx.ListBox(self.win)
+
+		self.SetPopupContent(self.win)
+
+		self.win.Bind(wx.EVT_LISTBOX, self.OnSelect, self.list)
+		self.win.Bind(wx.EVT_LISTBOX_DCLICK, self.OnSelect, self.list)
+
+	def OnSelect(self, evt):
+		self.PopDown()
+		print "OnSelect", evt.GetString(), dir(evt)
+
+	def FormatContent(self):
+		self.list.Set([os.path.basename(file) for file in self.application.media.todownload.keys()])
+
+		s = self.list.GetBestSize()
+		s += (0, 10)
+		self.list.SetSize(s)
+		self.win.SetClientSize(s)
+
+class StatusBar(wx.StatusBar):
 	WIDGET_PROGRESS = 0
 	WIDGET_PROGRESS_CANCEL = 1
 	TEXT_PROGRESS = 2
 	TEXT_TIMER = 3
 
-	def __init__(self, parent):
+	def __init__(self, application, parent):
 		wx.StatusBar.__init__(self, parent, -1)
 
 		self.SetFieldsCount(4)
 		self.SetStatusWidths([-3, 20, -3, -2])
 
-		self.Progress = wx.Gauge(self, -1, 1)
+		self.Progress = MediaProgress(self, application, -1)
 		self.ProgressCancel = wx.Button(self, -1, "X")
 		self.ProgressCancel.Enable(False)
 
-		self.SetStatusText("", TimeStatusBar.TEXT_TIMER)
-		self.SetStatusText("", TimeStatusBar.TEXT_PROGRESS)
+		self.SetStatusText("", StatusBar.TEXT_TIMER)
+		self.SetStatusText("", StatusBar.TEXT_PROGRESS)
 
 		self.endtime = 0
 		self.parent = parent
@@ -84,23 +112,23 @@ class TimeStatusBar(wx.StatusBar):
 			hours = math.floor(left / sih)
 			mins = math.floor((left - hours * sih) / sim)
 			secs = math.floor((left - hours * sih - mins * sim))
-			self.SetStatusText("EOT: %02i:%02i:%02i" % (hours, mins, secs), TimeStatusBar.TEXT_TIMER)
+			self.SetStatusText("EOT: %02i:%02i:%02i" % (hours, mins, secs), StatusBar.TEXT_TIMER)
 		else:
 			if self.endtime != 0:
 				self.parent.UpdateEOT()
 				self.endtime = 0
-			self.SetStatusText("EOT: Unknown", TimeStatusBar.TEXT_TIMER)
+			self.SetStatusText("EOT: Unknown", StatusBar.TEXT_TIMER)
 	
 	def SetEndTime(self, endtime):
 		print endtime
 		self.endtime = endtime + time.time()
 
 	def Reposition(self):
-		rect = self.GetFieldRect(TimeStatusBar.WIDGET_PROGRESS)
+		rect = self.GetFieldRect(StatusBar.WIDGET_PROGRESS)
 		self.Progress.SetPosition((rect.x+4, rect.y+2))
 		self.Progress.SetSize((rect.width-6, rect.height-4))
 
-		rect = self.GetFieldRect(TimeStatusBar.WIDGET_PROGRESS_CANCEL)
+		rect = self.GetFieldRect(StatusBar.WIDGET_PROGRESS_CANCEL)
 		self.ProgressCancel.SetPosition((rect.x, rect.y))
 		self.ProgressCancel.SetSize((rect.width, rect.height))
 		
@@ -115,7 +143,7 @@ class TimeStatusBar(wx.StatusBar):
 		tt.Enable(False)
 		self.SetToolTip(tt)
 
-		self.SetStatusText("", TimeStatusBar.TEXT_PROGRESS)
+		self.SetStatusText("", StatusBar.TEXT_PROGRESS)
 
 		del self.progress
 
@@ -130,7 +158,7 @@ class TimeStatusBar(wx.StatusBar):
 	def OnMediaDownloadStart(self, evt):
 		self.progress = evt.file
 		self.Progress.SetRange(evt.size)
-		self.SetStatusText("Dw: %s" % os.path.basename(evt.file), TimeStatusBar.TEXT_PROGRESS)
+		self.SetStatusText("Dw: %s" % os.path.basename(evt.file), StatusBar.TEXT_PROGRESS)
 		self.ProgressCancel.Enable(True)
 
 	def OnMediaDownloadProgress(self, evt):
@@ -150,6 +178,7 @@ class TimeStatusBar(wx.StatusBar):
 	def OnButtonCancel(self, evt):
 		self.parent.application.media.StopFile(self.progress)
 
+
 class winMain(winMDIBase):
 	title = _("Main Windows")
 
@@ -160,7 +189,7 @@ class winMain(winMDIBase):
 	def __init__(self, application):
 		winMDIBase.__init__(self, application)
 
-		self.statusbar = TimeStatusBar(self)
+		self.statusbar = StatusBar(application, self)
 		self.SetStatusBar(self.statusbar)
 
 		from windows.winDesign import winDesign
