@@ -277,3 +277,6 @@ wx.ListCtrl = wxListCtrl
 wx.Choice = wxChoice
 wx.ComboBox = wxComboBox
 wx.SimpleValidator = wxSimpleValidator
+
+from PopupCtrl import PopupCtrl
+wx.PopupCtrl = PopupCtrl
