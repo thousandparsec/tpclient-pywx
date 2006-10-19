@@ -74,20 +74,33 @@ class ConfigMixIn(object):
 		"""
 		raise AssertionError("ConfigDisplayUpdate not implimented")
 
-class winBaseMixIn(object):
+class winMixIn(object):
+	"""
+	Applies to all windows.
+	"""
 	def __init__(self, application, parent, config=None):
 		self.application = application
 		self.parent = parent
-		self.children = {}
+
 		self.config = self.ConfigDefault()
-	
-		if hasattr(parent, 'children'):
-			self.parent.children[self.title] = self
 
 		icon = wx.EmptyIcon()
 		icon.CopyFromBitmap(wx.Bitmap(os.path.join("graphics", "icon.ico"), wx.BITMAP_TYPE_ANY))
 		self.SetIcon(icon)
 
+
+	def SetSizeHard(self, pos):
+		self.SetMinSize(pos)
+		self.SetMaxSize(pos)
+		self.SetSize(pos)
+
+class winBaseMixIn(winMixIn):
+	"""
+	Applies to all top level windows.
+	"""
+	def __init__(self, application, parent, config=None):
+		winMixIn.__init__(self, application, parent, config)
+		self.children = {}
 		self.Bind(wx.EVT_CLOSE, self.OnProgramExit)
 
 	def OnProgramExit(self, evt):
@@ -97,22 +110,36 @@ class winBaseMixIn(object):
 	def Post(self, event):
 		# Post an event to this window and it's children
 		func = 'On' + event.__class__.__name__[:-5]	
-		if hasattr(self, func):
-			try:
+		try:
+			if hasattr(self, func):
+				print self.Post, self.title, func
 				getattr(self, func)(event)
-			except Exception, e:
-				utils.do_traceback()
+		except Exception, e:
+			utils.do_traceback()
 
 		for window in self.children.values():
 			try:
-				window.Post(event)
+				if hasattr(window, func):
+					print self.Post, window.title, func
+					getattr(window, func)(event)
 			except Exception, e:
 				utils.do_traceback()
 
-	def SetSizeHard(self, pos):
-		self.SetMinSize(pos)
-		self.SetMaxSize(pos)
-		self.SetSize(pos)
+	def OnNetworkFailure(self, evt):
+		self.application.gui.Show(self.application.gui.connectto)
+
+		# When the network fails pop-up a dialog then go to the connectto screen
+		dlg = wx.MessageDialog(self.application.gui.current, str(evt), _("Network Error"), wx.OK|wx.ICON_ERROR)
+		dlg.ShowModal()
+		dlg.Destroy()
+
+class winSubMixIn(winMixIn):
+	"""
+	Applies to all children windows.
+	"""
+	def __init__(self, application, parent, config=None):
+		winMixIn.__init__(self, application, parent, config)
+		self.parent.children[self.title] = self
 
 class winConfigMixIn(ConfigMixIn):
 	def ConfigDefault(self, config=None):
@@ -330,21 +357,25 @@ class winMDIBase(ConfigMixIn, winBaseMixIn, wx.MDIParentFrame):
 				wx.DEFAULT_FRAME_STYLE)
 		winBaseMixIn.__init__(self, application, None)
 
-class winMDISubBase(winConfigMixIn, winBaseMixIn, wx.MDIChildFrame):
+	def OnNetworkFailure(self, evt):
+		self.application.gui.Show(self.application.gui.connectto)
+
+		# When the network fails pop-up a dialog then go to the connectto screen
+		dlg = wx.MessageDialog(self.application.gui.current, str(evt), _("Network Error"), wx.OK|wx.ICON_ERROR)
+		dlg.ShowModal()
+		dlg.Destroy()
+
+class winMDISubBase(winConfigMixIn, winSubMixIn, wx.MDIChildFrame):
 	def __init__(self, application, parent):
 		wx.MDIChildFrame.__init__(self, parent, -1, 'TP: ' + self.title, wx.DefaultPosition, wx.DefaultSize, \
 				wx.TAB_TRAVERSAL|wx.RESIZE_BORDER)
-		winBaseMixIn.__init__(self, application, parent)
+		winSubMixIn.__init__(self, application, parent)
 
-class winMDIReportBase(winConfigMixIn, winBaseMixIn, wx.MDIChildFrame):
+class winMDIReportBase(winConfigMixIn, winSubMixIn, wx.MDIChildFrame):
 	def __init__(self, application, parent):
 		wx.MDIChildFrame.__init__(self, parent, -1, 'TP: ' + self.title, wx.DefaultPosition, wx.DefaultSize, \
 				wx.TAB_TRAVERSAL|wx.DEFAULT_FRAME_STYLE|wx.STAY_ON_TOP)
-		winBaseMixIn.__init__(self, application, parent)
-
-	def OnProgramExit(self, evt):
-		self.Hide()
-		evt.Veto(True)
+		winSubMixIn.__init__(self, application, parent)
 
 # These give a non-MDI interface under other operating systems
 class winNormalBase(ConfigMixIn, winBaseMixIn, wx.Frame):
@@ -370,22 +401,18 @@ class winNormalBase(ConfigMixIn, winBaseMixIn, wx.Frame):
 			if isinstance(window, winBase):
 				window.Raise()
 
-class winMiniSubBase(winConfigMixIn, winBaseMixIn, wx.MiniFrame):
+class winMiniSubBase(winConfigMixIn, winSubMixIn, wx.MiniFrame):
 	def __init__(self, application, parent):
 		wx.MiniFrame.__init__(self, None, -1, 'TP: ' + self.title, wx.DefaultPosition, wx.DefaultSize, \
 				wx.DEFAULT_FRAME_STYLE|wx.FRAME_NO_TASKBAR|wx.TAB_TRAVERSAL)
-		winBaseMixIn.__init__(self, application, parent)
+		winSubMixIn.__init__(self, application, parent)
 
-class winNormalSubBase(winConfigMixIn, winBaseMixIn, wx.Frame):
+class winNormalSubBase(winConfigMixIn, winSubMixIn, wx.Frame):
 	def __init__(self, application, parent):
 		wx.Frame.__init__(self, parent, -1, 'TP: ' + self.title, wx.DefaultPosition, wx.DefaultSize, \
 				wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL)
-		winBaseMixIn.__init__(self, application, parent)
+		winSubMixIn.__init__(self, application, parent)
 
-	def OnProgramExit(self, evt):
-		self.Hide()
-		evt.Veto(True)
-		
 """\
 There are 4 classes of windows in tpclient-pywx
 	- winMainBase, This is used for things like the config/connect window
