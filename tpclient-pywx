@@ -107,6 +107,9 @@ class GUI(wx.App):
 			from windows.winMain import winMain
 			self.main = winMain(application)
 
+			from windows.winAccount import winAccount
+			self.account = winAccount(application)
+
 			from windows.winConnect import winConnect
 			self.connectto = winConnect(application)
 
@@ -127,7 +130,7 @@ class GUI(wx.App):
 	def Cleanup(self):
 		for window in self.windows:
 			window.Close()
-		while self.application.network.isAlive():
+		while self.application.network.isAlive() or self.application.media.isAlive():
 			time.sleep(0.1)
 		sys.exit()
 
@@ -166,7 +169,6 @@ class GUI(wx.App):
 		Post an Event the current window.
 		"""
 		func = 'On' + event.__class__.__name__[:-5]
-		#debug(DEBUG_GUI, "Posting %s to %s" % (event, func))
 		if hasattr(self, func):
 			try:
 				getattr(self, func)(event)
@@ -193,23 +195,7 @@ class GUI(wx.App):
 		self.Post(self.ShowWindowEvent())
 		return r
 
-	# Event Handlers ------------------------------------------------
-	def OnNetworkFailure(self, evt):
-		self.Show(self.connectto)
-
-		# When the network fails pop-up a dialog then go to the connectto screen
-		dlg = wx.MessageDialog(self.current, str(evt), _("Network Error"), wx.OK|wx.ICON_ERROR)
-		dlg.ShowModal()
-		dlg.Destroy()
-
 class Network(NetworkThread):
-	## These are network events
-	class NetworkFailureEvent(Exception):
-		"""\
-		Raised when the network connection fails for what ever reason.
-		"""
-		pass
-
 	def ConnectTo(self, host, username, password, debug=False):
 		"""\
 		Connect to a given host using a certain username and password.
