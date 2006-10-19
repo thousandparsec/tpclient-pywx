@@ -1,0 +1,25 @@
+#! /bin/sh
+
+TMP=/tmp/to-search
+echo $LD_LIBRARY_PATH | sed -e's/:/\n/g'	 > $TMP 2> /dev/null
+cat /etc/ld.so.conf 						>> $TMP 2> /dev/null
+echo /usr/local/lib							>> $TMP 2> /dev/null
+echo /usr/lib 								>> $TMP
+echo /lib									>> $TMP
+
+while read LIB_DIR; do
+	if [ -e "$LIB_DIR" ]; then
+		TPDIR="$LIB_DIR/tpclient-pywx"
+
+		ARGS=""
+		for ARG in "$@"; do
+			ARGS="$ARGS \"$ARG\""
+		done
+
+		if [ -e "$TPDIR" ]; then
+			echo "Found the client in $TPDIR"
+			cd $TPDIR
+			./tpclient $ARGS
+		fi
+	fi
+done < $TMP
