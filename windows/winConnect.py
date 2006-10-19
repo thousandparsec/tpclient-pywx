@@ -25,37 +25,38 @@ class winConnect(winMainBase):
 		panel = wx.Panel(self, -1)
 
 		# The title
-		text_top = wx.StaticText( panel, -1, _("Connect to a Thousand Parsec Server"), wx.DefaultPosition, wx.DefaultSize, 0 )
+		text_top = wx.StaticText( panel, -1, _("Connect to a Server"), style=wx.TE_CENTRE)
 		text_top.SetFont( wx.Font( 16, wx.ROMAN, wx.NORMAL, wx.BOLD ) )
 
 		# The fill in text areas
 		sizer_top = wx.BoxSizer( wx.HORIZONTAL )
-		sizer_top.Add( text_top, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
+		sizer_top.Add( text_top, 1, wx.EXPAND, 5 )
 
-		text_host = wx.StaticText( panel, -1, _("Host"))
-		self.host = wx.ComboBox( panel, -1, "", wx.DefaultPosition, wx.Size(200,-1), [""], wx.CB_DROPDOWN )
+		# Server
+		text_host = wx.StaticText( panel, -1, _("Server"), style=wx.TE_RIGHT )
+		self.host = wx.ComboBox( panel, -1, "" )
 
-		text_username = wx.StaticText( panel, -1, _("Username"))
-		self.username = wx.ComboBox( panel, -1, "", wx.DefaultPosition, wx.Size(200,-1), [""], wx.CB_DROPDOWN )
+		text_username = wx.StaticText( panel, -1, _("Username"), style=wx.TE_RIGHT )
+		self.username = wx.ComboBox( panel, -1, "" )
 
-		text_password = wx.StaticText( panel, -1, _("Password"))
-		self.password = wx.TextCtrl( panel, -1, "", wx.DefaultPosition, wx.Size(200,-1), wx.TE_PASSWORD )
+		text_password = wx.StaticText( panel, -1, _("Password"), style=wx.TE_RIGHT )
+		self.password = wx.TextCtrl( panel, -1, "", style=wx.TE_PASSWORD )
 
-		TEXT_FLAGS = wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL
-
+		FLAGS = wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.EXPAND
 		grid = wx.FlexGridSizer( 0, 2, 5, 5 )
 		grid.AddGrowableCol(1)
-		grid.Add( text_host, 0, TEXT_FLAGS, 5 )
-		grid.Add( self.host, 1, wx.GROW, 5 )
-		grid.Add( text_username, 0, TEXT_FLAGS, 5 )
-		grid.Add( self.username, 1, wx.GROW, 5 )
-		grid.Add( text_password, 0, TEXT_FLAGS, 5 )
-		grid.Add( self.password, 1, wx.GROW, 5 )
+		grid.Add( text_host,     1, FLAGS )
+		grid.Add( self.host,     5, FLAGS )
+		grid.Add( text_username, 1, FLAGS )
+		grid.Add( self.username, 5, FLAGS )
+		grid.Add( text_password, 1, FLAGS )
+		grid.Add( self.password, 5, FLAGS )
 
-		# The buttons
-		button_ok = wx.Button(panel, wx.ID_OK, _("&OK"))
-		button_cancel = wx.Button(panel, wx.ID_CANCEL, _("Cancel"))
-		button_config = wx.Button(panel, wx.ID_PREFERENCES, _("&Preferences"))
+		# Buttons
+		button_ok     = wx.Button(panel, wx.ID_OK)
+		button_cancel = wx.Button(panel, wx.ID_CANCEL)
+		button_new    = wx.Button(panel, wx.ID_NEW)
+		button_config = wx.Button(panel, wx.ID_PREFERENCES)
 		button_ok.SetDefault()
 
 		buttons = wx.BoxSizer( wx.HORIZONTAL )
@@ -63,32 +64,30 @@ class winConnect(winMainBase):
 		buttons.Add( button_cancel, 0, wx.ALIGN_CENTRE)
 		buttons.AddSpacer(wx.Size(5, -1))
 		buttons.Add( button_config, 0, wx.ALIGN_CENTRE)
+		buttons.Add( button_new, 0, wx.ALIGN_CENTRE)
 
 		# The main sizer
 		sizer = wx.BoxSizer( wx.VERTICAL )
-		sizer.Add( sizer_top, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
-		sizer.Add( grid, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
-		sizer.Add( buttons, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
+		sizer.Add( sizer_top, 0, wx.ALIGN_CENTRE|wx.EXPAND, 5 )
+		sizer.Add( grid,      1, wx.ALIGN_CENTRE|wx.EXPAND, 5 )
+		sizer.Add( buttons,   0, wx.ALIGN_CENTRE|wx.ALL, 5 )
 
 		# Join the panel and the base sizer
 		panel.SetAutoLayout( True )
 		panel.SetSizer( sizer )
 		sizer.Fit( panel )
 		sizer.SetSizeHints( self )
-		
+
+		# Put the windows
+		self.SetSize(wx.Size(300, -1))
 		self.CenterOnScreen()
 
 		# Hook up the events
 		self.Bind(wx.EVT_BUTTON, self.OnOkay,   button_ok)
 		self.Bind(wx.EVT_BUTTON, self.OnCancel, button_cancel)
 		self.Bind(wx.EVT_BUTTON, self.OnConfig, button_config)
+		self.Bind(wx.EVT_BUTTON, self.OnNew,    button_new)
 		self.Bind(wx.EVT_CLOSE,  self.OnExit)
-
-	def OnConfig(self, evt):
-		self.application.ConfigDisplay()
-
-	def OnCancel(self, evt):
-		self.OnExit(evt)
 
 	def OnExit(self, evt):
 		self.application.Exit()
@@ -103,6 +102,15 @@ class winConnect(winMainBase):
 
 		self.application.network.Call(self.application.network.ConnectTo, host, username, password, debug=self.config['debug'])
 		self.application.media.Call(self.application.media.ConnectTo, host, username, debug=self.config['debug'])
+
+	def OnCancel(self, evt):
+		self.OnExit(evt)
+
+	def OnConfig(self, evt):
+		self.application.ConfigDisplay()
+
+	def OnNew(self, evt):
+		self.application.gui.Show(self.application.gui.account)
 	
 	# Config Functions -----------------------------------------------------------------------------
 	def ConfigDefault(self, config=None):
@@ -124,7 +132,7 @@ class winConnect(winMainBase):
 				raise ValueError('Config-%s: the servers list was empty' % (self,))
 
 		except (ValueError, KeyError), e:
-			config['servers'] = ["thousandparsec.net", "127.0.0.1:6923", "mithro.dyndns.org", "code-bear.dyndns.org", "llnz.dyndns.org"]
+			config['servers'] = ["demo1.thousandparsec.net", "demo2.thousandparsec.net", "127.0.0.1"]
 
 		try:
 			if not isinstance(config['username'], (unicode, str)):
@@ -151,7 +159,6 @@ class winConnect(winMainBase):
 			config['debug'] = False
 
 		return config
-
 
 	def ConfigSave(self):
 		"""\
