@@ -180,11 +180,11 @@ class winInfo(winBase):
 
 			file = self.application.media.GetFile(*image)
 		except:
-			file = ""
+			file = None
 
 		if file is None:
 			self.image_waiting = image[0]
-			self.DisplayImage("")
+			self.DisplayImage(os.path.join("graphics", "loading.png"))
 		else:
 			self.DisplayImage(file)
 

@@ -52,7 +52,7 @@ class winUpdate(winMainBase):
 
 		sizer = wx.BoxSizer( wx.VERTICAL )
 		sizer.AddSpacer(wx.Size(-1, 5))
-		sizer.Add( self.overall, 0, wx.ALIGN_CENTER, 5 )
+		sizer.Add( self.overall, 0, wx.ALIGN_CENTER|wx.EXPAND, 5 )
 		sizer.AddSpacer(wx.Size(-1, 5))
 		sizer.Add( grid, 0, wx.ALIGN_CENTER|wx.EXPAND, 5 )
 		self.sizer = sizer
