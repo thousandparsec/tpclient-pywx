@@ -60,12 +60,18 @@ class MediaProgress(wx.PopupCtrl):
 		self.win.Bind(wx.EVT_LISTBOX, self.OnSelect, self.list)
 		self.win.Bind(wx.EVT_LISTBOX_DCLICK, self.OnSelect, self.list)
 
+		self.listitems = []
+
 	def OnSelect(self, evt):
 		self.PopDown()
-		print "OnSelect", evt.GetString(), dir(evt)
+		print "OnSelect", evt.GetString()
+
+	def OnButton(self,evt):
+		if len(self.listitems) > 1: 
+			self.PopUp()
 
 	def FormatContent(self):
-		self.list.Set([os.path.basename(file) for file in self.application.media.todownload.keys()])
+		self.list.Set(self.listitems)
 
 		s = self.list.GetBestSize()
 		s += (0, 10)
@@ -80,6 +86,8 @@ class StatusBar(wx.StatusBar):
 
 	def __init__(self, application, parent):
 		wx.StatusBar.__init__(self, parent, -1)
+
+		self.application = application
 
 		self.SetFieldsCount(4)
 		self.SetStatusWidths([-3, 20, -3, -2])
@@ -157,9 +165,16 @@ class StatusBar(wx.StatusBar):
 
 	def OnMediaDownloadStart(self, evt):
 		self.progress = evt.file
+
 		self.Progress.SetRange(evt.size)
-		self.SetStatusText("Dw: %s" % os.path.basename(evt.file), StatusBar.TEXT_PROGRESS)
+		files = []
+		for file in self.application.media.todownload.keys():
+			if file != evt.file:
+				files.append(file)
+		self.Progress.listitems = files
 		self.ProgressCancel.Enable(True)
+
+		self.SetStatusText("Dw: %s" % os.path.basename(evt.file), StatusBar.TEXT_PROGRESS)
 
 	def OnMediaDownloadProgress(self, evt):
 		self.Progress.SetRange(evt.size)
