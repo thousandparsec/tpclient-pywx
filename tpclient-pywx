@@ -107,11 +107,11 @@ class GUI(wx.App):
 			from windows.winMain import winMain
 			self.main = winMain(application)
 
-			from windows.winAccount import winAccount
-			self.account = winAccount(application)
-
 			from windows.winConnect import winConnect
 			self.connectto = winConnect(application)
+
+			from windows.winAccount import winAccount
+			self.account = winAccount(application)
 
 			from windows.winUpdate import winUpdate
 			self.update = winUpdate(application)
