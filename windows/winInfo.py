@@ -179,7 +179,10 @@ class winInfo(winBase):
 			print "Choose:", image
 
 			file = self.application.media.GetFile(*image)
-		except:
+		except ZeroDivisionError, e:
+			file = ""
+		except Exception, e:
+			print e
 			file = None
 
 		if file is None:
