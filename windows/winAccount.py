@@ -222,13 +222,19 @@ class winAccount(winMainBase):
 			
 	def OnCheck(self, evt):
 		self.State("connecting")
-		self.application.network.Call(self.application.network.Connect, self.host.GetValue(), debug=self.config['debug'])
+		self.application.network.Call(self.application.network.Connect, self.host.GetValue(), 
+				debug=self.application.gui.connectto.config['debug'])
 
 	def OnNetworkConnect(self, evt):
 		if features.FEATURE_ACCOUNT_REGISTER in evt.args[0]:
 			self.State("details")
 		else:
 			self.OnNetworkFailure("This server does not support account creation.")
+
+	def OnNetworkAccount(self, evt):
+		self.application.gui.Show(self.application.gui.connectto)
+		dlg = wx.MessageDialog(self.application.gui.current, str(evt), _("Account Created"), wx.OK|wx.ICON_INFORMATION)
+		dlg.ShowModal()
 
 	def OnNetworkFailure(self, evt):
 		dlg = wx.MessageDialog(self.application.gui.current, str(evt), _("Network Error"), wx.OK|wx.ICON_ERROR)
