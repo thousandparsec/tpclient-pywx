@@ -160,13 +160,17 @@ class winInfo(winBase):
 		self.titletext.SetLabel(object.name)
 
 		# Figure out the right graphic
-		if isinstance(object, (Universe, Galaxy)):
-			images = self.images['nebula']
-		elif isinstance(object, StarSystem):
-			images = self.images['star']
-		elif isinstance(object, Planet):
-			images = self.images['planet']
-		else:
+		try:
+			if isinstance(object, (Universe, Galaxy)):
+				images = self.images['nebula']
+			elif isinstance(object, StarSystem):
+				images = self.images['star']
+			elif isinstance(object, Planet):
+				images = self.images['planet']
+			else:
+				images = {'still': []}
+		except KeyError, e:
+			print e
 			images = {'still': []}
 
 		if images.has_key("animation"):
@@ -180,7 +184,7 @@ class winInfo(winBase):
 
 			file = self.application.media.GetFile(*image)
 		except ZeroDivisionError, e:
-			file = ""
+			file = os.path.join("graphics", "unknown.png")
 		except Exception, e:
 			print e
 			file = None
