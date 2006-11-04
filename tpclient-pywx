@@ -189,7 +189,10 @@ class GUI(wx.App):
 			return
 
 		if self.current != None:
-			self.current.Hide()
+			try:
+				self.current.Hide()
+			except:
+				pass
 
 		self.SetTopWindow(window)
 
