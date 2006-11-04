@@ -526,7 +526,7 @@ class winMain(winMDIBase):
 		bar.Append( file, _("File") )
 		bar.Append( stat, _("Statistics") )
 		bar.Append( win,  _("Windows") )
-		bar.Append( help, _("Help") )
+		bar.Append( help, _("&Help") )
 
 		source.Bind(wx.EVT_MENU, self.OnConnect,     id=ID_OPEN)
 		source.Bind(wx.EVT_MENU, self.UpdateCache,   id=ID_UNIV)

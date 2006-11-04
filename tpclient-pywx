@@ -84,7 +84,8 @@ class GUI(wx.App):
 	######################################
 	def __init__(self, application):
 		if wx.Platform in ('__WXMSW__', '__WXMAC__'):
-			wx.App.__init__(self, redirect = True, filename = 'errors')
+			#wx.App.__init__(self, redirect = True, filename = 'errors')
+			wx.App.__init__(self, redirect=False)
 		else:
 			wx.App.__init__(self)
 
@@ -126,6 +127,9 @@ class GUI(wx.App):
 
 		except:
 			utils.do_traceback()
+		print "Finished init..."
+		self.Call(self.Show, self.connectto)
+		
 
 	def Cleanup(self):
 		for window in self.windows:

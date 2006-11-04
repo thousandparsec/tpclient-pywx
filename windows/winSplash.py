@@ -7,15 +7,7 @@ class winSplash(wx.SplashScreen):
 		wx.SplashScreen.__init__(self, image, wx.SPLASH_CENTRE_ON_SCREEN | wx.SPLASH_TIMEOUT, 2500, None, -1)
 
 		self.application = application
-		
-		self.Bind(wx.EVT_CLOSE, self.OnClose)
 	
 	def Post(self, evt):
 		pass
 
-	def OnClose(self, evt):
-		if hasattr(self.application, 'gui') and hasattr(self.application.gui, 'current'):
-			if self.application.gui.current == self:
-				self.application.gui.current = None
-		else:
-			evt.Veto(True)
