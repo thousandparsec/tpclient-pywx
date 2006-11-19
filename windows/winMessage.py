@@ -126,6 +126,7 @@ class winMessage(winBase, winShiftMixIn):
 		new.SetFont(wx.local.normalFont)
 		item7.Add( new, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
 		self.Bind(wx.EVT_BUTTON, self.MessageNew, new)
+		new.Disable()
 
 		delete = wx.Button( panel, -1, _("Delete"), wx.DefaultPosition, wx.local.buttonSize)
 		delete.SetFont(wx.local.normalFont)
