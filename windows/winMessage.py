@@ -17,7 +17,7 @@ import wx.lib.anchors
 from winBase import *
 
 # Protocol Imports
-from tp.netlib import failed
+from tp.netlib import failed, GenericRS
 
 MESSAGE_FILTER = 10000
 MESSAGE_TITLE = 10001
@@ -368,11 +368,13 @@ class winMessage(winBase, winShiftMixIn):
 				message_body = self.html_message % self.message.__dict__
 			else:
 				message_body = self.html_filtered % self.message.__dict__
+
+			print "references", self.message.references
 			
 			message_filter = not self.slot in self.messages_unfiltered
 			message_buttons = [
 				self.position > 0, 
-				1 in zip(*self.message.references)[0], # FIXME: Magic Number alert! 1 == Object reference..
+				GenericRS.Types["Object"] in self.message.references.types,
 				self.position < len(self.messages_unfiltered)-1
 			]
 			message_counter = _("%i of %i") % (self.slot+1, len(self.messages))
@@ -415,7 +417,7 @@ class winMessage(winBase, winShiftMixIn):
 		id = None
 		for reference, id in self.message.references:
 			# FIXME: Magic Number alert! 1 == Object reference..
-			if reference == 1:
+			if reference == GenericRS.Types["Object"]:
 				break
 		if not id is None:
 			self.application.Post(self.application.gui.SelectObjectEvent(id))
