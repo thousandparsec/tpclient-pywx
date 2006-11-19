@@ -79,6 +79,9 @@ class winConfig(winMainBase):
 	def OnConfigRevert(self, evt):
 		self.application.ConfigLoad()
 		self.Hide()
+
+	def OnProgramExit(self, evt):
+		self.OnConfigRevert(evt)
 	
 	# Config Functions -----------------------------------------------------------------------------
 	def ConfigDefault(self, config=None):
