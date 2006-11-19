@@ -89,27 +89,34 @@ class winMessage(winBase, winShiftMixIn):
 		self.prev.SetFont(wx.local.normalFont)
 		item7.Add( self.prev, 0, wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 1 )
 		self.Bind(wx.EVT_BUTTON, self.MessagePrev, self.prev)
+		self.prev.SetToolTip(wx.ToolTip(_("Goto previous message.")))
 
 		self.first = wx.Button( panel, -1, _("First"), wx.DefaultPosition, wx.local.buttonSize)
 		self.first.SetFont(wx.local.normalFont)
 		item7.Add( self.first, 0, wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 1 )
 		self.Bind(wx.EVT_BUTTON, self.MessageFirst, self.first)
 		self.first.Hide()
+		self.first.SetToolTip(wx.ToolTip(_("Goto first message.")))
 
-		goto = wx.Button( panel, -1, _("Goto"), wx.DefaultPosition, wx.local.buttonSize)
-		goto.SetFont(wx.local.normalFont)
-		item7.Add( goto, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
+		self.goto = wx.Button( panel, -1, _("Goto"), wx.DefaultPosition, wx.local.buttonSize)
+		self.goto.SetFont(wx.local.normalFont)
+		item7.Add( self.goto, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
+		self.Bind(wx.EVT_BUTTON, self.MessageGoto, self.goto)
+		self.goto.Disable()
+		self.goto.SetToolTip(wx.ToolTip(_("Goto object talked about in this message.")))
 
 		self.next = wx.Button( panel, -1, _("Next"), wx.DefaultPosition, wx.local.buttonSize)
 		self.next.SetFont(wx.local.normalFont)
 		item7.Add( self.next, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
 		self.Bind(wx.EVT_BUTTON, self.MessageNext, self.next)
+		self.next.SetToolTip(wx.ToolTip(_("Goto next message.")))
 
 		self.last = wx.Button( panel, -1, _("Last"), wx.DefaultPosition, wx.local.buttonSize)
 		self.last.SetFont(wx.local.normalFont)
 		item7.Add( self.last, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
 		self.Bind(wx.EVT_BUTTON, self.MessageLast, self.last)
 		self.last.Hide()
+		self.last.SetToolTip(wx.ToolTip(_("Goto last message.")))
 
 		item11 = wx.StaticLine( panel, MESSAGE_LINE, wx.DefaultPosition, wx.Size(20,-1), wx.LI_HORIZONTAL )
 		item11.Enable(False)
@@ -137,6 +144,8 @@ class winMessage(winBase, winShiftMixIn):
 	
 		# The current message slot
 		self.slot = 0
+		self.position = 0
+		self.dirty = True
 
 		# Contains the message types to be filtered
 		self.filtered = Set()
@@ -262,109 +271,133 @@ class winMessage(winBase, winShiftMixIn):
 			return
 			
 		self.BoardSet(0, evt.slot)
+		self.dirty = True
+
+	def message(self):
+		"""\
+		Returns the currently displayed message.
+		"""
+		return self.messages[self.slot]
+	message = property(message)
+
+	def messages(self):
+		"""\
+		Returns all the messages for the current board.
+		"""
+		if self.application.cache.messages.has_key(self.bid):
+			return self.application.cache.messages[self.bid]
+		else:
+			return []
+	messages = property(messages)
+
+	def messages_unfiltered(self):
+		"""\
+		Returns a list of the slots for unfiltered messages.
+		"""
+		if self.dirty:
+			unfiltered = []
+			for i in range(0, len(self.messages)):
+				if self.filtered > Set(self.messages[i].types):
+					continue
+				unfiltered.append(i)
+			self.__unfiltered = unfiltered
+			return unfiltered
+		else:
+			return self.__unfiltered 
+	messages_unfiltered = property(messages_unfiltered)
 
 	def BoardSet(self, id, slot=0):
+		"""\
+		Set the currently displayed board to id.
+		"""
 		self.bid = id
-		if self.application.cache.messages.has_key(self.bid):
-			messages = self.application.cache.messages[self.bid]
-		else:
-			messages = []
-
-		# Figure out the first non-filter message
-		found = slot
-		for i in range(slot, len(messages)):
-			message = messages[i]
-			if self.filtered > Set(message.types):
-				continue
-			else:
-				found = i
-				break
-
-		# Set that message as the current
-		self.MessageSet(found)
+		self.MessageSet(direction=0)
 	
-	def MessageSet(self, slot):
-		if self.application.cache.messages.has_key(self.bid):
-			messages = self.application.cache.messages[self.bid]
-		else:
-			messages = []
+	def MessageSet(self, direction=None, slot=None):
+		"""\
+		Set the currently displayed message to the given slot.
 
-		if slot >= len(messages) or slot < 0:
-			self.slot = -1
-		else:
-			self.slot = slot
-			
-		if self.slot == -1:
-			# Is it because we filtered the messages?
-			if len(messages) == 0:
-				message_subject = _("No messages")
-				message_body = self.html_nomessage
-			else:
-				message_subject = _("All filtered")
-				message_body = self.html_allfiltered
-				
+		Only shows messages which havn't been filtered.
+		Giving -1 will find first unfiltered message.
+		"""
+		# Are there any messages?
+		if len(self.messages) == 0:
+			message_subject = _("No messages")
+			message_counter = _("")
+			message_body = self.html_nomessage
 			message_filter = False
-		else:
-			message = messages[self.slot]
+			message_buttons = [False, False, False]
 
-			if self.filtered > Set(message.types):
-				html = self.html_filtered
-				message_filter = True
-			else:
-				html = self.html_message
-				message_filter = False
+		# Well are there any 
+		elif len(self.messages_unfiltered) == 0:
+			print "All messages were filtered"
+			message_subject = _("All filtered")
+			message_counter = _("")
+			message_body = self.html_allfiltered
+			message_filter = False
+			message_buttons = [False, False, False]
+
+		elif direction != None or slot != None:
+			# Are we going to a specific message?
+			if slot != None:
+				if slot > len(self.messages) or slot < 0:
+					raise IOError("Tried to go to a place that doesn't exist!")
+
+				self.slot = slot
+
+				# Find the closest unfiltered position
+				for i in range(1, len(self.messages_unfiltered)):
+					if self.messages_unfiltered[i] > self.slot:
+						self.position = i-1
+
+			# Are we just going in a general direction
+			if direction != None:
+				self.position += direction
+
+				# Can't go of the end
+				if self.position >= len(self.messages_unfiltered):
+					self.position = len(self.messages_unfiltered)-1
+				if self.position < 0:
+					self.position = 0
 				
-			message_subject = message.subject
-			message_body = html % message.__dict__
+				self.slot = self.messages_unfiltered[self.position]
+
+			message_subject = self.message.subject
+			if self.slot in self.messages_unfiltered:
+				message_body = self.html_message % self.message.__dict__
+			else:
+				message_body = self.html_filtered % self.message.__dict__
+			
+			message_filter = not self.slot in self.messages_unfiltered
+			message_buttons = [
+				self.position > 0, 
+				1 in zip(*self.message.references)[0], # FIXME: Magic Number alert! 1 == Object reference..
+				self.position < len(self.messages_unfiltered)-1
+			]
+			message_counter = _("%i of %i") % (self.slot+1, len(self.messages))
 
 		self.filter.SetValue(message_filter)
 		self.titletext.SetLabel(message_subject)
-		self.counter.SetLabel(_("%i of %i") % (self.slot+1, len(messages)))
+		self.counter.SetLabel(message_counter)
 		self.html.SetPage(message_body)
 
+		self.prev.Enable(message_buttons[0])
+		self.first.Enable(message_buttons[0])
+		self.goto.Enable(message_buttons[1])
+		self.last.Enable(message_buttons[-1])
+		self.next.Enable(message_buttons[-1])
+
 	def MessageFirst(self, evt=None):
-		self.slot = -1
-		self.MessageNext()
+		self.MessageSet(-len(self.messages))
 
 	def MessageNext(self, evt=None):
-		print "Going to next message..."
-		messages = self.application.cache.messages[self.bid]
-
-		# Find next non-filter message
-		slot = self.slot
-		for i in range(slot+1, len(messages)):
-			message = messages[i]
-			if self.filtered > Set(message.types):
-				print "Slot %i filtered" % i
-				continue
-			else:
-				print "Using %i" % i
-				slot = i
-				break
-
-		# Set that message as the current
-		self.MessageSet(slot)
+		self.MessageSet(1)
 	
 	def MessageLast(self, evt=None):
-		self.slot = len(self.application.cache.messages[self.bid])
-		self.MessagePrev()
+		self.MessageSet(len(self.messages))
 
 	def MessagePrev(self, evt=None):
-		print "Going to previous message..."
-		messages = self.application.cache.messages[self.bid]
-
-		# Find next non-filter message
-		slot = self.slot
-		for i in range(slot-1, -1, -1):
-			message = messages[i]
-			if self.filtered > Set(message.types):
-				continue
-			else:
-				slot = i
-				break
-
-		# Set that message as the current
-		self.MessageSet(slot)
+		self.MessageSet(-1)
 		
 	def MessageDelete(self, evt=None):
 		# Get the current slot
@@ -377,8 +410,14 @@ class winMessage(winBase, winShiftMixIn):
 		self.application.Post(self.application.cache.CacheDirtyEvent("messages", "remove", self.bid, slot, None))
 
 	def MessageGoto(self, slot):
-		messages = self.application.cache.messages[self.bid]
-		self.MessageSet(slot-1)
+		# Select the object this message references
+		id = None
+		for reference, id in self.message.references:
+			# FIXME: Magic Number alert! 1 == Object reference..
+			if reference == 1:
+				break
+		if not id is None:
+			self.application.Post(self.application.gui.SelectObjectEvent(id))
 
 	def MessageNew(self, evt=None):
 		pass
