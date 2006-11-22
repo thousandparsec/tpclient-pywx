@@ -88,11 +88,15 @@ class winMixIn(object):
 		icon.CopyFromBitmap(wx.Bitmap(os.path.join("graphics", "icon.ico"), wx.BITMAP_TYPE_ANY))
 		self.SetIcon(icon)
 
-
 	def SetSizeHard(self, pos):
 		self.SetMinSize(pos)
 		self.SetMaxSize(pos)
 		self.SetSize(pos)
+
+	def __str__(self):
+		if hasattr(self, 'title'):
+			return "<win %s>" % self.title
+		return super(self.__class__, self).__str__()
 
 class winBaseMixIn(winMixIn):
 	"""
@@ -112,7 +116,6 @@ class winBaseMixIn(winMixIn):
 		func = 'On' + event.__class__.__name__[:-5]	
 		try:
 			if hasattr(self, func):
-				print self.Post, self.title, func
 				getattr(self, func)(event)
 		except Exception, e:
 			utils.do_traceback()
@@ -120,7 +123,6 @@ class winBaseMixIn(winMixIn):
 		for window in self.children.values():
 			try:
 				if hasattr(window, func):
-					print self.Post, window.title, func
 					getattr(window, func)(event)
 			except Exception, e:
 				utils.do_traceback()
