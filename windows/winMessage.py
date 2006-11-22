@@ -128,10 +128,10 @@ class winMessage(winBase, winShiftMixIn):
 		self.Bind(wx.EVT_BUTTON, self.MessageNew, new)
 		new.Disable()
 
-		delete = wx.Button( panel, -1, _("Delete"), wx.DefaultPosition, wx.local.buttonSize)
-		delete.SetFont(wx.local.normalFont)
-		item7.Add( delete, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
-		self.Bind(wx.EVT_BUTTON, self.MessageDelete, delete)
+		self.delete = wx.Button( panel, -1, _("Delete"), wx.DefaultPosition, wx.local.buttonSize)
+		self.delete.SetFont(wx.local.normalFont)
+		item7.Add( self.delete, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
+		self.Bind(wx.EVT_BUTTON, self.MessageDelete, self.delete)
 
 		item5.Add( item7, 0, wx.GROW|wx.ALIGN_RIGHT|wx.ALL, 1 )
 
@@ -327,7 +327,7 @@ class winMessage(winBase, winShiftMixIn):
 			message_counter = _("")
 			message_body = self.html_nomessage
 			message_filter = False
-			message_buttons = [False, False, False]
+			message_buttons = [False, False, False, False]
 
 		# Well are there any 
 		elif len(self.messages_unfiltered) == 0:
@@ -336,7 +336,7 @@ class winMessage(winBase, winShiftMixIn):
 			message_counter = _("")
 			message_body = self.html_allfiltered
 			message_filter = False
-			message_buttons = [False, False, False]
+			message_buttons = [False, False, False, False]
 
 		elif direction != None or slot != None:
 			# Are we going to a specific message?
@@ -375,7 +375,8 @@ class winMessage(winBase, winShiftMixIn):
 			message_buttons = [
 				self.position > 0, 
 				GenericRS.Types["Object"] in self.message.references.types,
-				self.position < len(self.messages_unfiltered)-1
+				self.position < len(self.messages_unfiltered)-1,
+				True
 			]
 			message_counter = _("%i of %i") % (self.slot+1, len(self.messages))
 
@@ -387,8 +388,9 @@ class winMessage(winBase, winShiftMixIn):
 		self.prev.Enable(message_buttons[0])
 		self.first.Enable(message_buttons[0])
 		self.goto.Enable(message_buttons[1])
-		self.last.Enable(message_buttons[-1])
-		self.next.Enable(message_buttons[-1])
+		self.last.Enable(message_buttons[2])
+		self.next.Enable(message_buttons[2])
+		self.delete.Enable(message_buttons[3])
 
 	def MessageFirst(self, evt=None):
 		self.MessageSet(-len(self.messages))
@@ -416,7 +418,6 @@ class winMessage(winBase, winShiftMixIn):
 		# Select the object this message references
 		id = None
 		for reference, id in self.message.references:
-			# FIXME: Magic Number alert! 1 == Object reference..
 			if reference == GenericRS.Types["Object"]:
 				break
 		if not id is None:
