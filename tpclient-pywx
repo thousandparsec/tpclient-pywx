@@ -129,7 +129,6 @@ class GUI(wx.App):
 			utils.do_traceback()
 		print "Finished init..."
 		self.Call(self.Show, self.connectto)
-		
 
 	def Cleanup(self):
 		for window in self.windows:
@@ -191,8 +190,8 @@ class GUI(wx.App):
 		if self.current != None:
 			try:
 				self.current.Hide()
-			except:
-				pass
+			except Exception, e:
+				utils.do_traceback()
 
 		self.SetTopWindow(window)
 

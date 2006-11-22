@@ -259,6 +259,14 @@ class winMain(winMDIBase):
 
 		self.UpdateEOT()
 
+	def Hide(self, show=True):
+		if not show:
+			return self.Show()
+
+		for window in self.children.values():
+			window.Hide()
+		super(self.__class__, self).Hide()
+
 	def SetSizeHard(self, size):
 		winMDIBase.SetSize(self, size)
 		if wx.Platform != "__WXMSW__":
