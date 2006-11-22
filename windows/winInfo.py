@@ -90,6 +90,8 @@ class winInfo(winBase):
 
 		base_sizer.Add(middle, 1, wx.EXPAND, 0)
 
+		self.current = -1
+
 		# Find the images
 		self.images = {'nebula':{'still':[]}, 'star':{'still':[]}, 'planet':{'still':[]}}
 
@@ -150,6 +152,10 @@ class winInfo(winBase):
 
 	def OnSelectObject(self, evt):
 		print "winInfo SelectObject", evt
+		if evt.id == self.current:
+			return
+		self.current = evt.id
+
 		try:
 			object = self.application.cache.objects[evt.id]
 		except:

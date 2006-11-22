@@ -78,6 +78,7 @@ class winStarMap(winBase):
 		self.path = None
 
 		self.mode = "Normal"
+		self.current = -1
 
 	def Rebuild(self):
 		try:
@@ -209,17 +210,26 @@ class winStarMap(winBase):
 		"""\
 		Called when the cache has been updated.
 		"""
-		
-		self.Rebuild()
+		print self, "OnCacheUpdate"
+		if evt.what is None:
+			self.Rebuild()
+			return
+
+		if evt.what is "orders":
+			self.OnUpdateOrder(evt.change)
 
 	def OnSelectObject(self, evt):
 		"""\
 		Called when an object is selected.
 		"""
+		print self, "OnSelectObject"
+		if evt.id == self.current:
+			return
+		self.current = evt.id
+
 		object = self.application.cache.objects[evt.id]
 
 		self.arrow.Move(scale(object.pos))
-
 		if isinstance(object, Fleet):
 			points = getpath(self.application, object)
 			if points:
@@ -237,8 +247,9 @@ class winStarMap(winBase):
 		"""
 		object = self.application.cache.objects[evt.id]
 
+		self.arrow.Move(scale(object.pos))
+
 		self.RemovePath()
-		
 		if isinstance(object, Fleet):
 			points = getpath(self.application, object)
 
