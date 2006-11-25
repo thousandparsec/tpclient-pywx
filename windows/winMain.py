@@ -81,6 +81,7 @@ class MediaProgress(wx.PopupCtrl):
 class StatusBar(wx.StatusBar):
 	WIDGET_PROGRESS = 0
 	WIDGET_PROGRESS_CANCEL = 1
+	WIDGET_TEXT = 3
 	TEXT_PROGRESS = 2
 	TEXT_TIMER = 3
 
@@ -95,6 +96,9 @@ class StatusBar(wx.StatusBar):
 		self.Progress = MediaProgress(self, application, -1)
 		self.ProgressCancel = wx.Button(self, -1, "X")
 		self.ProgressCancel.Enable(False)
+
+		self.StatusText = wx.TextCtrl(self, -1, "")
+		self.StatusText.SetEditable(False)
 
 		self.SetStatusText("", StatusBar.TEXT_TIMER)
 		self.SetStatusText("", StatusBar.TEXT_PROGRESS)
@@ -117,15 +121,22 @@ class StatusBar(wx.StatusBar):
 
 		left = self.endtime - time.time()
 		if left > 0:
+			if left < 120 and left > 0:
+				# Flash the bar
+				if int(left) % 2 == 0:
+					self.StatusText.SetOwnBackgroundColour(wx.NullColour)
+				else:
+					self.StatusText.SetOwnBackgroundColour(wx.Colour(255,0,0))
+
 			hours = math.floor(left / sih)
 			mins = math.floor((left - hours * sih) / sim)
 			secs = math.floor((left - hours * sih - mins * sim))
-			self.SetStatusText("EOT: %02i:%02i:%02i" % (hours, mins, secs), StatusBar.TEXT_TIMER)
+			self.StatusText.SetValue("EOT: %02i:%02i:%02i" % (hours, mins, secs))
 		else:
 			if self.endtime != 0:
 				self.parent.UpdateEOT()
 				self.endtime = 0
-			self.SetStatusText("EOT: Unknown", StatusBar.TEXT_TIMER)
+			self.StatusText.SetValue("EOT: Unknown")
 	
 	def SetEndTime(self, endtime):
 		print endtime
@@ -139,6 +150,10 @@ class StatusBar(wx.StatusBar):
 		rect = self.GetFieldRect(StatusBar.WIDGET_PROGRESS_CANCEL)
 		self.ProgressCancel.SetPosition((rect.x, rect.y))
 		self.ProgressCancel.SetSize((rect.width, rect.height))
+
+		rect = self.GetFieldRect(StatusBar.WIDGET_TEXT)
+		self.StatusText.SetPosition((rect.x, rect.y))
+		self.StatusText.SetSize((rect.width, rect.height))
 		
 		self.sizeChanged = False
 
