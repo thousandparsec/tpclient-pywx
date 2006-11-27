@@ -45,6 +45,8 @@ class winAccount(winMainBase):
 
 		# Throbber to display when waiting for connection to server
 		self.throbber = GIFAnimationCtrl( panel, -1)
+		import os
+		print os.getcwd()
 		self.throbber.LoadFile(os.path.join("graphics", "throbber.gif"))
 		self.throbber.Hide()
 

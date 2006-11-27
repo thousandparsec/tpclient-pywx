@@ -23,6 +23,7 @@ DESC = 1
 
 COL_SIZE=150
 
+wx.ArtProvider()
 Art = wx.ArtProvider_GetBitmap
 wx.ArtSize = (16, 16)
 

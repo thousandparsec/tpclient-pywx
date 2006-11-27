@@ -15,7 +15,7 @@ import threading
 from types import *
 
 # Local imports
-from __init__ import version
+from version import version
 
 import utils
 from utils import debug, DEBUG_MAIN, DEBUG_GUI, DEBUG_NETWORK

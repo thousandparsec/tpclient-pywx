@@ -77,9 +77,10 @@ class winMessage(winBase, winShiftMixIn):
 		item5.Add( item6, 0, wx.GROW|wx.ALIGN_CENTER_HORIZONTAL|wx.ALL, 1 )
 
 		self.html = item6
-		if wx.Platform == "__WXMAC__":
-			self.html.SetFonts("Swiss", "Courier", [10, 12, 14, 16, 20, 24])
-		else:
+		if wx.Platform != "__WXMAC__":
+#			pass
+#			self.html.SetFonts("Swiss", "Courier", [10, 12, 14, 16, 20, 24])
+#		else:
 			self.html.SetFonts("Swiss", "Courier", [4, 6, 8, 10, 12, 14, 16])
 		self.html.SetPage("")
 

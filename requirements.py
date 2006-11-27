@@ -3,6 +3,8 @@
 
 notfound = []
 
+print __file__
+
 try:
 	import numarray
 except ImportError:
@@ -14,7 +16,8 @@ try:
 	
 	version = string.split(wxPython.__version__, '.')
 	intversion = int(version[0])*1000000+int(version[1])*10000+int(version[2])*100
-except ImportError:
+except ImportError, e:
+	print e
 	intversion = 0
 
 if intversion < 2060000:
@@ -22,14 +25,15 @@ if intversion < 2060000:
 
 try:
 	import tp.netlib
-except ImportError:
-	import sys
-	sys.path.append("..")
-	
-	try:
-		import tp.netlib
-	except ImportError:
-		notfound.append("tp.netlib")
+except ImportError, e:
+	print e
+	notfound.append("tp.netlib")
+
+try:
+	import tp.client
+except ImportError, e:
+	print e
+	notfound.append("tp.client")
 
 import __builtin__
 try:
@@ -45,7 +49,8 @@ except ImportError:
 
 try:
 	import Image
-except ImportError:
+except ImportError, e:
+	print e
 	print "It is highly recommended to install the PIL library, speed will be greatly improved."
 
 if len(notfound) > 0:
