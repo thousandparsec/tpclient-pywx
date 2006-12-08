@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource version="2.3.0.1" xmlns="http://www.wxwidgets.org/wxxrc">
+    <object class="wxDialog" name="MessageBrowser" subclass="winReportBase">
+        <style>wxCAPTION|wxRESIZE_BORDER|wxSYSTEM_MENU|wxCLOSE_BOX</style>
+        <exstyle>wxWS_EX_BLOCK_EVENTS</exstyle>
+        <size>400,300</size>
+        <title>Dialog</title>
+        <centered>1</centered>
+        <object class="wxFlexGridSizer">
+            <cols>2</cols>
+            <rows>2</rows>
+            <vgap>0</vgap>
+            <hgap>0</hgap>
+            <object class="sizeritem">
+                <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE</flag>
+                <border>5</border>
+                <object class="wxStaticText" name="wxID_STATIC">
+                    <label>Boards</label>
+                </object>
+            </object>
+            <object class="sizeritem">
+                <flag>wxALIGN_CENTER_HORIZONTAL|wxGROW|wxALL</flag>
+                <border>5</border>
+                <object class="wxFlexGridSizer">
+                    <cols>2</cols>
+                    <rows>1</rows>
+                    <vgap>0</vgap>
+                    <hgap>0</hgap>
+                    <growablecols>0</growablecols>
+                    <object class="sizeritem">
+                        <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE</flag>
+                        <border>5</border>
+                        <object class="wxStaticText" name="BoardName">
+                            <label>Board Name</label>
+                        </object>
+                    </object>
+                    <object class="sizeritem">
+                        <flag>wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                        <border>0</border>
+                        <object class="wxButton" name="Filter">
+                            <size>20,-1</size>
+                            <tooltip>Filter messages using this message as a template.</tooltip>
+                            <label>F</label>
+                        </object>
+                    </object>
+                </object>
+            </object>
+            <object class="sizeritem">
+                <flag>wxGROW|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                <border>5</border>
+                <object class="wxTreeCtrl" name="Boards">
+                    <size>100,100</size>
+                    <tooltip>Boards avaliable on the server.</tooltip>
+                    <style>wxTR_SINGLE</style>
+                </object>
+            </object>
+            <object class="sizeritem">
+                <flag>wxGROW|wxGROW|wxALL</flag>
+                <border>5</border>
+                <object class="wxFlexGridSizer">
+                    <cols>1</cols>
+                    <rows>2</rows>
+                    <vgap>0</vgap>
+                    <hgap>0</hgap>
+                    <object class="sizeritem">
+                        <flag>wxGROW|wxGROW|wxALL</flag>
+                        <border>5</border>
+                        <object class="wxHtmlWindow" name="Message">
+                            <size>200,150</size>
+                            <style>wxHW_SCROLLBAR_AUTO|wxSUNKEN_BORDER|wxHSCROLL|wxVSCROLL</style>
+                            <htmlcode>&lt;html&gt;
+&lt;body&gt;
+&lt;center&gt;
+        &lt;table cols=1 width="100%" background=""&gt;
+                &lt;tr&gt;
+                        &lt;td&gt;&lt;b&gt;Subject:&lt;/b&gt; Subject goes here!&lt;/td&gt;
+                &lt;/tr&gt;
+                &lt;tr&gt;
+                        &lt;td&gt;A really cool message body should go here.&lt;/td&gt;
+                &lt;/tr&gt;
+        &lt;/table&gt;
+&lt;/center&gt;
+&lt;/body&gt;
+&lt;/html&gt;</htmlcode>
+                        </object>
+                    </object>
+                    <object class="sizeritem">
+                        <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                        <border>5</border>
+                        <object class="wxBoxSizer">
+                            <orient>wxHORIZONTAL</orient>
+                            <object class="sizeritem">
+                                <flag>wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                <border>5</border>
+                                <object class="wxButton" name="New">
+                                    <tooltip>Create a new message on the current board.</tooltip>
+                                    <label>New</label>
+                                </object>
+                            </object>
+                            <object class="sizeritem">
+                                <flag>wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                <border>5</border>
+                                <object class="wxButton" name="Goto">
+                                    <tooltip>Goto objects referenced by this message.</tooltip>
+                                    <label>Goto</label>
+                                </object>
+                            </object>
+                            <object class="sizeritem">
+                                <flag>wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                <border>5</border>
+                                <object class="wxButton" name="Delete">
+                                    <tooltip>Delete this message.</tooltip>
+                                    <label>Delete</label>
+                                </object>
+                            </object>
+                        </object>
+                    </object>
+                </object>
+            </object>
+        </object>
+    </object>
+</resource>

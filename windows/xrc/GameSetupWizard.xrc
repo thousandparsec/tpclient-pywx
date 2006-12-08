@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource version="2.3.0.1" xmlns="http://www.wxwidgets.org/wxxrc">
+    <object class="wxWizard" name="GameSetupWizard" subclass="GameServerSetup">
+        <style>wxDEFAULT_DIALOG_STYLE|wxCAPTION|wxRESIZE_BORDER|wxSYSTEM_MENU|wxCLOSE_BOX</style>
+        <exstyle>wxWIZARD_EX_HELPBUTTON</exstyle>
+        <title>Game Setup Wizard</title>
+        <bitmap>wizard.png</bitmap>
+        <object class="wxWizardPageSimple" name="Start" subclass="WizardPage">
+            <style>wxTAB_TRAVERSAL</style>
+            <object class="wxFlexGridSizer">
+                <cols>0</cols>
+                <rows>8</rows>
+                <vgap>0</vgap>
+                <hgap>0</hgap>
+                <growablecols>0</growablecols>
+                <object class="sizeritem">
+                    <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE</flag>
+                    <border>5</border>
+                    <object class="wxStaticText" name="wxID_STATIC">
+                        <font>
+                            <size>12</size>
+                            <family>swiss</family>
+                            <weight>bold</weight>
+                            <face>Sans</face>
+                        </font>
+                        <label>Setup a Thousand Parsec Game</label>
+                    </object>
+                </object>
+                <object class="sizeritem">
+                    <flag>wxALIGN_CENTER_HORIZONTAL|wxGROW|wxALL</flag>
+                    <border>5</border>
+                    <object class="wxStaticLine" name="wxID_STATIC">
+                        <style>wxLI_HORIZONTAL</style>
+                    </object>
+                </object>
+                <object class="sizeritem">
+                    <flag>wxALIGN_CENTER_HORIZONTAL|wxGROW|wxALL</flag>
+                    <border>5</border>
+                    <object class="wxHtmlWindow" name="Message">
+                        <size>200,150</size>
+                        <font>
+                            <size>10</size>
+                            <family>swiss</family>
+                            <face>Sans</face>
+                        </font>
+                        <style>wxNO_BORDER</style>
+                        <htmlcode>&lt;p&gt;
+This wizard will walk you through setting up a temporary Thousand Parsec server on your local machine.
+&lt;/p&gt;&lt;p&gt;
+If you would like people to access the game while you are not running this client you CAN NOT use this wizard. Instead follow the instructions found at &lt;a href="http://www.thousandparsec.net/tp/gettingstarted.php#server"&gt;here&lt;/a&gt;.
+&lt;/p&gt;&lt;p&gt;
+You can load an old game or start a new game.
+&lt;/p&gt;</htmlcode>
+                    </object>
+                </object>
+                <object class="spacer">
+                    <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                    <border>5</border>
+                    <size>5,5</size>
+                </object>
+                <object class="sizeritem">
+                    <flag>wxGROW|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                    <border>5</border>
+                    <object class="wxRadioBox" name="TypeOfGame">
+                        <label>Would you like to?</label>
+                        <dimension>0</dimension>
+                        <selection>0</selection>
+                        <content>
+                            <item>&amp;Start New Game</item>
+                            <item>&amp;Load Existing Game</item>
+                        </content>
+                    </object>
+                </object>
+            </object>
+        </object>
+        <object class="wxWizardPageSimple" name="Load" subclass="WizardPage1">
+            <style>wxTAB_TRAVERSAL</style>
+            <object class="wxFlexGridSizer">
+                <cols>1</cols>
+                <rows>6</rows>
+                <vgap>0</vgap>
+                <hgap>0</hgap>
+                <growablecols>0</growablecols>
+                <object class="sizeritem">
+                    <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE</flag>
+                    <border>5</border>
+                    <object class="wxStaticText" name="wxID_STATIC">
+                        <font>
+                            <size>12</size>
+                            <family>swiss</family>
+                            <weight>bold</weight>
+                            <face>Sans</face>
+                        </font>
+                        <label>Please Select the Game to Load</label>
+                    </object>
+                </object>
+                <object class="sizeritem">
+                    <flag>wxALIGN_CENTER_HORIZONTAL|wxGROW|wxALL</flag>
+                    <border>5</border>
+                    <object class="wxStaticLine" name="wxID_STATIC">
+                        <style>wxLI_HORIZONTAL</style>
+                    </object>
+                </object>
+                <object class="sizeritem">
+                    <flag>wxGROW|wxGROW|wxALL|wxADJUST_MINSIZE</flag>
+                    <border>5</border>
+                    <object class="wxStaticText" name="wxID_STATIC">
+                        <label>Below is listed all the games the client has found on this computer. 
+
+If your game is not listed here try finding the game using the Browse button. </label>
+                    </object>
+                </object>
+                <object class="spacer">
+                    <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                    <border>5</border>
+                    <size>5,5</size>
+                </object>
+                <object class="sizeritem">
+                    <flag>wxALIGN_CENTER_HORIZONTAL|wxGROW|wxALL</flag>
+                    <border>5</border>
+                    <object class="wxRadioBox" name="Games">
+                        <style>wxRA_SPECIFY_ROWS</style>
+                        <label>Please select a game to load:</label>
+                        <dimension>0</dimension>
+                        <selection>0</selection>
+                        <content>
+                            <item>&amp;Test Game 1</item>
+                            <item>&amp;Test Game 2</item>
+                        </content>
+                    </object>
+                </object>
+                <object class="sizeritem">
+                    <flag>wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                    <border>5</border>
+                    <object class="wxButton" name="Browse">
+                        <label>Browse</label>
+                    </object>
+                </object>
+            </object>
+        </object>
+        <object class="wxWizardPageSimple" name="NewRuleset" subclass="WizardPage3">
+            <style>wxTAB_TRAVERSAL</style>
+            <object class="wxFlexGridSizer">
+                <cols>1</cols>
+                <rows>6</rows>
+                <vgap>0</vgap>
+                <hgap>0</hgap>
+                <growablecols>0</growablecols>
+                <object class="sizeritem">
+                    <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE</flag>
+                    <border>5</border>
+                    <object class="wxStaticText" name="wxID_STATIC">
+                        <font>
+                            <size>12</size>
+                            <family>swiss</family>
+                            <weight>bold</weight>
+                            <face>Sans</face>
+                        </font>
+                        <label>Please select the Ruleset to use</label>
+                    </object>
+                </object>
+                <object class="sizeritem">
+                    <flag>wxALIGN_CENTER_HORIZONTAL|wxGROW|wxALL</flag>
+                    <border>5</border>
+                    <object class="wxStaticLine" name="wxID_STATIC">
+                        <style>wxLI_HORIZONTAL</style>
+                    </object>
+                </object>
+                <object class="sizeritem">
+                    <flag>wxGROW|wxGROW|wxALL|wxADJUST_MINSIZE</flag>
+                    <border>5</border>
+                    <object class="wxStaticText" name="wxID_STATIC">
+                        <label>Below is listed all the rulesets supported by the server. 
+
+You need to choose which ruleset to use for this game.
+
+Each ruleset can be completely different game play and structure. For more rulesets you can checkout the Thousand Parsec website.</label>
+                    </object>
+                </object>
+                <object class="spacer">
+                    <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                    <border>5</border>
+                    <size>5,5</size>
+                </object>
+                <object class="sizeritem">
+                    <flag>wxALIGN_CENTER_HORIZONTAL|wxGROW|wxALL</flag>
+                    <border>5</border>
+                    <object class="wxRadioBox" name="Rulesets">
+                        <style>wxRA_SPECIFY_ROWS</style>
+                        <label>Please select a ruleset to use:</label>
+                        <dimension>0</dimension>
+                        <selection>0</selection>
+                        <content>
+                            <item>&amp;Test Ruleset 1</item>
+                            <item>&amp;Test Ruleset 2</item>
+                        </content>
+                    </object>
+                </object>
+            </object>
+        </object>
+        <object class="wxWizardPageSimple" name="Completed" subclass="WizardPage2">
+            <style>wxTAB_TRAVERSAL</style>
+            <object class="wxFlexGridSizer">
+                <cols>1</cols>
+                <rows>6</rows>
+                <vgap>0</vgap>
+                <hgap>0</hgap>
+                <growablecols>0</growablecols>
+                <object class="sizeritem">
+                    <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE</flag>
+                    <border>5</border>
+                    <object class="wxStaticText" name="wxID_STATIC">
+                        <font>
+                            <size>12</size>
+                            <family>swiss</family>
+                            <weight>bold</weight>
+                            <face>Sans</face>
+                        </font>
+                        <label>Server Setup!</label>
+                    </object>
+                </object>
+                <object class="sizeritem">
+                    <flag>wxALIGN_CENTER_HORIZONTAL|wxGROW|wxALL</flag>
+                    <border>5</border>
+                    <object class="wxStaticLine" name="wxID_STATIC">
+                        <style>wxLI_HORIZONTAL</style>
+                    </object>
+                </object>
+                <object class="sizeritem">
+                    <flag>wxGROW|wxGROW|wxALL|wxADJUST_MINSIZE</flag>
+                    <border>5</border>
+                    <object class="wxStaticText" name="wxID_STATIC">
+                        <label>You have successfully setup a server and it is now running. The details of the server which you can give to your friends is given below.
+
+If your friends are on the local network this new server should appear in the server browser.
+
+You can either create a new account or connect to the server straight away.</label>
+                    </object>
+                </object>
+                <object class="spacer">
+                    <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                    <border>5</border>
+                    <size>5,5</size>
+                </object>
+                <object class="sizeritem">
+                    <flag>wxGROW|wxGROW|wxALL</flag>
+                    <border>5</border>
+                    <object class="wxFlexGridSizer">
+                        <cols>2</cols>
+                        <rows>0</rows>
+                        <vgap>0</vgap>
+                        <hgap>0</hgap>
+                        <growablecols>1</growablecols>
+                        <object class="sizeritem">
+                            <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE</flag>
+                            <border>5</border>
+                            <object class="wxStaticText" name="wxID_STATIC">
+                                <label>Host URL:</label>
+                            </object>
+                        </object>
+                        <object class="sizeritem">
+                            <flag>wxALIGN_CENTER_HORIZONTAL|wxGROW|wxALL</flag>
+                            <border>5</border>
+                            <object class="wxTextCtrl" name="URL">
+                            </object>
+                        </object>
+                    </object>
+                </object>
+                <object class="spacer">
+                    <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                    <border>5</border>
+                    <size>5,5</size>
+                </object>
+                <object class="sizeritem">
+                    <flag>wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                    <border>5</border>
+                    <object class="wxBoxSizer">
+                        <orient>wxHORIZONTAL</orient>
+                        <object class="sizeritem">
+                            <flag>wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                            <border>5</border>
+                            <object class="wxButton" name="Connect">
+                                <tooltip>Connect to the newly created server.</tooltip>
+                                <label>Connect</label>
+                            </object>
+                        </object>
+                        <object class="sizeritem">
+                            <flag>wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                            <border>5</border>
+                            <object class="wxButton" name="NewAccount">
+                                <tooltip>Create a new account on the newly created server.</tooltip>
+                                <label>New Account</label>
+                            </object>
+                        </object>
+                    </object>
+                </object>
+            </object>
+        </object>
+    </object>
+</resource>
