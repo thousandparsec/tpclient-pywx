@@ -133,6 +133,7 @@ class winMessage(winBase, winShiftMixIn):
 		self.delete.SetFont(wx.local.normalFont)
 		item7.Add( self.delete, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
 		self.Bind(wx.EVT_BUTTON, self.MessageDelete, self.delete)
+		self.delete.SetToolTip(wx.ToolTip(_("Delete currently displayed message.")))
 
 		item5.Add( item7, 0, wx.GROW|wx.ALIGN_RIGHT|wx.ALL, 1 )
 

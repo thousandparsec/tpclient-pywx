@@ -71,7 +71,7 @@ class GUI(wx.App):
 
 	class DirtyOrderEvent(wx.PyEvent):
 		"""\
-		Raised when an order is selected.
+		Raised when an order value changes but hasn't been saved yet.
 		"""
 		def __init__(self, order):
 			self.id = order.id
@@ -79,7 +79,7 @@ class GUI(wx.App):
 			self.order = order
 		
 		def __str__(self):
-			return "<SelectOrderEvent id=%s slots=%s>" % (self.id, self.slots)
+			return "<DirtyOrderEvent id=%s slots=%s>" % (self.id, self.slots)
 
 	######################################
 	def __init__(self, application):
