@@ -160,6 +160,20 @@ class OrderedTreeCtrl(wx.TreeCtrl):
 		wx.TreeCtrl.__init__(self, *args, **kw)
 		self.Bind(wx.EVT_TREE_ITEM_ACTIVATED, self.OnActivate, self)
 
+	def SetItemPyData(self, item, data):
+		oldkey = self.GetItemData(item)
+		if self.objects.has_key(oldkey):
+			del self.objects[oldkey]
+
+		key = id(data)
+		self.SetItemData(item, key)
+		self.objects[key] = data
+
+	def GetItemPyData(self, item):
+		key = self.GetItemData(item)
+		if self.objects.has_key(key):
+			return self.objects[key]
+
 	def OnActivate(self, evt):
 		item = evt.GetItem()
 		self.Toggle(item)
