@@ -14,7 +14,7 @@
   CRCCheck On 
  
   ;Output File Name 
-  OutFile "tpclient-pywx-0.2.0rc1-setup.exe" 
+  OutFile "tpclient-pywx-0.2.0rc2-setup.exe" 
  
   ;The Default Installation Directory 
   InstallDir "$PROGRAMFILES\Thousand Parsec\tpclient-pywx" 
@@ -92,7 +92,7 @@ Section "Files" Files
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\tpclient-pywx" \
                  "DisplayIcon" "$INSTDIR\tpclient-pywx.exe"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\tpclient-pywx" \
-                 "DisplayVersion" "0.1.1"
+                 "DisplayVersion" "0.2.0"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\tpclient-pywx" \
                  "URLInfoAbout" "http://www.thousandparsec.net/tp/"
   WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\tpclient-pywx" \

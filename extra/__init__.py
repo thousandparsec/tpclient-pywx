@@ -157,18 +157,8 @@ class wxComboBox(wx.ComboBox, ToolTipItemMixIn):
 
 class OrderedTreeCtrl(wx.TreeCtrl):
 	def __init__(self, *args, **kw):
-		self.objects = {}
 		wx.TreeCtrl.__init__(self, *args, **kw)
 		self.Bind(wx.EVT_TREE_ITEM_ACTIVATED, self.OnActivate, self)
-
-	def SetPyData(self, item, data):
-		self.objects[item] = data
-
-	def GetPyData(self, item):
-		for i in self.objects.keys():
-			if i == item:
-				return self.objects[i]
-		return None
 
 	def OnActivate(self, evt):
 		item = evt.GetItem()
@@ -181,9 +171,17 @@ class OrderedTreeCtrl(wx.TreeCtrl):
 		if t1 == t2: return 0
 		return 1
 
+	def GetPyData(self, item):
+		if not item.IsOk():
+			return None
+		return wx.TreeCtrl.GetItemPyData(self, item)
+
 	def FindItemByData(self, pyData, compare=None, item=None):
 		if item == None:
 			item = self.GetRootItem()
+
+		if not item.IsOk():
+			return None
 
 		if not compare is None and compare(pyData, self.GetPyData(item)):
 			return item
@@ -210,6 +208,9 @@ class OrderedTreeCtrl(wx.TreeCtrl):
 
 		if item == None:
 			item = self.GetRootItem()
+
+		if not item.IsOk():
+			return None
 
 		if not compare is None:
 			if compare(pyData, self.GetPyData(item)):

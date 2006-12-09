@@ -22,7 +22,7 @@ arguments = dict(
 	author_email="tim@thousandparsec.net",
 	url="http://www.thousandparsec.net",
 # Files to include
-	scripts=["tpclient-pywx.py"],
+	scripts=["tpclient-pywx"],
 	packages=[ \
 		'.',
 		'windows',
@@ -42,6 +42,8 @@ if sys.platform == 'darwin':
 	from setuptools import find_packages
 	print find_packages()
 
+	arguments['scripts']=["tpclient-pywx.py"]
+	
 	# Py2App stuff
 	extra_arguments = dict(
 		app=["tpclient-pywx.py"],
@@ -81,6 +83,9 @@ if sys.platform == 'darwin':
 elif sys.platform == 'win32':
 	import py2exe
 
+	import sys
+	sys.path.append('.')
+
 	# Py2EXE stuff
 	extra_arguments = dict(
 		windows=[{
@@ -90,7 +95,7 @@ elif sys.platform == 'win32':
 		options={
 			"py2exe": { 
 				"dll_excludes": [], 
-				"packages": ["tp.netlib"], 
+				"packages": ["tp.netlib", "tp.client"], 
 				"excludes": ["Tkconstants", "Tkinter", "tcl", "pydoc", "unittest"],
 				"optimize": 2,
 				"compressed": 0,
