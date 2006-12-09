@@ -157,22 +157,18 @@ class wxComboBox(wx.ComboBox, ToolTipItemMixIn):
 
 class OrderedTreeCtrl(wx.TreeCtrl):
 	def __init__(self, *args, **kw):
+		self.objects = {}
 		wx.TreeCtrl.__init__(self, *args, **kw)
 		self.Bind(wx.EVT_TREE_ITEM_ACTIVATED, self.OnActivate, self)
 
-	def SetItemPyData(self, item, data):
-		oldkey = self.GetItemData(item)
-		if self.objects.has_key(oldkey):
-			del self.objects[oldkey]
+	def SetPyData(self, item, data):
+		self.objects[item] = data
 
-		key = id(data)
-		self.SetItemData(item, key)
-		self.objects[key] = data
-
-	def GetItemPyData(self, item):
-		key = self.GetItemData(item)
-		if self.objects.has_key(key):
-			return self.objects[key]
+	def GetPyData(self, item):
+		for i in self.objects.keys():
+			if i == item:
+				return self.objects[i]
+		return None
 
 	def OnActivate(self, evt):
 		item = evt.GetItem()
