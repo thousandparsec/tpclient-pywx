@@ -209,15 +209,21 @@ class winInfo(winBase):
 				continue
 
 			if key == "ships":
-				s += "ships: "
+				s += "Ships: "
+				# FIXME: This is a hack :/
 				for t, number in value:
-					design = self.application.cache.designs[t]
-					s += "%s %s, " % (number, design.name)
+					if self.application.cache.designs.has_key(t):
+						design = self.application.cache.designs[t]
+						s += "%s %s, " % (number, design.name)
+					else:
+						print "Unknown Design id:", t
+						s += "%s %s, " % (number, "Unknown (type: %s)" % t)
 				s = s[:-2] + "\n"
 				continue
 
+			key = key.title()
 			if type(value) == StringType:
-				s += "%s: '%s'\n" % (key, value)
+				s += "%s: %s\n" % (key, value)
 			elif type(value) in (ListType, TupleType):
 				s += "%s: " % (key,)
 				for i in value:

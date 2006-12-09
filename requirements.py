@@ -3,8 +3,6 @@
 
 notfound = []
 
-print __file__
-
 try:
 	import numarray
 except ImportError:
