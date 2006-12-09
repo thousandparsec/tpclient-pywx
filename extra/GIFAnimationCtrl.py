@@ -1,6 +1,12 @@
 
 import wx
 import Image
+import Image
+import PngImagePlugin
+import GifImagePlugin
+import JpegImagePlugin
+Image._initialized=2
+
 
 def pil2wx(pil,alpha=True):
 	if alpha:
