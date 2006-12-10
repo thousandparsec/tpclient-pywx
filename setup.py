@@ -83,8 +83,11 @@ if sys.platform == 'darwin':
 elif sys.platform == 'win32':
 	import py2exe
 
-	import sys
-	sys.path.append('.')
+	if os.path.exists("dist"):
+		shutil.rmtree("dist")
+	bat = os.path.join("..", "scratchpad", "setup.bat")
+	if os.path.exists(bat):
+		os.system(bat)
 
 	# Py2EXE stuff
 	extra_arguments = dict(
@@ -125,3 +128,15 @@ if sys.platform == 'darwin':
 
 	print "Creating dmg package"
 	os.system("hdiutil create -imagekey zlib-level=9 -srcfolder dist/tpclient-pywx.app %s" % dmg)
+elif sys.platform == 'win32':
+	# Repack the library.zip file
+	os.system(os.path.join("..", "scratchpad", "repack.bat"))
+	
+	# We should now use upx on the executables to make em smaller.
+	os.system("upx --best .\dist\*.pyd")
+	os.system("upx --best .\dist\*.dll")
+	os.system("upx --best .\dist\*.exe")
+
+	# Should generate the setup.nsi now.
+
+	# Should run NSIS now.
