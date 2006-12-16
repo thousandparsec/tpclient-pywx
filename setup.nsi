@@ -4,6 +4,12 @@
 
   !include "MUI.nsh"
 
+!macro CreateInternetShortcut FILENAME URL ICONFILE ICONINDEX
+WriteINIStr "${FILENAME}.url" "InternetShortcut" "URL" "${URL}"
+WriteINIStr "${FILENAME}.url" "InternetShortcut" "IconFile" "${ICONFILE}"
+WriteINIStr "${FILENAME}.url" "InternetShortcut" "IconIndex" "${ICONINDEX}"
+!macroend
+
 ;--------------------------------
 ;General
 
@@ -84,6 +90,24 @@ Section "Files" Files
   ;Store installation folder
   WriteRegStr HKCU "Software\Thousand Parsec\tpclient-pywx" "" $INSTDIR
 
+  ;Create the URL handlers
+  WriteRegStr HKCR "tp" "" "Thousand Parsec Server"
+  WriteRegStr HKCR "tp\shell" "" ""
+  WriteRegStr HKCR "tp\shell\open" "" ""
+  WriteRegStr HKCR "tp\shell\open\command" "" "$INSTDIR/tpclient-pywx.exe \"%1\""
+  WriteRegStr HKCR "tps" "" "Thousand Parsec Secure Server"
+  WriteRegStr HKCR "tps\shell" "" ""
+  WriteRegStr HKCR "tps\shell\open" "" ""
+  WriteRegStr HKCR "tps\shell\open\command" "" "$INSTDIR/tpclient-pywx.exe \"%1\""
+  WriteRegStr HKCR "tphttp" "" "Thousand Parsec HTTP Tunnel Server"
+  WriteRegStr HKCR "tphttp\shell" "" ""
+  WriteRegStr HKCR "tphttp\shell\open" "" ""
+  WriteRegStr HKCR "tphttp\shell\open\command" "" "$INSTDIR/tpclient-pywx.exe \"%1\""
+  WriteRegStr HKCR "tphttps" "" "Thousand Parsec HTTP Tunnel Server"
+  WriteRegStr HKCR "tphttps\shell" "" ""
+  WriteRegStr HKCR "tphttps\shell\open" "" ""
+  WriteRegStr HKCR "tphttps\shell\open\command" "" "$INSTDIR/tpclient-pywx.exe \"%1\""
+
   ;Store uninstall information
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\tpclient-pywx" \
                  "UninstallString" "$INSTDIR\uninstall.exe"
@@ -113,7 +137,8 @@ Section "Files" Files
     CreateDirectory "$SMPROGRAMS\$STARTMENU_FOLDER"
     CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\tpclient-pywx.lnk" "$INSTDIR\tpclient-pywx.exe" "" "$INSTDIR\tpclient-pywx.exe" 0 
     CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Uninstall.lnk" "$INSTDIR\Uninstall.exe"
-  
+	!insertmacro CreateInternetShortcut "$SMPROGRAMS\$STARTMENU_FOLDER\Thousand Parsec Homepage" "http://www.thousandparsec.net/tp/" "$INSTDIR\tpclient-pywx.exe" "0" 
+ 
   !insertmacro MUI_STARTMENU_WRITE_END
 
 SectionEnd
