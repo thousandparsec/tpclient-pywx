@@ -5,6 +5,7 @@ person enter the server/username/password.
 
 # Python imports
 import string
+import re
 
 # wxPython Imports
 import wx
@@ -13,6 +14,42 @@ import wx.gizmos
 # Local Imports
 from winBase import winMainBase
 from utils import *
+
+def url2bits(line):
+	urlspliter = r'(.*?://)?(((.*):|(.*@))(.*@)?)?(.*?)(/.*?)?$'
+
+	groups = re.compile(urlspliter, re.M).search(line).groups()
+	
+	proto = groups[0]
+	username = groups[2]
+	if not username is None:
+		if username[-1] in '@:':
+			username = username[:-1]
+
+	host = groups[6]
+	password = groups[5]
+	if not password is None:
+		if password[-1] is '@':
+			password = password[:-1]
+
+	game = groups[7]
+	if not game is None:
+		if game[0] is '/':
+			game = game[1:]
+		if len(game) == 0:
+			game = None
+
+	if proto is None:
+		one = host
+	else:
+		one = "%s%s" % (proto, host)
+
+	if game is None:
+		two = username
+	else:
+		two = "%s@%s" % (username, game)
+
+	return (one, two, password)
 
 class winConnect(winMainBase):
 	title = _("Connect")
@@ -111,7 +148,24 @@ class winConnect(winMainBase):
 
 	def OnNew(self, evt):
 		self.application.gui.Show(self.application.gui.account)
-	
+
+	def ShowURL(self, url):
+		# Split the URL out into username, password, etc
+		# <proto>://<username>:<password>@<server>/<game>
+		# server = <proto>://<server>/
+		# username = <username>@<game>
+		# password = <server>
+		host, username, password = url2bits(url)
+		if host is None:
+			return
+		self.host.SetValue(host)
+		if username is None:
+			username = ""
+		self.username.SetValue(username)
+		if password is None:
+			password = ""
+		self.password.SetValue(password)
+
 	# Config Functions -----------------------------------------------------------------------------
 	def ConfigDefault(self, config=None):
 		"""\

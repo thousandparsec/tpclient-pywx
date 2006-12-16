@@ -249,6 +249,10 @@ class Network(NetworkThread):
 
 _Application = Application
 class Application(_Application):
+	def __init__(self, url):
+		_Application.__init__(self)
+		self.gui.connectto.ShowURL(url)		
+
 	def Run(self):
 		"""\
 		Set the application running.
@@ -269,7 +273,11 @@ class Application(_Application):
 
 if __name__ == '__main__':
 	try:
-		app = Application()
+		import sys
+		if len(sys.argv) > 1:
+			url = sys.argv[1]
+
+		app = Application(url)
 		app.Run()
 	finally:
 		utils.do_traceback()
