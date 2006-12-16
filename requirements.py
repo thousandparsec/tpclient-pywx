@@ -10,11 +10,11 @@ except ImportError:
 
 import string
 try:
-	import wxPython
+	import wx
 	
-	version = string.split(wxPython.__version__, '.')
+	version = string.split(wx.__version__, '.')
 	intversion = int(version[0])*1000000+int(version[1])*10000+int(version[2])*100
-except ImportError, e:
+except (ImportError, KeyError), e:
 	print e
 	intversion = 0
 
