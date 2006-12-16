@@ -92,21 +92,25 @@ Section "Files" Files
 
   ;Create the URL handlers
   WriteRegStr HKCR "tp" "" "Thousand Parsec Server"
+  WriteRegStr HKCR "tp" "URL Protocol" ""
   WriteRegStr HKCR "tp\shell" "" ""
   WriteRegStr HKCR "tp\shell\open" "" ""
-  WriteRegStr HKCR "tp\shell\open\command" "" "$INSTDIR/tpclient-pywx.exe \"%1\""
+  WriteRegStr HKCR "tp\shell\open\command" "" '"$INSTDIR\tpclient-pywx.exe" "%1"'
   WriteRegStr HKCR "tps" "" "Thousand Parsec Secure Server"
+  WriteRegStr HKCR "tps" "URL Protocol" ""
   WriteRegStr HKCR "tps\shell" "" ""
   WriteRegStr HKCR "tps\shell\open" "" ""
-  WriteRegStr HKCR "tps\shell\open\command" "" "$INSTDIR/tpclient-pywx.exe \"%1\""
+  WriteRegStr HKCR "tps\shell\open\command" "" '"$INSTDIR\tpclient-pywx.exe" "%1"'
   WriteRegStr HKCR "tphttp" "" "Thousand Parsec HTTP Tunnel Server"
+  WriteRegStr HKCR "tphttp" "URL Protocol" ""
   WriteRegStr HKCR "tphttp\shell" "" ""
   WriteRegStr HKCR "tphttp\shell\open" "" ""
-  WriteRegStr HKCR "tphttp\shell\open\command" "" "$INSTDIR/tpclient-pywx.exe \"%1\""
+  WriteRegStr HKCR "tphttp\shell\open\command" "" '"$INSTDIR\tpclient-pywx.exe" "%1"'
   WriteRegStr HKCR "tphttps" "" "Thousand Parsec HTTP Tunnel Server"
+  WriteRegStr HKCR "tphttps" "URL Protocol" ""
   WriteRegStr HKCR "tphttps\shell" "" ""
   WriteRegStr HKCR "tphttps\shell\open" "" ""
-  WriteRegStr HKCR "tphttps\shell\open\command" "" "$INSTDIR/tpclient-pywx.exe \"%1\""
+  WriteRegStr HKCR "tphttps\shell\open\command" "" '"$INSTDIR\tpclient-pywx.exe" "%1"'
 
   ;Store uninstall information
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\tpclient-pywx" \
@@ -178,6 +182,10 @@ Section "Uninstall"
     StrCmp $MUI_TEMP $SMPROGRAMS startMenuDeleteLoopDone startMenuDeleteLoop
   startMenuDeleteLoopDone:
 
+  DeleteRegKey HKCR "tp" 
+  DeleteRegKey HKCR "tps" 
+  DeleteRegKey HKCR "tphttp" 
+  DeleteRegKey HKCR "tphttps" 
   DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\tpclient-pywx"
   DeleteRegKey /ifempty HKCU "Software\Thousand Parsec\Client pywx"
   DeleteRegKey /ifempty HKCU "Software\Thousand Parsec"

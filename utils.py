@@ -16,6 +16,8 @@ except ImportError:
 
 def do_traceback():
 	type, val, tb = sys.exc_info()
+	if type is None or val is None or tb is None:
+		return
 	sys.stderr.write(string.join(traceback.format_exception(type, val, tb), ''))
 	if hasattr(sys.stderr, "flush"):
 		sys.stderr.flush()
