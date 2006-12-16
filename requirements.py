@@ -51,6 +51,24 @@ except ImportError, e:
 	print e
 	print "It is highly recommended to install the PIL library, speed will be greatly improved."
 
+import sys
+if sys.platform == 'linux2':
+	# Check the file is executable
+	import os.path, stat
+	location = os.path.join(os.path.dirname(os.path.join(os.path.abspath(__file__))), "tpclient-pywx")
+	print location
+	os.chmod(location, stat.S_IRUSR|stat.S_IWUSR|stat.S_IXUSR|stat.S_IRGRP|stat.S_IXGRP|stat.S_IROTH|stat.S_IXOTH)
+
+	# Register the URL Handlers
+	try:
+		import gconf
+		for prefix in ['tp', 'tps', 'tphttp', 'tphttps']:
+			gconf.client_get_default().set_string('/desktop/gnome/url-handlers/%s/command' % prefix, location)
+			gconf.client_get_default().set_bool('/desktop/gnome/url-handlers/%s/enabled' % prefix, True)
+	except ImportError, e:
+		print e
+		print "It is recommended that under gnome you have the python-gconf module installed so I can register URL handlers."
+
 if len(notfound) > 0:
 	print "The following requirements where not met"
 	for module in notfound:
