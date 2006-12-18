@@ -96,7 +96,6 @@ class winInfo(winBase):
 		self.images = {'nebula':{'still':[]}, 'star':{'still':[]}, 'planet':{'still':[]}}
 
 	def OnMediaUpdate(self, evt):
-		print
 		print "winInfo.OnMediaUpdate", evt
 		files = {}
 		for file, timestamp in evt.files:

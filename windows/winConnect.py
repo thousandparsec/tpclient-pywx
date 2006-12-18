@@ -138,7 +138,6 @@ class winConnect(winMainBase):
 			return
 
 		self.application.network.Call(self.application.network.ConnectTo, host, username, password, debug=self.config['debug'])
-		self.application.media.Call(self.application.media.ConnectTo, host, username, debug=self.config['debug'])
 
 	def OnCancel(self, evt):
 		self.OnExit(evt)
