@@ -105,11 +105,12 @@ class winBaseMixIn(winMixIn):
 	def __init__(self, application, parent, config=None):
 		winMixIn.__init__(self, application, parent, config)
 		self.children = {}
-		self.Bind(wx.EVT_CLOSE, self.OnProgramExit)
+		self.Bind(wx.EVT_CLOSE, self.OnClose)
 
-	def OnProgramExit(self, evt):
+	def OnClose(self, evt):
 		# Ignore close events
-		evt.Veto(True)
+		if evt.CanVeto():
+			evt.Veto(True)
 
 	def Post(self, event):
 		# Post an event to this window and it's children
@@ -142,6 +143,13 @@ class winSubMixIn(winMixIn):
 	def __init__(self, application, parent, config=None):
 		winMixIn.__init__(self, application, parent, config)
 		self.parent.children[self.title] = self
+		self.Bind(wx.EVT_CLOSE, self.OnClose)
+
+	def OnClose(self, evt):
+		# Ignore close events
+		if evt.CanVeto():
+			evt.Veto(True)
+		self.Hide()
 
 class winConfigMixIn(ConfigMixIn):
 	def ConfigDefault(self, config=None):

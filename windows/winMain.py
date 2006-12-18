@@ -565,6 +565,9 @@ class winMain(winMDIBase):
 	def OnConfig(self, evt):
 		self.application.ConfigDisplay()
 
+	def OnClose(self, evt):
+		self.OnProgramExit(evt)
+
 	def OnProgramExit(self, evt):
 		self.application.Exit()
 
