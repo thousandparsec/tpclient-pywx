@@ -409,7 +409,8 @@ class winNormalBase(ConfigMixIn, winBaseMixIn, wx.Frame):
 	def RaiseChildren(self):
 		for window in self.children.values():
 			if isinstance(window, winBase):
-				window.Raise()
+				if window.IsShown():
+					window.Raise()
 
 class winMiniSubBase(winConfigMixIn, winSubMixIn, wx.MiniFrame):
 	def __init__(self, application, parent):
