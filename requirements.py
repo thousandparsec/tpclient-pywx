@@ -3,35 +3,59 @@
 
 notfound = []
 
+from types import StringTypes
+def cmp(ver1, ver2):
+	if type(ver2) in StringTypes:
+		ver2 = [int(x) for x in ver2.split('.')]
+	ver2 = [int(x) for x in ver2]
+
+	for a, b in zip(ver1, ver2):
+		if a <= b:
+			continue
+		return False
+	return True
+
+def tostr(ver1):
+	s = ""
+	for a in ver1:
+		s += "."+str(a)
+	return s[1:]
+
 try:
 	import numarray
 except ImportError:
 	notfound.append("numarray")
 
-import string
+wx_version = (2, 6, 0, 0)
 try:
 	import wx
-	
-	version = string.split(wx.__version__, '.')
-	intversion = int(version[0])*1000000+int(version[1])*10000+int(version[2])*100
+
+	if not cmp(wx_version, wx.__version__.split('.')):
+		raise ImportError("wxPython was too old")
 except (ImportError, KeyError), e:
 	print e
-	intversion = 0
-
-if intversion < 2060000:
 	notfound.append("wxPython > 2.6.0")
 
+netlib_version = (0, 2, 0)
 try:
 	import tp.netlib
-except ImportError, e:
-	print e
-	notfound.append("tp.netlib")
+	print "Thousand Parsec Protocol Library Version", tp.netlib.__version__
+	if not cmp(netlib_version, tp.netlib.__version__):
+		raise ImportError("Thousand Parsec Network Library (libtpproto-py) is to old")
 
+except (ImportError, KeyError), e:
+	print e
+	notfound.append("tp.netlib > " + tostr(netlib_version))
+
+client_version = (0, 2, 0)
 try:
 	import tp.client
-except ImportError, e:
+	print "Thousand Parsec Client Library Version", tp.client.__version__
+	if not cmp(client_version, tp.client.__version__):
+		raise ImportError("Thousand Parsec Client Library (libtpclient-py) is to old")
+except (ImportError, KeyError), e:
 	print e
-	notfound.append("tp.client")
+	notfound.append("tp.client > " + tostr(client_version))
 
 import __builtin__
 try:
