@@ -24,15 +24,27 @@ class MessageBrowserBase(winReportBase):
 		pre = wx.PrewinReportBase()
 		res.LoadOnPanel(pre, parent, "MessageBrowser")
 		self.OnInit()
-		self.PostCreate(pre)
 
 		# Define variables for the controls
 		self.BoardName = XRCCTRL(self, "BoardName")
 		self.Filter = XRCCTRL(self, "Filter")
+		if hasattr(self, "OnFilter"):
+			self.Bind(self.Filter, self.OnFilter)
+
 		self.Boards = XRCCTRL(self, "Boards")
 		self.Message = XRCCTRL(self, "Message")
 		self.New = XRCCTRL(self, "New")
+		if hasattr(self, "OnNew"):
+			self.Bind(self.New, self.OnNew)
+
 		self.Goto = XRCCTRL(self, "Goto")
+		if hasattr(self, "OnGoto"):
+			self.Bind(self.Goto, self.OnGoto)
+
 		self.Delete = XRCCTRL(self, "Delete")
+		if hasattr(self, "OnDelete"):
+			self.Bind(self.Delete, self.OnDelete)
+
+		self.PostCreate(pre)
 
 
