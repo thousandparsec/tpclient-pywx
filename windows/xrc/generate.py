@@ -37,43 +37,67 @@ class %(windowName)sBase(%(windowClass)s):
 		pre = wx.Pre%(windowClass)s()
 		res.LoadOnPanel(pre, parent, "%(windowName)s")
 		self.OnInit()
-		self.PostCreate(pre)
 
 		# Define variables for the controls"""
 
-controlDeclationTemplate = """\
-		self.%(controlName)s = XRCCTRL(self, \"%(controlName)s\")"""
+Template_Default = """\
+		self.%(controlName)s = XRCCTRL(self, "%(controlName)s")"""
+Template_Button = """\
+		self.%(controlName)s = XRCCTRL(self, "%(controlName)s")
+		if hasattr(self, "On%(controlName)s"):
+			self.Bind(self.%(controlName)s, self.On%(controlName)s)
+"""
+
+def Generate_wxDialog(xrcFile, topWindow, outFile):
+	fileName = os.path.basename(xrcFile.name)
+
+	windowClass = topWindow.getAttribute("subclass")
+	windowClass = re.sub("^wx", "wx.", windowClass)
+	windowName = topWindow.getAttribute("name")
+	print >> outFile, classDeclarationTemplate % locals()
+	
+	eventFunctions = [] # a list to store the code for the event functions
+
+	# Generate a variable for each control, and standard event handlers
+	# for standard controls.
+	for control in topWindow.getElementsByTagName("object"):
+		controlClass = control.getAttribute("class")
+		controlClass = re.sub("^wx", "wx.", controlClass)
+		controlName = control.getAttribute("name")
+		# Ignore anything which is still got a wx name...
+		if "wx" in controlName:
+			continue
+		if controlName != "" and controlClass != "":
+			print controlName, controlClass
+			try:
+				template = globals()["Template_%s" % controlClass.replace('wx.', '')]
+			except KeyError:
+				template = globals()["Template_Default"]
+
+			print >> outFile, template % locals()
+
+	print >> outFile, """		self.PostCreate(pre)"""
+	print >> outFile
+	print >> outFile, "\n".join(eventFunctions)
+	print eventFunctions
+
+Generate_wxWizard = Generate_wxDialog
 
 # ------------------------- GeneratePythonForXRC ----------------------------
 def GeneratePython(xrcFile, outFile):
-	fileName = os.path.basename(xrcFile.name)
-
 	xmldoc = minidom.parse(xrcFile)
 	resource = xmldoc.childNodes[0]
 	topWindows = [e for e in resource.childNodes
 				  if e.nodeType == e.ELEMENT_NODE and e.tagName == "object"]
+	print topWindows
 	print >> outFile, fileHeaderTemplate
 
 	# Generate a class for each top-window object (Frame, Panel, Dialog, etc.)
 	for topWindow in topWindows:
-		eventFunctions = [] # a list to store the code for the event functions
-		windowClass = topWindow.getAttribute("subclass")
-		windowClass = re.sub("^wx", "wx.", windowClass)
-		windowName = topWindow.getAttribute("name")
-		print >> outFile, classDeclarationTemplate % locals()
 
-		# Generate a variable for each control, and standard event handlers
-		# for standard controls.
-		for control in topWindow.getElementsByTagName("object"):
-			controlClass = control.getAttribute("class")
-			controlClass = re.sub("^wx", "wx.", controlClass)
-			controlName = control.getAttribute("name")
-			if controlName != "" and controlClass != "":
-				if not "wx" in controlName:
-					print >> outFile, controlDeclationTemplate% locals()
-
-		print >> outFile
-		print >> outFile, "\n".join(eventFunctions)
+		# Figure out if this is a Panel, Frame or Wizard
+		windowClass = topWindow.getAttribute("class")
+		globals()["Generate_"+windowClass](xrcFile, topWindow, outFile)
 
 # --------------------- Main ----------------
 
