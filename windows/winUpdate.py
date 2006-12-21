@@ -1,6 +1,7 @@
 
 # Python imports
 import string
+import os.path
 
 # wxPython Imports
 import wx
@@ -9,6 +10,9 @@ import wx
 from winBase import winMainBaseXRC
 from xrc.winUpdate import winUpdateBase
 
+throbber = os.path.join("graphics", "throbber.gif")
+okay = os.path.join("graphics", "tick.gif")
+
 class winUpdate(winUpdateBase, winMainBaseXRC):
 	title = _("Updating")
 	
@@ -16,65 +20,126 @@ class winUpdate(winUpdateBase, winMainBaseXRC):
 		winUpdateBase.__init__(self, None)
 		winMainBaseXRC.__init__(self, application)
 
-		self.Bind(wx.EVT_IDLE, self.IdleHandler)
+	def Clear(self):
+		self.TopText.SetLabel("")
+		self.Message.SetLabel("")
+
+		self.ConnectingGauge.SetRange(1)
+		self.ConnectingGauge.SetValue(0)
+
+		self.ConnectingAnim.LoadFile(throbber)
+		self.ConnectingAnim.Stop()
+
+		self.ConnectingText.SetLabel("")
+
+		self.ProgressTitle.SetLabel("")
+
+		self.ProgressGauge.SetRange(1)
+		self.ProgressGauge.SetValue(0)
+
+		self.ProgressAnim.LoadFile(throbber)
+		self.ProgressAnim.Stop()
+
+		self.ProgressText.SetLabel("")
+
+		self.ObjectsAnim.LoadFile(throbber)
+		self.ObjectsAnim.Stop()
+
+		self.OrdersAnim.LoadFile(throbber)
+		self.OrdersAnim.Stop()
+
+		self.BoardsAnim.LoadFile(throbber)
+		self.BoardsAnim.Stop()
+
+		self.MessagesAnim.LoadFile(throbber)
+		self.MessagesAnim.Stop()
+
+		self.CategoriesAnim.LoadFile(throbber)
+		self.CategoriesAnim.Stop()
+
+		self.DesignsAnim.LoadFile(throbber)
+		self.DesignsAnim.Stop()
+
+		self.ComponentsAnim.LoadFile(throbber)
+		self.ComponentsAnim.Stop()
+
+		self.PropertiesAnim.LoadFile(throbber)
+		self.PropertiesAnim.Stop()
+
+		self.PlayersAnim.LoadFile(throbber)
+		self.PlayersAnim.Stop()
+
+		self.ResourcesAnim.LoadFile(throbber)
+		self.ResourcesAnim.Stop()
 
 	def Show(self, show=True):
 		if not show:
 			return self.Hide()
 		
 		# Clear everything
-		self.overall.SetLabel("")
-		
-		for gauge, text in (self.connecting, self.objects, self.order_descs, self.boards, self.designs, self.players, self.remaining):
-			gauge.SetValue(0)
-			if hasattr(gauge, 'GetRange'):
-				gauge.SetRange(0)
-			text.SetLabel("")
-		
+		self.Clear()
+
 		return winMainBaseXRC.Show(self)
 
-	def IdleHandler(self, event):
-		active = None
-		if hasattr(active, 'GetMax'):
-			count = active.GetValue()
-			if count >= active.GetMax():
-				self.more = -1
-			if count <= active.GetMin():
-				self.more = 1
-
-			active.SetValue(count + self.more)
-	
-	def Update(self, text, mode=None, add=None, of=None):
-		self.overall.SetLabel(text)
+	def Update(self, mode, state, message="", todownload=None, total=None, amount=None):
+		# We do a little bit different for this mode
+		if mode == "connecting":
+			return
 		
-		if mode and getattr(self, mode) != self.mode:
-			self.active = None
+		animation = getattr(self, "%sAnim" % mode.title())
+		if state == "start":
+			# Set the progress title
+			self.ProgressTitle.SetLabel("Getting %s" % mode.title())
+
+			# Set the progress guage to be empty
+			self.ProgressGauge.SetValue(0)
+			self.ProgressGauge.SetRange(1)
 			
-			slider, text = self.mode
-			if hasattr(slider, 'GetMax'):
-				max = slider.GetMax()
-			elif hasattr(slider, 'GetRange'):
-				max = slider.GetRange()
-			slider.SetValue(max)
-			text.SetLabel("Done!")
+			# Set the progress text
+			self.ProgressText.SetLabel("")
+
+			# Start the throbber for this mode
+			animation.LoadFile(throbber)
+			animation.Play()
+
+		elif state == "todownload":
+			# Now we know how big to set the gauge too
+			if todownload == 0:
+				todownload = 1
 			
-			self.mode = getattr(self, mode)
-		
-		slider, text = self.mode
-		
-		if hasattr(slider, 'GetRange'):
-			if isinstance(of, long):
-				slider.SetRange(of)
+			self.ProgressGauge.SetRange(todownload)
 
-			if add and slider.GetValue()+add < slider.GetRange():
-				slider.SetValue(slider.GetValue()+add)
+		elif state == "progress":
+			# Nothing to do...
+			pass
 
-			if of != None or add:
-				text.SetLabel("%s of %s" % (slider.GetValue(), slider.GetRange()))
-		else:
-			self.active = slider
+		elif state == "failure":
+			# Don't do anything for now
+			# FIXME: Should highlight the line in red....
+			pass
 
-		self.sizer.Layout()
+		elif state == "downloaded":
+			# Progress the progress gauge
+			self.ProgressGauge.SetValue(self.ProgressGauge.GetValue()+amount)
+
+			# Update the text
+			self.ProgressText.SetLabel("%s of %s" % \
+				(self.ProgressGauge.GetValue(), self.ProgressGauge.GetRange()))
+			
+		elif state == "finished":
+			# Change to the tick
+			animation.LoadFile(okay)
+			animation.Play()
+			
+			# Set the gauge as completed!
+			self.ProgressGauge.SetValue(self.ProgressGauge.GetRange())
+
+			# Set the progress text
+			self.ProgressText.SetLabel("Done!")
+
+		self.Message.SetValue(message + "\n" + self.Message.GetValue())
+
+		self.Panel.Layout()
 
 	# Config Functions -----------------------------------------------------------------------------  
 	def ConfigDefault(self, config=None):
