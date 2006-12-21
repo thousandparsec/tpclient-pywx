@@ -30,6 +30,34 @@ class ToolTipItemMixIn:
 			elif self.GetToolTip().GetTip() != self.tooltips[slot]:
 				self.GetToolTip().SetTip(self.tooltips[slot])
 
+wx.ChoiceOrig = wx.Choice
+class wxChoice(wx.Choice, ToolTipItemMixIn):
+	def __init__(self, *arg, **kw):
+		wx.ChoiceOrig.__init__(self, *arg, **kw)
+		ToolTipItemMixIn.__init__(self)
+		
+		self.Bind(wx.EVT_CHOICE, self.OnSelection)
+
+	def OnSelection(self, evt):
+		slot = self.GetSelection()
+		self.SetToolTipCurrent(slot)
+
+wx.ComboBoxOrig = wx.ComboBox
+class wxComboBox(wx.ComboBox, ToolTipItemMixIn):
+	def __init__(self, *arg, **kw):
+		wx.ComboBoxOrig.__init__(self, *arg, **kw)
+		ToolTipItemMixIn.__init__(self)
+
+		self.Bind(wx.EVT_COMBOBOX, self.OnSelection)
+
+	def OnSelection(self, evt):
+		slot = self.GetSelection()
+		self.SetToolTipCurrent(slot)
+
+########################
+# This fix fixes a bunch of broken stuff with the ListCtrl and adds a few more
+# functionality which should be default.
+########################
 wx.ListCtrlOrig = wx.ListCtrl
 class wxListCtrl(wx.ListCtrlOrig, wx.lib.mixins.listctrl.ListCtrlAutoWidthMixin, ToolTipItemMixIn):
 	def __init__(self, parent, ID, pos=wx.DefaultPosition, size=wx.DefaultSize, style=0):
@@ -131,30 +159,9 @@ class wxListCtrl(wx.ListCtrlOrig, wx.lib.mixins.listctrl.ListCtrlAutoWidthMixin,
 	def AddSelected(self, slot):
 		self.SetItemState(slot, wx.LIST_STATE_SELECTED, wx.LIST_STATE_SELECTED)
 
-wx.ChoiceOrig = wx.Choice
-class wxChoice(wx.Choice, ToolTipItemMixIn):
-	def __init__(self, *arg, **kw):
-		wx.ChoiceOrig.__init__(self, *arg, **kw)
-		ToolTipItemMixIn.__init__(self)
-		
-		self.Bind(wx.EVT_CHOICE, self.OnSelection)
-
-	def OnSelection(self, evt):
-		slot = self.GetSelection()
-		self.SetToolTipCurrent(slot)
-
-wx.ComboBoxOrig = wx.ComboBox
-class wxComboBox(wx.ComboBox, ToolTipItemMixIn):
-	def __init__(self, *arg, **kw):
-		wx.ComboBoxOrig.__init__(self, *arg, **kw)
-		ToolTipItemMixIn.__init__(self)
-
-		self.Bind(wx.EVT_COMBOBOX, self.OnSelection)
-
-	def OnSelection(self, evt):
-		slot = self.GetSelection()
-		self.SetToolTipCurrent(slot)
-
+########################
+# This adds a TreeCtrl which orders itself by the Python Data.
+########################
 class OrderedTreeCtrl(wx.TreeCtrl):
 	def __init__(self, *args, **kw):
 		wx.TreeCtrl.__init__(self, *args, **kw)
@@ -232,6 +239,9 @@ class OrderedTreeCtrl(wx.TreeCtrl):
 
 wx.OrderedTreeCtrl = OrderedTreeCtrl
 
+########################
+# This adds a simple validator which only takes DIGITs and ALPHA characters.
+########################
 wx.DIGIT_ONLY = 1
 wx.ALPHA_ONLY = 2
 class wxSimpleValidator(wx.PyValidator):
