@@ -122,6 +122,7 @@ class GUI(wx.App):
 
 			from windows.winUpdate import winUpdate
 			self.update = winUpdate(application)
+			self.update.Show()
 
 			from windows.winDebug import winDebug
 			self.debug = winDebug(application)

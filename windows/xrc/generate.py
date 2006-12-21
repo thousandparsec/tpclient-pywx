@@ -12,31 +12,49 @@ fileHeaderTemplate = """\
 # This file has been automatically generated.
 # Please do not edit it manually.
 
+# Python Imports
+import os.path
+
+# wxPython imports
 import wx
-from wx.xrc import *
+from wx.xrc import XRCCTRL, XmlResourceWithHandlers
 """
 
 classDeclarationTemplate = """\
-from winBase import %(windowClass)s
-
-class %(windowName)sBase(%(windowClass)s):
+class %(windowName)sBase:
 	xrc = '%(fileName)s'
 
-	def OnInit(self):
+	def PreCreate(self, pre):
 		\"\"\" This function is called during the class's initialization.
 		
-		Override it for custom setup (setting additional styles, etc.)\"\"\"
+		Override it for custom setup before the window is created usually to
+		set additional window styles using SetWindowStyle() and SetExtraStyle().\"\"\"
 		pass
 
-	def __init__(self, parent, res):
+	def __init__(self, parent, *args, **kw):
 		\"\"\" Pass an initialized wx.xrc.XmlResource into res \"\"\"
-		
-		res = XmlResource(self.xrc)
+		f = os.path.join(os.path.dirname(__file__), self.xrc)
+		res = XmlResourceWithHandlers(f)		
 
+		# Figure out what Frame class is actually our base...
+		bases = set()
+		def findbases(klass, set):
+			for base in klass.__bases__:
+				set.add(base)
+				findbases(base, set)
+		findbases(self.__class__, bases)
+
+		print bases
+		for base in bases:
+			print base.__name__
+			if base.__name__.endswith("Frame"):
+				break
+		
 		# Two stage creation (see http://wiki.wxpython.org/index.cgi/TwoStageCreation)
-		pre = wx.Pre%(windowClass)s()
-		res.LoadOnPanel(pre, parent, "%(windowName)s")
-		self.OnInit()
+		pre = getattr(wx, "Pre%s" % base.__name__)()
+		res.LoadOnFrame(pre, parent, "%(windowName)s")
+		self.PreCreate(pre)
+		self.PostCreate(pre)
 
 		# Define variables for the controls"""
 
@@ -48,12 +66,16 @@ Template_Button = """\
 			self.Bind(self.%(controlName)s, self.On%(controlName)s)
 """
 
-def Generate_wxDialog(xrcFile, topWindow, outFile):
+def Generate_wxFrame(xrcFile, topWindow, outFile):
 	fileName = os.path.basename(xrcFile.name)
 
 	windowClass = topWindow.getAttribute("subclass")
+	if len(windowClass) == 0:
+		windowClass = topWindow.getAttribute("class")
 	windowClass = re.sub("^wx", "wx.", windowClass)
+
 	windowName = topWindow.getAttribute("name")
+	print "'%s' '%s'"% (windowClass, windowName)
 	print >> outFile, classDeclarationTemplate % locals()
 	
 	eventFunctions = [] # a list to store the code for the event functions
@@ -76,12 +98,11 @@ def Generate_wxDialog(xrcFile, topWindow, outFile):
 
 			print >> outFile, template % locals()
 
-	print >> outFile, """		self.PostCreate(pre)"""
 	print >> outFile
 	print >> outFile, "\n".join(eventFunctions)
 	print eventFunctions
 
-Generate_wxWizard = Generate_wxDialog
+#Generate_wxWizard = Generate_wxDialog
 
 # ------------------------- GeneratePythonForXRC ----------------------------
 def GeneratePython(xrcFile, outFile):

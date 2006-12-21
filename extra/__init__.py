@@ -4,6 +4,40 @@ import wx
 import wx.gizmos
 import wx.lib.mixins.listctrl
 
+########################
+# This fix allows me to globaly register XRC handlers
+########################
+import wx.xrc as xrc
+from wx.xrc import EmptyXmlResource as EmptyXmlResourceOrig
+
+EmptyXmlResourceOrig()
+
+xrc.ExtraHandlers = []
+def XmlResourceWithHandlers(*args, **kw):
+	if len(args)+len(kw) > 1:
+		raise RuntimeError("Don't know what to do with all the arguments!")
+	if len(args) > 0:
+		f = args[0]
+	else:
+		f = kw['file']
+
+	res = EmptyXmlResourceOrig()
+	for handler in xrc.ExtraHandlers:
+		res.InsertHandler(handler())
+	res.Load(f)
+	return res
+xrc.XmlResourceWithHandlers = XmlResourceWithHandlers
+
+def EmptyXmlResourceWithHandlers(*args, **kwargs):
+	res = EmptyXmlResourceOrig(*args, **kwargs)
+	for handler in xrc.ExtraHandlers:
+		res.InsertHandler(handler())
+	return res
+xrc.EmptyXmlResourceWithHandlers = EmptyXmlResourceWithHandlers
+
+########################
+# This fix allows me to have tooltips on individual items rather then just the whole control.
+########################
 class ToolTipItemMixIn:
 	def __init__(self):
 		self.tooltips = {}

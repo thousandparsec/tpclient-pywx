@@ -6,65 +6,15 @@ import string
 import wx
 
 # Local Imports
-from winBase import winMainBase
+from winBase import winMainBaseXRC
+from xrc.winUpdate import winUpdateBase
 
-class winUpdate(winMainBase):
+class winUpdate(winUpdateBase, winMainBaseXRC):
 	title = _("Updating")
 	
 	def __init__(self, application):
-		winMainBase.__init__(self, application)
-
-		# FIXME: We shouldn't need active anymore
-		self.active = None
-
-		panel = wx.Panel(self, -1)
-		self.overall = wx.StaticText(panel, -1, "", style=wx.ALIGN_CENTER)
-
-	   	self.connecting = (wx.Slider(panel, -1, 0, 0, 600, style=wx.SL_HORIZONTAL), wx.StaticText(panel, -1, ""))
-		self.connecting[0].Disable()
-		self.objects = (wx.Gauge(panel, -1, 1), wx.StaticText(panel, -1, ""))
-		self.boards = (wx.Gauge(panel, -1, 1), wx.StaticText(panel, -1, ""))
-		self.order_descs = (wx.Gauge(panel, -1, 1), wx.StaticText(panel, -1, ""))
-		self.designs = (wx.Gauge(panel, -1, 4), wx.StaticText(panel, -1, ""))
-		self.players = (wx.Gauge(panel, -1, 4), wx.StaticText(panel, -1, ""))
-	   	self.remaining = (wx.Slider(panel, -1, 0, 0, 600, style=wx.SL_HORIZONTAL), wx.StaticText(panel, -1, ""))
-		self.remaining[0].Disable()
-	
-		self.mode = self.connecting
-
-		grid = wx.FlexGridSizer( 0, 2, 2, 10 )
-		grid.AddGrowableCol(0)
-		
-		grid.Add( self.connecting[0], 0, wx.ALIGN_CENTER|wx.EXPAND , 5 )
-		grid.Add( self.connecting[1], 0, wx.ALIGN_CENTER|wx.EXPAND, 5 )
-		grid.Add( self.objects[0], 0, wx.ALIGN_CENTER|wx.EXPAND, 5 )
-		grid.Add( self.objects[1], 0, wx.ALIGN_CENTER|wx.EXPAND, 5 )
-		grid.Add( self.boards[0], 0, wx.ALIGN_CENTER|wx.EXPAND, 5 )
-		grid.Add( self.boards[1], 0, wx.ALIGN_CENTER|wx.EXPAND, 5 )
-		grid.Add( self.order_descs[0], 0, wx.ALIGN_CENTER|wx.EXPAND, 5 )
-		grid.Add( self.order_descs[1], 0, wx.ALIGN_CENTER|wx.EXPAND, 5 )
-		grid.Add( self.designs[0], 0, wx.ALIGN_CENTER|wx.EXPAND, 5 )
-		grid.Add( self.designs[1], 0, wx.ALIGN_CENTER|wx.EXPAND, 5 )
-		grid.Add( self.players[0], 0, wx.ALIGN_CENTER|wx.EXPAND, 5 )
-		grid.Add( self.players[1], 0, wx.ALIGN_CENTER|wx.EXPAND, 5 )
-		grid.Add( self.remaining[0], 0, wx.ALIGN_CENTER|wx.EXPAND, 5 )
-		grid.Add( self.remaining[1], 0, wx.ALIGN_CENTER|wx.EXPAND, 5 )
-
-		sizer = wx.BoxSizer( wx.VERTICAL )
-		sizer.AddSpacer(wx.Size(-1, 5))
-		sizer.Add( self.overall, 0, wx.ALIGN_CENTER|wx.EXPAND, 5 )
-		sizer.AddSpacer(wx.Size(-1, 5))
-		sizer.Add( grid, 0, wx.ALIGN_CENTER|wx.EXPAND, 5 )
-		self.sizer = sizer
-
-		# Join the panel and the base sizer
-		panel.SetAutoLayout( True )
-		panel.SetSizer( sizer )
-		sizer.Fit( panel )
-		sizer.SetSizeHints( self )
-
-		self.SetSize(wx.Size(640, -1))
-		self.CenterOnScreen()
+		winUpdateBase.__init__(self, None)
+		winMainBaseXRC.__init__(self, application)
 
 		self.Bind(wx.EVT_IDLE, self.IdleHandler)
 
@@ -81,10 +31,10 @@ class winUpdate(winMainBase):
 				gauge.SetRange(0)
 			text.SetLabel("")
 		
-		return winMainBase.Show(self)
+		return winMainBaseXRC.Show(self)
 
 	def IdleHandler(self, event):
-		active = self.mode[0]
+		active = None
 		if hasattr(active, 'GetMax'):
 			count = active.GetValue()
 			if count >= active.GetMax():

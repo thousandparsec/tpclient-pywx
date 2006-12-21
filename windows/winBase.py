@@ -128,13 +128,9 @@ class winBaseMixIn(winMixIn):
 			except Exception, e:
 				utils.do_traceback()
 
-	def OnNetworkFailure(self, evt):
-		self.application.gui.Show(self.application.gui.connectto)
-
-		# When the network fails pop-up a dialog then go to the connectto screen
-		dlg = wx.MessageDialog(self.application.gui.current, str(evt), _("Network Error"), wx.OK|wx.ICON_ERROR)
-		dlg.ShowModal()
-		dlg.Destroy()
+	def PreCreate(self, pre):
+		print "PreCreate", self.title
+		pre.SetTitle('TP: ' + self.title)
 
 class winSubMixIn(winMixIn):
 	"""
@@ -418,10 +414,68 @@ class winMiniSubBase(winConfigMixIn, winSubMixIn, wx.MiniFrame):
 				wx.DEFAULT_FRAME_STYLE|wx.FRAME_NO_TASKBAR|wx.TAB_TRAVERSAL)
 		winSubMixIn.__init__(self, application, parent)
 
+
 class winNormalSubBase(winConfigMixIn, winSubMixIn, wx.Frame):
 	def __init__(self, application, parent):
 		wx.Frame.__init__(self, parent, -1, 'TP: ' + self.title, wx.DefaultPosition, wx.DefaultSize, \
 				wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL)
+		winSubMixIn.__init__(self, application, parent)
+
+
+
+
+
+
+
+
+
+
+# These give a MDI interface under windows
+class winMDIBaseXRC(ConfigMixIn, winBaseMixIn, wx.MDIParentFrame):
+	def __init__(self, application):
+		winBaseMixIn.__init__(self, application, None)
+
+class winMDISubBaseXRC(winConfigMixIn, winSubMixIn, wx.MDIChildFrame):
+	def __init__(self, application, parent):
+		winSubMixIn.__init__(self, application, parent)
+
+class winMDIReportBaseXRC(winConfigMixIn, winSubMixIn, wx.MDIChildFrame):
+	def __init__(self, application, parent):
+		winSubMixIn.__init__(self, application, parent)
+
+	def PreCreate(self, pre):
+		self.SetStyle(wx.TAB_TRAVERSAL|wx.DEFAULT_FRAME_STYLE|wx.STAY_ON_TOP)
+
+# These give a non-MDI interface under other operating systems
+class winNormalBaseXRC(ConfigMixIn, winBaseMixIn, wx.Frame):
+	def __init__(self, application):
+		winBaseMixIn.__init__(self, application, None)
+		self.Bind(wx.EVT_ACTIVATE, self.OnActivate)
+
+	def OnActivate(self, evt):
+		if not evt.GetActive():
+			return
+		self.RaiseChildren()
+
+	def HideChildren(self):
+		for window in self.children.values():
+			if isinstance(window, winBase):
+				window.Hide()
+
+	def RaiseChildren(self):
+		for window in self.children.values():
+			if isinstance(window, winBase):
+				window.Raise()
+
+class winMiniSubBaseXRC(winConfigMixIn, winSubMixIn, wx.MiniFrame):
+	def __init__(self, application, parent):
+		winSubMixIn.__init__(self, application, parent)
+
+	def PreCreate(self, pre):
+		pre.SetStyle(wx.DEFAULT_FRAME_STYLE|wx.FRAME_NO_TASKBAR|wx.TAB_TRAVERSAL)
+
+class winNormalSubBaseXRC(winConfigMixIn, winSubMixIn, wx.Frame):
+	def __init__(self, application, parent):
 		winSubMixIn.__init__(self, application, parent)
 
 """\
@@ -456,16 +510,31 @@ if wx.Platform == '__WXMSW__':
 	winBase			= winMDISubBase
 	winReportBase 	= winMDIReportBase
 
+	winMainBaseXRC		= winNormalBaseXRC
+	winMDIBaseXRC		= winMDIBaseXRC
+	winBaseXRC			= winMDISubBaseXRC
+	winReportBaseXRC 	= winMDIReportBaseXRC
+
 elif wx.Platform == '__WXMAC__':
 	winMainBase		= winNormalBase
 	winMDIBase		= winNormalBase
 	winBase			= winNormalSubBase
 	winReportBase 	= winNormalSubBase
 
+	winMainBaseXRC		= winNormalBaseXRC
+	winMDIBaseXRC		= winNormalBaseXRC
+	winBaseXRC			= winNormalSubBaseXRC
+	winReportBaseXRC 	= winNormalSubBaseXRC
 else:
 	winMainBase		= winNormalBase
 	winMDIBase		= winNormalBase
 	winBase			= winMiniSubBase
 	winReportBase 	= winNormalSubBase
+
+	winMainBaseXRC		= winNormalBaseXRC
+	winMDIBaseXRC		= winNormalBaseXRC
+	winBaseXRC			= winMiniSubBaseXRC
+	winReportBaseXRC 	= winNormalSubBaseXRC
+
 
 __all__ = ['winMainBase', 'winBase', 'winMDIBase', 'winReportBase', 'winShiftMixIn', '__all__']
