@@ -109,7 +109,7 @@ class GUI(wx.App):
 			from windows.winSplash import winSplash
 			self.splash = winSplash(application)
 			self.Show(self.splash)
-			
+
 			# Load the other main windows
 			from windows.winMain import winMain
 			self.main = winMain(application)
@@ -208,6 +208,14 @@ class GUI(wx.App):
 		self.Post(self.ShowWindowEvent())
 		return r
 
+	def OnNetworkFailure(self, evt):
+		self.Show(self.connectto)
+
+		# When the network fails pop-up a dialog then go to the connectto screen
+		dlg = wx.MessageDialog(self.application.gui.current, str(evt), _("Network Error"), wx.OK|wx.ICON_ERROR)
+		dlg.ShowModal()
+		dlg.Destroy()
+
 class Network(NetworkThread):
 	def ConnectTo(self, host, username, password, debug=False):
 		"""\
@@ -238,6 +246,7 @@ class Network(NetworkThread):
 		self.application.Post(self.application.cache.CacheUpdateEvent(None))
 
 	def EOTUpdate(self):
+		# FIXME: This is bar :/
 		gui = self.application.gui
 		timeRemaining = self.connection.time()
 
