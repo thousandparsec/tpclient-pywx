@@ -8,8 +8,8 @@ import os.path
 import wx
 from wx.xrc import XRCCTRL, XmlResourceWithHandlers
 
-class winUpdateBase:
-	xrc = 'winUpdate.xrc'
+class winConnectBase:
+	xrc = 'winConnect.xrc'
 
 	def PreCreate(self, pre):
 		""" This function is called during the class's initialization.
@@ -37,42 +37,30 @@ class winUpdateBase:
 		
 		# Two stage creation (see http://wiki.wxpython.org/index.cgi/TwoStageCreation)
 		pre = getattr(wx, "Pre%s" % base.__name__)()
-		res.LoadOnFrame(pre, parent, "winUpdate")
+		res.LoadOnFrame(pre, parent, "winConnect")
 		self.PreCreate(pre)
 		self.PostCreate(pre)
 
 		# Define variables for the controls
 		self.Panel = XRCCTRL(self, "Panel")
-		self.TopText = XRCCTRL(self, "TopText")
-		self.Message = XRCCTRL(self, "Message")
-		self.ConnectingGauge = XRCCTRL(self, "ConnectingGauge")
-		self.ConnectingAnim = XRCCTRL(self, "ConnectingAnim")
-		self.ConnectingText = XRCCTRL(self, "ConnectingText")
-		self.ProgressTitle = XRCCTRL(self, "ProgressTitle")
-		self.ProgressGauge = XRCCTRL(self, "ProgressGauge")
-		self.ProgressAnim = XRCCTRL(self, "ProgressAnim")
-		self.ProgressText = XRCCTRL(self, "ProgressText")
-		self.ObjectsAnim = XRCCTRL(self, "ObjectsAnim")
-		self.OrdersAnim = XRCCTRL(self, "OrdersAnim")
-		self.BoardsAnim = XRCCTRL(self, "BoardsAnim")
-		self.MessagesAnim = XRCCTRL(self, "MessagesAnim")
-		self.CategoriesAnim = XRCCTRL(self, "CategoriesAnim")
-		self.DesignsAnim = XRCCTRL(self, "DesignsAnim")
-		self.ComponentsAnim = XRCCTRL(self, "ComponentsAnim")
-		self.PropertiesAnim = XRCCTRL(self, "PropertiesAnim")
-		self.PlayersAnim = XRCCTRL(self, "PlayersAnim")
-		self.ResourcesAnim = XRCCTRL(self, "ResourcesAnim")
+		self.Server = XRCCTRL(self, "Server")
+		self.Username = XRCCTRL(self, "Username")
+		self.Password = XRCCTRL(self, "Password")
 		self.Okay = XRCCTRL(self, "wxID_OK")
 		if hasattr(self, "OnOkay"):
 			self.Bind(wx.EVT_BUTTON, self.OnOkay, self.Okay)
 
-		self.Save = XRCCTRL(self, "wxID_SAVE")
-		if hasattr(self, "OnSave"):
-			self.Bind(wx.EVT_BUTTON, self.OnSave, self.Save)
-
 		self.Cancel = XRCCTRL(self, "wxID_CANCEL")
 		if hasattr(self, "OnCancel"):
 			self.Bind(wx.EVT_BUTTON, self.OnCancel, self.Cancel)
+
+		self.Find = XRCCTRL(self, "wxID_FIND")
+		if hasattr(self, "OnFind"):
+			self.Bind(wx.EVT_BUTTON, self.OnFind, self.Find)
+
+		self.Config = XRCCTRL(self, "wxID_PREFERENCES")
+		if hasattr(self, "OnConfig"):
+			self.Bind(wx.EVT_BUTTON, self.OnConfig, self.Config)
 
 
 

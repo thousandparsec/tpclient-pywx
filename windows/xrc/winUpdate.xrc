@@ -3,7 +3,7 @@
     <object class="wxFrame" name="winUpdate">
         <style>wxCAPTION|wxRESIZE_BORDER|wxSYSTEM_MENU|wxCLOSE_BOX</style>
         <size>600,600</size>
-        <title>UpdateWindow</title>
+        <title>TP: Downloading Universe</title>
         <object class="wxPanel" name="Panel">
             <style>wxSUNKEN_BORDER|wxTAB_TRAVERSAL</style>
             <object class="wxFlexGridSizer">
@@ -352,25 +352,26 @@
                         <object class="sizeritem">
                             <flag>wxALIGN_CENTER_VERTICAL|wxALL</flag>
                             <border>5</border>
-                            <object class="wxButton" name="Continue">
+                            <object class="wxButton" name="wxID_OK">
                                 <tooltip>Continue to the main game window.</tooltip>
-                                <label>Continue...</label>
+                                <label>&amp;OK</label>
+                                <default>1</default>
                             </object>
                         </object>
                         <object class="sizeritem">
                             <flag>wxALIGN_CENTER_VERTICAL|wxALL</flag>
                             <border>5</border>
-                            <object class="wxButton" name="SaveLog">
+                            <object class="wxButton" name="wxID_SAVE">
                                 <tooltip>Save a copy of the message box window to a file.</tooltip>
-                                <label>Save Log</label>
+                                <label>&amp;Save</label>
                             </object>
                         </object>
                         <object class="sizeritem">
                             <flag>wxALIGN_CENTER_VERTICAL|wxALL</flag>
                             <border>5</border>
-                            <object class="wxButton" name="Cancel">
+                            <object class="wxButton" name="wxID_CANCEL">
                                 <tooltip>Cancel the current update and go back to the connect screen.</tooltip>
-                                <label>Cancel</label>
+                                <label>&amp;Cancel</label>
                             </object>
                         </object>
                     </object>
