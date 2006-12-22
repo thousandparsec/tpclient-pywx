@@ -43,18 +43,18 @@ try:
 			self.Bind(wx.EVT_TIMER, self.OnTimer, self.timer)
 
 		def Play(self):
-			print "Starting Animation"
+			#print "Starting Animation"
 			self.timer.Start(self.delay)
 
 		def Stop(self):
-			print "Stoping Animation"
+			#print "Stoping Animation"
 			self.timer.Stop()
 
 		def LoadFile(self, file):
 
-			print "Loading File", file
+			#print "Loading File", file
 			self.gif = Image.open(file)
-			if self.gif.info['duration'] == 0:
+			if not self.gif.info.has_key('duration') or self.gif.info['duration'] == 0:
 				self.delay = 100
 			else:
 				self.delay = self.gif.info['duration']
