@@ -27,12 +27,16 @@ import utils
 from utils import debug, DEBUG_MAIN, DEBUG_GUI, DEBUG_NETWORK
 
 from tp.netlib import Connection, failed, constants
-from tp.client.threads import Application, NetworkThread, MediaThread
+from tp.client.threads import Application, NetworkThread, MediaThread, ThreadStop
 from tp.client.cache import Cache
 
+class ThreadExited(Exception):
+	pass
 
-def make(thread, method):
+def make(me, thread, method):
 	def t(*args, **kw):
+		if me.reset:
+			raise ThreadStop("Should die now!")
 		thread.Call(method, *args, **kw)
 	return t
 
@@ -122,7 +126,7 @@ class GUI(wx.App):
 
 			from windows.winUpdate import winUpdate
 			self.update = winUpdate(application)
-			self.update.Show()
+#			self.update.Show()
 
 			from windows.winDebug import winDebug
 			self.debug = winDebug(application)
@@ -209,6 +213,7 @@ class GUI(wx.App):
 		return r
 
 	def OnNetworkFailure(self, evt):
+		print evt
 		self.Show(self.connectto)
 
 		# When the network fails pop-up a dialog then go to the connectto screen
@@ -223,27 +228,25 @@ class Network(NetworkThread):
 		"""
 		# FIXME: This should be sending events really
 		gui = self.application.gui
-		up = make(gui, gui.update.Update)
+		up = make(self, gui, gui.update.Update)
 
 		# Show the Update window
 		gui.Call(gui.Show, gui.update)
 		if NetworkThread.ConnectTo(self, host, username, password, debug, up, cs="tpclient-pywx/%s.%s.%s" % version):
 			self.CacheUpdate()
 
+		up("finishing", "finished", "")
+
 		media = self.application.media
 		media.Call(media.ConnectTo, host, username)
 
 	def CacheUpdate(self):
 		gui = self.application.gui
-		callback = make(gui, gui.update.Update)
+		callback = make(self, gui, gui.update.Update)
 
 		# Show the update window
 		gui.Call(gui.Show, gui.update)
-		
 		NetworkThread.CacheUpdate(self, callback)
-	
-		gui.Call(gui.Show, gui.main)
-		self.application.Post(self.application.cache.CacheUpdateEvent(None))
 
 	def EOTUpdate(self):
 		# FIXME: This is bar :/

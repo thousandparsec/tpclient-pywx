@@ -1,7 +1,8 @@
 
 # Python imports
 import string
-import os.path
+import os, os.path
+import time
 
 # wxPython Imports
 import wx
@@ -10,8 +11,9 @@ import wx
 from winBase import winMainBaseXRC
 from xrc.winUpdate import winUpdateBase
 
-throbber = os.path.join("graphics", "throbber.gif")
-okay = os.path.join("graphics", "tick.gif")
+throbber = os.path.join("graphics", "downloading.gif")
+okay = os.path.join("graphics", "finished.gif")
+waiting = os.path.join("graphics", "waiting.gif")
 
 class winUpdate(winUpdateBase, winMainBaseXRC):
 	title = _("Updating")
@@ -20,57 +22,88 @@ class winUpdate(winUpdateBase, winMainBaseXRC):
 		winUpdateBase.__init__(self, None)
 		winMainBaseXRC.__init__(self, application)
 
+		self.Message.Bind(wx.EVT_UPDATE_UI, self.MessageDown)
+		self.GoDown = False
+
+	def OnCancel(self, evt):
+		self.application.network.Reset()
+		self.application.gui.Show(self.application.gui.connectto)
+
+	def OnSaveLog(self, evt):
+		dlg = wx.FileDialog(self, message="Save log as ...", defaultDir=os.getcwd(), 
+								defaultFile="update.log", wildcard="Log file (*.log)|*.log", style=wx.SAVE)
+		dlg.SetFilterIndex(0)
+		if dlg.ShowModal() != wx.ID_OK:
+			return
+
+		path = dlg.GetPath()
+		self.Message.SaveFile(path)
+
+	def OnContinue(self, evt):
+		self.application.gui.Show(self.application.gui.main)
+		self.application.Post(self.application.cache.CacheUpdateEvent(None))
+
+	def MessageDown(self, evt):
+		if self.GoDown:
+			self.Message.ShowPosition(self.Message.GetLastPosition())
+			self.GoDown = False
+
 	def Clear(self):
 		self.TopText.SetLabel("")
-		self.Message.SetLabel("")
+		self.Message.SetValue("")
 
 		self.ConnectingGauge.SetRange(1)
 		self.ConnectingGauge.SetValue(0)
 
-		self.ConnectingAnim.LoadFile(throbber)
-		self.ConnectingAnim.Stop()
+		self.ConnectingAnim.LoadFile(waiting)
+		self.ConnectingAnim.Play()
 
 		self.ConnectingText.SetLabel("")
 
 		self.ProgressTitle.SetLabel("")
-
+		self.ProgressTitle.Hide()
+		self.ProgressGauge.Disable()
 		self.ProgressGauge.SetRange(1)
 		self.ProgressGauge.SetValue(0)
-
-		self.ProgressAnim.LoadFile(throbber)
-		self.ProgressAnim.Stop()
-
+		self.ProgressGauge.Hide()
+		self.ProgressAnim.LoadFile(waiting)
+		self.ProgressAnim.Play()
+		self.ProgressAnim.Hide()
 		self.ProgressText.SetLabel("")
+		self.ProgressText.Hide()
 
-		self.ObjectsAnim.LoadFile(throbber)
-		self.ObjectsAnim.Stop()
+		self.ObjectsAnim.LoadFile(waiting)
+		self.ObjectsAnim.Play()
 
-		self.OrdersAnim.LoadFile(throbber)
-		self.OrdersAnim.Stop()
+		self.OrdersAnim.LoadFile(waiting)
+		self.OrdersAnim.Play()
 
-		self.BoardsAnim.LoadFile(throbber)
-		self.BoardsAnim.Stop()
+		self.BoardsAnim.LoadFile(waiting)
+		self.BoardsAnim.Play()
 
-		self.MessagesAnim.LoadFile(throbber)
-		self.MessagesAnim.Stop()
+		self.MessagesAnim.LoadFile(waiting)
+		self.MessagesAnim.Play()
 
-		self.CategoriesAnim.LoadFile(throbber)
-		self.CategoriesAnim.Stop()
+		self.CategoriesAnim.LoadFile(waiting)
+		self.CategoriesAnim.Play()
 
-		self.DesignsAnim.LoadFile(throbber)
-		self.DesignsAnim.Stop()
+		self.DesignsAnim.LoadFile(waiting)
+		self.DesignsAnim.Play()
 
-		self.ComponentsAnim.LoadFile(throbber)
-		self.ComponentsAnim.Stop()
+		self.ComponentsAnim.LoadFile(waiting)
+		self.ComponentsAnim.Play()
 
-		self.PropertiesAnim.LoadFile(throbber)
-		self.PropertiesAnim.Stop()
+		self.PropertiesAnim.LoadFile(waiting)
+		self.PropertiesAnim.Play()
 
-		self.PlayersAnim.LoadFile(throbber)
-		self.PlayersAnim.Stop()
+		self.PlayersAnim.LoadFile(waiting)
+		self.PlayersAnim.Play()
 
-		self.ResourcesAnim.LoadFile(throbber)
-		self.ResourcesAnim.Stop()
+		self.ResourcesAnim.LoadFile(waiting)
+		self.ResourcesAnim.Play()
+
+		self.Continue.Disable()
+		self.SaveLog.Disable()
 
 	def Show(self, show=True):
 		if not show:
@@ -79,67 +112,117 @@ class winUpdate(winUpdateBase, winMainBaseXRC):
 		# Clear everything
 		self.Clear()
 
+		self.CenterOnScreen(wx.BOTH)
 		return winMainBaseXRC.Show(self)
 
 	def Update(self, mode, state, message="", todownload=None, total=None, amount=None):
 		# We do a little bit different for this mode
 		if mode == "connecting":
-			return
-		
-		animation = getattr(self, "%sAnim" % mode.title())
-		if state == "start":
-			# Set the progress title
-			self.ProgressTitle.SetLabel("Getting %s" % mode.title())
+			animation = getattr(self, "%sAnim" % mode.title())
 
-			# Set the progress guage to be empty
-			self.ProgressGauge.SetValue(0)
-			self.ProgressGauge.SetRange(1)
-			
-			# Set the progress text
-			self.ProgressText.SetLabel("")
+			if state == "start":
+				# Start the connection throbber
+				animation.LoadFile(throbber)
+				animation.Play()
 
-			# Start the throbber for this mode
-			animation.LoadFile(throbber)
-			animation.Play()
+			elif state == "todownload":
+				self.ConnectingGauge.SetValue(0)
+				self.ConnectingGauge.SetRange(todownload)
+			elif state == "downloaded":
+				self.ConnectingGauge.SetValue(self.ConnectingGauge.GetValue()+amount)
+			elif state == "finished":
+				# Change to the tick
+				animation.LoadFile(okay)
+				animation.Play()
+				
+				# Set the gauge as completed!
+				self.ConnectingGauge.SetValue(self.ConnectingGauge.GetRange())
 
-		elif state == "todownload":
-			# Now we know how big to set the gauge too
-			if todownload == 0:
-				todownload = 1
-			
-			self.ProgressGauge.SetRange(todownload)
+				# Set the progress text
+				self.ConnectingText.SetLabel("Done!")
 
-		elif state == "progress":
-			# Nothing to do...
-			pass
+		elif mode == "finishing":
+			# Change the buttons
+			self.Continue.Enable()
+			self.SaveLog.Enable()
+			self.Cancel.Disable()
 
-		elif state == "failure":
-			# Don't do anything for now
-			# FIXME: Should highlight the line in red....
-			pass
+		else:	
+			animation = getattr(self, "%sAnim" % mode.title())
 
-		elif state == "downloaded":
-			# Progress the progress gauge
-			self.ProgressGauge.SetValue(self.ProgressGauge.GetValue()+amount)
+			self.ProgressTitle.Show()
+			self.ProgressGauge.Show()
+			self.ProgressAnim.Show()
+			self.ProgressText.Show()
 
-			# Update the text
-			self.ProgressText.SetLabel("%s of %s" % \
-				(self.ProgressGauge.GetValue(), self.ProgressGauge.GetRange()))
-			
-		elif state == "finished":
-			# Change to the tick
-			animation.LoadFile(okay)
-			animation.Play()
-			
-			# Set the gauge as completed!
-			self.ProgressGauge.SetValue(self.ProgressGauge.GetRange())
+			if state == "start":
+				# Set the progress title
+				self.ProgressTitle.SetLabel("Getting %s" % mode.title())
 
-			# Set the progress text
-			self.ProgressText.SetLabel("Done!")
+				# Set the progress guage to be empty
+				self.ProgressGauge.Enable()
+				self.ProgressGauge.SetValue(0)
+				self.ProgressGauge.SetRange(1)
+				
+				# Set the progress text
+				self.ProgressText.SetLabel("")
 
-		self.Message.SetValue(message + "\n" + self.Message.GetValue())
+				# Set the progress animation
+				self.ProgressAnim.LoadFile(throbber)
+				self.ProgressAnim.Play()
 
+				# Start the throbber for this mode
+				animation.LoadFile(throbber)
+				animation.Play()
+
+			elif state == "todownload":
+				# Now we know how big to set the gauge too
+				if todownload == 0:
+					self.ProgressGauge.SetValue(1)
+					self.ProgressGauge.SetRange(1)
+				else:	
+					self.ProgressGauge.SetValue(0)
+					self.ProgressGauge.SetRange(todownload)
+
+				# Update the text
+				self.ProgressText.SetLabel("%s of %s" % (0, todownload))
+
+			elif state == "progress":
+				# Nothing to do...
+				pass
+
+			elif state == "downloaded":
+				# Progress the progress gauge
+				self.ProgressGauge.SetValue(self.ProgressGauge.GetValue()+amount)
+
+				# Update the text
+				self.ProgressText.SetLabel("%s of %s" % \
+					(self.ProgressGauge.GetValue(), self.ProgressGauge.GetRange()))
+				
+			elif state == "finished":
+				# Change to the tick
+				animation.LoadFile(okay)
+				animation.Play()
+				
+				# Set the gauge as completed!
+				self.ProgressGauge.SetValue(self.ProgressGauge.GetRange())
+
+				# Set the progress text
+				self.ProgressText.SetLabel("Done!")
+
+				# Stop the progress animation
+				self.ProgressAnim.Stop()
+
+		if len(message) > 0:
+			self.Message.AppendText("\n" + message)
 		self.Panel.Layout()
+		self.GoDown = True
+
+		if state == "failure":
+			# Don't do anything for now
+			end = self.Message.GetLastPosition()
+			self.Message.SetStyle(end-len(message), end, wx.TextAttr(wx.RED))
+
 
 	# Config Functions -----------------------------------------------------------------------------  
 	def ConfigDefault(self, config=None):

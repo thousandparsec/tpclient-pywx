@@ -36,7 +36,6 @@ class winUpdateBase:
 				break
 		
 		# Two stage creation (see http://wiki.wxpython.org/index.cgi/TwoStageCreation)
-		print "Base Frame", base.__name__
 		pre = getattr(wx, "Pre%s" % base.__name__)()
 		res.LoadOnFrame(pre, parent, "winUpdate")
 		self.PreCreate(pre)
@@ -53,17 +52,27 @@ class winUpdateBase:
 		self.ProgressGauge = XRCCTRL(self, "ProgressGauge")
 		self.ProgressAnim = XRCCTRL(self, "ProgressAnim")
 		self.ProgressText = XRCCTRL(self, "ProgressText")
-		self.ObjectAnim = XRCCTRL(self, "ObjectAnim")
-		self.OrderAnim = XRCCTRL(self, "OrderAnim")
-		self.BoardAnim = XRCCTRL(self, "BoardAnim")
-		self.MessageAnim = XRCCTRL(self, "MessageAnim")
-		self.CategoryAnim = XRCCTRL(self, "CategoryAnim")
-		self.DesignAnim = XRCCTRL(self, "DesignAnim")
-		self.ComponentAnim = XRCCTRL(self, "ComponentAnim")
-		self.PropertyAnim = XRCCTRL(self, "PropertyAnim")
-		self.PlayerAnim = XRCCTRL(self, "PlayerAnim")
-		self.ResourceAnim = XRCCTRL(self, "ResourceAnim")
+		self.ObjectsAnim = XRCCTRL(self, "ObjectsAnim")
+		self.OrdersAnim = XRCCTRL(self, "OrdersAnim")
+		self.BoardsAnim = XRCCTRL(self, "BoardsAnim")
+		self.MessagesAnim = XRCCTRL(self, "MessagesAnim")
+		self.CategoriesAnim = XRCCTRL(self, "CategoriesAnim")
+		self.DesignsAnim = XRCCTRL(self, "DesignsAnim")
+		self.ComponentsAnim = XRCCTRL(self, "ComponentsAnim")
+		self.PropertiesAnim = XRCCTRL(self, "PropertiesAnim")
+		self.PlayersAnim = XRCCTRL(self, "PlayersAnim")
+		self.ResourcesAnim = XRCCTRL(self, "ResourcesAnim")
+		self.Continue = XRCCTRL(self, "Continue")
+		if hasattr(self, "OnContinue"):
+			self.Bind(wx.EVT_BUTTON, self.OnContinue, self.Continue)
+
+		self.SaveLog = XRCCTRL(self, "SaveLog")
+		if hasattr(self, "OnSaveLog"):
+			self.Bind(wx.EVT_BUTTON, self.OnSaveLog, self.SaveLog)
+
 		self.Cancel = XRCCTRL(self, "Cancel")
 		if hasattr(self, "OnCancel"):
-			self.Bind(self.Cancel, self.OnCancel)
+			self.Bind(wx.EVT_BUTTON, self.OnCancel, self.Cancel)
+
+
 
