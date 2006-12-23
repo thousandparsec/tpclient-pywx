@@ -259,11 +259,17 @@ class Network(NetworkThread):
 
 	def CacheUpdate(self):
 		gui = self.application.gui
-		callback = make(self, gui, gui.update.Update)
+		up = make(self, gui, gui.update.Update)
 
 		# Show the update window
 		gui.Call(gui.Show, gui.update)
-		NetworkThread.CacheUpdate(self, callback)
+		while gui.current != gui.update:
+			time.sleep(0.1)
+
+		up("connecting", "start", "Connecting...")
+		up("connecting", "finished", "")
+		NetworkThread.CacheUpdate(self, up)
+		up("finishing", "finished", "")
 
 	def EOTUpdate(self):
 		# FIXME: This is bar :/
