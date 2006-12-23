@@ -44,27 +44,42 @@ class %(windowName)sBase:
 				findbases(base, set)
 		findbases(self.__class__, bases)
 
-		print bases
 		for base in bases:
-			print base.__name__
 			if base.__name__.endswith("Frame"):
 				break
 		
 		# Two stage creation (see http://wiki.wxpython.org/index.cgi/TwoStageCreation)
-		pre = getattr(wx, "Pre%s" % base.__name__)()
+		pre = getattr(wx, "Pre%%s" %% base.__name__)()
 		res.LoadOnFrame(pre, parent, "%(windowName)s")
 		self.PreCreate(pre)
 		self.PostCreate(pre)
 
 		# Define variables for the controls"""
 
+IDmap = {
+	"wxID_CANCEL":		"Cancel",
+	"wxID_SAVE":		"Save",
+	"wxID_SAVEAS":		"SaveAs",
+	"wxID_NEW":			"New",
+	"wxID_OK":			"Okay",
+	"wxID_FIND":		"Find",
+	"wxID_REFRESH":		"Refresh",
+	"wxID_PREFERENCES":	"Config",
+}
+
 Template_Default = """\
-		self.%(controlName)s = XRCCTRL(self, "%(controlName)s")"""
+		self.%(controlName)s = XRCCTRL(self, "%(controlID)s")"""
 Template_Button = """\
-		self.%(controlName)s = XRCCTRL(self, "%(controlName)s")
+		self.%(controlName)s = XRCCTRL(self, "%(controlID)s")
 		if hasattr(self, "On%(controlName)s"):
-			self.Bind(self.%(controlName)s, self.On%(controlName)s)
+			self.Bind(wx.EVT_BUTTON, self.On%(controlName)s, self.%(controlName)s)
 """
+Template_ToggleButton = """\
+		self.%(controlName)s = XRCCTRL(self, "%(controlID)s")
+		if hasattr(self, "On%(controlName)s"):
+			self.Bind(wx.EVT_TOGGLEBUTTON, self.On%(controlName)s, self.%(controlName)s)
+"""
+Template_BitmapButton = Template_Button
 
 def Generate_wxFrame(xrcFile, topWindow, outFile):
 	fileName = os.path.basename(xrcFile.name)
@@ -87,6 +102,12 @@ def Generate_wxFrame(xrcFile, topWindow, outFile):
 		controlClass = re.sub("^wx", "wx.", controlClass)
 		controlName = control.getAttribute("name")
 		# Ignore anything which is still got a wx name...
+		if controlName in IDmap:
+			controlID = controlName
+			controlName = IDmap[controlName]
+		else:
+			controlID = controlName
+
 		if "wx" in controlName:
 			continue
 		if controlName != "" and controlClass != "":
