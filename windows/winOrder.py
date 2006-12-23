@@ -376,6 +376,12 @@ class winOrder(winBase):
 			self.oid = None
 			self.OnOrderSelect(None)
 			return
+		
+		print "Orders", object.order_number, "Order Types", object.order_types
+		if object.order_number == 0 and len(object.order_types) == 0:
+			self.Hide()
+		else:
+			self.Show()
 
 		# We now point to this object
 		self.oid = evt.id 
@@ -400,6 +406,9 @@ class winOrder(winBase):
 				desc = od.__doc__
 			desc = desc.strip()
 			self.type_list.SetToolTipItem(self.type_list.GetCount()-1, desc)
+
+		if len(object.order_types) > 0:
+			self.type_list.SetSelection(0)
 
 		# Select no orders
 		self.OnOrderSelect(None)
