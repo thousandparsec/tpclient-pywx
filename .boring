@@ -38,3 +38,4 @@
 ^build$
 ^MANIFEST$
 ^update.log$
+(^|/)windows/xrc/tp.*$
