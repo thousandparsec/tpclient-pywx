@@ -29,7 +29,7 @@ class winUpdate(winUpdateBase, winMainBaseXRC):
 		self.application.network.Reset()
 		self.application.gui.Show(self.application.gui.connectto)
 
-	def OnSaveLog(self, evt):
+	def OnSave(self, evt):
 		dlg = wx.FileDialog(self, message="Save log as ...", defaultDir=os.getcwd(), 
 								defaultFile="update.log", wildcard="Log file (*.log)|*.log", style=wx.SAVE)
 		dlg.SetFilterIndex(0)
@@ -39,7 +39,7 @@ class winUpdate(winUpdateBase, winMainBaseXRC):
 		path = dlg.GetPath()
 		self.Message.SaveFile(path)
 
-	def OnContinue(self, evt):
+	def OnOkay(self, evt):
 		self.application.gui.Show(self.application.gui.main)
 		self.application.Post(self.application.cache.CacheUpdateEvent(None))
 
@@ -49,6 +49,9 @@ class winUpdate(winUpdateBase, winMainBaseXRC):
 			self.GoDown = False
 
 	def Clear(self):
+		# Enable the cancel button
+		self.Cancel.Enable()
+
 		self.TopText.SetLabel("")
 		self.Message.SetValue("")
 
@@ -102,8 +105,8 @@ class winUpdate(winUpdateBase, winMainBaseXRC):
 		self.ResourcesAnim.LoadFile(waiting)
 		self.ResourcesAnim.Play()
 
-		self.Continue.Disable()
-		self.SaveLog.Disable()
+		self.Okay.Disable()
+		self.Save.Disable()
 
 	def Show(self, show=True):
 		if not show:
@@ -143,8 +146,8 @@ class winUpdate(winUpdateBase, winMainBaseXRC):
 
 		elif mode == "finishing":
 			# Change the buttons
-			self.Continue.Enable()
-			self.SaveLog.Enable()
+			self.Okay.Enable()
+			self.Save.Enable()
 			self.Cancel.Disable()
 
 		else:	
@@ -214,7 +217,7 @@ class winUpdate(winUpdateBase, winMainBaseXRC):
 				self.ProgressAnim.Stop()
 
 		if len(message) > 0:
-			self.Message.AppendText("\n" + message)
+			self.Message.AppendText(message+"\n")
 		self.Panel.Layout()
 		self.GoDown = True
 

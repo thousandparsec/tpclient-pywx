@@ -124,7 +124,7 @@ class winConnect(winConnectBase, winMainBaseXRC):
 		self.application.ConfigDisplay()
 
 	def OnFind(self, evt):
-		self.application.gui.Show(self.application.gui.account)
+		self.application.gui.Show(self.application.gui.servers)
 
 	def ShowURL(self, url):
 		# Split the URL out into username, password, etc
