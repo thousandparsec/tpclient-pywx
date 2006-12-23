@@ -27,7 +27,7 @@ import utils
 from utils import debug, DEBUG_MAIN, DEBUG_GUI, DEBUG_NETWORK
 
 from tp.netlib import Connection, failed, constants
-from tp.client.threads import Application, NetworkThread, MediaThread, FinderThread, ThreadStop
+from tp.client.threads import Application, NetworkThread, MediaThread, FinderThread, ThreadStop, NotImportantEvent
 from tp.client.cache import Cache
 
 class ThreadExited(Exception):
@@ -57,6 +57,7 @@ class GUI(wx.App):
 	
 		def __str__(self):
 			return "<SelectObjectEvent id=%s>" % self.id
+		__repr__ = __str__
 	
 	class SelectPositionEvent(wx.PyEvent):
 		"""\
@@ -67,6 +68,7 @@ class GUI(wx.App):
 		
 		def __str__(self):
 			return "<SelectPositionEvent (%s, %s %s)>" % (self.x, self.y, self.z)
+		__repr__ = __str__
 	
 	class SelectOrderEvent(wx.PyEvent):
 		"""\
@@ -78,6 +80,7 @@ class GUI(wx.App):
 		
 		def __str__(self):
 			return "<SelectOrderEvent id=%s slots=%s>" % (self.id, self.slots)
+		__repr__ = __str__
 
 	class DirtyOrderEvent(wx.PyEvent):
 		"""\
@@ -90,6 +93,7 @@ class GUI(wx.App):
 		
 		def __str__(self):
 			return "<DirtyOrderEvent id=%s slots=%s>" % (self.id, self.slots)
+		__repr__ = __str__
 
 	######################################
 	def __init__(self, application):
@@ -144,6 +148,9 @@ class GUI(wx.App):
 		print "Finished init..."
 		self.Call(self.Show, self.connectto)
 
+	def __str__(self):
+		return "<GUIThread(wxThread, %s)>" % hex(id(self))
+
 	def Cleanup(self):
 		for window in self.windows:
 			window.Close()
@@ -193,6 +200,13 @@ class GUI(wx.App):
 				utils.do_traceback()
 
 		self.current.Post(event)
+
+		# If it's not a GUI event also post to all the other windows...
+		if not isinstance(event, (wx.PyEvent, NotImportantEvent)):
+			for window in self.windows:
+				if window is self.current:
+					continue
+				window.Post(event)
 
 	def Show(self, window):
 		"""
