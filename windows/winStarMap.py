@@ -80,6 +80,11 @@ class winStarMap(winBase):
 		self.mode = "Normal"
 		self.current = -1
 
+		self.Bind(wx.EVT_ACTIVATE, self.OnShow)
+
+	def OnShow(self, evt):
+		self.Canvas.Draw()
+
 	def Rebuild(self):
 		try:
 			self.RemovePath()
