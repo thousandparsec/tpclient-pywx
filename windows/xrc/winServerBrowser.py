@@ -46,14 +46,23 @@ class winServerBrowserBase:
 		self.Progress = XRCCTRL(self, "Progress")
 		self.InternetServers = XRCCTRL(self, "InternetServers")
 		self.LocalServers = XRCCTRL(self, "LocalServers")
-		self.ID_TEXTCTRL = XRCCTRL(self, "ID_TEXTCTRL")
+		self.URLTitle = XRCCTRL(self, "URLTitle")
+		self.URL = XRCCTRL(self, "URL")
+		self.Refresh = XRCCTRL(self, "wxID_REFRESH")
+		if hasattr(self, "OnRefresh"):
+			self.Bind(wx.EVT_BUTTON, self.OnRefresh, self.Refresh)
+
 		self.NewAccount = XRCCTRL(self, "NewAccount")
 		if hasattr(self, "OnNewAccount"):
 			self.Bind(wx.EVT_BUTTON, self.OnNewAccount, self.NewAccount)
 
-		self.Connect = XRCCTRL(self, "Connect")
-		if hasattr(self, "OnConnect"):
-			self.Bind(wx.EVT_BUTTON, self.OnConnect, self.Connect)
+		self.ConnectTo = XRCCTRL(self, "ConnectTo")
+		if hasattr(self, "OnConnectTo"):
+			self.Bind(wx.EVT_BUTTON, self.OnConnectTo, self.ConnectTo)
+
+		self.Cancel = XRCCTRL(self, "wxID_CANCEL")
+		if hasattr(self, "OnCancel"):
+			self.Bind(wx.EVT_BUTTON, self.OnCancel, self.Cancel)
 
 
 

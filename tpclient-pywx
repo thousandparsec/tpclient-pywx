@@ -27,7 +27,7 @@ import utils
 from utils import debug, DEBUG_MAIN, DEBUG_GUI, DEBUG_NETWORK
 
 from tp.netlib import Connection, failed, constants
-from tp.client.threads import Application, NetworkThread, MediaThread, ThreadStop
+from tp.client.threads import Application, NetworkThread, MediaThread, FinderThread, ThreadStop
 from tp.client.cache import Cache
 
 class ThreadExited(Exception):
@@ -120,6 +120,9 @@ class GUI(wx.App):
 
 			from windows.winConnect import winConnect
 			self.connectto = winConnect(application)
+
+			from windows.winServerBrowser import winServerBrowser
+			self.servers = winServerBrowser(application)
 
 			from windows.winAccount import winAccount
 			self.account = winAccount(application)
@@ -280,6 +283,7 @@ class Application(_Application):
 	GUIClass = GUI
 	NetworkClass = Network
 	MediaClass = MediaThread
+	FinderClass = FinderThread
 	ConfigFile = "pywx_preferences"
 
 if __name__ == '__main__':

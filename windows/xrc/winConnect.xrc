@@ -132,6 +132,7 @@
                             <border>0</border>
                             <object class="wxButton" name="wxID_OK">
                                 <label>&amp;OK</label>
+                                <default>1</default>
                             </object>
                         </object>
                         <object class="sizeritem">
