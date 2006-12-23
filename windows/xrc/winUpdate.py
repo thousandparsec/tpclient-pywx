@@ -52,6 +52,8 @@ class winUpdateBase:
 		self.ProgressGauge = XRCCTRL(self, "ProgressGauge")
 		self.ProgressAnim = XRCCTRL(self, "ProgressAnim")
 		self.ProgressText = XRCCTRL(self, "ProgressText")
+		self.ObjectdescsAnim = XRCCTRL(self, "ObjectdescsAnim")
+		self.OrderdescsAnim = XRCCTRL(self, "OrderdescsAnim")
 		self.ObjectsAnim = XRCCTRL(self, "ObjectsAnim")
 		self.OrdersAnim = XRCCTRL(self, "OrdersAnim")
 		self.BoardsAnim = XRCCTRL(self, "BoardsAnim")

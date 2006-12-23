@@ -75,6 +75,12 @@ class winUpdate(winUpdateBase, winMainBaseXRC):
 		self.ProgressText.SetLabel("")
 		self.ProgressText.Hide()
 
+		self.ObjectdescsAnim.LoadFile(waiting)
+		self.ObjectdescsAnim.Play()
+
+		self.OrderdescsAnim.LoadFile(waiting)
+		self.OrderdescsAnim.Play()
+
 		self.ObjectsAnim.LoadFile(waiting)
 		self.ObjectsAnim.Play()
 
