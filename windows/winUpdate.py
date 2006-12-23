@@ -224,7 +224,7 @@ class winUpdate(winUpdateBase, winMainBaseXRC):
 		if state == "failure":
 			# Don't do anything for now
 			end = self.Message.GetLastPosition()
-			self.Message.SetStyle(end-len(message), end, wx.TextAttr(wx.RED))
+			self.Message.SetStyle(end-len(message)-1, end, wx.TextAttr(wx.RED))
 
 
 	# Config Functions -----------------------------------------------------------------------------  
