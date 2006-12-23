@@ -37,3 +37,4 @@
 ^graphics/media$
 ^build$
 ^MANIFEST$
+^update.log$
