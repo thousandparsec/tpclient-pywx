@@ -47,7 +47,7 @@ except (ImportError, KeyError), e:
 	print e
 	notfound.append("tp.netlib > " + tostr(netlib_version))
 
-client_version = (0, 2, 0)
+client_version = (0, 3, 0)
 try:
 	import tp.client
 	print "Thousand Parsec Client Library Version", tp.client.__version__
