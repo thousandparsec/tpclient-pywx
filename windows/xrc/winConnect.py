@@ -45,6 +45,12 @@ class winConnectBase:
 		self.Panel = XRCCTRL(self, "Panel")
 		self.Server = XRCCTRL(self, "Server")
 		self.Username = XRCCTRL(self, "Username")
+		self.GameShow = XRCCTRL(self, "GameShow")
+		if hasattr(self, "OnGameShow"):
+			self.Bind(wx.EVT_TOGGLEBUTTON, self.OnGameShow, self.GameShow)
+
+		self.GameTitle = XRCCTRL(self, "GameTitle")
+		self.Game = XRCCTRL(self, "Game")
 		self.Password = XRCCTRL(self, "Password")
 		self.Okay = XRCCTRL(self, "wxID_OK")
 		if hasattr(self, "OnOkay"):

@@ -121,7 +121,7 @@ class winAccount(winMainBase):
 	def Show(self, a=True):
 		if a:
 			self.State("start")
-			self.host.SetValue(self.application.gui.connectto.host.GetValue())
+			self.host.SetValue(self.application.gui.connectto.Server.GetValue())
 		winMainBase.Show(self, a)
 
 	def State(self, mode):

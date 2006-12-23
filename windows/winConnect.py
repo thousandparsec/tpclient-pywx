@@ -12,7 +12,8 @@ import wx
 import wx.gizmos
 
 # Local Imports
-from winBase import winMainBase
+from winBase import winMainBaseXRC
+from xrc.winConnect import winConnectBase
 from utils import *
 
 def url2bits(line):
@@ -26,7 +27,7 @@ def url2bits(line):
 		if username[-1] in '@:':
 			username = username[:-1]
 
-	host = groups[6]
+	server = groups[6]
 	password = groups[5]
 	if not password is None:
 		if password[-1] is '@':
@@ -40,104 +41,81 @@ def url2bits(line):
 			game = None
 
 	if proto is None:
-		one = host
+		one = server
 	else:
-		one = "%s%s" % (proto, host)
+		one = "%s%s" % (proto, server)
 
-	if game is None:
-		two = username
-	else:
-		two = "%s@%s" % (username, game)
+	return (one, username, game, password)
 
-	return (one, two, password)
-
-class winConnect(winMainBase):
+class winConnect(winConnectBase, winMainBaseXRC):
 	title = _("Connect")
 
 	def Post(*args):
 		pass
-	
+
 	def __init__(self, application):
-		winMainBase.__init__(self, application)
-		panel = wx.Panel(self, -1)
+		winConnectBase.__init__(self, None)
+		winMainBaseXRC.__init__(self, application)	
 
-		# The title
-		text_top = wx.StaticText( panel, -1, _("Connect to a Server"), style=wx.TE_CENTRE)
-		text_top.SetFont( wx.Font( 16, wx.ROMAN, wx.NORMAL, wx.BOLD ) )
-
-		# The fill in text areas
-		sizer_top = wx.BoxSizer( wx.HORIZONTAL )
-		sizer_top.Add( text_top, 1, wx.EXPAND, 5 )
-
-		# Server
-		text_host = wx.StaticText( panel, -1, _("Server"), style=wx.TE_RIGHT )
-		self.host = wx.ComboBox( panel, -1, "" )
-
-		text_username = wx.StaticText( panel, -1, _("Username"), style=wx.TE_RIGHT )
-		self.username = wx.ComboBox( panel, -1, "" )
-
-		text_password = wx.StaticText( panel, -1, _("Password"), style=wx.TE_RIGHT )
-		self.password = wx.TextCtrl( panel, -1, "", style=wx.TE_PASSWORD )
-
-		FLAGS = wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.EXPAND
-		grid = wx.FlexGridSizer( 0, 2, 5, 5 )
-		grid.AddGrowableCol(1)
-		grid.Add( text_host,     1, FLAGS )
-		grid.Add( self.host,     5, FLAGS )
-		grid.Add( text_username, 1, FLAGS )
-		grid.Add( self.username, 5, FLAGS )
-		grid.Add( text_password, 1, FLAGS )
-		grid.Add( self.password, 5, FLAGS )
-
-		# Buttons
-		button_ok     = wx.Button(panel, wx.ID_OK)
-		button_cancel = wx.Button(panel, wx.ID_CANCEL)
-		button_new    = wx.Button(panel, wx.ID_NEW)
-		button_config = wx.Button(panel, wx.ID_PREFERENCES)
-		button_ok.SetDefault()
-
-		buttons = wx.BoxSizer( wx.HORIZONTAL )
-		buttons.Add( button_ok, 0, wx.ALIGN_CENTRE)
-		buttons.Add( button_cancel, 0, wx.ALIGN_CENTRE)
-		buttons.AddSpacer(wx.Size(5, -1))
-		buttons.Add( button_config, 0, wx.ALIGN_CENTRE)
-		buttons.Add( button_new, 0, wx.ALIGN_CENTRE)
-
-		# The main sizer
-		sizer = wx.BoxSizer( wx.VERTICAL )
-		sizer.Add( sizer_top, 0, wx.ALIGN_CENTRE|wx.EXPAND, 5 )
-		sizer.Add( grid,      1, wx.ALIGN_CENTRE|wx.EXPAND, 5 )
-		sizer.Add( buttons,   0, wx.ALIGN_CENTRE|wx.ALL, 5 )
-
-		# Join the panel and the base sizer
-		panel.SetAutoLayout( True )
-		panel.SetSizer( sizer )
-		sizer.Fit( panel )
-		sizer.SetSizeHints( self )
-
-		# Put the windows
-		self.SetSize(wx.Size(300, -1))
-		self.CenterOnScreen()
-
-		# Hook up the events
-		self.Bind(wx.EVT_BUTTON, self.OnOkay,   button_ok)
-		self.Bind(wx.EVT_BUTTON, self.OnCancel, button_cancel)
-		self.Bind(wx.EVT_BUTTON, self.OnConfig, button_config)
-		self.Bind(wx.EVT_BUTTON, self.OnNew,    button_new)
 		self.Bind(wx.EVT_CLOSE,  self.OnExit)
 
 	def OnExit(self, evt):
 		self.application.Exit()
-			
-	def OnOkay(self, evt):
-		host = self.host.GetValue()
-		username = self.username.GetValue()
-		password = self.password.GetValue()
 
-		if host == "" or username == "":
+	def Show(self, show=True):
+		if not show:
+			return self.Hide()
+
+		self.Panel.Layout()
+		size = self.Panel.GetBestSize()
+		self.SetClientSize(size)
+		
+		self.CenterOnScreen(wx.BOTH)
+		return winMainBaseXRC.Show(self)
+	
+	def OnGameShow(self, evt):
+		if self.GameShow.GetValue():
+			# Split the part after the @ into the game box
+			username = self.Username.GetValue().split('@')
+			if len(username) == 2:
+				username, game = username
+			else:
+				username = username[0]
+				game = ""
+
+			self.Username.SetValue(username)
+			self.Game.SetValue(game)
+
+			# Show the game boxes
+			self.GameTitle.Show()
+			self.Game.Show()
+		else:
+			game = self.Game.GetValue()
+			username = self.Username.GetValue()
+			if len(game) > 0:
+				username = "%s@%s" % (username, game)
+
+			self.Username.SetValue(username)
+
+			# Hide the game boxes
+			self.GameTitle.Hide()
+			self.Game.Hide()
+
+		self.Panel.Layout()
+		size = self.Panel.GetBestSize()
+		self.SetClientSize(size)
+
+	def OnOkay(self, evt):
+		server = self.Server.GetValue()
+		username = self.Username.GetValue()
+		if self.Game.IsShown():
+			username = "%s@%s" % (username, self.Game.GetVale())
+
+		password = self.Password.GetValue()
+		if server == "" or username == "":
 			return
 
-		self.application.network.Call(self.application.network.ConnectTo, host, username, password, debug=self.config['debug'])
+		self.application.network.Call(self.application.network.ConnectTo, server, username, password, debug=self.config['debug'])
 
 	def OnCancel(self, evt):
 		self.OnExit(evt)
@@ -145,7 +123,7 @@ class winConnect(winMainBase):
 	def OnConfig(self, evt):
 		self.application.ConfigDisplay()
 
-	def OnNew(self, evt):
+	def OnFind(self, evt):
 		self.application.gui.Show(self.application.gui.account)
 
 	def ShowURL(self, url):
@@ -154,16 +132,25 @@ class winConnect(winMainBase):
 		# server = <proto>://<server>/
 		# username = <username>@<game>
 		# password = <server>
-		host, username, password = url2bits(url)
-		if host is None:
+		server, username, game, password = url2bits(url)
+		if server is None:
 			return
-		self.host.SetValue(host)
+		self.Server.SetValue(server)
+
 		if username is None:
 			username = ""
-		self.username.SetValue(username)
+		if self.Game.IsShown():
+			if game is None:
+				game = ""
+			self.Game.SetValue(game)
+		else:
+			if not game is None:
+				username = "%s@%s" % (username, game)
+
+		self.Username.SetValue(username)
 		if password is None:
 			password = ""
-		self.password.SetValue(password)
+		self.Password.SetValue(password)
 
 	# Config Functions -----------------------------------------------------------------------------
 	def ConfigDefault(self, config=None):
@@ -229,12 +216,12 @@ class winConnect(winMainBase):
 		self.config = config
 		self.ConfigDefault(config)
 
-		self.host.Clear()
-		self.host.AppendItems(self.config['servers'])
-		self.host.SetValue(self.config['servers'][0])
+		self.Server.Clear()
+		self.Server.AppendItems(self.config['servers'])
+		self.Server.SetValue(self.config['servers'][0])
 		
-		self.username.SetValue(self.config['username'])
-		self.password.SetValue(self.config['password'])
+		self.Username.SetValue(self.config['username'])
+		self.Password.SetValue(self.config['password'])
 
 		self.ConfigDisplayUpdate(None)
 
