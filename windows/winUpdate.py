@@ -105,6 +105,12 @@ class winUpdate(winMainBase):
 				max = slider.GetMax()
 			elif hasattr(slider, 'GetRange'):
 				max = slider.GetRange()
+			if max == 0:
+				if hasattr(slider, 'SetMax'):
+					max = slider.SetMax(1)
+				elif hasattr(slider, 'SetRange'):
+					max = slider.SetRange(1)
+				max = 1
 			slider.SetValue(max)
 			text.SetLabel("Done!")
 			
