@@ -81,13 +81,13 @@ class winOrder(winBase):
 		
 		line_vert = wx.StaticLine( base_panel, -1, wx.DefaultPosition, wx.Size(-1,10), wx.LI_VERTICAL )
 
-		delete_button = wx.Button( base_panel, -1, _("Delete"), size=wx.local.buttonSize)
-		delete_button.SetFont(wx.local.normalFont)
+		self.delete_button = wx.Button( base_panel, -1, _("Delete"), size=wx.local.buttonSize)
+		self.delete_button.SetFont(wx.local.normalFont)
 		
 		button_sizer.Add( type_list,     0, wx.ALIGN_CENTRE, 1 )
 		button_sizer.Add( new_button,    0, wx.ALIGN_CENTRE, 1 )
 		button_sizer.Add( line_vert,     0, wx.ALIGN_CENTRE, 1 )
-		button_sizer.Add( delete_button, 0, wx.ALIGN_CENTRE, 1 )
+		button_sizer.Add( self.delete_button, 0, wx.ALIGN_CENTRE, 1 )
 		
 		# Order arguments
 		argument_sizer = wx.FlexGridSizer( 0, 1, 0, 0)
@@ -116,7 +116,7 @@ class winOrder(winBase):
 		self.argument_line = argument_line
 
 		self.Bind(wx.EVT_BUTTON, self.OnOrderNew, new_button)
-		self.Bind(wx.EVT_BUTTON, self.OnOrderDelete, delete_button)
+		self.Bind(wx.EVT_BUTTON, self.OnOrderDelete, self.delete_button)
 		
 		self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.OnOrderSelect, order_list)
 		self.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.OnOrderSelect, order_list)
@@ -390,6 +390,11 @@ class winOrder(winBase):
 		# Add all the orders to the list
 		for slot in range(0, len(self.application.cache.orders[self.oid])):
 			self.InsertListItem(slot, self.application.cache.orders[self.oid][slot])
+		
+		if len(self.application.cache.orders[self.oid]) > 0:
+			self.delete_button.Enable()
+		else:
+			self.delete_button.Disable()
 
 		# Set which orders can be added to this object
 		self.type_list.SetToolTipDefault(_("Order type to create"))
@@ -425,8 +430,14 @@ class winOrder(winBase):
 		# Only intrested in an order has been updated and we are currently looking at that
 		if evt.what != "orders" or evt.id != self.oid:
 			return
+
+		if len(self.application.cache.orders[self.oid]) > 0:
+			self.delete_button.Enable()
+		else:
+			self.delete_button.Disable()
 			
 		if evt.action in ("create", "change"):
+
 			self.UpdateListItem(evt.slot, evt.change)
 			
 			# Rebuild the panel
@@ -434,6 +445,11 @@ class winOrder(winBase):
 				self.OnOrderSelect(None, force=True)
 		elif evt.action == "remove":
 			self.RemoveListItem(evt.slot)
+
+			slots = self.order_list.GetSelected()
+			print "slots", slots
+			if evt.slot in slots or len(slots) == 0:
+				self.OnOrderSelect(None)
 
 	####################################################
 	# Local Event Handlers
