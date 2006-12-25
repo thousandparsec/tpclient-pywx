@@ -413,7 +413,15 @@ class winMiniSubBase(winConfigMixIn, winSubMixIn, wx.MiniFrame):
 		wx.MiniFrame.__init__(self, None, -1, 'TP: ' + self.title, wx.DefaultPosition, wx.DefaultSize, \
 				wx.DEFAULT_FRAME_STYLE|wx.FRAME_NO_TASKBAR|wx.TAB_TRAVERSAL)
 		winSubMixIn.__init__(self, application, parent)
+		self.Bind(wx.EVT_ACTIVATE, self.OnActivate)
 
+	def OnActivate(self, evt):
+		if not evt.GetActive():
+			return
+		if hasattr(self, 'panel'):
+			self.panel.SetFocus()
+		else:
+			self.Panel.SetFocus()
 
 class winNormalSubBase(winConfigMixIn, winSubMixIn, wx.Frame):
 	def __init__(self, application, parent):

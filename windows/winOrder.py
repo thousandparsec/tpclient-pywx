@@ -49,6 +49,7 @@ class winOrder(winBase):
 		# Create a base panel
 		base_panel = wx.Panel(self, -1)
 		base_panel.SetAutoLayout( True )
+		self.panel = base_panel
 
 		# Create a base sizer
 		base_sizer = wx.BoxSizer( wx.VERTICAL )

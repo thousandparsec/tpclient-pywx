@@ -34,6 +34,7 @@ class winSystem(winBase):
 		self.ignore = False
 
 		self.tree = wx.OrderedTreeCtrl(self, -1, style=wx.TR_DEFAULT_STYLE | wx.TR_HAS_VARIABLE_ROW_HEIGHT)
+		self.panel = self.tree
 
 		self.icons = {}
 		self.icons['Blank'] = wx.Image("graphics/blank-icon.png").ConvertToBitmap()
