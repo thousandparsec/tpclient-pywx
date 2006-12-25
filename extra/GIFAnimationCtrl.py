@@ -19,19 +19,41 @@ def pil2wx(pil,alpha=True):
 	return image
 
 class ImagePanel(wx.Panel):
-	def __init__(self, parent, id):
-		wx.Panel.__init__(self, parent, id)
-		self.image = None
+	def __init__(self, parent, id, *args, **kw):
+		wx.Panel.__init__(self, parent, id, *args, **kw)
+		self.bitmap = None
+		self.background = None
+
+		self.Bind(wx.EVT_ERASE_BACKGROUND, self.OnErase)
 		self.Bind(wx.EVT_PAINT, self.OnPaint)
 
 	def display(self, image):
-		self.image = image
+		if wx.Platform == '__WXMSW__' and self.IsShown():
+			if self.background is None:
+				dc = wx.ClientDC(self)
+				dc.Clear()
+				color = dc.GetPixel(0, 0)
+				self.background = (wx.Pen(wx.Color(*color)), wx.Brush(wx.Color(*color)))
+
+			bitmap = image.ConvertToBitmap()
+			self.bitmap = wx.EmptyBitmap(*self.GetSize())
+			dc = wx.MemoryDC(self.bitmap)
+			dc.SetPen(self.background[0])
+			dc.SetBrush(self.background[1])
+
+			dc.DrawRectangle(0, 0, *self.GetSize())
+			dc.DrawBitmap(bitmap, 0,0)
+		else:
+			self.bitmap = image.ConvertToBimap() 
 		self.Refresh(True)
 
 	def OnPaint(self, evt):
 		dc = wx.PaintDC(self)
-		if self.image:
-			dc.DrawBitmap(self.image.ConvertToBitmap(), 0,0)
+		if self.bitmap:
+			dc.DrawBitmap(self.bitmap, 0,0)
+
+	def OnErase(self, evt):
+		return True
 
 class GIFAnimationCtrl(ImagePanel):
 	def __init__(self, parent, id=-1):
