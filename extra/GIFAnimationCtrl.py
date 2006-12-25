@@ -45,7 +45,7 @@ try:
 				dc.DrawRectangle(0, 0, *self.GetSize())
 				dc.DrawBitmap(bitmap, 0,0)
 			else:
-				self.bitmap = image.ConvertToBimap() 
+				self.bitmap = image.ConvertToBitmap() 
 			self.Refresh(True)
 
 		def OnPaint(self, evt):
