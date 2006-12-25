@@ -9,7 +9,6 @@ try:
 	import JpegImagePlugin
 	Image._initialized=2
 
-
 	def pil2wx(pil,alpha=True):
 		if alpha:
 			image = wx.EmptyImage(*pil.size)
@@ -23,17 +22,19 @@ try:
 	class ImagePanel(wx.Panel):
 		def __init__(self, parent, id, *args, **kw):
 			wx.Panel.__init__(self, parent, id, *args, **kw)
-			self.image = None
+			self.image  = None
+			self.bitmap = None
 			self.Bind(wx.EVT_PAINT, self.OnPaint)
 
 		def display(self, image):
 			self.image = image
+			self.bitmap = self.image.ConvertToBitmap()
 			self.Refresh(True)
 
 		def OnPaint(self, evt):
 			dc = wx.PaintDC(self)
-			if self.image:
-				dc.DrawBitmap(self.image.ConvertToBitmap(), 0,0)
+			if self.bitmap:
+				dc.DrawBitmap(self.bitmap, 0,0)
 
 	class GIFAnimationCtrl(ImagePanel):
 		def __init__(self, parent, id=-1, file="", *args, **kw):
