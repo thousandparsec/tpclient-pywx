@@ -418,12 +418,32 @@ class winMessage(winBase, winShiftMixIn):
 
 	def MessageGoto(self, slot):
 		# Select the object this message references
-		id = None
+		ids = []
 		for reference, id in self.message.references:
 			if reference == GenericRS.Types["Object"]:
-				break
-		if not id is None:
-			self.application.Post(self.application.gui.SelectObjectEvent(id))
+				ids.append(id)
+
+		if len(ids) > 1:
+			menu = wx.Menu()
+			for id in ids:
+				try:
+					obj = self.application.cache.objects[id]
+					menu.Append(-1, "%s (%s)" % (obj.name, obj.id))
+				except KeyError:
+					pass
+			self.Bind(wx.EVT_MENU, self.MessageGotoMenu)
+			x, y = self.goto.GetPosition()
+			self.PopupMenu(menu, (x,y+self.goto.GetSize()[1]))
+
+		elif len(ids) == 1:
+			self.application.Post(self.application.gui.SelectObjectEvent(ids[0]))
+
+	def MessageGotoMenu(self, evt):
+		menu = evt.GetEventObject()
+		item = menu.FindItemById(evt.GetId())
+
+		id = int(item.GetLabel().split('(')[-1][:-1])
+		self.application.Post(self.application.gui.SelectObjectEvent(id))
 
 	def MessageNew(self, evt=None):
 		pass
