@@ -25,6 +25,17 @@ class winUpdate(winUpdateBase, winMainBaseXRC):
 		self.Message.Bind(wx.EVT_UPDATE_UI, self.MessageDown)
 		self.GoDown = False
 
+		if wx.Platform == "__WXMAC__":
+			self.ConnectingText.SetLabel("___________")
+			self.ConnectingText.SetMinSize(self.ConnectingText.GetBestSize())
+			self.ProgressText.SetLabel("___________")
+			self.ProgressText.SetMinSize(self.ProgressText.GetBestSize())
+
+			self.ProgressAnim.SetMinSize((32, 32))
+			self.ConnectingAnim.SetMinSize((32, 32))
+
+		self.Panel.Layout()
+
 	def OnCancel(self, evt):
 		self.application.network.Reset()
 		self.application.gui.Show(self.application.gui.connectto)
