@@ -30,7 +30,7 @@
                     <flag>wxGROW|wxGROW|wxALL</flag>
                     <border>5</border>
                     <object class="wxTextCtrl" name="Message">
-                        <size>100,50</size>
+                        <size>100,100</size>
                         <style>wxTE_MULTILINE|wxDOUBLE_BORDER</style>
                     </object>
                 </object>
@@ -42,7 +42,7 @@
                         <rows>2</rows>
                         <vgap>0</vgap>
                         <hgap>0</hgap>
-                        <growablecols>0</growablecols>
+                        <growablecols>0,1</growablecols>
                         <object class="sizeritem">
                             <flag>wxALIGN_CENTER_HORIZONTAL|wxGROW|wxALL</flag>
                             <border>5</border>
@@ -53,17 +53,17 @@
                             </object>
                         </object>
                         <object class="sizeritem">
-                            <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL</flag>
-                            <border>5</border>
-                            <object class="wxGIFAnimationCtrl" name="ConnectingAnim">
-                                <size>32,32</size>
-                            </object>
-                        </object>
-                        <object class="sizeritem">
                             <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE</flag>
                             <border>5</border>
                             <object class="wxStaticText" name="ConnectingText">
                                 <label>Done!</label>
+                            </object>
+                        </object>
+                        <object class="sizeritem">
+                            <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                            <border>5</border>
+                            <object class="wxGIFAnimationCtrl" name="ConnectingAnim">
+                                <size>32,32</size>
                             </object>
                         </object>
                         <object class="sizeritem">
@@ -94,17 +94,17 @@
                             </object>
                         </object>
                         <object class="sizeritem">
-                            <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL</flag>
-                            <border>5</border>
-                            <object class="wxGIFAnimationCtrl" name="ProgressAnim">
-                                <size>32,32</size>
-                            </object>
-                        </object>
-                        <object class="sizeritem">
                             <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE</flag>
                             <border>5</border>
                             <object class="wxStaticText" name="ProgressText">
                                 <label>Done!</label>
+                            </object>
+                        </object>
+                        <object class="sizeritem">
+                            <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                            <border>5</border>
+                            <object class="wxGIFAnimationCtrl" name="ProgressAnim">
+                                <size>32,32</size>
                             </object>
                         </object>
                     </object>
