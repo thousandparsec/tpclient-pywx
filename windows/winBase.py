@@ -335,8 +335,7 @@ class winShiftMixIn(object):
 		self.shift = False
 
 	def ShiftStart(self):
-		if wx.Platform != '__WXMAC__':
-			self.timer.Start(50)
+		self.timer.Start(50)
 		self.Bind(wx.EVT_TIMER, self.OnTimer, self.timer)
 
 	def ShiftStop(self):
