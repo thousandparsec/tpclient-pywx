@@ -20,7 +20,7 @@ import wx
 from wx.xrc import XRCCTRL, XmlResourceWithHandlers
 """
 
-classDeclarationTemplate = """\
+frameTemplate = """\
 class %(windowName)sBase:
 	xrc = '%(fileName)s'
 
@@ -36,7 +36,7 @@ class %(windowName)sBase:
 		f = os.path.join(os.path.dirname(__file__), self.xrc)
 		res = XmlResourceWithHandlers(f)		
 
-		# Figure out what Frame class is actually our base...
+		# Figure out what Frame class (MDI, MiniFrame, etc) is actually our base...
 		bases = set()
 		def findbases(klass, set):
 			for base in klass.__bases__:
@@ -51,6 +51,30 @@ class %(windowName)sBase:
 		# Two stage creation (see http://wiki.wxpython.org/index.cgi/TwoStageCreation)
 		pre = getattr(wx, "Pre%%s" %% base.__name__)()
 		res.LoadOnFrame(pre, parent, "%(windowName)s")
+		self.PreCreate(pre)
+		self.PostCreate(pre)
+
+		# Define variables for the controls"""
+
+panelTemplate = """\
+class %(windowName)sBase(wx.Panel):
+	xrc = '%(fileName)s'
+
+	def PreCreate(self, pre):
+		\"\"\" This function is called during the class's initialization.
+		
+		Override it for custom setup before the window is created usually to
+		set additional window styles using SetWindowStyle() and SetExtraStyle().\"\"\"
+		pass
+
+	def __init__(self, parent, *args, **kw):
+		\"\"\" Pass an initialized wx.xrc.XmlResource into res \"\"\"
+		f = os.path.join(os.path.dirname(__file__), self.xrc)
+		res = XmlResourceWithHandlers(f)		
+
+		# Two stage creation (see http://wiki.wxpython.org/index.cgi/TwoStageCreation)
+		pre = wx.PrePanel()
+		res.LoadOnPanel(pre, parent, "%(windowName)s")
 		self.PreCreate(pre)
 		self.PostCreate(pre)
 
@@ -74,6 +98,12 @@ Template_Button = """\
 		if hasattr(self, "On%(controlName)s"):
 			self.Bind(wx.EVT_BUTTON, self.On%(controlName)s, self.%(controlName)s)
 """
+Template_CheckBox = """\
+		self.%(controlName)s = XRCCTRL(self, "%(controlID)s")
+		if hasattr(self, "On%(controlName)s"):
+			self.Bind(wx.EVT_CHECKBOX, self.On%(controlName)s, self.%(controlName)s)
+"""
+
 Template_ToggleButton = """\
 		self.%(controlName)s = XRCCTRL(self, "%(controlID)s")
 		if hasattr(self, "On%(controlName)s"):
@@ -91,7 +121,7 @@ def Generate_wxFrame(xrcFile, topWindow, outFile):
 
 	windowName = topWindow.getAttribute("name")
 	print "'%s' '%s'"% (windowClass, windowName)
-	print >> outFile, classDeclarationTemplate % locals()
+	print >> outFile, frameTemplate % locals()
 	
 	eventFunctions = [] # a list to store the code for the event functions
 
@@ -123,6 +153,51 @@ def Generate_wxFrame(xrcFile, topWindow, outFile):
 	print >> outFile, "\n".join(eventFunctions)
 	print eventFunctions
 
+def Generate_wxPanel(xrcFile, topWindow, outFile):
+	fileName = os.path.basename(xrcFile.name)
+
+	windowClass = topWindow.getAttribute("subclass")
+	if len(windowClass) == 0:
+		windowClass = topWindow.getAttribute("class")
+	windowClass = re.sub("^wx", "wx.", windowClass)
+
+	windowName = topWindow.getAttribute("name")
+	print "'%s' '%s'"% (windowClass, windowName)
+	print >> outFile, panelTemplate % locals()
+	
+	eventFunctions = [] # a list to store the code for the event functions
+
+	# Generate a variable for each control, and standard event handlers
+	# for standard controls.
+	for control in topWindow.getElementsByTagName("object"):
+		controlClass = control.getAttribute("class")
+		controlClass = re.sub("^wx", "wx.", controlClass)
+		controlName = control.getAttribute("name")
+		# Ignore anything which is still got a wx name...
+		if controlName in IDmap:
+			controlID = controlName
+			controlName = IDmap[controlName]
+		else:
+			controlID = controlName
+
+		if "wx" in controlName:
+			continue
+		if controlName != "" and controlClass != "":
+			print controlName, controlClass
+			try:
+				template = globals()["Template_%s" % controlClass.replace('wx.', '')]
+			except KeyError:
+				template = globals()["Template_Default"]
+
+			print >> outFile, template % locals()
+
+	print >> outFile
+	print >> outFile, "\n".join(eventFunctions)
+	print eventFunctions
+
+
+
+
 #Generate_wxWizard = Generate_wxDialog
 
 # ------------------------- GeneratePythonForXRC ----------------------------
@@ -136,9 +211,10 @@ def GeneratePython(xrcFile, outFile):
 
 	# Generate a class for each top-window object (Frame, Panel, Dialog, etc.)
 	for topWindow in topWindows:
-
 		# Figure out if this is a Panel, Frame or Wizard
 		windowClass = topWindow.getAttribute("class")
+		windowName  = topWindow.getAttribute("name")
+
 		globals()["Generate_"+windowClass](xrcFile, topWindow, outFile)
 
 # --------------------- Main ----------------
