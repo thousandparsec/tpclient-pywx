@@ -73,7 +73,10 @@ class usernameMixIn:
 		self.SetClientSize(size)
 
 	def OnUsernameChar(self, evt):
-		key = evt.KeyCode()
+		if isinstance(evt.KeyCode, (int,long)):
+			key = evt.KeyCode
+		else: 
+			key = evt.KeyCode()
 		if key < wx.WXK_SPACE or key == wx.WXK_DELETE or key > 255:
 			evt.Skip()
 			return
@@ -88,7 +91,10 @@ class usernameMixIn:
 		return
 
 	def OnGameChar(self, evt):
-		key = evt.KeyCode()
+		if isinstance(evt.KeyCode, (int,long)):
+			key = evt.KeyCode
+		else: 
+			key = evt.KeyCode()
 		if key < wx.WXK_SPACE or key == wx.WXK_DELETE or key > 255:
 			evt.Skip()
 			return
@@ -159,7 +165,7 @@ class configConnect(configConnectBase, usernameMixIn):
 		self.AutoConnect.Enable()
 
 	def DisableDetails(self):
-		self.ServerDetails.SetLabel(" ")
+		#self.ServerDetails.SetLabel(" ")
 		self.Username.Disable()
 		self.Username.SetValue("")
 		self.Game.Disable()
@@ -338,6 +344,11 @@ class winConnect(winConnectBase, winMainBaseXRC, usernameMixIn):
 		"""
 		self.config['debug'] = self.ConfigPanel.Debug.GetValue()
 
+		self.config['servers'] = self.ConfigPanel.Servers.GetStrings()
+		for removed in self.config['details'].keys():
+			if not removed in self.config['servers']:
+				del self.config['details'][removed]
+
 	def ConfigDisplay(self, panel, sizer):
 		"""\
 		Display a config panel with all the config options.
@@ -366,11 +377,12 @@ class winConnect(winConnectBase, winMainBaseXRC, usernameMixIn):
 
 	def OnConfigSelectServer(self, evt):
 		server = evt.GetText()
+
 		if len(server) > 0:
 			self.ConfigPanel.EnableDetails(server)
 
 			if not self.config['details'].has_key(server):
-				self.config['details'] = ("", "", False)
+				self.config['details'][server] = [self.ConfigPanel.GetUsername(), self.ConfigPanel.Password.GetValue(), False]
 
 			self.ConfigPanel.SetUsername(self.config['details'][server][0])
 			self.ConfigPanel.Password.SetValue(self.config['details'][server][1])
