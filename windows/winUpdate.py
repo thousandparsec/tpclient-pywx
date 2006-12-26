@@ -30,9 +30,15 @@ class winUpdate(winUpdateBase, winMainBaseXRC):
 			self.ConnectingText.SetMinSize(self.ConnectingText.GetBestSize())
 			self.ProgressText.SetLabel("___________")
 			self.ProgressText.SetMinSize(self.ProgressText.GetBestSize())
+			self.ProgressTitle.SetLabel("_________________________________")
+			self.ProgressTitle.SetMaxSize(self.ProgressTitle.GetBestSize())
+			self.ProgressTitle.SetMinSize(self.ProgressTitle.GetBestSize())
+			self.ProgressTitle.SetSize(self.ProgressTitle.GetBestSize())
 
 			self.ProgressAnim.SetMinSize((32, 32))
 			self.ConnectingAnim.SetMinSize((32, 32))
+		else:
+			self.Panel.GetSizer().RemoveGrowableCol(1)
 
 		self.Panel.Layout()
 
@@ -280,3 +286,4 @@ class winUpdate(winUpdateBase, winMainBaseXRC):
 		Update the Display because it's changed externally.
 		"""
 		pass
+
