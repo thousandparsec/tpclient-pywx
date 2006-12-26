@@ -35,6 +35,44 @@ def EmptyXmlResourceWithHandlers(*args, **kwargs):
 	return res
 xrc.EmptyXmlResourceWithHandlers = EmptyXmlResourceWithHandlers
 
+import wx.gizmos
+from wx.gizmos import EditableListBox
+class EditableListBoxXmlHandler(xrc.XmlResourceHandler):
+	def __init__(self):
+		xrc.XmlResourceHandler.__init__(self)
+		# Specify the styles recognized by objects of this type
+		self.AddStyle("wxEL_ALLOW_NEW", wx.gizmos.EL_ALLOW_NEW)
+		self.AddStyle("wxEL_ALLOW_EDIT", wx.gizmos.EL_ALLOW_EDIT)
+		self.AddStyle("wxEL_ALLOW_DELETE", wx.gizmos.EL_ALLOW_DELETE)
+		self.AddWindowStyles()
+
+	# This method and the next one are required for XmlResourceHandlers
+	def CanHandle(self, node):
+		return self.IsOfClass(node, "wxEditableListBox") or self.IsOfClass(node, "EditableListBox")
+
+	def DoCreateResource(self):
+		# The simple method assumes that there is no existing
+		# instance.  Be sure of that with an assert.
+		assert self.GetInstance() is None
+
+		ctrl = EditableListBox(self.GetParentAsWindow(),
+								self.GetID(),
+								"", #self.GetLabel(),
+								self.GetPosition(),
+								self.GetSize(),
+								self.GetStyle(),
+								self.GetName(),
+								)
+
+		# These two things should be done in either case:
+		# Set standard window attributes
+		self.SetupWindow(ctrl)
+		# Create any child windows of this node
+		self.CreateChildren(ctrl)
+
+		return ctrl
+xrc.ExtraHandlers.append(EditableListBoxXmlHandler)
+
 ########################
 # This fix allows me to have tooltips on individual items rather then just the whole control.
 ########################
