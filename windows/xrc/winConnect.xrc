@@ -81,6 +81,7 @@
                                     <border>0</border>
                                     <object class="wxToggleButton" name="GameShow">
                                         <size>25,25</size>
+                                        <tooltip>Show seperate game box.</tooltip>
                                         <label>G</label>
                                         <checked>0</checked>
                                     </object>

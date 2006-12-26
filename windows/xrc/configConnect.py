@@ -8,8 +8,8 @@ import os.path
 import wx
 from wx.xrc import XRCCTRL, XmlResourceWithHandlers
 
-class winConnectBase:
-	xrc = 'winConnect.xrc'
+class configConnectBase(wx.Panel):
+	xrc = 'configConnect.xrc'
 
 	def PreCreate(self, pre):
 		""" This function is called during the class's initialization.
@@ -23,27 +23,15 @@ class winConnectBase:
 		f = os.path.join(os.path.dirname(__file__), self.xrc)
 		res = XmlResourceWithHandlers(f)		
 
-		# Figure out what Frame class (MDI, MiniFrame, etc) is actually our base...
-		bases = set()
-		def findbases(klass, set):
-			for base in klass.__bases__:
-				set.add(base)
-				findbases(base, set)
-		findbases(self.__class__, bases)
-
-		for base in bases:
-			if base.__name__.endswith("Frame"):
-				break
-		
 		# Two stage creation (see http://wiki.wxpython.org/index.cgi/TwoStageCreation)
-		pre = getattr(wx, "Pre%s" % base.__name__)()
-		res.LoadOnFrame(pre, parent, "winConnect")
+		pre = wx.PrePanel()
+		res.LoadOnPanel(pre, parent, "configConnect")
 		self.PreCreate(pre)
 		self.PostCreate(pre)
 
 		# Define variables for the controls
-		self.Panel = XRCCTRL(self, "Panel")
-		self.Server = XRCCTRL(self, "Server")
+		self.Servers = XRCCTRL(self, "Servers")
+		self.ServerDetails = XRCCTRL(self, "ServerDetails")
 		self.Username = XRCCTRL(self, "Username")
 		self.GameShow = XRCCTRL(self, "GameShow")
 		if hasattr(self, "OnGameShow"):
@@ -52,21 +40,13 @@ class winConnectBase:
 		self.GameTitle = XRCCTRL(self, "GameTitle")
 		self.Game = XRCCTRL(self, "Game")
 		self.Password = XRCCTRL(self, "Password")
-		self.Okay = XRCCTRL(self, "wxID_OK")
-		if hasattr(self, "OnOkay"):
-			self.Bind(wx.EVT_BUTTON, self.OnOkay, self.Okay)
+		self.AutoConnect = XRCCTRL(self, "AutoConnect")
+		if hasattr(self, "OnAutoConnect"):
+			self.Bind(wx.EVT_CHECKBOX, self.OnAutoConnect, self.AutoConnect)
 
-		self.Cancel = XRCCTRL(self, "wxID_CANCEL")
-		if hasattr(self, "OnCancel"):
-			self.Bind(wx.EVT_BUTTON, self.OnCancel, self.Cancel)
-
-		self.Find = XRCCTRL(self, "wxID_FIND")
-		if hasattr(self, "OnFind"):
-			self.Bind(wx.EVT_BUTTON, self.OnFind, self.Find)
-
-		self.Config = XRCCTRL(self, "wxID_PREFERENCES")
-		if hasattr(self, "OnConfig"):
-			self.Bind(wx.EVT_BUTTON, self.OnConfig, self.Config)
+		self.Debug = XRCCTRL(self, "Debug")
+		if hasattr(self, "OnDebug"):
+			self.Bind(wx.EVT_CHECKBOX, self.OnDebug, self.Debug)
 
 
 

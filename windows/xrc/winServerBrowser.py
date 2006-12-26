@@ -23,7 +23,7 @@ class winServerBrowserBase:
 		f = os.path.join(os.path.dirname(__file__), self.xrc)
 		res = XmlResourceWithHandlers(f)		
 
-		# Figure out what Frame class is actually our base...
+		# Figure out what Frame class (MDI, MiniFrame, etc) is actually our base...
 		bases = set()
 		def findbases(klass, set):
 			for base in klass.__bases__:

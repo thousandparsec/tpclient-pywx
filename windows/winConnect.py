@@ -6,6 +6,7 @@ person enter the server/username/password.
 # Python imports
 import string
 import re
+import pprint
 
 # wxPython Imports
 import wx
@@ -14,6 +15,7 @@ import wx.gizmos
 # Local Imports
 from winBase import winMainBaseXRC
 from xrc.winConnect import winConnectBase
+from xrc.configConnect import configConnectBase
 from utils import *
 
 def url2bits(line):
@@ -47,7 +49,127 @@ def url2bits(line):
 
 	return (one, username, game, password)
 
-class winConnect(winConnectBase, winMainBaseXRC):
+class usernameMixIn:
+	def __init__(self):
+
+		self.Username.Bind(wx.EVT_CHAR, self.OnUsernameChar)
+		self.Game.Bind(wx.EVT_CHAR, self.OnGameChar)
+
+	def OnGameShow(self, evt):
+		if self.GameShow.GetValue():
+			self.SetUsername(self.Username.GetValue())
+			# Show the game boxes
+			self.GameTitle.Show()
+			self.Game.Show()
+	
+		else:
+			self.SetUsername("%s@%s" % (self.Username.GetValue(), self.Game.GetValue()))
+			# Hide the game boxes
+			self.GameTitle.Hide()
+			self.Game.Hide()
+
+		self.Panel.Layout()
+		size = self.Panel.GetBestSize()
+		self.SetClientSize(size)
+
+	def OnUsernameChar(self, evt):
+		key = evt.KeyCode()
+		if key < wx.WXK_SPACE or key == wx.WXK_DELETE or key > 255:
+			evt.Skip()
+			return
+		if chr(key) in string.letters+string.digits:
+			evt.Skip()
+			return
+
+		if not self.GameShow.GetValue():
+			if chr(key) == '@':
+				evt.Skip()
+				return
+		return
+
+	def OnGameChar(self, evt):
+		key = evt.KeyCode()
+		if key < wx.WXK_SPACE or key == wx.WXK_DELETE or key > 255:
+			evt.Skip()
+			return
+		if chr(key) in string.letters+string.digits:
+			evt.Skip()
+			return
+		return
+
+	def GetUsername(self):
+		game = self.Game.GetValue()
+		username = self.Username.GetValue()
+		if len(game) > 0:
+			return "%s@%s" % (username, game)
+		else:
+			return username
+
+	def SetUsername(self, value):
+		# Split the part after the @ into the game box
+		username = value.split('@')
+		if len(username) == 2:
+			username, game = username
+		else:
+			username = username[0]
+			game = ""
+
+		if self.GameShow.GetValue():
+			self.Username.SetValue(username)
+			self.Game.SetValue(game)
+		elif len(game) == 0:
+			self.Username.SetValue(username)
+		else:
+			self.Username.SetValue("%s@%s" % (username, game))
+
+class configConnect(configConnectBase, usernameMixIn):
+	def __init__(self, *args, **kw):
+		configConnectBase.__init__(self, *args, **kw)
+		usernameMixIn.__init__(self)
+		self.Panel = self
+
+		self.GameShow.MoveAfterInTabOrder(self.Password)
+		self.Servers.SetMinSize(wx.Size(300, -1))
+		self.Layout()
+
+		# Use better Art Graphics for the EditableList
+		custom = {
+			"Del":	wx.ART_DELETE,
+			"New":	wx.ART_NEW,
+			"Up":	wx.ART_GO_UP,
+			"Down":	wx.ART_GO_DOWN,
+			"Edit":	wx.ART_REPORT_VIEW,}
+
+		for name, id in custom.items():
+			bmp = wx.ArtProvider_GetBitmap(id, wx.ART_TOOLBAR, (16,16))
+
+			if not bmp.Ok():
+				continue
+
+			button = getattr(self.Servers, "Get%sButton" % name)()
+			button.SetBitmapLabel(bmp)
+			button.SetBitmapDisabled(bmp)
+
+	def EnableDetails(self, label):
+		self.ServerDetails.SetLabel("Login for " + label)
+		self.Username.Enable()
+		self.Game.Enable()
+		self.GameShow.Enable()
+		self.Password.Enable()
+		self.AutoConnect.Enable()
+
+	def DisableDetails(self):
+		self.ServerDetails.SetLabel(" ")
+		self.Username.Disable()
+		self.Username.SetValue("")
+		self.Game.Disable()
+		self.Game.SetValue("")
+		self.GameShow.Disable()
+		self.Password.Disable()
+		self.Password.SetValue("")
+		self.AutoConnect.Disable()
+
+class winConnect(winConnectBase, winMainBaseXRC, usernameMixIn):
 	title = _("Connect")
 
 	def Post(*args):
@@ -56,8 +178,20 @@ class winConnect(winConnectBase, winMainBaseXRC):
 	def __init__(self, application):
 		winConnectBase.__init__(self, None)
 		winMainBaseXRC.__init__(self, application)	
+		usernameMixIn.__init__(self)
 
-		self.Bind(wx.EVT_CLOSE,  self.OnExit)
+		self.attemps = 0
+
+		self.GameShow.MoveAfterInTabOrder(self.Okay)
+
+		self.Bind(wx.EVT_CLOSE, self.OnExit)
+		self.Bind(wx.EVT_COMBOBOX, self.OnChangeServer, self.Server)
+
+	def OnChangeServer(self, evt):
+		server = self.Server.GetValue()
+		if server in self.config['servers']:
+			self.SetUsername(self.config['details'][server][0])
+			self.Password.SetValue(self.config['details'][server][1])
 
 	def OnExit(self, evt):
 		self.application.Exit()
@@ -71,45 +205,19 @@ class winConnect(winConnectBase, winMainBaseXRC):
 		self.SetClientSize(size)
 		
 		self.CenterOnScreen(wx.BOTH)
+
+		if self.attemps == 0:
+			for server, details in self.config['details'].items():
+				# We have been set to autoconnect to this server
+				if details[2]:
+					wx.CallAfter(self.OnOkay, None)
+		self.attemps += 1
+
 		return winMainBaseXRC.Show(self)
-	
-	def OnGameShow(self, evt):
-		if self.GameShow.GetValue():
-			# Split the part after the @ into the game box
-			username = self.Username.GetValue().split('@')
-			if len(username) == 2:
-				username, game = username
-			else:
-				username = username[0]
-				game = ""
-
-			self.Username.SetValue(username)
-			self.Game.SetValue(game)
-
-			# Show the game boxes
-			self.GameTitle.Show()
-			self.Game.Show()
-		else:
-			game = self.Game.GetValue()
-			username = self.Username.GetValue()
-			if len(game) > 0:
-				username = "%s@%s" % (username, game)
-
-			self.Username.SetValue(username)
-
-			# Hide the game boxes
-			self.GameTitle.Hide()
-			self.Game.Hide()
-
-		self.Panel.Layout()
-		size = self.Panel.GetBestSize()
-		self.SetClientSize(size)
 
 	def OnOkay(self, evt):
 		server = self.Server.GetValue()
-		username = self.Username.GetValue()
-		if self.Game.IsShown():
-			username = "%s@%s" % (username, self.Game.GetVale())
+		username = self.GetUsername()
 
 		password = self.Password.GetValue()
 		if server == "" or username == "":
@@ -139,15 +247,9 @@ class winConnect(winConnectBase, winMainBaseXRC):
 
 		if username is None:
 			username = ""
-		if self.Game.IsShown():
-			if game is None:
-				game = ""
-			self.Game.SetValue(game)
-		else:
-			if not game is None:
-				username = "%s@%s" % (username, game)
-
-		self.Username.SetValue(username)
+		if not game is None:
+			username = "%s@%s" % (username, game)
+		self.SetUsername(username)
 		if password is None:
 			password = ""
 		self.Password.SetValue(password)
@@ -175,22 +277,24 @@ class winConnect(winConnectBase, winMainBaseXRC):
 			config['servers'] = ["demo1.thousandparsec.net", "demo2.thousandparsec.net", "127.0.0.1"]
 
 		try:
-			if not isinstance(config['username'], (unicode, str)):
-				raise ValueError('Config-%s: a username value of %s is not valid' % (self, config['username']))
-		except (ValueError, KeyError), e:
-			config['username'] = "guest@tp"
+			if not isinstance(config['details'], dict):
+				raise ValueError('Config-%s: a details value of %s is not valid' % (self, config['details']))
 
-		try:
-			if not isinstance(config['password'], (unicode, str)):
-				raise ValueError('Config-%s: a password value of %s is not valid' % (self, config['password']))
-		except (ValueError, KeyError), e:
-			config['password'] = "guest"
+			for server, details in config['details'].items():
+				if not isinstance(details, list) or len(details) != 3 or \
+						not isinstance(details[0], (str, unicode)) or \
+						not isinstance(details[1], (str, unicode)) or \
+						not isinstance(details[2], bool):
+					print "deleteing", server, details
+					del config[server]
 
-		try:
-			if not isinstance(config['auto'], bool):
-				raise ValueError('Config-%s: a auto value of %s is not valid' % (self, config['auto']))
 		except (ValueError, KeyError), e:
-			config['auto'] = False
+			print e
+			config['details'] = {}
+		for server in config['servers']:
+			if server not in config['details']:
+				config['details'][server] = ["guest@tp", "guest", False]
+
 
 		try:
 			if not isinstance(config['debug'], bool):
@@ -218,10 +322,13 @@ class winConnect(winConnectBase, winMainBaseXRC):
 
 		self.Server.Clear()
 		self.Server.AppendItems(self.config['servers'])
-		self.Server.SetValue(self.config['servers'][0])
-		
-		self.Username.SetValue(self.config['username'])
-		self.Password.SetValue(self.config['password'])
+
+		server = self.config['servers'][0]
+		self.Server.SetValue(server)
+		self.SetUsername(self.config['details'][server][0])
+		self.Password.SetValue(self.config['details'][server][1])
+
+		pprint.pprint(self.config)
 
 		self.ConfigDisplayUpdate(None)
 
@@ -229,76 +336,23 @@ class winConnect(winConnectBase, winMainBaseXRC):
 		"""\
 		Updates the config details using external sources.
 		"""
-		if hasattr(self, 'ConfigWidgets'):
-			servers, username, password, auto, debug = self.ConfigWidgets
-
-			self.config['servers']  = servers.GetStrings()
-			self.config['username'] = username.GetValue()
-			self.config['password'] = password.GetValue()
-
-			self.config['auto']  = auto.GetValue()
-			self.config['debug'] = debug.GetValue()
+		self.config['debug'] = self.ConfigPanel.Debug.GetValue()
 
 	def ConfigDisplay(self, panel, sizer):
 		"""\
 		Display a config panel with all the config options.
 		"""
-		SIZER_FLAGS = wx.GROW|wx.ALIGN_CENTER_VERTICAL|wx.ALL
-		TEXT_FLAGS = wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL
-	
-		# List of Servers to Choose From
-		servers = wx.gizmos.EditableListBox(panel, -1, "Server List")
-		servers.SetStrings([""])
+		self.ConfigPanel = configConnect(panel)
 
-		def OnConfigDisplayServers(evt, f=self.OnConfigDisplayServers, servers=servers):
-			return f(evt, servers)
-		panel.Bind(wx.EVT_LISTBOX, OnConfigDisplayServers, servers)
+		self.ConfigPanel.Servers.Bind(wx.EVT_LIST_ITEM_FOCUSED,   self.OnConfigSelectServer)
+		self.ConfigPanel.Servers.Bind(wx.EVT_LIST_END_LABEL_EDIT, self.OnConfigSelectServer)
+		self.ConfigPanel.Username.Bind(wx.EVT_KILL_FOCUS, self.OnConfigUsername)
+		self.ConfigPanel.Game.Bind(wx.EVT_KILL_FOCUS, self.OnConfigUsername)
+		self.ConfigPanel.Password.Bind(wx.EVT_KILL_FOCUS, self.OnConfigPassword)
+		self.ConfigPanel.AutoConnect.Bind(wx.EVT_CHECKBOX, self.OnConfigAutoConnect)
+		self.ConfigPanel.Debug.Bind(wx.EVT_CHECKBOX, self.OnConfigDebug)
 
-		sizer.Add(servers, 1, SIZER_FLAGS)
-
-		# Username and Password Field
-		main = wx.BoxSizer(wx.VERTICAL)
-		sizer.Add(main, 1, SIZER_FLAGS, 5)
-		
-		grid = wx.FlexGridSizer( 0, 2, 1, 5 )
-		grid.AddGrowableCol(1)	
-		main.Add(grid, 2, SIZER_FLAGS, 5)
-	
-		# Username Box
-		text_username = wx.StaticText( panel, -1, _("Username"))
-		grid.Add( text_username, 0, TEXT_FLAGS)
-		
-		username = wx.TextCtrl( panel, -1, "")
-		grid.Add( username, 1, SIZER_FLAGS)
-		
-		panel.Bind(wx.EVT_TEXT, self.OnConfigDisplayUsername, username)
-
-		# Password Box
-		text_password = wx.StaticText( panel, -1, _("Password"))
-		grid.Add( text_password, 0, TEXT_FLAGS)
-		
-		password = wx.TextCtrl( panel, -1, "", style=wx.TE_PASSWORD )
-		grid.Add( password, 1, SIZER_FLAGS)
-
-		panel.Bind(wx.EVT_TEXT, self.OnConfigDisplayPassword, password)
-		
-		# The check boxes
-		checks = wx.BoxSizer(wx.HORIZONTAL)
-		main.Add(checks, 1, SIZER_FLAGS)
-		
-		# Autoconnect Checkbox
-		auto = wx.CheckBox(panel, -1, _("Autoconnect?"))
-		checks.Add(auto, 0, SIZER_FLAGS, 5 )
-		panel.Bind(wx.EVT_CHECKBOX, self.OnConfigDisplayAuto, auto)
-
-		# Print debug	
-		debug = wx.CheckBox(panel, -1, _("Debug Output?"))
-		checks.Add(debug, 0, SIZER_FLAGS, 5 )
-		panel.Bind(wx.EVT_CHECKBOX, self.OnConfigDisplayDebug, debug)
-	
-		# FIXME: This is bad too!
-		self.ConfigWidgets = [servers, username, password, auto, debug]
-		self.Bind(wx.EVT_ACTIVATE, self.ConfigDisplayUpdate)
+		sizer.Add( self.ConfigPanel, 1, wx.EXPAND, 5 )
 
 	def ConfigDisplayUpdate(self, evt):
 		"""\
@@ -307,27 +361,56 @@ class winConnect(winConnectBase, winMainBaseXRC):
 		if evt != None:
 			evt.Skip()
 
-		if not hasattr(self, 'ConfigWidgets'):
-			return
-		
-		servers, username, password, auto, debug = self.ConfigWidgets
-		servers.SetStrings(self.config['servers'])
-		username.SetValue(self.config['username'])
-		password.SetValue(self.config['password'])
-		auto.SetValue(self.config['auto'])
-		debug.SetValue(self.config['debug'])
-	
-	def OnConfigDisplayServers(self, evt, servers):
-		self.config['servers'] = servers.GetStrings()
+		self.ConfigPanel.Debug.SetValue(self.config['debug'])
+		self.ConfigPanel.Servers.SetStrings(self.config['servers'])
 
-	def OnConfigDisplayDebug(self, evt):
+	def OnConfigSelectServer(self, evt):
+		server = evt.GetText()
+		if len(server) > 0:
+			self.ConfigPanel.EnableDetails(server)
+
+			if not self.config['details'].has_key(server):
+				self.config['details'] = ("", "", False)
+
+			self.ConfigPanel.SetUsername(self.config['details'][server][0])
+			self.ConfigPanel.Password.SetValue(self.config['details'][server][1])
+			self.ConfigPanel.AutoConnect.SetValue(self.config['details'][server][2])
+		else:
+			self.ConfigPanel.DisableDetails()
+		evt.Skip()
+
+	def OnConfigUsername(self, evt):
+		server = self.ConfigPanel.ServerDetails.GetLabel()[len(_("Login for ")):]
+		self.config['details'][server][0] = self.ConfigPanel.GetUsername()
+		pprint.pprint(self.config)
+
+	def OnConfigPassword(self, evt):
+		server = self.ConfigPanel.ServerDetails.GetLabel()[len(_("Login for ")):]
+		self.config['details'][server][1] = self.ConfigPanel.Password.GetValue()
+		pprint.pprint(self.config)
+
+	def OnConfigAutoConnect(self, evt):
+		server = self.ConfigPanel.ServerDetails.GetLabel()[len(_("Login for ")):]
+
+		if evt.Checked():
+			# Check that no other server is also set to autoconnect
+			for key, details in self.config['details'].items():
+				if not details[2]: 
+					continue
+				msg = """
+The client is already set to autoconnect to %s.
+
+Would you instead like to autoconnect to %s.
+""" % (key, server)
+				dlg = wx.MessageDialog(self.ConfigPanel, msg, _("Autoconnect to?"), wx.OK|wx.ICON_INFORMATION)
+				if not dlg.ShowModal():
+					evt.Veto()
+					return
+				else:
+					details[2] = False
+		print "OnConfigAutoConnect", server, evt.Checked()
+		self.config['details'][server][2] = evt.Checked()
+		pprint.pprint(self.config)
+
+	def OnConfigDebug(self, evt):
 		self.config['debug'] = evt.Checked()
-	
-	def OnConfigDisplayAuto(self, evt):
-		self.config['auto'] = evt.Checked()
-
-	def OnConfigDisplayUsername(self, evt):
-		self.config['username'] = evt.GetString()
-		
-	def OnConfigDisplayPassword(self, evt):
-		self.config['password'] = evt.GetString()
