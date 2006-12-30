@@ -18,25 +18,52 @@ notokay = os.path.join("graphics", "waiting.gif")
 class winServerBrowser(winServerBrowserBase, winMainBaseXRC):
 	title = _("Updating")
 	
+	Columns = ["Name", "Comment", "Playing", "Server", "Players", "Cons", "Objs", "Other"]
 	def __init__(self, application):
 		winServerBrowserBase.__init__(self, None)
 		winMainBaseXRC.__init__(self, application)
 
-		# Setup the columns in each 
-		Columns = ("ID", "Name", "Players", "Server")
-		for i in range(0, len(Columns)):
-			self.InternetServers.InsertColumn(i, Columns[i])
-			self.LocalServers.InsertColumn(i, Columns[i])
 
 	def Clear(self):
-		pass
+		local, remote = self.application.finder.Games()
+
+		for ctrl, values in ((self.LocalServers, local), (self.InternetServers, remote)):
+			ctrl.ClearAll()
+			for i, name in enumerate(self.Columns):
+				ctrl.InsertColumn(i, name)
+			for i, game in enumerate(values):
+				# Set the name
+				print i, game
+				ctrl.InsertStringItem(i, "")
+				ctrl.SetStringItem(i, self.Columns.index("Name"), game.name)
+				ctrl.SetStringItem(i, self.Columns.index("Playing"), "%s (%s)" % (game.rule, game.rulever))
+				ctrl.SetStringItem(i, self.Columns.index("Server"),  "%s (%s)" % (game.sertype, game.server))
+
+				try:
+					ctrl.SetStringItem(i, self.Columns.index("Comment"),  game.cmt)
+				except AttributeError: pass
+
+				try:
+					ctrl.SetStringItem(i, self.Columns.index("Cons"),  game.cons)
+				except AttributeError: pass
+
+				try:
+					ctrl.SetStringItem(i, self.Columns.index("Objs"),  game.cons)
+				except AttributeError: pass
+
+				try:
+					ctrl.SetStringItem(i, self.Columns.index("Players"),  game.plys)
+				except AttributeError: pass
 
 	def Show(self, show=True):
 		if not show:
 			return self.Hide()
 		
 		# Clear everything
-		self.Clear()
+		try:
+			self.Clear()
+		except Exception, e:
+			print e
 
 		self.CenterOnScreen(wx.BOTH)
 		return winMainBaseXRC.Show(self)
