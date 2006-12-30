@@ -18,11 +18,15 @@ notokay = os.path.join("graphics", "waiting.gif")
 class winServerBrowser(winServerBrowserBase, winMainBaseXRC):
 	title = _("Updating")
 	
-	Columns = ["Name", "Comment", "Playing", "Server", "Players", "Cons", "Objs", "Other"]
+	Columns = ["Name", "Playing", "Server", "P", "C", "O", "Other"]
+	Columns_Sizes = [
+		wx.LIST_AUTOSIZE, wx.LIST_AUTOSIZE, 100, 
+		wx.LIST_AUTOSIZE_USEHEADER, wx.LIST_AUTOSIZE_USEHEADER, wx.LIST_AUTOSIZE_USEHEADER, 
+		-1
+	]
 	def __init__(self, application):
 		winServerBrowserBase.__init__(self, None)
 		winMainBaseXRC.__init__(self, application)
-
 
 	def Clear(self):
 		local, remote = self.application.finder.Games()
@@ -31,29 +35,39 @@ class winServerBrowser(winServerBrowserBase, winMainBaseXRC):
 			ctrl.ClearAll()
 			for i, name in enumerate(self.Columns):
 				ctrl.InsertColumn(i, name)
+			
+#				ctrl.SetColumnWidth(i, self.Columns_Sizes[i])
+#			ctrl.setResizeColumn(0)
+#			ctrl.resizeColumn(10)
 			for i, game in enumerate(values):
 				# Set the name
 				print i, game
 				ctrl.InsertStringItem(i, "")
 				ctrl.SetStringItem(i, self.Columns.index("Name"), game.name)
-				ctrl.SetStringItem(i, self.Columns.index("Playing"), "%s (%s)" % (game.rule, game.rulever))
-				ctrl.SetStringItem(i, self.Columns.index("Server"),  "%s (%s)" % (game.sertype, game.server))
-
 				try:
-					ctrl.SetStringItem(i, self.Columns.index("Comment"),  game.cmt)
+					ctrl.SetStringItem(i, self.Columns.index("Playing"), "%s (%s)" % (game.rule, game.rulever))
+				except AttributeError: pass
+				try:
+					ctrl.SetStringItem(i, self.Columns.index("Server"),  "%s (%s)" % (game.sertype, game.server))
 				except AttributeError: pass
 
 				try:
-					ctrl.SetStringItem(i, self.Columns.index("Cons"),  game.cons)
+					ctrl.SetToolTipItem(i, game.cmt)
 				except AttributeError: pass
 
 				try:
-					ctrl.SetStringItem(i, self.Columns.index("Objs"),  game.cons)
+					ctrl.SetStringItem(i, self.Columns.index("C"),  game.cons)
 				except AttributeError: pass
 
 				try:
-					ctrl.SetStringItem(i, self.Columns.index("Players"),  game.plys)
+					ctrl.SetStringItem(i, self.Columns.index("O"),  game.cons)
 				except AttributeError: pass
+
+				try:
+					ctrl.SetStringItem(i, self.Columns.index("P"),  game.plys)
+				except AttributeError: pass
+			for i, name in enumerate(self.Columns):
+				ctrl.SetColumnWidth(i, self.Columns_Sizes[i])
 
 	def Show(self, show=True):
 		if not show:
