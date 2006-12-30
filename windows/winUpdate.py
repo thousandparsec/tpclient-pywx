@@ -38,7 +38,8 @@ class winUpdate(winUpdateBase, winMainBaseXRC):
 			self.ProgressAnim.SetMinSize((32, 32))
 			self.ConnectingAnim.SetMinSize((32, 32))
 		else:
-			self.Panel.GetSizer().RemoveGrowableCol(1)
+			print self.Panel.GetSizer()
+			self.Panel.GetSizer().GetItem(2).GetSizer().RemoveGrowableCol(1)
 
 		self.Panel.Layout()
 

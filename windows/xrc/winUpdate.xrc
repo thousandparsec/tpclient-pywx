@@ -79,6 +79,7 @@
                                     <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE</flag>
                                     <border>5</border>
                                     <object class="wxStaticText" name="ProgressTitle">
+                                        <style>wxALIGN_CENTRE</style>
                                         <label>Progress</label>
                                     </object>
                                 </object>
