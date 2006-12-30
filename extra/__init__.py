@@ -73,6 +73,59 @@ class EditableListBoxXmlHandler(xrc.XmlResourceHandler):
 		return ctrl
 xrc.ExtraHandlers.append(EditableListBoxXmlHandler)
 
+class ListCtrlXmlHandler(xrc.XmlResourceHandler):
+	extra_styles = [
+		"LC_LIST",
+		"LC_REPORT",
+		"LC_VIRTUAL",
+		"LC_ICON",
+		"LC_SMALL_ICON",
+		"LC_ALIGN_TOP",
+		"LC_ALIGN_LEFT",
+		"LC_AUTOARRANGE",
+		"LC_EDIT_LABELS",
+		"LC_NO_HEADER",
+		"LC_SINGLE_SEL",
+		"LC_SORT_ASCENDING",
+		"LC_SORT_DESCENDING",
+		"LC_HRULES",
+		"LC_VRULES"]
+
+	def __init__(self):
+		xrc.XmlResourceHandler.__init__(self)
+		# Specify the styles recognized by objects of this type
+		self.AddWindowStyles()
+		for style in self.extra_styles:
+			self.AddStyle("wx%s" % style, getattr(wx, style))
+
+	# This method and the next one are required for XmlResourceHandlers
+	def CanHandle(self, node):
+		return self.IsOfClass(node, "wxListCtrl") or self.IsOfClass(node, "ListCtrl")
+
+	def DoCreateResource(self):
+		print "DoCreateResource", self
+		# The simple method assumes that there is no existing
+		# instance.  Be sure of that with an assert.
+		assert self.GetInstance() is None
+
+		ctrl = wx.ListCtrl(self.GetParentAsWindow(),
+								self.GetID(),
+								self.GetPosition(),
+								self.GetSize(),
+								self.GetStyle(),
+								name=self.GetName(),
+								)
+
+		# These two things should be done in either case:
+		# Set standard window attributes
+		self.SetupWindow(ctrl)
+		# Create any child windows of this node
+		self.CreateChildren(ctrl)
+
+		return ctrl
+xrc.ExtraHandlers.append(ListCtrlXmlHandler)
+
+
 ########################
 # This fix allows me to have tooltips on individual items rather then just the whole control.
 ########################
@@ -132,8 +185,8 @@ class wxComboBox(wx.ComboBox, ToolTipItemMixIn):
 ########################
 wx.ListCtrlOrig = wx.ListCtrl
 class wxListCtrl(wx.ListCtrlOrig, wx.lib.mixins.listctrl.ListCtrlAutoWidthMixin, ToolTipItemMixIn):
-	def __init__(self, parent, ID, pos=wx.DefaultPosition, size=wx.DefaultSize, style=0):
-		wx.ListCtrlOrig.__init__(self, parent, ID, pos, size, style)
+	def __init__(self, parent, ID, pos=wx.DefaultPosition, size=wx.DefaultSize, *args, **kw):
+		wx.ListCtrlOrig.__init__(self, parent, ID, pos, size, *args, **kw)
 		wx.lib.mixins.listctrl.ListCtrlAutoWidthMixin.__init__(self)
 		ToolTipItemMixIn.__init__(self)
 
