@@ -251,10 +251,10 @@ class Network(NetworkThread):
 		if NetworkThread.ConnectTo(self, host, username, password, debug, up, cs="tpclient-pywx/%s.%s.%s" % version):
 			self.CacheUpdate()
 
-		up("finishing", "finished", "")
-
-		media = self.application.media
-		media.Call(media.ConnectTo, host, username)
+			media = self.application.media
+			media.Call(media.ConnectTo, host, username)
+		else:
+			print "Connecting to failed"
 
 	def CacheUpdate(self):
 		gui = self.application.gui
