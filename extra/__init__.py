@@ -106,15 +106,26 @@ class ListCtrlXmlHandler(xrc.XmlResourceHandler):
 		print "DoCreateResource", self
 		# The simple method assumes that there is no existing
 		# instance.  Be sure of that with an assert.
-		assert self.GetInstance() is None
+		if self.GetInstance() is None:
+			ctrl = wx.ListCtrl(self.GetParentAsWindow(),
+									self.GetID(),
+									self.GetPosition(),
+									self.GetSize(),
+									self.GetStyle(),
+									name=self.GetName(),
+									)
+		else:
+			ctrl = self.GetInstance()
 
-		ctrl = wx.ListCtrl(self.GetParentAsWindow(),
-								self.GetID(),
-								self.GetPosition(),
-								self.GetSize(),
-								self.GetStyle(),
-								name=self.GetName(),
-								)
+			# Now call the ctrl's Create method to actually create the window
+			ctrl.Create(self.GetParentAsWindow(),
+						 self.GetID(),
+						 self.GetPosition(),
+						 self.GetSize(),
+						 self.GetStyle(),
+						 name = self.GetName()
+						 )
+
 
 		# These two things should be done in either case:
 		# Set standard window attributes
@@ -124,7 +135,6 @@ class ListCtrlXmlHandler(xrc.XmlResourceHandler):
 
 		return ctrl
 xrc.ExtraHandlers.append(ListCtrlXmlHandler)
-
 
 ########################
 # This fix allows me to have tooltips on individual items rather then just the whole control.
@@ -183,34 +193,89 @@ class wxComboBox(wx.ComboBox, ToolTipItemMixIn):
 # This fix fixes a bunch of broken stuff with the ListCtrl and adds a few more
 # functionality which should be default.
 ########################
+import wx.lib.mixins.listctrl as mlc
+
 wx.ListCtrlOrig = wx.ListCtrl
-class wxListCtrl(wx.ListCtrlOrig, wx.lib.mixins.listctrl.ListCtrlAutoWidthMixin, ToolTipItemMixIn):
+class wxListCtrl(wx.ListCtrlOrig, mlc.ListCtrlAutoWidthMixin, mlc.ColumnSorterMixin, ToolTipItemMixIn):
 	def __init__(self, parent, ID, pos=wx.DefaultPosition, size=wx.DefaultSize, *args, **kw):
 		wx.ListCtrlOrig.__init__(self, parent, ID, pos, size, *args, **kw)
-		wx.lib.mixins.listctrl.ListCtrlAutoWidthMixin.__init__(self)
+		mlc.ListCtrlAutoWidthMixin.__init__(self)
+		mlc.ColumnSorterMixin.__init__(self, self.GetColumnCount())
 		ToolTipItemMixIn.__init__(self)
 
 		self.objects = []
 		self.Bind(wx.EVT_MOTION, self.OnMouseMotion)
 
+	#############################################################################
+	# ColumnSorterMixin: This adds support for sorting then clicking the headers
+	#############################################################################
+	def GetColumnSorter(self):
+		return self.__ColumnSorter
+
+	def __ColumnSorter(self, key1, key2):
+		col = self._col
+		ascending = self._colSortFlag[col]
+
+		v1 = self.GetStringItem(key1, col)
+		v2 = self.GetStringItem(key2, col)
+		if not ascending:
+			return cmp(v1, v2)
+		else:
+			return -cmp(v1, v2)
+
+	def GetSortImages(self):
+		# FIXME: This is a strange place to put this.
+		# This makes sure the selected items still have focus after sorting
+		item = self.GetNextItem(-1)
+		while item != -1:
+			if self.GetItemState(item, wx.LIST_STATE_SELECTED) == 0:
+				self.SetItemState(item, 0, wx.LIST_STATE_FOCUSED)
+			else:
+				self.SetItemState(item, wx.LIST_STATE_FOCUSED, wx.LIST_STATE_FOCUSED)
+
+			item = self.GetNextItem(item)
+
+		# Update the slots as we have reorganised them
+		slot = -1
+		while True:
+			slot = self.GetNextItem(slot, wx.LIST_NEXT_ALL, wx.LIST_STATE_DONTCARE)
+			if slot == wx.NOT_FOUND:
+				break
+			self.SetItemData(slot, slot)
+
+		return (-1, -1)
+
+	def InsertColumn(self, *args, **kw):
+		super(self.__class__, self).InsertColumn(*args, **kw)
+		self.SetColumnCount(self.GetColumnCount())
+
+	def GetListCtrl(self):
+		return self
+	#############################################################################
+
+	#############################################################################
+	# This stuff makes the PyData stuff actually work and allows searching on the
+	# pyData
+	#############################################################################
 	def InsertItem(self, item):
+		slot = wx.ListCtrlOrig.InsertItem(self, item)
 		self._increasePyData(slot)
-		wx.ListCtrlOrig.InsertItem(self, item)
 		
 	def InsertStringItem(self, slot, label):
-		self._increasePyData(slot)
 		wx.ListCtrlOrig.InsertStringItem(self, slot, label)
+		self._increasePyData(slot)
 		
 	def InsertImageItem(self, slot, imageIndex):
-		self._increasePyData(slot)
 		wx.ListCtrlOrig.InsertImageItem(self, slot, imageIndex)
+		self._increasePyData(slot)
 		
 	def InsertImageStringItem(self, slot, label, imageIndex):
-		self._increasePyData(slot)
 		wx.ListCtrlOrig.InsertImageStringItem(self, slot, label, imageIndex)
+		self._increasePyData(slot)
 
 	def _increasePyData(self, slot):
 		self.objects.insert(slot, None)
+		self.SetItemData(slot, slot)
 
 	def SetItemPyData(self, slot, data):
 		self.objects[slot] = data
@@ -246,10 +311,12 @@ class wxListCtrl(wx.ListCtrlOrig, wx.lib.mixins.listctrl.ListCtrlAutoWidthMixin,
 		else:
 			return item.GetText()
 
+	# Display individual line tooltips
 	def OnMouseMotion(self, evt):
 		slot = self.HitTest(evt.GetPosition())[0]
 		self.SetToolTipCurrent(slot)
 
+	# This prevents perious errors about wxPyDeadObject
 	def _doResize(self):
 		if hasattr(wx, 'core'):
 			try:
@@ -259,7 +326,10 @@ class wxListCtrl(wx.ListCtrlOrig, wx.lib.mixins.listctrl.ListCtrlAutoWidthMixin,
 				pass
 		else:
 			wx.lib.mixins.listctrl.ListCtrlAutoWidthMixin._doResize(self)
-	
+
+	#############################################################################
+	# This stuff makes working with selected items much easier
+	#############################################################################
 	def GetSelected(self):
 		slots = [-1,]
 		while True:
