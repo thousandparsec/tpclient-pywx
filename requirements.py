@@ -36,7 +36,7 @@ except (ImportError, KeyError), e:
 	print e
 	notfound.append("wxPython > 2.6.0")
 
-netlib_version = (0, 2, 0)
+netlib_version = (0, 2, 1)
 try:
 	import tp.netlib
 	print "Thousand Parsec Protocol Library Version", tp.netlib.__version__
@@ -47,7 +47,7 @@ except (ImportError, KeyError), e:
 	print e
 	notfound.append("tp.netlib > " + tostr(netlib_version))
 
-client_version = (0, 2, 0)
+client_version = (0, 2, 1)
 try:
 	import tp.client
 	print "Thousand Parsec Client Library Version", tp.client.__version__
