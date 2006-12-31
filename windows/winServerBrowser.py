@@ -141,7 +141,9 @@ class winServerBrowser(winServerBrowserBase, winMainBaseXRC):
 			
 		self.LocationsBox.Layout()
 		self.LocationsPanel.Layout()
-		self.Panel.Layout()		
+		if wx.Platform == "__WXMAC__":
+			self.Servers.SetSize((-1, 10))
+		self.Panel.Layout()
 
 	def OnLocationSelect(self, evt):
 		if isinstance(evt, int):
