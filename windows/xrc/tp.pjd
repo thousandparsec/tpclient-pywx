@@ -5914,7 +5914,7 @@ You can either create a new account or connect to the server straight away."</st
                 <string name="created">"23/12/2006"</string>
                 <string name="proxy-type">"wbFlexGridSizerProxy"</string>
                 <string name="proxy-GrowableColumns">"0"</string>
-                <string name="proxy-GrowableRows">"0,1"</string>
+                <string name="proxy-GrowableRows">"0"</string>
                 <long name="proxy-Columns">1</long>
                 <long name="proxy-Rows">2</long>
                 <long name="proxy-ColumnSpacing">0</long>
@@ -5945,7 +5945,7 @@ You can either create a new account or connect to the server straight away."</st
                   <string name="proxy-type">"wbStaticBoxSizerProxy"</string>
                   <string name="proxy-Id name">"wxID_ANY"</string>
                   <long name="proxy-Id value">-1</long>
-                  <string name="proxy-Label">"Internet Servers"</string>
+                  <string name="proxy-Label">"Servers"</string>
                   <string name="proxy-Sizer member variable name">""</string>
                   <string name="proxy-Foreground colour">""</string>
                   <string name="proxy-Font">"10, wxSWISS, wxNORMAL, wxBOLD, false, Sans"</string>
@@ -5966,7 +5966,7 @@ You can either create a new account or connect to the server straight away."</st
                   <bool name="proxy-wxFIXED_MINSIZE">0</bool>
                   <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
                   <document>
-                    <string name="title">"wxListCtrl: InternetServers"</string>
+                    <string name="title">"wxListCtrl: Servers"</string>
                     <string name="type">"dialog-control-document"</string>
                     <string name="filename">""</string>
                     <string name="icon-name">"listctrl"</string>
@@ -5976,7 +5976,7 @@ You can either create a new account or connect to the server straight away."</st
                     <long name="locked">0</long>
                     <string name="created">"23/12/2006"</string>
                     <string name="proxy-type">"wbListCtrlProxy"</string>
-                    <string name="proxy-Id name">"InternetServers"</string>
+                    <string name="proxy-Id name">"Servers"</string>
                     <long name="proxy-Id value">-1</long>
                     <string name="proxy-Class">"wxListCtrl"</string>
                     <string name="proxy-Member variable name">""</string>
@@ -6001,7 +6001,7 @@ You can either create a new account or connect to the server straight away."</st
                     <bool name="proxy-wxLC_USER_TEXT">0</bool>
                     <bool name="proxy-wxLC_EDIT_LABELS">0</bool>
                     <bool name="proxy-wxLC_NO_HEADER">0</bool>
-                    <bool name="proxy-wxLC_SINGLE_SEL">0</bool>
+                    <bool name="proxy-wxLC_SINGLE_SEL">1</bool>
                     <bool name="proxy-wxLC_SORT_ASCENDING">0</bool>
                     <bool name="proxy-wxLC_SORT_DESCENDING">0</bool>
                     <bool name="proxy-wxLC_HRULES">0</bool>
@@ -6047,9 +6047,9 @@ You can either create a new account or connect to the server straight away."</st
                   <long name="locked">0</long>
                   <string name="created">"23/12/2006"</string>
                   <string name="proxy-type">"wbStaticBoxSizerProxy"</string>
-                  <string name="proxy-Id name">"wxID_ANY"</string>
+                  <string name="proxy-Id name">"LocationsBox"</string>
                   <long name="proxy-Id value">-1</long>
-                  <string name="proxy-Label">"Local Servers"</string>
+                  <string name="proxy-Label">"Locations"</string>
                   <string name="proxy-Sizer member variable name">""</string>
                   <string name="proxy-Foreground colour">""</string>
                   <string name="proxy-Font">"10, wxSWISS, wxNORMAL, wxBOLD, false, Sans"</string>
@@ -6059,7 +6059,7 @@ You can either create a new account or connect to the server straight away."</st
                   <string name="proxy-Member variable name">""</string>
                   <string name="proxy-AlignH">"Expand"</string>
                   <string name="proxy-AlignV">"Expand"</string>
-                  <long name="proxy-Stretch factor">1</long>
+                  <long name="proxy-Stretch factor">0</long>
                   <long name="proxy-Border">5</long>
                   <bool name="proxy-wxLEFT">1</bool>
                   <bool name="proxy-wxRIGHT">1</bool>
@@ -6070,7 +6070,7 @@ You can either create a new account or connect to the server straight away."</st
                   <bool name="proxy-wxFIXED_MINSIZE">0</bool>
                   <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
                   <document>
-                    <string name="title">"wxListCtrl: LocalServers"</string>
+                    <string name="title">"wxListCtrl: Locations"</string>
                     <string name="type">"dialog-control-document"</string>
                     <string name="filename">""</string>
                     <string name="icon-name">"listctrl"</string>
@@ -6080,7 +6080,7 @@ You can either create a new account or connect to the server straight away."</st
                     <long name="locked">0</long>
                     <string name="created">"23/12/2006"</string>
                     <string name="proxy-type">"wbListCtrlProxy"</string>
-                    <string name="proxy-Id name">"LocalServers"</string>
+                    <string name="proxy-Id name">"Locations"</string>
                     <long name="proxy-Id value">-1</long>
                     <string name="proxy-Class">"wxListCtrl"</string>
                     <string name="proxy-Member variable name">""</string>
@@ -6105,7 +6105,7 @@ You can either create a new account or connect to the server straight away."</st
                     <bool name="proxy-wxLC_USER_TEXT">0</bool>
                     <bool name="proxy-wxLC_EDIT_LABELS">0</bool>
                     <bool name="proxy-wxLC_NO_HEADER">0</bool>
-                    <bool name="proxy-wxLC_SINGLE_SEL">0</bool>
+                    <bool name="proxy-wxLC_SINGLE_SEL">1</bool>
                     <bool name="proxy-wxLC_SORT_ASCENDING">0</bool>
                     <bool name="proxy-wxLC_SORT_DESCENDING">0</bool>
                     <bool name="proxy-wxLC_HRULES">0</bool>
