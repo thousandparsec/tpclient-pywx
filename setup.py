@@ -122,12 +122,12 @@ if sys.platform == 'darwin':
 				shutil.rmtree(p)
 
 	# Create a package
-	dmg = os.path.join("dist", "tpclient-pywx_%s.dmg" % version)
+	dmg = "tpclient-pywx_%s.dmg" % version
 	if os.path.exists(dmg):
 		os.unlink(dmg)
 
 	print "Creating dmg package"
-	os.system("hdiutil create -imagekey zlib-level=9 -srcfolder dist/tpclient-pywx.app %s" % dmg)
+	os.system("cd doc/mac/; chmod a+x pkg-dmg make-diskimage; ./make-diskimage ../../%s  ../../dist tpclient-pywx -null- dstore background.jpg" % dmg)
 elif sys.platform == 'win32':
 	# Repack the library.zip file
 	os.system(os.path.join("..", "scratchpad", "repack.bat"))
