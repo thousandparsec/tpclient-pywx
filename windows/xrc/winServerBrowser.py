@@ -44,8 +44,9 @@ class winServerBrowserBase:
 		# Define variables for the controls
 		self.Panel = XRCCTRL(self, "Panel")
 		self.Progress = XRCCTRL(self, "Progress")
-		self.InternetServers = XRCCTRL(self, "InternetServers")
-		self.LocalServers = XRCCTRL(self, "LocalServers")
+		self.Servers = XRCCTRL(self, "Servers")
+		self.LocationsBox = XRCCTRL(self, "LocationsBox")
+		self.Locations = XRCCTRL(self, "Locations")
 		self.URLTitle = XRCCTRL(self, "URLTitle")
 		self.URL = XRCCTRL(self, "URL")
 		self.Refresh = XRCCTRL(self, "wxID_REFRESH")
