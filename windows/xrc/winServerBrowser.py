@@ -47,6 +47,7 @@ class winServerBrowserBase:
 		self.Servers = XRCCTRL(self, "Servers")
 		self.LocationsBox = XRCCTRL(self, "LocationsBox")
 		self.Locations = XRCCTRL(self, "Locations")
+		self.LocationsPanel = XRCCTRL(self, "LocationsPanel")
 		self.URLTitle = XRCCTRL(self, "URLTitle")
 		self.URL = XRCCTRL(self, "URL")
 		self.Refresh = XRCCTRL(self, "wxID_REFRESH")

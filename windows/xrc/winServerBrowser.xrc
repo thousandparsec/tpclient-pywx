@@ -82,25 +82,28 @@
                             </object>
                         </object>
                         <object class="sizeritem">
-                            <flag>wxGROW|wxGROW|wxLEFT|wxRIGHT</flag>
+                            <flag>wxGROW|wxALIGN_CENTER_VERTICAL|wxALL</flag>
                             <border>5</border>
-                            <object class="wxStaticBoxSizer" name="LocationsBox">
-                                <orient>wxVERTICAL</orient>
-                                <label>Locations</label>
-                                <font>
-                                    <size>10</size>
-                                    <family>swiss</family>
-                                    <weight>bold</weight>
-                                    <face>Sans</face>
-                                </font>
-                                <object class="sizeritem">
-                                    <flag>wxGROW|wxALL</flag>
-                                    <border>5</border>
-                                    <option>1</option>
-                                    <object class="wxListCtrl" name="Locations">
-                                        <size>100,100</size>
-                                        <tooltip>List of all the servers found on the local network.</tooltip>
-                                        <style>wxLC_REPORT|wxLC_SINGLE_SEL</style>
+                            <object class="wxPanel" name="LocationsPanel">
+                                <pos>100,-1</pos>
+                                <object class="wxStaticBoxSizer" name="LocationsBox">
+                                    <orient>wxVERTICAL</orient>
+                                    <label>Locations</label>
+                                    <font>
+                                        <size>10</size>
+                                        <family>swiss</family>
+                                        <weight>bold</weight>
+                                        <face>Sans</face>
+                                    </font>
+                                    <object class="sizeritem">
+                                        <flag>wxGROW|wxALL</flag>
+                                        <border>5</border>
+                                        <option>1</option>
+                                        <object class="wxListCtrl" name="Locations">
+                                            <size>100,100</size>
+                                            <tooltip>List of all the servers found on the local network.</tooltip>
+                                            <style>wxLC_REPORT|wxLC_SINGLE_SEL</style>
+                                        </object>
                                     </object>
                                 </object>
                             </object>

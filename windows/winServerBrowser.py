@@ -34,6 +34,7 @@ class winServerBrowser(winServerBrowserBase, winMainBaseXRC):
 		self.Servers.Bind(wx.EVT_LIST_ITEM_SELECTED, self.OnServerSelect)
 		self.Locations.Bind(wx.EVT_LIST_ITEM_SELECTED, self.OnLocationSelect)
 		self.LocationsBox.Bind(wx.EVT_LEFT_DOWN, self.OnToggleLocation)
+		self.LocationsPanel.Bind(wx.EVT_LEFT_DOWN, self.OnToggleLocation)
 
 		self.OnToggleLocation(False)
 
@@ -136,9 +137,10 @@ class winServerBrowser(winServerBrowserBase, winMainBaseXRC):
 			self.LocationsBox.SetClientSize(self.Locations.GetBestSize())
 		else:
 			self.Locations.Hide()
-			self.LocationsBox.SetSize((-1, 10))
+			self.LocationsBox.SetSize((-1, 1))
 			
 		self.LocationsBox.Layout()
+		self.LocationsPanel.Layout()
 		self.Panel.Layout()		
 
 	def OnLocationSelect(self, evt):
