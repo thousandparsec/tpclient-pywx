@@ -121,7 +121,12 @@ class winAccount(winMainBase):
 	def Show(self, a=True):
 		if a:
 			self.State("start")
-			self.host.SetValue(self.application.gui.connectto.Server.GetValue())
+
+			url = self.application.gui.servers.URL.GetValue()
+			g = url.rfind('/')
+			url, game = url[:g], url[g+1:]
+
+			self.host.SetValue(url)
 		winMainBase.Show(self, a)
 
 	def State(self, mode):
@@ -245,7 +250,12 @@ class winAccount(winMainBase):
 		self.State("start")
 
 	def OnOkay(self, evt):
-		username = self.username.GetValue().strip()
+		username = self.username.GetValue().strip().split('@')
+		if len(username) == 2:
+			username, game = username
+		else:
+			username = username[0]
+
 		password1 = self.password1.GetValue().strip()
 		password2 = self.password2.GetValue().strip()
 		email = self.email.GetValue().strip()
@@ -259,6 +269,13 @@ class winAccount(winMainBase):
 			dlg = wx.MessageDialog(self.application.gui.current, "Password fields do not match.", _("Fields Required"), wx.OK|wx.ICON_ERROR)
 			dlg.ShowModal()
 			return
+
+		url = self.host.GetValue()		
+		p = url.find('://')+3
+
+		fullurl = "%s%s:%s@%s/%s" % (url[:p], username, password1, url[p:], game)
+		print fullurl
+		self.application.gui.connectto.ShowURL(fullurl)
 
 		#self.application.network.Call(self.application.network.ConnectTo, host, username, password, debug=self.config['debug'])
 		self.application.network.Call(self.application.network.NewAccount, username, password1, email)

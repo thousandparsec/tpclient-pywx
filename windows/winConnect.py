@@ -19,25 +19,29 @@ from xrc.configConnect import configConnectBase
 from utils import *
 
 def url2bits(line):
-	urlspliter = r'(.*?://)?(((.*):|(.*@))(.*@)?)?(.*?)(/.*?)?$'
-
+	urlspliter = r'(.*?://)?(((.*):(.*)@)|(.*)@)?(.*?)(:(.*?))?(/.*?)?$'
 	groups = re.compile(urlspliter, re.M).search(line).groups()
 	
 	proto = groups[0]
-	username = groups[2]
-	if not username is None:
-		if username[-1] in '@:':
-			username = username[:-1]
+
+	if not groups[3] is None:
+		username = groups[3]
+	elif not groups[5] is None:
+		username = groups[5]
+	else:
+		username = None
 
 	server = groups[6]
-	password = groups[5]
+	port = groups[8]
+
+	password = groups[4]
 	if not password is None:
 		if password[-1] is '@':
 			password = password[:-1]
 
-	game = groups[7]
+	game = groups[9]
 	if not game is None:
-		if game[0] is '/':
+		if game[0] == '/':
 			game = game[1:]
 		if len(game) == 0:
 			game = None
@@ -46,6 +50,9 @@ def url2bits(line):
 		one = server
 	else:
 		one = "%s%s" % (proto, server)
+
+	if not port is None:
+		one = "%s:%s" % (one, port)
 
 	return (one, username, game, password)
 

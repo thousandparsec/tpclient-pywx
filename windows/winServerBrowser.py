@@ -159,6 +159,11 @@ class winServerBrowser(winServerBrowserBase, winMainBaseXRC):
 		# Set the copy box to the URL
 		self.URL.SetValue("%s://%s:%s/%s" % (type, dns, port, game.name))
 
+	def OnNewAccount(self, evt):
+		self.application.gui.Show(self.application.gui.account)
+
+	def OnConnectTo(self, evt):
+		print "OnConnectTo", evt
 
 	def Show(self, show=True):
 		if not show:
