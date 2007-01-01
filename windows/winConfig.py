@@ -80,7 +80,7 @@ class winConfig(winMainBase):
 		self.application.ConfigLoad()
 		self.Hide()
 
-	def OnProgramExit(self, evt):
+	def OnClose(self, evt):
 		self.OnConfigRevert(evt)
 	
 	# Config Functions -----------------------------------------------------------------------------
