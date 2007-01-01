@@ -328,7 +328,11 @@ class panelMessage(panelMessageBase, winShiftMixIn):
 		ids = []
 		for reference, id in self.message.references:
 			if reference == GenericRS.Types["Object"]:
-				ids.append(id)
+				try:
+					obj = self.application.cache.objects[id]
+					ids.append(id)
+				except KeyError:
+					pass
 
 		if len(ids) > 1:
 			menu = wx.Menu()
