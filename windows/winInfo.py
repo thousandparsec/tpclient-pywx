@@ -42,55 +42,30 @@ def splitall(start):
 
 
 WAITING = os.path.join(".", "graphics", "loading.gif")
-
 class winInfo(winBase):
 	title = _("Information")
 
 	from defaults import winInfoDefaultPosition as DefaultPosition
 	from defaults import winInfoDefaultSize as DefaultSize
 	from defaults import winInfoDefaultShow as DefaultShow
-
+	
 	def __init__(self, application, parent):
 		winBase.__init__(self, application, parent)
 
-		# Create a base panel
-		base_panel = wx.Panel(self, -1)
-		base_panel.SetAutoLayout( True )
-		self.panel = base_panel
+		self.Panel = panelInformation(application, self)
 
-		# Create a base sizer
-		base_sizer = wx.BoxSizer( wx.VERTICAL )
-		base_sizer.Fit( base_panel )
-		base_sizer.SetSizeHints( base_panel )
+	def __getattr__(self, key):
+		try:
+			return winBase.__getattr__(self, key)
+		except AttributeError:
+			return getattr(self.Panel, key)
 
-		# Link the panel to the sizer
-		base_panel.SetSizer( base_sizer )
+from xrc.panelInformation import panelInformationBase
+class panelInformation(panelInformationBase):
+	def __init__(self, application, parent):
+		panelInformationBase.__init__(self, parent)
 
-		# Title Display
-		self.titletext = wx.StaticText(base_panel, -1, _("No Object Selected."))
-
-		# Picture Display
-		self.picture_panel = wx.Panel(base_panel)
-		self.picture_panel.SetBackgroundColour(wx.Colour(0, 0, 0))
-		self.picture_still = wx.StaticBitmap(self.picture_panel, -1, wx.BitmapFromImage(wx.EmptyImage(128, 128)))
-		self.picture_animated = GIFAnimationCtrl(self.picture_panel, -1)
-		self.picture_animated.SetBackgroundColour(wx.Colour(0, 0, 0))
-		self.picture_animated.Stop(); self.picture_animated.Hide()
-
-		# Property Display
-		self.text = wx.TextCtrl(base_panel, -1, "", style=wx.TE_MULTILINE|wx.TE_READONLY)
-
-		base_sizer.Add(self.titletext, 0, wx.BOTTOM|wx.TOP|wx.ALIGN_CENTER, 3)
-
-		#information = wx.BoxSizer(wx.VERTICAL)
-		#information.Add(self.text, 1, wx.EXPAND, 0)
-		
-		middle = wx.BoxSizer(wx.HORIZONTAL)
-		middle.Add(self.picture_panel, 0, 0, 0)
-		middle.Add(self.text, 1, wx.EXPAND, 0)
-
-		base_sizer.Add(middle, 1, wx.EXPAND, 0)
-
+		self.application = application
 		self.current = -1
 
 		# Find the images
@@ -129,24 +104,24 @@ class winInfo(winBase):
 		print "Displaying", file
 		if file.endswith(".gif"):
 			print "Animated image!"
-			self.picture_still.Hide()
+			self.Image.Hide()
 			print "Showing the Image"	
-			self.picture_animated.Show()
+			self.Animation.Show()
 			print "Loading Image"
-			self.picture_animated.LoadFile(file)
+			self.Animation.LoadFile(file)
 			print "Playing the Image"
-			self.picture_animated.Play()
+			self.Animation.Play()
 		else:
 			print "Still image!"
-			self.picture_still.Show()
-			self.picture_animated.Stop()
-			self.picture_animated.Hide()
+			self.Image.Show()
+			self.Animation.Stop()
+			self.Animation.Hide()
 
 			if file != "":
 				bitmap = wx.BitmapFromImage(wx.Image(file))
 			else:
 				bitmap = wx.BitmapFromImage(wx.EmptyImage(128, 128))
-			self.picture_still.SetBitmap(bitmap)
+			self.Image.SetBitmap(bitmap)
 		self.Layout()
 
 	def OnSelectObject(self, evt):
@@ -162,7 +137,7 @@ class winInfo(winBase):
 			debug(DEBUG_WINDOWS, "SelectObject: No such object.")
 			return
 
-		self.titletext.SetLabel(object.name)
+		self.Title.SetLabel(object.name)
 
 		# Figure out the right graphic
 		try:
@@ -231,5 +206,5 @@ class winInfo(winBase):
 			else:
 				s += "%s: %s\n" % (key, value)
 
-		self.text.SetValue(s)
+		self.Details.SetValue(s)
 
