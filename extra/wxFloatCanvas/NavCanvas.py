@@ -3,17 +3,9 @@ A Panel that includes the FloatCanvas and Navigation controls
 
 """
 
-#from Numeric import array,Float,cos,pi,sum,minimum,maximum,Int32
-
-#from time import clock, sleep
-
 import wx
 
-#import types
-#import os        
-
 import FloatCanvas, Resources
-
 
 ID_ZOOM_IN_BUTTON = wx.NewId()
 ID_ZOOM_OUT_BUTTON = wx.NewId()
@@ -31,7 +23,7 @@ class NavCanvas(wx.Panel):
     This is a high level window that encloses the FloatCanvas in a panel
     and adds a Navigation toolbar.
 
-    Copyright: wxWindows Software Foundation (Assigned by: Christopher Barker)
+    Copyright: Christopher Barker
 
     License: Same as the version of wxPython you are using it with
 
@@ -43,71 +35,68 @@ class NavCanvas(wx.Panel):
 
     """ 
     
-    def __init__(self, parent, id = -1,
+    def __init__(self,
+                 parent,
+                 id = wx.ID_ANY,
                  size = wx.DefaultSize,
                  **kwargs): # The rest just get passed into FloatCanvas
 
-        wx.Panel.__init__( self, parent, id, wx.DefaultPosition, size)
+        wx.Panel.__init__(self, parent, id, wx.DefaultPosition, size)
 
         ## Create the vertical sizer for the toolbar and Panel
         box = wx.BoxSizer(wx.VERTICAL)
         box.Add(self.BuildToolbar(), 0, wx.ALL | wx.ALIGN_LEFT | wx.GROW, 4)
         
         self.Canvas = FloatCanvas.FloatCanvas( self, wx.NewId(),
-                                   size = wx.DefaultSize,
-                                   **kwargs)
+                                               size = wx.DefaultSize,
+                                               **kwargs)
         box.Add(self.Canvas,1,wx.GROW)
 
-        box.Fit(self)
-        self.SetSizer(box)
+        #box.Fit(self)
+        self.SetSizerAndFit(box)
 
         # default to Mouse mode
         self.ToolBar.ToggleTool(ID_POINTER_BUTTON,1)
         self.Canvas.SetMode("Mouse")
-
-        self.Canvas.Bind(wx.EVT_MOUSEWHEEL, self.WheelEvent) 
-
+        
         return None
 
-    def __getattr__(self, name):
-        """
-        Delegate all extra methods to the Canvas
-        """
-        attrib = getattr(self.Canvas, name)
-        ## add the attribute to this module's dict for future calls
-        self.__dict__[name] = attrib
-        return attrib
+##    def __getattr__(self, name):
+##        Removed. Instead jsut reference the Canvas specifically.
+##        """
+##        Delegate all extra methods to the Canvas
+##        """
+##        attrib = getattr(self.Canvas, name)
+##        ## add the attribute to this module's dict for future calls
+##        self.__dict__[name] = attrib
+##        return attrib
 
-    def WheelEvent(self, event):
-        if event.GetWheelRotation() > 0:
-            self.ZoomInWheel(event)
-        elif event.GetWheelRotation() < 0:
-            self.ZoomOutWheel(event)
-
-    def ZoomInWheel(self, event):
-        center = self.Canvas.PixelToWorld( event.GetPosition() )
-        self.Canvas.Zoom(1/1.5, center)
-
-    def ZoomOutWheel(self, event):
-        center = self.Canvas.PixelToWorld( event.GetPosition() )
-        self.Canvas.Zoom(1.5/1, center)
+##    def __setattr__(self, name, value):\
+##        ## note: this mever worked.    
+##        """
+##        Delegate extra attribute setting to the Canvas
+##        """
+##        print "trying to set %s to %s"%(name, value)
+###        setattr(self.Canvas, name, value)
+      
 
     def BuildToolbar(self):
         tb = wx.ToolBar(self,-1)
         self.ToolBar = tb
         
-        tb.SetToolBitmapSize((23,23))
+        tb.SetToolBitmapSize((24,24))
         
-        tb.AddTool(ID_POINTER_BUTTON, Resources.GetPointerBitmap(), isToggle=True, shortHelpString = "Pointer")
+        tb.AddTool(ID_POINTER_BUTTON, Resources.getPointerBitmap(), isToggle=True, shortHelpString = "Pointer")
         wx.EVT_TOOL(self, ID_POINTER_BUTTON, self.SetToolMode)
+        
 
-        tb.AddTool(ID_ZOOM_IN_BUTTON, Resources.GetPlusBitmap(), isToggle=True, shortHelpString = "Zoom In")
+        tb.AddTool(ID_ZOOM_IN_BUTTON, Resources.getMagPlusBitmap(), isToggle=True, shortHelpString = "Zoom In")
         wx.EVT_TOOL(self, ID_ZOOM_IN_BUTTON, self.SetToolMode)
         
-        tb.AddTool(ID_ZOOM_OUT_BUTTON, Resources.GetMinusBitmap(), isToggle=True, shortHelpString = "Zoom Out")
+        tb.AddTool(ID_ZOOM_OUT_BUTTON, Resources.getMagMinusBitmap(), isToggle=True, shortHelpString = "Zoom Out")
         wx.EVT_TOOL(self, ID_ZOOM_OUT_BUTTON, self.SetToolMode)
         
-        tb.AddTool(ID_MOVE_MODE_BUTTON, Resources.GetHandBitmap(), isToggle=True, shortHelpString = "Move")
+        tb.AddTool(ID_MOVE_MODE_BUTTON, Resources.getHandBitmap(), isToggle=True, shortHelpString = "Move")
         wx.EVT_TOOL(self, ID_MOVE_MODE_BUTTON, self.SetToolMode)
         
         tb.AddSeparator()
@@ -116,6 +105,8 @@ class NavCanvas(wx.Panel):
         wx.EVT_BUTTON(self, ID_ZOOM_TO_FIT_BUTTON, self.ZoomToFit)
 
         tb.Realize()
+        S = tb.GetSize()
+        tb.SetSizeHints(S[0],S[1])
         return tb
 
     def SetToolMode(self,event):
@@ -133,7 +124,7 @@ class NavCanvas(wx.Panel):
             self.Canvas.SetMode("Move")
         elif event.GetId() == ID_POINTER_BUTTON:
             self.Canvas.SetMode("Mouse")
-
+           
 
     def ZoomToFit(self,Event):
         self.Canvas.ZoomToBB()

@@ -71,8 +71,9 @@ class winStarMap(winBase):
 
 		self.application = application
 
-		self.Canvas = NavCanvas(self, size=wx.Size(500,500), Debug = 1, BackgroundColor = "BLACK")
-		self.Canvas.ZoomToBB()
+		self.Navigator = NavCanvas(self, size=wx.Size(500,500), Debug = 1, BackgroundColor = "BLACK")
+		self.Navigator.ZoomToFit(None)
+		self.Canvas = self.Navigator.Canvas
 
 		self.cache = {}
 		self.path = None
@@ -103,19 +104,19 @@ class winStarMap(winBase):
 					so = round(s * 1.25)
 
 					if len(object.contains) > 0:
-						C(object, CircleNoSmall(x,y,so,10,LineWidth=1,LineColor="White",FillColor="Black"))
+						C(object, CircleNoSmall((x,y),so,10,LineWidth=1,LineColor="White",FillColor="Black"))
 					else:	
-						C(object, CircleNoSmall(x,y,so,10,LineWidth=1,LineColor="Black",FillColor="Black"))
+						C(object, CircleNoSmall((x,y),so,10,LineWidth=1,LineColor="Black",FillColor="Black"))
 
-					C(object, CircleNoSmall(x,y,s,4,LineWidth=1,LineColor="Yellow",FillColor="Yellow"))
-					C(object, Text(object.name,x,y-100,Position="tc",Color="White",Size=8))
+					C(object, CircleNoSmall((x,y),s,4,LineWidth=1,LineColor="Yellow",FillColor="Yellow"))
+					C(object, Text(object.name,(x,y-100),Position="tc",Color="White",Size=8))
 
 				if isinstance(object, Fleet):
 					points = getpath(application, object)
 					if points:
-						C(object, Line(scale(points), LineColor="Grey", InForeground=True), as="path")
+						C(object, Line(scale(points), LineColor="Grey", InForeground=True), name="path")
 					elif object.vel != (0, 0, 0):
-						C(object, CrossLine(scale(object.pos[0:2]), scale(object.vel[0:2]), 3, LineColor="Grey"), as="path")
+						C(object, CrossLine(scale(object.pos[0:2]), scale(object.vel[0:2]), 3, LineColor="Grey"), name="path")
 						
 					parent = application.cache.objects[object.parent]
 					if parent.pos == object.pos:
@@ -125,26 +126,26 @@ class winStarMap(winBase):
 					ship = PolyNoSize([(0,0), (3,0), (0,4), (0,2), (-3,0)], LineWidth=1,LineColor="Blue",FillColor="Blue")
 					ship.Move(scale(object.pos))
 
-					C(object, ship, as="icon")
+					C(object, ship, name="icon")
 
 			self.arrow = PolyNoSize([(0,0), (-5,-10), (0, -8), (5,-10)], LineWidth=1,LineColor="Red",FillColor="Red",InForeground=True)
 			self.Canvas.AddObject(self.arrow)
 
-			self.Canvas.ZoomToBB()
+			self.Navigator.ZoomToFit(None)
 
 		except Exception, e:
 			do_traceback()
 
-	def Create(self, object, drawable, as=None):
+	def Create(self, object, drawable, name=None):
 		drawable.data = object.id
 
 		self.Canvas.AddObject(drawable)
 
-		if as:
+		if name:
 			if not self.cache.has_key(object.id):
 				self.cache[object.id] = {}
 		
-			self.cache[object.id][as] = drawable
+			self.cache[object.id][name] = drawable
 
 		drawable.Bind(EVT_FC_LEFT_DOWN, self.OnLeftClick)
 		drawable.Bind(EVT_FC_RIGHT_DOWN, self.OnRightClick)
@@ -153,15 +154,15 @@ class winStarMap(winBase):
 
 	def OnLeftClick(self, evt):
 		if self.mode == "Position":
-			pos = self.application.cache.objects[evt.obj.data].pos
+			pos = self.application.cache.objects[evt.data].pos
 			self.application.Post(self.application.gui.SelectPositionEvent(pos))
 			
 			self.SetMode("Normal")
 		else:
-			self.application.Post(self.application.gui.SelectObjectEvent(evt.obj.data))
+			self.application.Post(self.application.gui.SelectObjectEvent(evt.data))
 
 	def OnRightClick(self, evt):
-		obj = self.application.cache.objects[evt.obj.data]
+		obj = self.application.cache.objects[evt.data]
 		
 		menu = wx.Menu()
 		
@@ -173,7 +174,7 @@ class winStarMap(winBase):
 		ac(self.application.cache.objects, menu, obj)
 
 		self.Bind(wx.EVT_MENU, self.OnContextMenu)
-		self.PopupMenu(menu, evt.GetPosition())
+		self.PopupMenu(menu, evt.HitCoordsPixel)
 
 	def OnContextMenu(self, evt):
 		menu = evt.GetEventObject()
@@ -263,7 +264,7 @@ class winStarMap(winBase):
 
 			# Update the lines
 			if points:
-				self.Create(object, Line(scale(points), LineColor="Grey", InForeground=True), as="path")
+				self.Create(object, Line(scale(points), LineColor="Grey", InForeground=True), name="path")
 
 				path = self.Create(object, Line(scale(points), LineColor="Blue", InForeground=True))
 				self.SetPath(path)

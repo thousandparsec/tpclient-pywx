@@ -2,8 +2,8 @@
 from FloatCanvas import RectEllipse
 
 class Dot(RectEllipse):
-    def __init__(self, x ,y, Diameter, **kwargs):
-        RectEllipse.__init__(self, x, y, Diameter, Diameter, **kwargs)
+    def __init__(self, (x, y), Diameter, **kwargs):
+        RectEllipse.__init__(self, (x, y), (Diameter, Diameter), **kwargs)
         self.Diameter = Diameter
 
     def _Draw(self, dc, WorldToPixel, ScaleWorldToPixel, HTdc=None):

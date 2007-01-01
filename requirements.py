@@ -22,9 +22,9 @@ def tostr(ver1):
 	return s[1:]
 
 try:
-	import numarray
+	import numpy
 except ImportError:
-	notfound.append("numarray")
+	notfound.append("numpy or scipy")
 
 wx_version = (2, 6, 0, 0)
 try:

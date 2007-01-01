@@ -2,7 +2,7 @@
 This is the floatcanvas package. It provides two primary modules, and a
 support module.
 
-FloatCanvas.py contains the main FloatCanvas class, and it's supporting
+FloatCanvas.py contains the main FloatCanvas class, and its supporting
 classes.  NavCanvas.py contains a wrapper for the FloatCanvas that
 provides the canvas and a toolbar with tools that allow you to navigate
 the canvas (zooming, panning, etc.)  Resources.py is a module that
@@ -29,8 +29,7 @@ It is double buffered, so re-draws after the window is uncovered by
 something else are very quick.
 
 It relies on NumPy, which is needed for speed (maybe, I haven't profiled
-it). It will also use numarray, if you don't have Numeric, but it is
-slower.
+properly) and convenience. 
 
 Bugs and Limitations: Lots: patches, fixes welcome
 
@@ -68,10 +67,14 @@ checks the BBs.
 
 Mouse Events:
 
-At this point, there are a full set of custom mouse events. They are
-just like the regular mouse events, but include an extra attribute:
-Event.GetCoords(), that returns the (x,y) position in world coordinates,
-as a length-2 NumPy vector of Floats.
+There are a full set of custom mouse events. They are just like the
+regular mouse events, but include an extra attribute: Event.GetCoords(),
+that returns the (x,y) position in world coordinates, as a length-2
+NumPy vector of Floats.
+
+There are also a full set of bindings to mouse events on objects, so
+that you can specify a given function be called when an object is
+clicked, mouse-over'd, etc.
 
 See the Demo for what it can do, and how to use it.
 
@@ -79,8 +82,7 @@ Copyright: Christopher Barker
 
 License: Same as the version of wxPython you are using it with.
 
-Check for updates at:
-http://home.comcast.net/~chrishbarker/FloatCanvas/
+Check for updates or answers to questions, send me an email.
 
 Please let me know if you're using this!!!
 
@@ -90,6 +92,6 @@ Chris.Barker@noaa.gov
 
 """
 
-__version__ = "0.8.3"
+__version__ = "0.9.16"
 
 

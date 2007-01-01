@@ -1,11 +1,6 @@
 
 from FloatCanvas import Polygon
 
-try:
-	import Numeric
-except ImportError:
-	import numarray as Numeric
-
 class PolyNoSize(Polygon):
 	def _Draw(self, dc, WorldToPixel, ScaleWorldToPixel, HTdc=None):
 		# World out the difference

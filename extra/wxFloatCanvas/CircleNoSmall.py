@@ -2,8 +2,8 @@
 from FloatCanvas import RectEllipse
 
 class CircleNoSmall(RectEllipse):
-	def __init__(self, x ,y, Diameter, MinDiameter, **kwargs):
-		RectEllipse.__init__(self, x, y, Diameter, Diameter, **kwargs)
+	def __init__(self, (x, y), Diameter, MinDiameter, **kwargs):
+		RectEllipse.__init__(self, (x, y), (Diameter, Diameter), **kwargs)
 		self.Diameter = Diameter
 		self.MinDiameter = MinDiameter
 	

@@ -3,11 +3,9 @@ from FloatCanvas import Line
 import math
 
 try:
-	from Numeric import array, empty, dot, sum, asarray, Float
+    from numpy import array, empty, dot, sum, asarray, float
 except ImportError:
-	from numarray import array, dot, sum, asarray, Float
-	def empty(shape, typecode):
-		return array(shape=shape, typecode=typecode)
+    raise ImportError("I could not import numpy")
 
 t = array([[0,-1],[1,0]])
 
@@ -19,9 +17,9 @@ class CrossLine(Line):
 				 InForeground = False):
 		self.Number = Number
 
-		Points = empty((Number*4,2), Float)
+		Points = empty((Number*4,2), float)
 		Points[0] = start
-		Points[1] = array(start,Float)+array(delta,Float)
+		Points[1] = array(start,float)+array(delta,float)
 		Points[2] = Points[3] = Points[1]
 
 		for i in range(4, len(Points), 4):
