@@ -33,6 +33,7 @@ defaults = {
 	constants.ARG_RANGE: [-1, -1, -1, -1],
 }
 
+# Shows messages from the game system to the player.
 class winOrder(winBase):
 	title = _("Orders")
 	
@@ -43,121 +44,76 @@ class winOrder(winBase):
 	def __init__(self, application, parent):
 		winBase.__init__(self, application, parent)
 
+		self.Panel = panelOrder(application, self)
+
+	def __getattr__(self, key):
+		try:
+			return winBase.__getattr__(self, key)
+		except AttributeError:
+			return getattr(self.Panel, key)
+
+from xrc.panelOrder import panelOrderBase
+
+class panelOrder(panelOrderBase):
+	def __init__(self, application, parent):
+		panelOrderBase.__init__(self, parent)
+
+		self.application = application
+		self.parent = parent
+
 		self.clipboard = None
 		self.ignore = False
 
-		# Create a base panel
-		base_panel = wx.Panel(self, -1)
-		base_panel.SetAutoLayout( True )
-		self.panel = base_panel
+		self.oid = None
+		self.slots = []
 
-		# Create a base sizer
-		base_sizer = wx.BoxSizer( wx.VERTICAL )
-		base_sizer.Fit( base_panel )
-		base_sizer.SetSizeHints( base_panel )
+		self.Orders.InsertColumn(TURNS_COL, _("Turns"))
+		self.Orders.SetColumnWidth(TURNS_COL, 40)
+		self.Orders.InsertColumn(ORDERS_COL, _("Order Information"))
+		self.Orders.SetColumnWidth(ORDERS_COL, 140)
+		self.Orders.SetFont(wx.local.normalFont)
 
-		# Link the panel to the sizer
-		base_panel.SetSizer( base_sizer )
-		
-		# List of current orders
-		order_list = wx.ListCtrl( base_panel, -1, wx.DefaultPosition, wx.Size(160,80), wx.LC_REPORT|wx.SUNKEN_BORDER )
-		order_list.InsertColumn(TURNS_COL, _("Turns"))
-		order_list.SetColumnWidth(TURNS_COL, 40)
-		order_list.InsertColumn(ORDERS_COL, _("Order Information"))
-		order_list.SetColumnWidth(ORDERS_COL, 140)
-		order_list.SetFont(wx.local.normalFont)
+		self.DetailsSizer = self.DetailsPanel.GetSizer()
 
-		# A horizontal line
-		line_horiz1 = wx.StaticLine( base_panel, -1, wx.DefaultPosition, wx.Size(20,-1), wx.LI_HORIZONTAL)
-		argument_line = wx.StaticLine( base_panel, -1, wx.DefaultPosition, wx.Size(20,-1), wx.LI_HORIZONTAL)
-
-		# Buttons to add/delete orders
-		button_sizer = wx.FlexGridSizer( 1, 0, 0, 0 )
-		
-		type_list = wx.Choice( base_panel, -1, choices=[], size=wx.local.buttonSize)
-		type_list.SetFont(wx.local.tinyFont)
-		
-		new_button = wx.Button( base_panel, -1, _("New"), size=wx.local.buttonSize)
-		new_button.SetFont(wx.local.normalFont)
-		
-		line_vert = wx.StaticLine( base_panel, -1, wx.DefaultPosition, wx.Size(-1,10), wx.LI_VERTICAL )
-
-		self.delete_button = wx.Button( base_panel, -1, _("Delete"), size=wx.local.buttonSize)
-		self.delete_button.SetFont(wx.local.normalFont)
-		
-		button_sizer.Add( type_list,     0, wx.ALIGN_CENTRE, 1 )
-		button_sizer.Add( new_button,    0, wx.ALIGN_CENTRE, 1 )
-		button_sizer.Add( line_vert,     0, wx.ALIGN_CENTRE, 1 )
-		button_sizer.Add( self.delete_button, 0, wx.ALIGN_CENTRE, 1 )
-		
-		# Order arguments
-		argument_sizer = wx.FlexGridSizer( 0, 1, 0, 0)
-		argument_panel = wx.Panel(base_panel, -1)
-
-		# Link the argument sizer with the new panel
-		argument_panel.SetSizer(argument_sizer)
-		argument_panel.SetAutoLayout( True )
-
-		# Put them all on the sizer
-		base_sizer.Add( order_list, 1, wx.GROW|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 1 )
-		base_sizer.Add( line_horiz1, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
-		base_sizer.Add( button_sizer, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
-		base_sizer.Add( argument_line, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
-		base_sizer.Add( argument_panel, 0, wx.GROW|wx.ALIGN_CENTER|wx.ALL, 1 )
-
-		self.oid = 0
-		self.slots = None
-		self.app = application
-		self.base_panel = base_panel
-		self.base_sizer = base_sizer
-		self.order_list = order_list
-		self.type_list = type_list
-		self.argument_sizer = argument_sizer
-		self.argument_panel = argument_panel
-		self.argument_line = argument_line
-
-		self.Bind(wx.EVT_BUTTON, self.OnOrderNew, new_button)
-		self.Bind(wx.EVT_BUTTON, self.OnOrderDelete, self.delete_button)
-		
-		self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.OnOrderSelect, order_list)
-		self.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.OnOrderSelect, order_list)
-		order_list.Bind(wx.EVT_RIGHT_UP, self.OnRightClick)
+		self.Orders.Bind(wx.EVT_LIST_ITEM_SELECTED, self.OnOrderSelect)
+		self.Orders.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.OnOrderSelect)
+		self.Orders.Bind(wx.EVT_RIGHT_UP, self.OnRightClick)
 
 	def InsertListItem(self, slot, order):
 		"""\
 		Inserts an order a certain position in the list.
 		"""
-		self.order_list.InsertStringItem(slot, "")
+		self.Orders.InsertStringItem(slot, "")
 		self.UpdateListItem(slot, order)
 
 	def UpdateListItem(self, slot, order):
 		"""\
 		Updates an order at a certain position in the list.
 		"""
-		self.order_list.SetStringItem(slot, TURNS_COL, str(order.turns))
-		self.order_list.SetStringItem(slot, ORDERS_COL, order._name)
-		#self.order_list.SetToolTipItem(slot, _("Tip %s") % slot)
+		self.Orders.SetStringItem(slot, TURNS_COL, str(order.turns))
+		self.Orders.SetStringItem(slot, ORDERS_COL, order._name)
+		#self.Orders.SetToolTipItem(slot, _("Tip %s") % slot)
 
 		if hasattr(order, '_dirty'):
 			self.ColourListItem(slot, wx.BLUE)
 		else:
 			self.ColourListItem(slot, wx.BLACK)
 
-		self.order_list.SetItemPyData(slot, order)
+		self.Orders.SetItemPyData(slot, order)
 		
 	def RemoveListItem(self, slot):
 		"""\
 		Removes an order from a position in the list.
 		"""
-		self.order_list.DeleteItem(slot)
+		self.Orders.DeleteItem(slot)
 
 	def ColourListItem(self, slot, color):
 		"""\
 		Makes a slot show that the item is pending changes.
 		"""
-		item = self.order_list.GetItem(slot)
+		item = self.Orders.GetItem(slot)
 		item.SetTextColour(color)
-		self.order_list.SetItem(item)
+		self.Orders.SetItem(item)
 
 	def InsertOrder(self, slot, order):
 		"""\
@@ -171,7 +127,7 @@ class winOrder(winBase):
 		self.InsertListItem(slot, order)
 
 		# Tell everyone else about the change
-		if slot > self.order_list.GetItemCount():
+		if slot > self.Orders.GetItemCount():
 			slot = -1
 		self.application.Post(self.application.cache.CacheDirtyEvent("orders", "create", self.oid, slot, order))
 
@@ -231,7 +187,7 @@ class winOrder(winBase):
 				if not objects.OrderDescs().has_key(order.type):
 					return False
 
-				slot = self.type_list.FindString(objects.OrderDescs()[order.type]._name)
+				slot = self.Possible.FindString(objects.OrderDescs()[order.type]._name)
 				if slot == wx.NOT_FOUND:
 					return False
 			return True
@@ -244,13 +200,13 @@ class winOrder(winBase):
 		"""\
 		Pop-up a menu when a person right clicks on the order list.
 		"""
-		slot = self.order_list.HitTest(evt.GetPosition())[0]
+		slot = self.Orders.HitTest(evt.GetPosition())[0]
 		if slot != wx.NOT_FOUND:
 			if not evt.ControlDown() and not evt.ShiftDown():
 				# Check if shift or ctrl is being held down...
-				self.order_list.SetSelected([slot])
+				self.Orders.SetSelected([slot])
 			else:
-				self.order_list.AddSelected(slot)
+				self.Orders.AddSelected(slot)
 
 		id = wx.NewId()
 		menu = wx.Menu()
@@ -259,7 +215,7 @@ class winOrder(winBase):
 		# Check to see if we can paste the stuff here...
 		nopaste = self.CheckClipBoard()
 
-		slots = self.order_list.GetSelected()
+		slots = self.Orders.GetSelected()
 		if len(slots) > 0:
 			before = wx.Menu()
 			before.SetTitle(_("Before"))
@@ -307,7 +263,7 @@ class winOrder(winBase):
 		if t == _("Delete"):
 			self.OnOrderDelete(None)
 		elif t in (_("Copy"), _("Cut")):
-			slots = self.order_list.GetSelected()
+			slots = self.Orders.GetSelected()
 
 			if len(slots) < 1:
 				return
@@ -317,7 +273,7 @@ class winOrder(winBase):
 			self.clipboard = []
 
 			for slot in slots:
-				order = self.order_list.GetItemPyData(slot)
+				order = self.Orders.GetItemPyData(slot)
 				self.clipboard.append(order)
 		
 			if t == _("Cut"):
@@ -329,22 +285,22 @@ class winOrder(winBase):
 				return
 				
 			# Figure out whats out new position
-			slots = self.order_list.GetSelected()
+			slots = self.Orders.GetSelected()
 			if len(slots) != 0:
 				slot = slots[0] + t.endswith(_("After"))
 			else:
-				slot = self.order_list.GetItemCount()
+				slot = self.Orders.GetItemCount()
 
 			for i in xrange(0, len(self.clipboard)):
 				order = copy.copy(self.clipboard[i])
 				self.InsertOrder(slot+i, order)
 
 		else:
-			slot = self.type_list.FindString(t)
+			slot = self.Possible.FindString(t)
 			if slot == wx.NOT_FOUND:
 				return
 
-			self.type_list.SetSelection(slot)
+			self.Possible.SetSelection(slot)
 			
 			if menu.GetTitle() == _("Before"):
 				self.OnOrderNew(None, after=False)
@@ -370,8 +326,8 @@ class winOrder(winBase):
 			evt = None
 	
 		# Do the clean up first
-		self.order_list.DeleteAllItems()
-		self.type_list.Clear()
+		self.Orders.DeleteAllItems()
+		self.Possible.Clear()
 		
 		if evt == None:
 			self.oid = None
@@ -380,41 +336,41 @@ class winOrder(winBase):
 		
 		print "Orders", object.order_number, "Order Types", object.order_types
 		if object.order_number == 0 and len(object.order_types) == 0:
-			self.Hide()
+			self.parent.Hide()
 		else:
-			self.Show()
+			self.parent.Show()
 
 		# We now point to this object
 		self.oid = evt.id 
-		self.order_list.SetToolTipDefault(_("Current orders on %s.") % object.name)
+		self.Orders.SetToolTipDefault(_("Current orders on %s.") % object.name)
 		
 		# Add all the orders to the list
 		for slot in range(0, len(self.application.cache.orders[self.oid])):
 			self.InsertListItem(slot, self.application.cache.orders[self.oid][slot])
 		
 		if len(self.application.cache.orders[self.oid]) > 0:
-			self.delete_button.Enable()
+			self.Delete.Enable()
 		else:
-			self.delete_button.Disable()
+			self.Delete.Disable()
 
 		# Set which orders can be added to this object
-		self.type_list.SetToolTipDefault(_("Order type to create"))
+		self.Possible.SetToolTipDefault(_("Order type to create"))
 		for type in object.order_types:
 			if not objects.OrderDescs().has_key(type):
 				continue
 
 			od = objects.OrderDescs()[type]
 			
-			self.type_list.Append(od._name, type)
+			self.Possible.Append(od._name, type)
 			if hasattr(od, "doc"):
 				desc = od.doc
 			else:
 				desc = od.__doc__
 			desc = desc.strip()
-			self.type_list.SetToolTipItem(self.type_list.GetCount()-1, desc)
+			self.Possible.SetToolTipItem(self.Possible.GetCount()-1, desc)
 
 		if len(object.order_types) > 0:
-			self.type_list.SetSelection(0)
+			self.Possible.SetSelection(0)
 
 		# Select no orders
 		self.OnOrderSelect(None)
@@ -433,21 +389,21 @@ class winOrder(winBase):
 			return
 
 		if len(self.application.cache.orders[self.oid]) > 0:
-			self.delete_button.Enable()
+			self.Delete.Enable()
 		else:
-			self.delete_button.Disable()
+			self.Delete.Disable()
 			
 		if evt.action in ("create", "change"):
 
 			self.UpdateListItem(evt.slot, evt.change)
 			
 			# Rebuild the panel
-			if evt.slot in self.order_list.GetSelected():
+			if evt.slot in self.Orders.GetSelected():
 				self.OnOrderSelect(None, force=True)
 		elif evt.action == "remove":
 			self.RemoveListItem(evt.slot)
 
-			slots = self.order_list.GetSelected()
+			slots = self.Orders.GetSelected()
 			print "slots", slots
 			if evt.slot in slots or len(slots) == 0:
 				self.OnOrderSelect(None)
@@ -459,7 +415,7 @@ class winOrder(winBase):
 		"""\
 		Called when somebody selects an order.
 		"""
-		slots = self.order_list.GetSelected()
+		slots = self.Orders.GetSelected()
 		if self.slots == slots and not force:
 			return
 			
@@ -470,14 +426,14 @@ class winOrder(winBase):
 		elif self.oid == None:
 			order = _("No object selected.")
 		else:
-			order = self.order_list.GetItemPyData(slots[0])
+			order = self.Orders.GetItemPyData(slots[0])
 
-		self.slots == slots
+		self.slots = slots
 		self.BuildPanel(order)
 
 		# Ensure we can see the items
 		if len(slots) > 0:
-			self.order_list.EnsureVisible(slots[-1])
+			self.Orders.EnsureVisible(slots[-1])
 		
 		# FIXME: This should be done better
 		if not hasattr(order, '_dirty'):
@@ -487,20 +443,20 @@ class winOrder(winBase):
 		"""\
 		Called to add a new order.
 		"""
-		slots = self.order_list.GetSelected()
+		slots = self.Orders.GetSelected()
 
 		# Figure out what type of new order we are creating
-		type = self.type_list.GetSelection()
+		type = self.Possible.GetSelection()
 		if type == wx.NOT_FOUND:
 			return
-		type = self.type_list.GetClientData(type)
+		type = self.Possible.GetClientData(type)
 		
 		# Figure out the slot number
-		slots = self.order_list.GetSelected()
+		slots = self.Orders.GetSelected()
 		if len(slots) != 0:
 			slot = slots[0] + after
 		else:
-			slot = self.order_list.GetItemCount()
+			slot = self.Orders.GetItemCount()
 		
 		# Build the argument list
 		orderdesc = objects.OrderDescs()[type]	
@@ -519,30 +475,30 @@ class winOrder(winBase):
 		self.InsertOrder(slot, new)
 		
 		# Select the newly created order
-		self.order_list.SetSelected([slot])
+		self.Orders.SetSelected([slot])
 		self.OnOrderSelect(None)
 
 	def OnOrderDelete(self, evt):
 		"""\
 		Called to delete the selected orders.
 		"""
-		slots = self.order_list.GetSelected()
+		slots = self.Orders.GetSelected()
 		for slot in slots:
-			self.DeleteOrder(slot, self.order_list.GetItemPyData(slot))
+			self.DeleteOrder(slot, self.Orders.GetItemPyData(slot))
 
 	def OnOrderSave(self, evt):
 		"""\
 		Called to save the current selected orders.
 		"""
 		# Figure out which slot is selected
-		slots = self.order_list.GetSelected()
+		slots = self.Orders.GetSelected()
 		if len(slots) != 1:
 			debug(DEBUG_WINDOWS, "OrderSave: No order selected for save. (%s)" % str(slots))
 			return
 		slot = slots[0]
 		
 		# Check we arn't trying to save an order with a pending changes
-		order = self.order_list.GetItemPyData(slot)
+		order = self.Orders.GetItemPyData(slot)
 		if hasattr(order, '_dirty'):
 			# FIXME: Need to pop-up an error
 			return
@@ -556,6 +512,13 @@ class winOrder(winBase):
 		# Tell everyone about the change
 		self.application.Post(self.application.cache.CacheDirtyEvent("orders", "change", self.oid, slot, order))
 
+	OnNew    = OnOrderNew
+	OnSave   = OnOrderSave
+	OnDelete = OnOrderDelete
+
+	def OnRevert(self, evt):
+		self.OnOrderSelect(evt, force=True)
+
 	def OnOrderUpdate(self, evt):
 		"""\
 		Called when an order is updated but not yet saved.
@@ -565,14 +528,14 @@ class winOrder(winBase):
 			pass
 		
 		# Figure out which slot to use
-		slots = self.order_list.GetSelected()
+		slots = self.Orders.GetSelected()
 		if len(slots) != 1:
 			debug(DEBUG_WINDOWS, "OrderSave: No order selected for update. (%s)" % str(slots))
 			return
 		slot = slots[0]
 
 		# Check if the order is pending changes
-		order = self.order_list.GetItemPyData(slot)
+		order = self.Orders.GetItemPyData(slot)
 		
 		# Update the order
 		order.slot = slot
@@ -589,96 +552,97 @@ class winOrder(winBase):
 		Builds a panel for the entering of orders arguments.
 		"""
 		# Remove the previous panel and stuff
-		self.argument_panel.Hide()
-		self.base_sizer.Remove(self.argument_panel)
-		self.argument_panel.Destroy()
+		if hasattr(self, "ArgumentsPanel"):
+			self.ArgumentsPanel.Hide()
+			self.DetailsSizer.Remove(self.ArgumentsPanel)
+			self.ArgumentsPanel.Destroy()
+			del self.ArgumentsPanel
 
-		# Show the dividing line
-		self.argument_line.Show()
+		# Show the details panel
+		self.DetailsPanel.Show()
+		self.Message.SetLabel("")
 
-		# Create a new panel
-		self.argument_panel = wx.Panel(self.base_panel, -1)
-		self.argument_panel.SetAutoLayout( True )
-		self.argument_sizer = wx.FlexGridSizer( 0, 2, 0, 0)
-		
-		self.argument_panel.SetSizer(self.argument_sizer)
-		self.argument_sizer.AddGrowableCol( 1 )
-
-		# Do we actually have an order
 		if isinstance(order, objects.Order):
+			# Create a new panel
+			self.ArgumentsPanel = wx.Panel(self.DetailsPanel, -1)
+			self.ArgumentsPanel.SetAutoLayout( True )
+			self.ArgumentsSizer = wx.FlexGridSizer( 0, 2, 0, 0)
+			
+			self.ArgumentsPanel.SetSizer(self.ArgumentsSizer)
+			self.ArgumentsSizer.AddGrowableCol( 1 )
+
 			# Is this object dirty?
 			if hasattr(order, '_dirty'):
-				#self.argument_panel.SetBackgroundColour(wx.BLUE)
+				#self.ArgumentsPanel.SetBackgroundColour(wx.BLUE)
 				pass
 		
 			orderdesc = objects.OrderDescs()[order.type]
 			
 			# List for the argument subpanels
-			self.argument_subpanels = []
+			self.ArgumentsChildren = []
 				
 			for name, type in orderdesc.names:
 				# Add there name..
-				name_text = wx.StaticText( self.argument_panel, -1, name.title().replace("_","") )
+				name_text = wx.StaticText( self.ArgumentsPanel, -1, name.title().replace("_","") )
 				name_text.SetFont(wx.local.normalFont)
 
-				self.argument_sizer.Add( name_text, 0, wx.ALIGN_CENTER|wx.RIGHT, 4 )
+				self.ArgumentsSizer.Add( name_text, 0, wx.ALIGN_CENTER|wx.RIGHT, 4 )
 
 				# Add the arguments bit
 				if type == constants.ARG_ABS_COORD:
-					subpanel = argCoordPanel( self, self.argument_panel, getattr(order, name) )
+					subpanel = argCoordPanel( self, self.ArgumentsPanel, getattr(order, name) )
 				elif type == constants.ARG_TIME:
-					subpanel = argTimePanel( self, self.argument_panel, getattr(order, name) )
+					subpanel = argTimePanel( self, self.ArgumentsPanel, getattr(order, name) )
 				elif type == constants.ARG_OBJECT:
-					subpanel = argObjectPanel( self, self.argument_panel, getattr(order, name), self.application.cache )
+					subpanel = argObjectPanel( self, self.ArgumentsPanel, getattr(order, name), self.application.cache )
 				elif type == constants.ARG_LIST:
-					subpanel = argListPanel( self, self.argument_panel, getattr(order, name) )
+					subpanel = argListPanel( self, self.ArgumentsPanel, getattr(order, name) )
 				elif type == constants.ARG_STRING:
-					subpanel = argStringPanel( self, self.argument_panel, getattr(order, name) )
+					subpanel = argStringPanel( self, self.ArgumentsPanel, getattr(order, name) )
 				else:
-					subpanel = argNotImplimentedPanel( self, self.argument_panel, None )
+					subpanel = argNotImplimentedPanel( self, self.ArgumentsPanel, None )
 
 				subpanel.SetToolTip(wx.ToolTip(getattr(orderdesc, name+'__doc__')))
 
 				subpanel.SetFont(wx.local.normalFont)
-				self.argument_subpanels.append( subpanel )
+				self.ArgumentsChildren.append( subpanel )
 				
-				self.argument_sizer.Add( subpanel, 0, wx.GROW|wx.ALIGN_CENTER)
-				self.argument_sizer.AddGrowableRow( len(self.argument_subpanels) - 1 )
-
-			button_sizer = wx.FlexGridSizer( 1, 0, 0, 0 )
-
-			save_button = wx.Button( self.argument_panel, -1, _("Save"), size=wx.local.buttonSize )
-			save_button.SetFont(wx.local.normalFont)
-			self.Bind(wx.EVT_BUTTON, self.OnOrderSave, save_button)
-			revert_button = wx.Button( self.argument_panel, -1, _("Revert"), size=wx.local.buttonSize )
-			revert_button.SetFont(wx.local.normalFont)
-			self.Bind(wx.EVT_BUTTON, self.OnOrderSelect, revert_button)
+				self.ArgumentsSizer.Add( subpanel, 0, wx.GROW|wx.ALIGN_CENTER)
+				self.ArgumentsSizer.AddGrowableRow( len(self.ArgumentsChildren) - 1 )
 			
-			button_sizer.Add( save_button, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
-			button_sizer.Add( revert_button, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
+			self.DetailsPanel.SetClientSize(self.ArgumentsPanel.GetBestSize())
+			self.DetailsSizer.Add( self.ArgumentsPanel, 0, wx.GROW|wx.ALIGN_CENTER|wx.ALL, 0 )
+
+			# Show the Save/Revert/Delete buttons
+			self.Save.Show()
+			self.Revert.Show()
+			self.Delete.Show()		
 	
-			self.argument_sizer.Add( wx.BoxSizer( wx.HORIZONTAL ) )
-			self.argument_sizer.Add( button_sizer, 0, wx.ALIGN_CENTRE|wx.ALL, 5 )
-			
 		elif isinstance(order, (unicode, str)):
-			# Display message
-			msg = wx.StaticText( self.argument_panel, -1, str(order), wx.DefaultPosition, wx.DefaultSize, 0)
-			msg.SetFont(wx.local.normalFont)
-			
-			self.argument_sizer.Add( msg, 0, wx.ALIGN_CENTER|wx.ALL, 5)
+			self.Message.SetLabel(order)
+
+			# Hide the Save/Revert buttons
+			self.Save.Hide()
+			self.Revert.Hide()
+
+			# Delete button should still be valid
+			self.Delete.Show()
 		else:
-			self.argument_line.Hide()
-			self.argument_panel.Hide()
+			self.DetailsPanel.Hide()
+
+			# Hide the Save/Revert/Delete buttons
+			self.Save.Hide()
+			self.Revert.Hide()
+			self.Delete.Hide()
 		
-		self.argument_sizer.Fit(self.argument_panel)
-		self.base_sizer.Add( self.argument_panel, 0, wx.GROW|wx.ALIGN_CENTER|wx.ALL, 5 )
-		self.base_sizer.Layout()
+		self.DetailsPanel.Layout()
+		self.Layout()
 
 	def FromPanel(self, order):
 		orderdesc = objects.OrderDescs()[order.type]
 		
 		args = [order.sequence, order.id, order.slot, order.type, 0, []]
-		subpanels = copy.copy(self.argument_subpanels)
+		subpanels = copy.copy(self.ArgumentsChildren)
 		for name, type in orderdesc.names:
 			panel = subpanels.pop(0)
 				
@@ -994,9 +958,9 @@ def argCoordPanel(parent, parent_panel, args):
 	parent.OnSelectPosition = OnSelectPosition
 
 	# FIXME: Better way to get the children is needed...
-	def p(evt, starmap=parent.parent.children[_('StarMap')]):
-		starmap.SetMode("Position")
-	parent.Bind(wx.EVT_BUTTON, p, item7)
+#	def p(evt, starmap=parent.parent.children[_('StarMap')]):
+#		starmap.SetMode("Position")
+#	parent.Bind(wx.EVT_BUTTON, p, item7)
 
 	parent.Bind(wx.EVT_TEXT, parent.OnOrderUpdate, item2)
 	parent.Bind(wx.EVT_TEXT, parent.OnOrderUpdate, item4)
