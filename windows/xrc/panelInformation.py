@@ -31,6 +31,7 @@ class panelInformationBase(wx.Panel):
 
 		# Define variables for the controls
 		self.Title = XRCCTRL(self, "Title")
+		self.Background = XRCCTRL(self, "Background")
 		self.Image = XRCCTRL(self, "Image")
 		self.Animation = XRCCTRL(self, "Animation")
 		self.Details = XRCCTRL(self, "Details")
