@@ -255,6 +255,7 @@ class winAccount(winMainBase):
 			username, game = username
 		else:
 			username = username[0]
+			game = ""
 
 		password1 = self.password1.GetValue().strip()
 		password2 = self.password2.GetValue().strip()

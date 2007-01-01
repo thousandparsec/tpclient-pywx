@@ -254,6 +254,7 @@ class winConnect(winConnectBase, winMainBaseXRC, usernameMixIn):
 		# username = <username>@<game>
 		# password = <server>
 		server, username, game, password = url2bits(url)
+
 		if server is None:
 			return
 		self.Server.SetValue(server)
