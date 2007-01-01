@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource version="2.3.0.1" xmlns="http://www.wxwidgets.org/wxxrc">
+    <object class="wxPanel" name="panelMessage" subclass="Dialog">
+        <size>400,170</size>
+        <object class="wxFlexGridSizer">
+            <cols>1</cols>
+            <rows>2</rows>
+            <vgap>0</vgap>
+            <hgap>0</hgap>
+            <growablecols>0</growablecols>
+            <growablerows>1</growablerows>
+            <object class="sizeritem">
+                <flag>wxGROW|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                <border>1</border>
+                <object class="wxBoxSizer">
+                    <orient>wxHORIZONTAL</orient>
+                    <object class="sizeritem">
+                        <flag>wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                        <border>1</border>
+                        <object class="wxButton" name="Filter">
+                            <font>
+                                <size>8</size>
+                                <family>swiss</family>
+                                <face>Sans</face>
+                            </font>
+                            <style>wxBU_EXACTFIT</style>
+                            <label>Filter</label>
+                        </object>
+                    </object>
+                    <object class="sizeritem">
+                        <flag>wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE</flag>
+                        <border>0</border>
+                        <option>3</option>
+                        <object class="wxStaticText" name="Title">
+                            <style>wxALIGN_CENTRE|wxST_NO_AUTORESIZE</style>
+                            <label>Static text</label>
+                        </object>
+                    </object>
+                    <object class="sizeritem">
+                        <flag>wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE</flag>
+                        <border>0</border>
+                        <option>1</option>
+                        <object class="wxStaticText" name="Counter">
+                            <font>
+                                <size>8</size>
+                                <family>swiss</family>
+                                <face>Sans</face>
+                            </font>
+                            <style>wxALIGN_RIGHT|wxST_NO_AUTORESIZE</style>
+                            <label>100 of 100</label>
+                        </object>
+                    </object>
+                </object>
+            </object>
+            <object class="sizeritem">
+                <flag>wxGROW|wxGROW|wxALL</flag>
+                <border>2</border>
+                <option>1</option>
+                <object class="wxFlexGridSizer">
+                    <cols>2</cols>
+                    <rows>2</rows>
+                    <vgap>0</vgap>
+                    <hgap>0</hgap>
+                    <growablecols>0</growablecols>
+                    <growablerows>0</growablerows>
+                    <object class="sizeritem">
+                        <flag>wxALIGN_CENTER_HORIZONTAL|wxGROW|wxRIGHT</flag>
+                        <border>2</border>
+                        <option>1</option>
+                        <object class="wxHtmlWindow" name="Message">
+                            <style>wxNO_BORDER</style>
+                            <htmlcode>&lt;html&gt;
+&lt;body&gt;
+&lt;center&gt;
+	&lt;table cols=1 width="100%"&gt;
+		&lt;tr&gt;
+			&lt;td&gt;&lt;b&gt;Subject:&lt;/b&gt; You are unloved!
+		&lt;/tr&gt;
+		&lt;tr&gt;
+			&lt;td&gt;
+			You have recived no messages this turn!&lt;br&gt;&lt;br&gt;
+			Actually if you didn't recive any messages it most proberly
+			means that your client couldn't load the results from the server.
+			Try reload/restart the client.
+			&lt;/td&gt;
+		&lt;/tr&gt;
+	 &lt;/table&gt;
+&lt;/center&gt;
+&lt;/body&gt;
+&lt;/html&gt;</htmlcode>
+                        </object>
+                    </object>
+                    <object class="sizeritem">
+                        <flag>wxGROW|wxGROW|wxLEFT|wxTOP|wxBOTTOM</flag>
+                        <border>0</border>
+                        <object class="wxFlexGridSizer">
+                            <cols>1</cols>
+                            <rows>2</rows>
+                            <vgap>0</vgap>
+                            <hgap>0</hgap>
+                            <object class="sizeritem">
+                                <flag>wxGROW|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                <border>0</border>
+                                <option>1</option>
+                                <object class="wxBoxSizer">
+                                    <orient>wxHORIZONTAL</orient>
+                                    <object class="sizeritem">
+                                        <flag>wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                        <border>0</border>
+                                        <object class="wxButton" name="Prev">
+                                            <size>45,22</size>
+                                            <font>
+                                                <size>8</size>
+                                                <family>swiss</family>
+                                                <face>Sans</face>
+                                            </font>
+                                            <label>Prev</label>
+                                        </object>
+                                    </object>
+                                    <object class="sizeritem">
+                                        <flag>wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                        <border>0</border>
+                                        <object class="wxButton" name="First">
+                                            <size>45,-1</size>
+                                            <font>
+                                                <size>8</size>
+                                                <family>swiss</family>
+                                                <face>Sans</face>
+                                            </font>
+                                            <style>wxBU_EXACTFIT</style>
+                                            <hidden>1</hidden>
+                                            <label>First</label>
+                                        </object>
+                                    </object>
+                                </object>
+                            </object>
+                            <object class="sizeritem">
+                                <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                <border>0</border>
+                                <object class="wxButton" name="Goto">
+                                    <size>45,22</size>
+                                    <font>
+                                        <size>8</size>
+                                        <family>swiss</family>
+                                        <face>Sans</face>
+                                    </font>
+                                    <label>Goto</label>
+                                </object>
+                            </object>
+                            <object class="sizeritem">
+                                <flag>wxGROW|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                <border>0</border>
+                                <option>1</option>
+                                <object class="wxBoxSizer">
+                                    <orient>wxHORIZONTAL</orient>
+                                    <object class="sizeritem">
+                                        <flag>wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                        <border>0</border>
+                                        <object class="wxButton" name="Next">
+                                            <size>45,22</size>
+                                            <font>
+                                                <size>8</size>
+                                                <family>swiss</family>
+                                                <face>Sans</face>
+                                            </font>
+                                            <label>Next</label>
+                                        </object>
+                                    </object>
+                                    <object class="sizeritem">
+                                        <flag>wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                        <border>0</border>
+                                        <object class="wxButton" name="Last">
+                                            <size>45,-1</size>
+                                            <font>
+                                                <size>8</size>
+                                                <family>swiss</family>
+                                                <face>Sans</face>
+                                            </font>
+                                            <style>wxBU_EXACTFIT</style>
+                                            <hidden>1</hidden>
+                                            <label>Last</label>
+                                        </object>
+                                    </object>
+                                </object>
+                            </object>
+                            <object class="sizeritem">
+                                <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_TOP|wxALL</flag>
+                                <border>2</border>
+                                <object class="wxStaticLine" name="wxID_STATIC">
+                                    <size>20,-1</size>
+                                    <style>wxLI_HORIZONTAL</style>
+                                </object>
+                            </object>
+                            <object class="sizeritem">
+                                <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                <border>0</border>
+                                <object class="wxButton" name="Delete">
+                                    <size>45,22</size>
+                                    <font>
+                                        <size>8</size>
+                                        <family>swiss</family>
+                                        <face>Sans</face>
+                                    </font>
+                                    <label>Delete</label>
+                                </object>
+                            </object>
+                        </object>
+                    </object>
+                </object>
+            </object>
+        </object>
+    </object>
+</resource>

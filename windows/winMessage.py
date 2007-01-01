@@ -19,19 +19,8 @@ from winBase import *
 # Protocol Imports
 from tp.netlib import failed, GenericRS
 
-MESSAGE_FILTER = 10000
-MESSAGE_TITLE = 10001
-MESSAGE_ID = 10002
-MESSAGE_HTML = 10003
-MESSAGE_PREV = 10004
-MESSAGE_GOTO = 10005
-MESSAGE_NEXT = 10006
-MESSAGE_LINE = 10007
-MESSAGE_NEW = 10008
-MESSAGE_DEL = 10009
-
 # Shows messages from the game system to the player.
-class winMessage(winBase, winShiftMixIn):
+class winMessage(winBase):
 	title = _("Messages")
 
 	from defaults import winMessageDefaultPosition as DefaultPosition
@@ -40,119 +29,18 @@ class winMessage(winBase, winShiftMixIn):
 	
 	def __init__(self, application, parent):
 		winBase.__init__(self, application, parent)
-		winShiftMixIn.__init__(self)
 
-		panel = wx.Panel(self, -1)
-		panel.SetConstraints(wx.lib.anchors.LayoutAnchors(self, 1, 1, 1, 1))
-		self.panel = panel
-		self.obj = {}
+		self.Panel = panelMessage(application, self)
 
-		item0 = wx.FlexGridSizer( 0, 1, 0, 0 )
-		item0.AddGrowableCol( 0 )
-		item0.AddGrowableRow( 1 )
+	def __getattr__(self, key):
+		try:
+			return winBase.__getattr__(self, key)
+		except AttributeError:
+			return getattr(self.Panel, key)
 
-		item1 = wx.FlexGridSizer( 0, 3, 0, 0 )
-		item1.AddGrowableCol( 1 )
+from xrc.panelMessage import panelMessageBase
 
-		self.filter = wx.CheckBox( panel, MESSAGE_FILTER, _("Filter"), wx.DefaultPosition, wx.local.buttonSize, 0 )
-		self.filter.SetFont(wx.local.normalFont)
-		item1.Add( self.filter, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 1 )
-
-		self.titletext = wx.StaticText( panel, MESSAGE_TITLE, _("Title"), wx.DefaultPosition, wx.DefaultSize, wx.ALIGN_CENTRE|wx.ST_NO_AUTORESIZE )
-		self.titletext.SetFont(wx.local.normalFont)
-		item1.Add( self.titletext, 0, wx.GROW|wx.ALIGN_CENTRE_HORIZONTAL|wx.ALL, 1 )
-
-		self.counter = wx.StaticText( panel, MESSAGE_ID, _("# of #"), wx.DefaultPosition, wx.local.buttonSize, 0 )
-		self.counter.SetFont(wx.local.normalFont)
-		item1.Add( self.counter, 0, wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 1 )
-
-		item0.Add( item1, 0, wx.GROW|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 1 )
-
-		item5 = wx.FlexGridSizer( 0, 2, 0, 0 )
-		item5.AddGrowableCol( 0 )
-		item5.AddGrowableRow( 0 )
-
-		# This is the main HTML display!
-		item6 = wx.html.HtmlWindow(panel, MESSAGE_HTML, wx.DefaultPosition, wx.Size(200,10))
-		item5.Add( item6, 0, wx.GROW|wx.ALIGN_CENTER_HORIZONTAL|wx.ALL, 1 )
-
-		self.html = item6
-		if wx.Platform != "__WXMAC__":
-#			pass
-#			self.html.SetFonts("Swiss", "Courier", [10, 12, 14, 16, 20, 24])
-#		else:
-			self.html.SetFonts("Swiss", "Courier", [4, 6, 8, 10, 12, 14, 16])
-		self.html.SetPage("")
-
-		item7 = wx.BoxSizer( wx.VERTICAL )
-
-		self.prev = wx.Button( panel, -1, _("Prev"), wx.DefaultPosition, wx.local.buttonSize)
-		self.prev.SetFont(wx.local.normalFont)
-		item7.Add( self.prev, 0, wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 1 )
-		self.Bind(wx.EVT_BUTTON, self.MessagePrev, self.prev)
-		self.prev.SetToolTip(wx.ToolTip(_("Goto previous message.")))
-
-		self.first = wx.Button( panel, -1, _("First"), wx.DefaultPosition, wx.local.buttonSize)
-		self.first.SetFont(wx.local.normalFont)
-		item7.Add( self.first, 0, wx.ALIGN_RIGHT|wx.ALIGN_CENTER_VERTICAL|wx.ALL, 1 )
-		self.Bind(wx.EVT_BUTTON, self.MessageFirst, self.first)
-		self.first.Hide()
-		self.first.SetToolTip(wx.ToolTip(_("Goto first message.")))
-
-		self.goto = wx.Button( panel, -1, _("Goto"), wx.DefaultPosition, wx.local.buttonSize)
-		self.goto.SetFont(wx.local.normalFont)
-		item7.Add( self.goto, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
-		self.Bind(wx.EVT_BUTTON, self.MessageGoto, self.goto)
-		self.goto.Disable()
-		self.goto.SetToolTip(wx.ToolTip(_("Goto object talked about in this message.")))
-
-		self.next = wx.Button( panel, -1, _("Next"), wx.DefaultPosition, wx.local.buttonSize)
-		self.next.SetFont(wx.local.normalFont)
-		item7.Add( self.next, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
-		self.Bind(wx.EVT_BUTTON, self.MessageNext, self.next)
-		self.next.SetToolTip(wx.ToolTip(_("Goto next message.")))
-
-		self.last = wx.Button( panel, -1, _("Last"), wx.DefaultPosition, wx.local.buttonSize)
-		self.last.SetFont(wx.local.normalFont)
-		item7.Add( self.last, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
-		self.Bind(wx.EVT_BUTTON, self.MessageLast, self.last)
-		self.last.Hide()
-		self.last.SetToolTip(wx.ToolTip(_("Goto last message.")))
-
-		item11 = wx.StaticLine( panel, MESSAGE_LINE, wx.DefaultPosition, wx.Size(20,-1), wx.LI_HORIZONTAL )
-		item11.Enable(False)
-		item7.Add( item11, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
-
-		new = wx.Button( panel, -1, _("New"), wx.DefaultPosition, wx.local.buttonSize)
-		new.SetFont(wx.local.normalFont)
-		item7.Add( new, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
-		self.Bind(wx.EVT_BUTTON, self.MessageNew, new)
-		new.Disable()
-
-		self.delete = wx.Button( panel, -1, _("Delete"), wx.DefaultPosition, wx.local.buttonSize)
-		self.delete.SetFont(wx.local.normalFont)
-		item7.Add( self.delete, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
-		self.Bind(wx.EVT_BUTTON, self.MessageDelete, self.delete)
-		self.delete.SetToolTip(wx.ToolTip(_("Delete currently displayed message.")))
-
-		item5.Add( item7, 0, wx.GROW|wx.ALIGN_RIGHT|wx.ALL, 1 )
-
-		item0.Add( item5, 0, wx.GROW|wx.ALIGN_CENTER_HORIZONTAL|wx.ALL, 1 )
-
-		panel.SetAutoLayout(True)
-		panel.SetSizer( item0 )
-		
-		item0.Fit( panel )
-		item0.SetSizeHints( panel )
-	
-		# The current message slot
-		self.slot = 0
-		self.position = 0
-		self.dirty = True
-
-		# Contains the message types to be filtered
-		self.filtered = Set()
-
+class panelMessage(panelMessageBase, winShiftMixIn):
 	html_filtered = """\
 <html>
 <body>
@@ -222,17 +110,37 @@ class winMessage(winBase, winShiftMixIn):
 </body>
 </html>"""
 
+	def __init__(self, application, parent):
+		panelMessageBase.__init__(self, parent)
+		winShiftMixIn.__init__(self)
+
+		self.application = application
+
+		if wx.Platform != "__WXMAC__":
+			self.Message.SetFonts("Swiss", "Courier", [4, 6, 8, 10, 12, 14, 16])
+		else:
+			self.Message.SetFonts("Swiss", "Courier", [10, 12, 14, 16, 20, 24])
+		self.Message.SetPage("")
+
+		# The current message slot
+		self.slot = 0
+		self.position = 0
+		self.dirty = True
+
+		# Contains the message types to be filtered
+		self.filtered = Set()
+
 	def Show(self, show=True):
 		if show:
 			self.ShiftStart()
-			winBase.Show(self)
+			panelMessageBase.Show(self)
 		else:
 			self.Hide()
 
 	def Hide(self, hide=True):
 		if hide:
 			self.ShiftStop()
-			winBase.Hide(self)
+			panelMessageBase.Hide(self)
 		else:
 			self.Show()
 		
@@ -243,22 +151,22 @@ class winMessage(winBase, winShiftMixIn):
 		self.ShowPN()
 	
 	def ShowPN(self):
-		self.first.Hide()
-		self.last.Hide()
+		self.First.Hide()
+		self.Last.Hide()
 		
-		self.prev.Show()
-		self.next.Show()
+		self.Prev.Show()
+		self.Next.Show()
 
-		self.panel.Layout()
+		self.Layout()
 
 	def ShowFL(self):
-		self.prev.Hide()
-		self.next.Hide()
+		self.Prev.Hide()
+		self.Next.Hide()
 
-		self.first.Show()
-		self.last.Show()
+		self.First.Show()
+		self.Last.Show()
 		
-		self.panel.Layout()
+		self.Layout()
 		
 	def OnCacheUpdate(self, evt=None):
 		"""\
@@ -382,31 +290,30 @@ class winMessage(winBase, winShiftMixIn):
 			]
 			message_counter = _("%i of %i") % (self.slot+1, len(self.messages))
 
-		self.filter.SetValue(message_filter)
-		self.titletext.SetLabel(message_subject)
-		self.counter.SetLabel(message_counter)
-		self.html.SetPage(message_body)
+		self.Title.SetLabel(message_subject)
+		self.Counter.SetLabel(message_counter)
+		self.Message.SetPage(message_body)
 
-		self.prev.Enable(message_buttons[0])
-		self.first.Enable(message_buttons[0])
-		self.goto.Enable(message_buttons[1])
-		self.last.Enable(message_buttons[2])
-		self.next.Enable(message_buttons[2])
-		self.delete.Enable(message_buttons[3])
+		self.Prev.Enable(message_buttons[0])
+		self.First.Enable(message_buttons[0])
+		self.Goto.Enable(message_buttons[1])
+		self.Last.Enable(message_buttons[2])
+		self.Next.Enable(message_buttons[2])
+		self.Delete.Enable(message_buttons[3])
 
-	def MessageFirst(self, evt=None):
+	def OnFirst(self, evt=None):
 		self.MessageSet(-len(self.messages))
 
-	def MessageNext(self, evt=None):
+	def OnNext(self, evt=None):
 		self.MessageSet(1)
 	
-	def MessageLast(self, evt=None):
+	def OnLast(self, evt=None):
 		self.MessageSet(len(self.messages))
 
-	def MessagePrev(self, evt=None):
+	def OnPrev(self, evt=None):
 		self.MessageSet(-1)
 		
-	def MessageDelete(self, evt=None):
+	def OnDelete(self, evt=None):
 		# Get the current slot
 		slot = self.slot
 
@@ -416,7 +323,7 @@ class winMessage(winBase, winShiftMixIn):
 		# Tell everyone about the change
 		self.application.Post(self.application.cache.CacheDirtyEvent("messages", "remove", self.bid, slot, None))
 
-	def MessageGoto(self, slot):
+	def OnGoto(self, slot):
 		# Select the object this message references
 		ids = []
 		for reference, id in self.message.references:
@@ -432,8 +339,8 @@ class winMessage(winBase, winShiftMixIn):
 				except KeyError:
 					pass
 			self.Bind(wx.EVT_MENU, self.MessageGotoMenu)
-			x, y = self.goto.GetPosition()
-			self.PopupMenu(menu, (x,y+self.goto.GetSize()[1]))
+			x, y = self.Goto.GetPosition()
+			self.PopupMenu(menu, (x,y+self.Goto.GetSize()[1]))
 
 		elif len(ids) == 1:
 			self.application.Post(self.application.gui.SelectObjectEvent(ids[0]))
@@ -445,8 +352,5 @@ class winMessage(winBase, winShiftMixIn):
 		id = int(item.GetLabel().split('(')[-1][:-1])
 		self.application.Post(self.application.gui.SelectObjectEvent(id))
 
-	def MessageNew(self, evt=None):
-		pass
-	
 	def MessageFilter(self):
 		pass
