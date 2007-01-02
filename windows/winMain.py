@@ -225,20 +225,44 @@ class winMain(winMDIBase):
 		from windows.winDesign import winDesign
 		winDesign(application, self)
 
-		from windows.winInfo import winInfo
-		winInfo(application, self)
+		from extra import wxAUI
+		self.mgr = wxAUI.FrameManager()
+		self.mgr.SetFrame(self)
 
-		from windows.winMessage import winMessage
-		winMessage(application, self)
+		from windows.winInfo import panelInformation
+		self.children["info"] = panelInformation(application, self)
+		self.mgr.AddPane(self.children["info"], wx.LEFT)
 
-		from windows.winOrder import winOrder
-		winOrder(application, self)
+		from windows.winOrder import panelOrder
+		self.children["order"] = panelOrder(application, self)
+		info = wxAUI.PaneInfo()
+		info.MinSize(self.children["order"].GetBestSize())
+		info.Left()
+		info.Layer(2)
+		info.PaneBorder(False)
+		self.mgr.AddPane(self.children["order"], info)
 
-		from windows.winStarMap import winStarMap
-		winStarMap(application, self)
+		from windows.winMessage import panelMessage
+		self.children["message"] = panelMessage(application, self)
+		info = wxAUI.PaneInfo()
+		info.MinSize(self.children["message"].GetBestSize())
+		info.CloseButton(True)
+		info.Bottom()
+		info.Layer(1)
+		info.MinimizeButton(True)
+		info.MaximizeButton(False)
+		info.PinButton(True)
+		self.mgr.AddPane(self.children["message"], info)
 
-		from windows.winSystem import winSystem
-		winSystem(application, self)
+		from windows.winStarMap import panelStarMap
+		self.children["starmap"] = panelStarMap(application, self)
+		self.mgr.AddPane(self.children["starmap"], wx.CENTER)
+
+		from windows.winSystem import panelSystem
+		self.children["system"] = panelSystem(application, self)
+		self.mgr.AddPane(self.children["system"], wx.RIGHT)
+
+		self.mgr.Update()
 
 		self.SetMenuBar(self.Menu(self))
 
@@ -264,12 +288,15 @@ class winMain(winMDIBase):
 			return self.Hide()
 
 		for window in self.children.values():
-			if window.config.has_key('show') and window.config['show']:
-				window.Show()
+			try:
+				if window.config.has_key('show') and window.config['show']:
+					window.Show()
+			except Exception, e:
+				print e
 
 		# Lock the size for non-MDI platforms
-		if wx.Platform != "__WXMSW__":
-			self.SetSizeHard(self.config['size'])
+#		if wx.Platform != "__WXMSW__":
+#			self.SetSizeHard(self.config['size'])
 
 		winMDIBase.Show(self)
 
@@ -285,11 +312,11 @@ class winMain(winMDIBase):
 			window.Hide()
 		super(self.__class__, self).Hide()
 
-	def SetSizeHard(self, size):
-		winMDIBase.SetSize(self, size)
-		if wx.Platform != "__WXMSW__":
-			self.SetClientSize(wx.Size(-1,0))
-			winMDIBase.SetSizeHard(self, (-1, self.GetSize()[1]))
+#	def SetSizeHard(self, size):
+#		winMDIBase.SetSize(self, size)
+#		if wx.Platform != "__WXMSW__":
+#			self.SetClientSize(wx.Size(-1,0))
+#			winMDIBase.SetSizeHard(self, (-1, self.GetSize()[1]))
 
 	# Config Functions -----------------------------------------------------------------------------
 	def ConfigDefault(self, config=None):
@@ -344,7 +371,10 @@ class winMain(winMDIBase):
 		"""
 		# Get the details from there children
 		for window in self.children.values():
-			self.config[window.title] = window.ConfigSave()
+			try:
+				self.config[window.title] = window.ConfigSave()
+			except Exception, e:
+				print e
 
 		return self.config
 
@@ -356,9 +386,12 @@ class winMain(winMDIBase):
 		self.config = copy.copy(config)
 
 		for name, window in self.children.items():
-			window.ConfigLoad(config.get(name, {}))
+			try:
+				window.ConfigLoad(config.get(name, {}))
+			except Exception, e:
+				print e
 			
-		self.SetSizeHard(config['size'])
+#		self.SetSizeHard(config['size'])
 		self.SetPosition(config['position'])
 
 		self.ConfigDisplayUpdate(None)
@@ -447,7 +480,10 @@ class winMain(winMDIBase):
 			cpanel = wx.Panel(notebook, -1)
 			csizer = wx.BoxSizer(wx.HORIZONTAL)
 
-			window.ConfigDisplay(cpanel, csizer)
+			try:
+				window.ConfigDisplay(cpanel, csizer)
+			except Exception, e:
+				print e
 
 			cpanel.SetSizer( csizer )
 			notebook.AddPage(cpanel, name)
@@ -482,7 +518,7 @@ class winMain(winMDIBase):
 		self.ConfigUpdate()
 
 	def OnConfigDisplayWidth(self, evt):
-		self.SetSize(wx.Size(evt.GetInt(), -1))
+#		self.SetSize(wx.Size(evt.GetInt(), -1))
 		self.ConfigUpdate()
 
 	def OnConfigDisplayMove(self, evt):

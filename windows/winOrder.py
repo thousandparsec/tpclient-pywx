@@ -335,10 +335,10 @@ class panelOrder(panelOrderBase):
 			return
 		
 		print "Orders", object.order_number, "Order Types", object.order_types
-		if object.order_number == 0 and len(object.order_types) == 0:
-			self.parent.Hide()
-		else:
-			self.parent.Show()
+#		if object.order_number == 0 and len(object.order_types) == 0:
+#			self.Hide()
+#		else:
+#			self.Show()
 
 		# We now point to this object
 		self.oid = evt.id 
@@ -518,6 +518,11 @@ class panelOrder(panelOrderBase):
 
 	def OnRevert(self, evt):
 		self.OnOrderSelect(evt, force=True)
+
+	def DockBestSize(self):
+		print "DockBestSize", self.GetBestSize()
+		return wx.Size(*self.GetBestSize())
+	min_size = property(DockBestSize)
 
 	def OnOrderUpdate(self, evt):
 		"""\

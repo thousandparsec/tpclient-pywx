@@ -19,22 +19,17 @@ NAME = 0
 DESC = 1
 
 # Show the universe
-class winSystem(winBase):
+class panelSystem(wx.Panel):
 	title = _("System")
 	
-	from defaults import winSystemDefaultPosition as DefaultPosition
-	from defaults import winSystemDefaultSize as DefaultSize
-	from defaults import winSystemDefaultShow as DefaultShow
-	
 	def __init__(self, application, parent):
-		winBase.__init__(self, application, parent)
+		wx.Panel.__init__(self, parent)
 
 		# Setup to recieve game events
 		self.application = application
 		self.ignore = False
 
 		self.tree = wx.OrderedTreeCtrl(self, -1, style=wx.TR_DEFAULT_STYLE | wx.TR_HAS_VARIABLE_ROW_HEIGHT)
-		self.panel = self.tree
 
 		self.icons = {}
 		self.icons['Blank'] = wx.Image("graphics/blank-icon.png").ConvertToBitmap()
@@ -53,6 +48,11 @@ class winSystem(winBase):
 
 		self.tree.SetFont(wx.local.normalFont)
 		self.Bind(wx.EVT_TREE_SEL_CHANGED, self.OnSelectItem)
+
+		self.Bind(wx.EVT_SIZE, self.OnSize)
+
+	def OnSize(self, evt):
+		self.tree.SetSize(self.GetClientSize())
 
 	def Rebuild(self):
 		"""\

@@ -59,19 +59,15 @@ def scale(value):
 		return round(value/(1000*1000))
 
 # Shows the main map of the universe.
-class winStarMap(winBase):
+class panelStarMap(wx.Panel):
 	title = _("StarMap")
 
-	from defaults import winStarMapDefaultPosition as DefaultPosition
-	from defaults import winStarMapDefaultSize as DefaultSize
-	from defaults import winStarMapDefaultShow as DefaultShow
-
 	def __init__(self, application, parent):
-		winBase.__init__(self, application, parent)
+		wx.Panel.__init__(self, parent)
 
 		self.application = application
 
-		self.Navigator = NavCanvas(self, size=wx.Size(500,500), Debug = 1, BackgroundColor = "BLACK")
+		self.Navigator = NavCanvas(self, Debug = 1, BackgroundColor = "BLACK")
 		self.Navigator.ZoomToFit(None)
 		self.Canvas = self.Navigator.Canvas
 
@@ -81,7 +77,11 @@ class winStarMap(winBase):
 		self.mode = "Normal"
 		self.current = -1
 
+		self.Bind(wx.EVT_SIZE, self.OnSize)
 		self.Bind(wx.EVT_ACTIVATE, self.OnShow)
+
+	def OnSize(self, evt):
+		self.Navigator.SetSize(self.GetClientSize())
 
 	def OnShow(self, evt):
 		self.Canvas.Draw()
