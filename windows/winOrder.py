@@ -33,28 +33,11 @@ defaults = {
 	constants.ARG_RANGE: [-1, -1, -1, -1],
 }
 
-# Shows messages from the game system to the player.
-class winOrder(winBase):
-	title = _("Orders")
-	
-	from defaults import winOrderDefaultPosition as DefaultPosition
-	from defaults import winOrderDefaultSize as DefaultSize
-	from defaults import winOrderDefaultShow as DefaultShow
-	
-	def __init__(self, application, parent):
-		winBase.__init__(self, application, parent)
-
-		self.Panel = panelOrder(application, self)
-
-	def __getattr__(self, key):
-		try:
-			return winBase.__getattr__(self, key)
-		except AttributeError:
-			return getattr(self.Panel, key)
-
 from xrc.panelOrder import panelOrderBase
-
 class panelOrder(panelOrderBase):
+	title = _("Orders")
+	from defaults import winOrderDefaultSize as DefaultSize
+
 	def __init__(self, application, parent):
 		panelOrderBase.__init__(self, parent)
 
@@ -78,6 +61,13 @@ class panelOrder(panelOrderBase):
 		self.Orders.Bind(wx.EVT_LIST_ITEM_SELECTED, self.OnOrderSelect)
 		self.Orders.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.OnOrderSelect)
 		self.Orders.Bind(wx.EVT_RIGHT_UP, self.OnRightClick)
+
+	def GetPaneInfo(self):
+		info = wx.aui.AuiPaneInfo()
+		info.MinSize(self.GetBestSize())
+		info.Left()
+		info.Layer(2)
+		return info
 
 	def InsertListItem(self, slot, order):
 		"""\

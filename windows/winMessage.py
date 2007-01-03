@@ -19,27 +19,7 @@ from winBase import *
 # Protocol Imports
 from tp.netlib import failed, GenericRS
 
-# Shows messages from the game system to the player.
-class winMessage(winBase):
-	title = _("Messages")
-
-	from defaults import winMessageDefaultPosition as DefaultPosition
-	from defaults import winMessageDefaultSize as DefaultSize
-	from defaults import winMessageDefaultShow as DefaultShow
-	
-	def __init__(self, application, parent):
-		winBase.__init__(self, application, parent)
-
-		self.Panel = panelMessage(application, self)
-
-	def __getattr__(self, key):
-		try:
-			return winBase.__getattr__(self, key)
-		except AttributeError:
-			return getattr(self.Panel, key)
-
 from xrc.panelMessage import panelMessageBase
-
 class panelMessage(panelMessageBase, winShiftMixIn):
 	html_filtered = """\
 <html>
@@ -110,6 +90,9 @@ class panelMessage(panelMessageBase, winShiftMixIn):
 </body>
 </html>"""
 
+	title = _("Messages")
+	from defaults import winMessageDefaultSize as DefaultSize
+
 	def __init__(self, application, parent):
 		panelMessageBase.__init__(self, parent)
 		winShiftMixIn.__init__(self)
@@ -129,6 +112,13 @@ class panelMessage(panelMessageBase, winShiftMixIn):
 
 		# Contains the message types to be filtered
 		self.filtered = Set()
+
+	def GetPaneInfo(self):
+		info = wx.aui.AuiPaneInfo()
+		info.MinSize(self.GetBestSize())
+		info.Bottom()
+		info.Layer(1)
+		return info
 
 	def Show(self, show=True):
 		if show:

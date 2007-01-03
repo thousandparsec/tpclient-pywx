@@ -230,6 +230,7 @@ class GUI(wx.App):
 		return r
 
 	def OnNetworkFailure(self, evt):
+		print "OnNetworkFailure", evt
 		self.Show(self.connectto)
 
 		# When the network fails pop-up a dialog then go to the connectto screen

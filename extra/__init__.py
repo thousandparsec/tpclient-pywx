@@ -540,3 +540,16 @@ wx.SimpleValidator = wxSimpleValidator
 
 from PopupCtrl import PopupCtrl
 wx.PopupCtrl = PopupCtrl
+
+
+if wx.VERSION_STRING < "2.8":
+		if wx.VERSION_STRING < "2.7.2" and wx.VERSION_STRING > "2.7.0":
+			import wx.aui as aui
+		else:
+			import PyAUI as aui
+			wx.aui = aui
+		aui.AuiManager		= aui.FrameManager
+		aui.AuiManagerEvent = aui.FrameManagerEvent
+		aui.AuiPaneInfo		= aui.PaneInfo
+		aui.AuiFloatingPane = aui.FloatingPane
+

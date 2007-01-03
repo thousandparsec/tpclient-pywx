@@ -129,6 +129,10 @@ if sys.platform == 'darwin':
 	print "Creating dmg package"
 	os.system("cd doc/mac/; chmod a+x pkg-dmg make-diskimage; ./make-diskimage ../../%s  ../../dist tpclient-pywx -null- dstore background.jpg" % dmg)
 elif sys.platform == 'win32':
+	# Check that gdi.dll exists, some windows need it
+	if not os.path.exists(os.path.join("dist", "gdiplus.dll")):
+		raise IOError("gdiplus.dll doesn't exist! Copy it to dist!")
+
 	# Repack the library.zip file
 	os.system(os.path.join("..", "scratchpad", "repack.bat"))
 	

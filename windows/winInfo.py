@@ -43,11 +43,6 @@ def splitall(start):
 
 WAITING = os.path.join(".", "graphics", "loading.gif")
 class winInfo(winBase):
-	title = _("Information")
-
-	from defaults import winInfoDefaultPosition as DefaultPosition
-	from defaults import winInfoDefaultSize as DefaultSize
-	from defaults import winInfoDefaultShow as DefaultShow
 	
 	def __init__(self, application, parent):
 		winBase.__init__(self, application, parent)
@@ -62,14 +57,27 @@ class winInfo(winBase):
 
 from xrc.panelInformation import panelInformationBase
 class panelInformation(panelInformationBase):
+	title = _("Information")
+	from defaults import winInfoDefaultSize as DefaultSize
+
 	def __init__(self, application, parent):
 		panelInformationBase.__init__(self, parent)
 
 		self.application = application
 		self.current = -1
 
+		self.Animation.Hide()
+		self.Image.Hide()
+
 		# Find the images
 		self.images = {'nebula':{'still':[]}, 'star':{'still':[]}, 'planet':{'still':[]}}
+
+	def GetPaneInfo(self):
+		info = wx.aui.AuiPaneInfo()
+		info.MinSize(self.GetBestSize())
+		info.Left()
+		info.Layer(2)
+		return info
 
 	def OnMediaUpdate(self, evt):
 		files = {}

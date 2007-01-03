@@ -80,6 +80,11 @@ class panelStarMap(wx.Panel):
 		self.Bind(wx.EVT_SIZE, self.OnSize)
 		self.Bind(wx.EVT_ACTIVATE, self.OnShow)
 
+	def GetPaneInfo(self):
+		info = wx.aui.AuiPaneInfo()
+		info.Center()
+		return info
+
 	def OnSize(self, evt):
 		self.Navigator.SetSize(self.GetClientSize())
 

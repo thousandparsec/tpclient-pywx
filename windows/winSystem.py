@@ -21,6 +21,8 @@ DESC = 1
 # Show the universe
 class panelSystem(wx.Panel):
 	title = _("System")
+
+	from defaults import winSystemDefaultSize as DefaultSize
 	
 	def __init__(self, application, parent):
 		wx.Panel.__init__(self, parent)
@@ -50,6 +52,13 @@ class panelSystem(wx.Panel):
 		self.Bind(wx.EVT_TREE_SEL_CHANGED, self.OnSelectItem)
 
 		self.Bind(wx.EVT_SIZE, self.OnSize)
+
+	def GetPaneInfo(self):
+		info = wx.aui.AuiPaneInfo()
+		info.MinSize(self.GetMinSize())
+		info.Bottom()
+		info.Layer(1)
+		return info
 
 	def OnSize(self, evt):
 		self.tree.SetSize(self.GetClientSize())
