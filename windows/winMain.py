@@ -222,7 +222,6 @@ class winMain(winMDIBase):
 		from windows.winDesign import winDesign
 		winDesign(application, self)
 
-		import wx.aui
 		self.mgr = wx.aui.AuiManager()
 		self.mgr.SetFrame(self)
 
