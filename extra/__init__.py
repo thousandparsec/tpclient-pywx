@@ -548,6 +548,9 @@ if wx.VERSION_STRING < "2.8":
 		else:
 			import PyAUI as aui
 			wx.aui = aui
+
+		print "Using the following AUI", wx.aui
+
 		aui.AuiManager		= aui.FrameManager
 		aui.AuiManagerEvent = aui.FrameManagerEvent
 		aui.AuiPaneInfo		= aui.PaneInfo
