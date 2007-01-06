@@ -128,8 +128,8 @@ class panelSystem(wx.Panel):
 				else:
 					new_root = self.tree.AppendItem(root, caption, self.icons['Unknown'])
 		
-		if object != None and hasattr(object, "owner") and object.owner == self.application.cache.players[0].id:
-			self.tree.SetItemTextColour(new_root, 'Blue')
+		if object != None and hasattr(object, "owner") and object.owner != -1:
+			self.tree.SetItemTextColour(new_root, object.owner == self.application.cache.players[0].id and 'DarkGreen' or 'DarkRed')
 
 		if hasattr(object, "contains"):
 			for id in object.contains:
