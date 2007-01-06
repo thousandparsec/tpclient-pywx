@@ -132,9 +132,9 @@ class panelStarMap(wx.Panel):
 						if len(owners) > 0:
 							if len(owners) == 1:
 								if pid in owners:
-									color = "Green"
+									color = "DarkGreen"
 								else:
-									color = "Red"
+									color = "DarkRed"
 							else:
 								if pid in owners:
 									color = "Yellow"
