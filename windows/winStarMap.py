@@ -58,6 +58,12 @@ def scale(value):
 	else:
 		return round(value/(1000*1000))
 
+def contains(cid, cache, d):
+	for id in cache[cid].contains:
+		d.append(id)
+		contains(id, cache, d)
+	return d	
+
 # Shows the main map of the universe.
 class panelStarMap(wx.Panel):
 	title = _("StarMap")
@@ -98,7 +104,8 @@ class panelStarMap(wx.Panel):
 		
 			application = self.application
 			C = self.Create
-			
+
+			pid = application.cache.players[0].id
 			for object in application.cache.objects.values():
 				if isinstance(object, StarSystem):
 					s = scale(object.size)
@@ -108,12 +115,38 @@ class panelStarMap(wx.Panel):
 					# Draw an orbit
 					so = round(s * 1.25)
 
+					color = "White"
 					if len(object.contains) > 0:
-						C(object, CircleNoSmall((x,y),so,10,LineWidth=1,LineColor="White",FillColor="Black"))
+
+						# Find all the owners of the containing objects
+						print contains(object.id, application.cache.objects, [])
+
+						owners = []
+						for id in contains(object.id, application.cache.objects, []):
+							child = application.cache.objects[id]
+							if hasattr(child, "owner") and child.owner != -1:
+								if not child.owner in owners:
+									owners.append(child.owner)
+
+						print owners
+						if len(owners) > 0:
+							if len(owners) == 1:
+								if pid in owners:
+									color = "Green"
+								else:
+									color = "Red"
+							else:
+								if pid in owners:
+									color = "Yellow"
+								else:
+									color = "Pink"
+
+						C(object, CircleNoSmall((x,y),so,10,LineWidth=1,LineColor=color,FillColor="Black"))
 					else:	
 						C(object, CircleNoSmall((x,y),so,10,LineWidth=1,LineColor="Black",FillColor="Black"))
 
-					C(object, CircleNoSmall((x,y),s,4,LineWidth=1,LineColor="Yellow",FillColor="Yellow"))
+					print "Color for ", object.id, color
+					C(object, CircleNoSmall((x,y),s,4,LineWidth=1,LineColor=color,FillColor=color))
 					C(object, Text(object.name,(x,y-100),Position="tc",Color="White",Size=8))
 
 				if isinstance(object, Fleet):
@@ -128,7 +161,15 @@ class panelStarMap(wx.Panel):
 						continue
 
 					# Draw the ship
-					ship = PolyNoSize([(0,0), (3,0), (0,4), (0,2), (-3,0)], LineWidth=1,LineColor="Blue",FillColor="Blue")
+					if hasattr(object, "owner"):
+						if object.owner == application.cache.players[0].id:
+							color = "Blue"
+						else:
+							color = "Red"
+					else:
+						color = "White"
+						
+					ship = PolyNoSize([(0,0), (3,0), (0,4), (0,2), (-3,0)], LineWidth=1,LineColor=color,FillColor=color)
 					ship.Move(scale(object.pos))
 
 					C(object, ship, name="icon")
