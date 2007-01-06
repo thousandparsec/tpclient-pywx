@@ -181,6 +181,7 @@ class panelInformation(panelInformationBase):
 			self.image_waiting = image[0]
 			self.DisplayImage(os.path.join("graphics", "loading.png"))
 		else:
+			self.image_waiting = None
 			self.DisplayImage(file)
 
 		# Add the object type specific information
