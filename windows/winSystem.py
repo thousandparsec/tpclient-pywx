@@ -87,22 +87,49 @@ class panelSystem(wx.Panel):
 			self.tree.SelectItem(selected)
 			self.tree.EnsureVisible(selected)
 		
+	def ObjectTurnSummary(self, object):
+		"""\
+		Builds a brief string, identifying the number of turns remaining
+		on the given object's current order, and the total number of turns
+		allocated to all future scheduled orders.
+		"""
+		orders = self.application.cache.orders[object.id]
+		if len(orders) == 0:
+			return "#"
+		elif len(orders) == 1:
+			return str(orders[0].turns)
+		else:
+			turns = 0
+			for order in orders:
+				turns += order.turns
+			turns -= orders[0].turns
+
+			return str(orders[0].turns) + ", " + str(turns)
+
 	def Add(self, root, object, selected_id=-1):
 		"""\
 		Recursive method which builds the object list.
 		"""
 		selected = None
 		new_root = None
+		orderable = object != None and hasattr(object, "order_types") and len(object.order_types) > 0
+
+		caption = object.name
+
+		if orderable:
+			caption += "  [" + self.ObjectTurnSummary(object) + "]"
 		
 		if root == None:
 			new_root = self.tree.AddRoot(_("Known Universe"), self.icons['Root'])
 		else:
 			if object != None:
 				if self.icons.has_key(object.__class__.__name__):
-					new_root = self.tree.AppendItem(root, object.name, self.icons[object.__class__.__name__])
+					new_root = self.tree.AppendItem(root, caption, self.icons[object.__class__.__name__])
 				else:
-					new_root = self.tree.AppendItem(root, object.name, self.icons['Unknown'])
+					new_root = self.tree.AppendItem(root, caption, self.icons['Unknown'])
 		
+		self.tree.SetItemBold(new_root, orderable)
+
 		if hasattr(object, "contains"):
 			for id in object.contains:
 				if not self.application.cache.objects.has_key(id):
