@@ -262,12 +262,9 @@ class winMain(winMDIBase):
 			except Exception, e:
 				print e
 
-		# Lock the size for non-MDI platforms
-#		if wx.Platform != "__WXMSW__":
-#			self.SetSizeHard(self.config['size'])
-
 		winMDIBase.Show(self)
 
+		wx.CallAfter(self.mgr.Update)
 		wx.CallAfter(self.ShowTips)
 
 		self.UpdateEOT()
@@ -401,9 +398,6 @@ class winMain(winMDIBase):
 		source.Bind(wx.EVT_MENU, self.ShowTips, id=ID_WIN_TIPS)
 		return bar
 
-	def temp(self, evt):
-		print "temp", self, evt
-
 	def AccelTable(self, source):
 		source.Bind(wx.EVT_KEY_DOWN, self.temp)
 
@@ -427,6 +421,7 @@ class winMain(winMDIBase):
 		self.OnProgramExit(evt)
 
 	def OnProgramExit(self, evt):
+#		self.mgr.UnInit()
 		self.application.Exit()
 
 	def ShowTips(self, override=None):
