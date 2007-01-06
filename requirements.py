@@ -7,7 +7,15 @@ from types import StringTypes
 def cmp(ver1, ver2):
 	if type(ver2) in StringTypes:
 		ver2 = [int(x) for x in ver2.split('.')]
-	ver2 = [int(x) for x in ver2]
+
+	ver2 = list(ver2)
+	for i,x in enumerate(ver2):
+		try:
+			ver2[i] = int(x)
+		except ValueError:
+			# This means there could be a "pre" or "rc" something in the version
+			# We will treat this version as the one before.
+			ver2[i] = int(re.search('(\d+)', x).group())-1
 
 	for a, b in zip(ver1, ver2):
 		if a <= b:
