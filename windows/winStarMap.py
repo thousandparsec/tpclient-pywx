@@ -89,6 +89,9 @@ class panelStarMap(wx.Panel):
 	def GetPaneInfo(self):
 		info = wx.aui.AuiPaneInfo()
 		info.Center()
+		info.PinButton(True)
+		info.MaximizeButton(True)
+#		info.MinimizeButton(True)
 		return info
 
 	def OnSize(self, evt):
