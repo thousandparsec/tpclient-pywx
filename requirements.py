@@ -36,10 +36,17 @@ except ImportError:
 
 wx_version = (2, 6, 0, 0)
 try:
+	import os.path
+	if os.path.exists("wxversion"):
+		import wxversion
+		wxversion.select(open("wxversion").read())
+
 	import wx
 
 	if not cmp(wx_version, wx.__version__.split('.')):
 		raise ImportError("wxPython was too old")
+
+	print "wxPython Version", wx.__version__
 except (ImportError, KeyError), e:
 	print e
 	notfound.append("wxPython > 2.6.0")
@@ -108,3 +115,5 @@ if len(notfound) > 0:
 
 	import sys
 	sys.exit(1)
+
+import extra
