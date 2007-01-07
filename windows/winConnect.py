@@ -18,43 +18,7 @@ from xrc.winConnect import winConnectBase
 from xrc.configConnect import configConnectBase
 from utils import *
 
-def url2bits(line):
-	urlspliter = r'(.*?://)?(((.*):(.*)@)|(.*)@)?(.*?)(:(.*?))?(/.*?)?$'
-	groups = re.compile(urlspliter, re.M).search(line).groups()
-	
-	proto = groups[0]
-
-	if not groups[3] is None:
-		username = groups[3]
-	elif not groups[5] is None:
-		username = groups[5]
-	else:
-		username = None
-
-	server = groups[6]
-	port = groups[8]
-
-	password = groups[4]
-	if not password is None:
-		if password[-1] is '@':
-			password = password[:-1]
-
-	game = groups[9]
-	if not game is None:
-		if game[0] == '/':
-			game = game[1:]
-		if len(game) == 0:
-			game = None
-
-	if proto is None:
-		one = server
-	else:
-		one = "%s%s" % (proto, server)
-
-	if not port is None:
-		one = "%s:%s" % (one, port)
-
-	return (one, username, game, password)
+from tp.netlib.client import url2bits
 
 class usernameMixIn:
 	def __init__(self):
