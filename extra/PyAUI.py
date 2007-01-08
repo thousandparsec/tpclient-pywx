@@ -332,25 +332,29 @@ def GetCloseImage():
     stream = cStringIO.StringIO(GetCloseData())
     return wx.ImageFromStream(stream)
 
+def Colorize(i, color):
+    if wx.VERSION_STRING < "2.7":
+        i.Replace(255,255,255,123,123,123)
+        i.Replace(0,0,0,color.Red(),color.Green(),color.Blue())
+        i.SetMaskColour(123,123,123)
+    else:
+        i.Replace(0,0,0,123,123,123)
+        i.Replace(255,255,255,color.Red(),color.Green(),color.Blue())
+        i.SetMaskColour(123,123,123)
+
 def GetRestoreImage(color):
-    i = wx.ImageFromBitmap(wx.BitmapFromBits(restore_bits, 16, 16))
-    i.Replace(255,255,255,123,123,123)
-    i.Replace(0,0,0,color.Red(),color.Green(),color.Blue())
-    i.SetMaskColour(123,123,123)
+    i = wx.ImageFromBitmap(wx.BitmapFromBits(restore_bits, 16, 16, 1))
+    Colorize(i, color)
     return i
 
 def GetMaximizeImage(color):
-    i = wx.ImageFromBitmap(wx.BitmapFromBits(max_bits, 16, 16))
-    i.Replace(255,255,255,123,123,123)
-    i.Replace(0,0,0,color.Red(),color.Green(),color.Blue())
-    i.SetMaskColour(123,123,123)
+    i = wx.ImageFromBitmap(wx.BitmapFromBits(max_bits, 16, 16, 1))
+    Colorize(i, color)
     return i
 
 def GetPinImage(color):
-    i = wx.ImageFromBitmap(wx.BitmapFromBits(pin_bits, 16, 16))
-    i.Replace(255,255,255,123,123,123)
-    i.Replace(0,0,0,color.Red(),color.Green(),color.Blue())
-    i.SetMaskColour(123,123,123)
+    i = wx.ImageFromBitmap(wx.BitmapFromBits(pin_bits, 16, 16, 1))
+    Colorize(i, color)
     return i
 
 def StepColour(c, percent):
