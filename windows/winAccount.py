@@ -271,8 +271,13 @@ class winAccount(winMainBase):
 			dlg.ShowModal()
 			return
 
-		url = self.host.GetValue()		
-		p = url.find('://')+3
+		url = self.host.GetValue()
+
+		p = url.find('://')
+		if p != -1:
+			p += 3
+		else:
+			p = 0		
 
 		fullurl = "%s%s:%s@%s/%s" % (url[:p], username, password1, url[p:], game)
 		print fullurl
