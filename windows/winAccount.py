@@ -287,7 +287,7 @@ class winAccount(winMainBase):
 		self.application.network.Call(self.application.network.NewAccount, username, password1, email)
 
 	def OnCancel(self, evt):
-		self.application.gui.Show(self.application.gui.connectto)
+		self.application.gui.Show(self.application.gui.servers)
 
 	# Config Functions -----------------------------------------------------------------------------
 	def ConfigDefault(self, config=None):

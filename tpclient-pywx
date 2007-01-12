@@ -18,6 +18,7 @@ import pprint
 import socket
 import time
 import threading
+import traceback
 from types import *
 
 # Local imports
@@ -230,13 +231,18 @@ class GUI(wx.App):
 		return r
 
 	def OnNetworkFailure(self, evt):
-		print "OnNetworkFailure", evt
-		self.Show(self.connectto)
+		utils.do_traceback()
 
-		# When the network fails pop-up a dialog then go to the connectto screen
-		dlg = wx.MessageDialog(self.application.gui.current, str(evt), _("Network Error"), wx.OK|wx.ICON_ERROR)
-		dlg.ShowModal()
-		dlg.Destroy()
+		if hasattr(self.current, "OnNetworkFailure"):
+			return
+		else:
+			print "OnNetworkFailure", evt
+			self.Show(self.connectto)
+
+			# When the network fails pop-up a dialog then go to the connectto screen
+			dlg = wx.MessageDialog(self.application.gui.current, str(evt), _("Network Error"), wx.OK|wx.ICON_ERROR)
+			dlg.ShowModal()
+			dlg.Destroy()
 
 class Network(NetworkThread):
 	def ConnectTo(self, host, username, password, debug=False):
