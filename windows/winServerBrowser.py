@@ -38,53 +38,77 @@ class winServerBrowser(winServerBrowserBase, winMainBaseXRC):
 
 		self.OnToggleLocation(False)
 
+	def AddGame(self, game=None, resize=True):
+		print "AddGame", self, game, resize
+
+		ctrl = self.Servers
+		Columns, Columns_Sizes = self.ServersColumns, self.ServersColumns_Sizes
+
+		if not game is None:
+			print game
+
+			i = ctrl.GetItemCount()
+			ctrl.InsertStringItem(i, "")
+			ctrl.SetItemPyData(i, game)
+
+			ctrl.SetStringItem(i, Columns.index("Name"), game.name)
+			if game.where == "local":
+				ctrl.SetItemTextColour(i, wx.Color(0,0,255))
+
+			try:
+				ctrl.SetStringItem(i, Columns.index("Playing"), "%s (%s)" % (game.rule, game.rulever))
+			except AttributeError: pass
+			try:
+				ctrl.SetStringItem(i, Columns.index("Server"),  "%s (%s)" % (game.sertype, game.server))
+			except AttributeError: pass
+
+			try:
+				ctrl.SetToolTipItem(i, game.cmt)
+			except AttributeError: pass
+
+			try:
+				ctrl.SetStringItem(i, Columns.index("C"),  game.cons)
+			except AttributeError: pass
+
+			try:
+				ctrl.SetStringItem(i, Columns.index("O"),  game.cons)
+			except AttributeError: pass
+
+			try:
+				ctrl.SetStringItem(i, Columns.index("P"),  game.plys)
+			except AttributeError: pass
+
+		if resize:
+			for i, name in enumerate(Columns):
+				ctrl.SetColumnWidth(i, Columns_Sizes[i])
+
 	def Setup(self):
 		ctrl = self.Servers
 		Columns, Columns_Sizes = self.ServersColumns, self.ServersColumns_Sizes
 
-		local, remote = self.application.finder.Games()
-
 		ctrl.ClearAll()
 		for i, name in enumerate(Columns):
 			ctrl.InsertColumn(i, name)
+
+		local, remote = self.application.finder.Games()
 		for games in (local, remote):
 			for game in games.values():
-				i = ctrl.GetItemCount()
-
-				ctrl.InsertStringItem(i, "")
-				ctrl.SetItemPyData(i, game)
-
-				ctrl.SetStringItem(i, Columns.index("Name"), game.name)
 				if game.name in local:
 					game.where = "local"
-					ctrl.SetItemTextColour(i, wx.Color(0,0,255))
 				else:
 					game.where = "remote"
+				self.AddGame(game, False)
+			self.AddGame(None, True)
 
-				try:
-					ctrl.SetStringItem(i, Columns.index("Playing"), "%s (%s)" % (game.rule, game.rulever))
-				except AttributeError: pass
-				try:
-					ctrl.SetStringItem(i, Columns.index("Server"),  "%s (%s)" % (game.sertype, game.server))
-				except AttributeError: pass
+	def OnFoundLocalGame(self, evt):
+		game = evt.game
+		game.where = "local"
+		self.AddGame(game)
 
-				try:
-					ctrl.SetToolTipItem(i, game.cmt)
-				except AttributeError: pass
-
-				try:
-					ctrl.SetStringItem(i, Columns.index("C"),  game.cons)
-				except AttributeError: pass
-
-				try:
-					ctrl.SetStringItem(i, Columns.index("O"),  game.cons)
-				except AttributeError: pass
-
-				try:
-					ctrl.SetStringItem(i, Columns.index("P"),  game.plys)
-				except AttributeError: pass
-			for i, name in enumerate(Columns):
-				ctrl.SetColumnWidth(i, Columns_Sizes[i])
+	def OnFoundRemoteGame(self, evt):
+		game = evt.game
+		game.where = "remote"
+		self.AddGame(game)
 
 	def OnServerSelect(self, evt):
 		ctrl = self.Locations
