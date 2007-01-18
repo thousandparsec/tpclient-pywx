@@ -41,7 +41,8 @@ def splitall(start):
 	return bits
 
 
-WAITING = os.path.join(".", "graphics", "loading.gif")
+from requirements import graphics
+WAITING = os.path.join(graphics, "graphics", "loading.gif")
 
 class winInfo(winBase):
 	title = _("Information")
@@ -189,14 +190,14 @@ class winInfo(winBase):
 
 			file = self.application.media.GetFile(*image)
 		except ZeroDivisionError, e:
-			file = os.path.join("graphics", "unknown.png")
+			file = os.path.join(graphics, "graphics", "unknown.png")
 		except Exception, e:
 			print e
 			file = None
 
 		if file is None:
 			self.image_waiting = image[0]
-			self.DisplayImage(os.path.join("graphics", "loading.png"))
+			self.DisplayImage(os.path.join(graphics, "graphics", "loading.png"))
 		else:
 			self.DisplayImage(file)
 

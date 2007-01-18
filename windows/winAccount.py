@@ -22,6 +22,7 @@ from tp.netlib import constants as features
 from winBase import winMainBase
 from utils import *
 
+from requirements import graphics
 class winAccount(winMainBase):
 	title = _("Account")
 
@@ -47,7 +48,7 @@ class winAccount(winMainBase):
 		self.throbber = GIFAnimationCtrl( panel, -1)
 		import os
 		print os.getcwd()
-		self.throbber.LoadFile(os.path.join("graphics", "throbber.gif"))
+		self.throbber.LoadFile(os.path.join(graphics, "graphics", "throbber.gif"))
 		self.throbber.Hide()
 
 		# Button to connect to the server

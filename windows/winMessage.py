@@ -30,6 +30,8 @@ MESSAGE_LINE = 10007
 MESSAGE_NEW = 10008
 MESSAGE_DEL = 10009
 
+from requirements import graphics
+
 # Shows messages from the game system to the player.
 class winMessage(winBase, winShiftMixIn):
 	title = _("Messages")
@@ -157,7 +159,7 @@ class winMessage(winBase, winShiftMixIn):
 <html>
 <body>
 <center>
-	<table cols=1 width="100%%" background="./graphics/filtered.png">
+	<table cols=1 width="100%%" background="%GRAPHICS/graphics/filtered.png">
 		<tr>
 			<td><b>Subject:</b> %(subject)s</td>
 		</tr>
@@ -167,7 +169,7 @@ class winMessage(winBase, winShiftMixIn):
 	</table>
 </center>
 </body>
-</html>"""
+</html>""".replace("%GRAPHICS", graphics)
 
 	html_message = """\
 <html>
@@ -183,7 +185,7 @@ class winMessage(winBase, winShiftMixIn):
 	</table>
 </center>
 </body>
-</html>"""
+</html>""".replace("%GRAPHICS", graphics)
 
 	html_nomessage = """\
 <html>
@@ -195,8 +197,8 @@ class winMessage(winBase, winShiftMixIn):
 		</tr>
 		<tr>
 			<td>
-			You have recived no messages this turn!<br><br>
-			Actually if you didn't recive any messages it most proberly
+			You have received no messages this turn!<br><br>
+			Actually if you didn't receive any messages it most probably
 			means that your client couldn't load the results from the server.
 			Try reload/restart the client.
 			</td>
@@ -210,17 +212,17 @@ class winMessage(winBase, winShiftMixIn):
 <html>
 <body>
 <center>
-	<table cols=1 width="100%" background="./graphics/filtered.png">
+	<table cols=1 width="100%" background="%GRAPHICS/graphics/filtered.png">
 		<tr>
 			<td><b>Subject:</b> All messages filtered
 		</tr>
 		<tr>
-			<td>All messages you have recived this turn have been filtered.</td>
+			<td>All messages you have received this turn have been filtered.</td>
 		</tr>
 	</table>
 </center>
 </body>
-</html>"""
+</html>""".replace("%GRAPHICS", graphics)
 
 	def Show(self, show=True):
 		if show:

@@ -74,6 +74,7 @@ class ConfigMixIn(object):
 		"""
 		raise AssertionError("ConfigDisplayUpdate not implimented")
 
+from requirements import graphics
 class winMixIn(object):
 	"""
 	Applies to all windows.
@@ -85,7 +86,7 @@ class winMixIn(object):
 		self.config = self.ConfigDefault()
 
 		icon = wx.EmptyIcon()
-		icon.CopyFromBitmap(wx.Bitmap(os.path.join("graphics", "icon.ico"), wx.BITMAP_TYPE_ANY))
+		icon.CopyFromBitmap(wx.Bitmap(os.path.join(graphics, "graphics", "icon.ico"), wx.BITMAP_TYPE_ANY))
 		self.SetIcon(icon)
 
 	def SetSizeHard(self, pos):

@@ -102,6 +102,12 @@ if sys.platform == 'linux2':
 		print e
 		print "It is recommended that under gnome you have the python-gconf module installed so I can register URL handlers."
 
+import os
+if os.environ.has_key("TPCLIENT_MEDIA"):
+	graphics = os.environ["TPCLIENT_MEDIA"]
+else:
+	graphics = '.'
+
 if len(notfound) > 0:
 	print "The following requirements where not met"
 	for module in notfound:
