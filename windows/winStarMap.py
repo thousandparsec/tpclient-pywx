@@ -122,8 +122,6 @@ class panelStarMap(wx.Panel):
 					if len(object.contains) > 0:
 
 						# Find all the owners of the containing objects
-						print contains(object.id, application.cache.objects, [])
-
 						owners = []
 						for id in contains(object.id, application.cache.objects, []):
 							child = application.cache.objects[id]
@@ -131,7 +129,6 @@ class panelStarMap(wx.Panel):
 								if not child.owner in owners:
 									owners.append(child.owner)
 
-						print owners
 						if len(owners) > 0:
 							if len(owners) == 1:
 								if pid in owners:
@@ -148,7 +145,6 @@ class panelStarMap(wx.Panel):
 					else:	
 						C(object, CircleNoSmall((x,y),so,10,LineWidth=1,LineColor="Black",FillColor="Black"))
 
-					print "Color for ", object.id, color
 					C(object, CircleNoSmall((x,y),s,4,LineWidth=1,LineColor=color,FillColor=color))
 					C(object, Text(object.name,(x,y-100),Position="tc",Color="White",Size=8))
 
