@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource version="2.3.0.1" xmlns="http://www.wxwidgets.org/wxxrc">
+    <object class="wxFrame" name="winAccount" subclass="Frame">
+        <style>wxCAPTION|wxRESIZE_BORDER|wxSYSTEM_MENU|wxCLOSE_BOX</style>
+        <size>400,240</size>
+        <title>TP: Connect to a Server</title>
+        <object class="wxPanel" name="Panel">
+            <style>wxSUNKEN_BORDER|wxTAB_TRAVERSAL</style>
+            <object class="wxFlexGridSizer">
+                <cols>1</cols>
+                <rows>3</rows>
+                <vgap>0</vgap>
+                <hgap>0</hgap>
+                <growablecols>0</growablecols>
+                <object class="sizeritem">
+                    <flag>wxGROW|wxGROW|wxALL|wxADJUST_MINSIZE</flag>
+                    <border>5</border>
+                    <object class="wxStaticText" name="wxID_STATIC">
+                        <font>
+                            <size>14</size>
+                            <family>swiss</family>
+                            <weight>bold</weight>
+                            <face>Sans</face>
+                        </font>
+                        <style>wxALIGN_CENTRE</style>
+                        <label>Create an Account</label>
+                    </object>
+                </object>
+                <object class="sizeritem">
+                    <flag>wxGROW|wxGROW|wxALL</flag>
+                    <border>5</border>
+                    <object class="wxFlexGridSizer">
+                        <cols>2</cols>
+                        <rows>2</rows>
+                        <vgap>0</vgap>
+                        <hgap>0</hgap>
+                        <growablecols>1</growablecols>
+                        <growablerows>0,1,2</growablerows>
+                        <object class="sizeritem">
+                            <flag>wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE</flag>
+                            <border>5</border>
+                            <object class="wxStaticText" name="wxID_STATIC">
+                                <label>Server</label>
+                            </object>
+                        </object>
+                        <object class="sizeritem">
+                            <flag>wxGROW|wxGROW|wxALL</flag>
+                            <border>0</border>
+                            <object class="wxBoxSizer">
+                                <orient>wxHORIZONTAL</orient>
+                                <object class="sizeritem">
+                                    <flag>wxGROW|wxALL</flag>
+                                    <border>0</border>
+                                    <option>1</option>
+                                    <object class="wxComboBox" name="Server">
+                                        <tooltip>The URL for the Thousand Parsec server.</tooltip>
+                                        <style>wxCB_DROPDOWN</style>
+                                    </object>
+                                </object>
+                                <object class="sizeritem">
+                                    <flag>wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                    <border>0</border>
+                                    <object class="GIFAnimationCtrl" name="Checking">
+                                        <size>32,32</size>
+                                        <tooltip>Choose a server to create an account on.</tooltip>
+                                        <style>wxNO_BORDER</style>
+                                        <hidden>1</hidden>
+                                    </object>
+                                </object>
+                                <object class="sizeritem">
+                                    <flag>wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                    <border>0</border>
+                                    <object class="wxButton" name="Check">
+                                        <size>50,32</size>
+                                        <label>Check</label>
+                                    </object>
+                                </object>
+                            </object>
+                        </object>
+                        <object class="sizeritem">
+                            <flag>wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE</flag>
+                            <border>5</border>
+                            <object class="wxStaticText" name="wxID_STATIC">
+                                <label>Username</label>
+                            </object>
+                        </object>
+                        <object class="sizeritem">
+                            <flag>wxGROW|wxGROW|wxALL</flag>
+                            <border>0</border>
+                            <object class="wxFlexGridSizer">
+                                <cols>2</cols>
+                                <rows>2</rows>
+                                <vgap>0</vgap>
+                                <hgap>0</hgap>
+                                <growablecols>0</growablecols>
+                                <object class="sizeritem">
+                                    <flag>wxGROW|wxGROW|wxALL</flag>
+                                    <border>1</border>
+                                    <object class="wxTextCtrl" name="Username">
+                                        <tooltip>The username for the account on the Thousand Parsec server.</tooltip>
+                                        <enabled>0</enabled>
+                                    </object>
+                                </object>
+                                <object class="sizeritem">
+                                    <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                    <border>0</border>
+                                    <object class="wxToggleButton" name="GameShow">
+                                        <size>25,25</size>
+                                        <tooltip>Show seperate game box.</tooltip>
+                                        <enabled>0</enabled>
+                                        <label>G</label>
+                                        <checked>0</checked>
+                                    </object>
+                                </object>
+                            </object>
+                        </object>
+                        <object class="sizeritem">
+                            <flag>wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE</flag>
+                            <border>5</border>
+                            <object class="wxStaticText" name="GameTitle">
+                                <hidden>1</hidden>
+                                <label>Game</label>
+                            </object>
+                        </object>
+                        <object class="sizeritem">
+                            <flag>wxGROW|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                            <border>1</border>
+                            <object class="wxTextCtrl" name="Game">
+                                <hidden>1</hidden>
+                            </object>
+                        </object>
+                        <object class="sizeritem">
+                            <flag>wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE</flag>
+                            <border>5</border>
+                            <object class="wxStaticText" name="wxID_STATIC">
+                                <label>Password</label>
+                            </object>
+                        </object>
+                        <object class="sizeritem">
+                            <flag>wxGROW|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                            <border>1</border>
+                            <object class="wxTextCtrl" name="Password1">
+                                <tooltip>Choose your password here.</tooltip>
+                                <style>wxTE_PASSWORD</style>
+                                <enabled>0</enabled>
+                            </object>
+                        </object>
+                        <object class="sizeritem">
+                            <flag>wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE</flag>
+                            <border>5</border>
+                            <object class="wxStaticText" name="wxID_STATIC">
+                                <label> </label>
+                            </object>
+                        </object>
+                        <object class="sizeritem">
+                            <flag>wxGROW|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                            <border>1</border>
+                            <object class="wxTextCtrl" name="Password2">
+                                <tooltip>Repeat the password</tooltip>
+                                <style>wxTE_PASSWORD</style>
+                                <enabled>0</enabled>
+                            </object>
+                        </object>
+                        <object class="sizeritem">
+                            <flag>wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE</flag>
+                            <border>5</border>
+                            <object class="wxStaticText" name="wxID_STATIC">
+                                <label>Email </label>
+                            </object>
+                        </object>
+                        <object class="sizeritem">
+                            <flag>wxGROW|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                            <border>1</border>
+                            <object class="wxTextCtrl" name="Email">
+                                <size>280,-1</size>
+                                <tooltip>Repeat the password</tooltip>
+                                <enabled>0</enabled>
+                            </object>
+                        </object>
+                    </object>
+                </object>
+                <object class="sizeritem">
+                    <flag>wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                    <border>3</border>
+                    <object class="wxStdDialogButtonSizer">
+                        <object class="button">
+                            <flag>wxALIGN_CENTER_HORIZONTAL|wxLEFT|wxBOTTOM</flag>
+                            <border>5</border>
+                            <object class="wxButton" name="wxID_OK">
+                                <enabled>0</enabled>
+                                <label>&amp;OK</label>
+                                <default>1</default>
+                            </object>
+                        </object>
+                        <object class="button">
+                            <flag>wxALIGN_RIGHT|wxBOTTOM</flag>
+                            <border>5</border>
+                            <object class="wxButton" name="wxID_CANCEL">
+                                <label>&amp;Cancel</label>
+                            </object>
+                        </object>
+                    </object>
+                </object>
+            </object>
+        </object>
+    </object>
+</resource>
