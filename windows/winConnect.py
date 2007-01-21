@@ -82,6 +82,14 @@ class usernameMixIn:
 		else:
 			return username
 
+	def GetUsernameGame(self):
+		game = self.Game.GetValue()
+		username = self.Username.GetValue()
+		if len(game) > 0:
+			return (username, game)
+		else:
+			return (username, "")
+
 	def SetUsername(self, value):
 		# Split the part after the @ into the game box
 		username = value.split('@')
