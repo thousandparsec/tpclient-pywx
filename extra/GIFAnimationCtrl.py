@@ -64,8 +64,11 @@ try:
 			self.Bind(wx.EVT_TIMER, self.OnTimer, self.timer)
 
 		def Play(self):
-			#print "Starting Animation"
-			self.timer.Start(self.delay)
+			if hasattr(self, "gif"):
+				#print "Starting Animation"
+				self.timer.Start(self.delay)
+			else:
+				raise IOError("No file loaded...")
 
 		def Stop(self):
 			#print "Stoping Animation"
