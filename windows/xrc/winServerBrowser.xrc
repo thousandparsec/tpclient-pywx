@@ -157,7 +157,7 @@
                             <border>0</border>
                             <object class="wxButton" name="wxID_REFRESH">
                                 <tooltip>Force a refresh of the server list.</tooltip>
-                                <label>Refresh</label>
+                                <label>&amp;Refresh</label>
                                 <default>1</default>
                             </object>
                         </object>
@@ -171,7 +171,7 @@
                             <border>0</border>
                             <object platform="unix" class="wxButton" name="NewAccount">
                                 <tooltip>Create a new account on the currently selected server.</tooltip>
-                                <label>New Account</label>
+                                <label>&amp;New Account</label>
                                 <default>1</default>
                             </object>
                         </object>
@@ -180,7 +180,7 @@
                             <border>0</border>
                             <object class="wxButton" name="ConnectTo">
                                 <tooltip>Connect to the currently selected server.</tooltip>
-                                <label>Connect</label>
+                                <label>C&amp;onnect</label>
                             </object>
                         </object>
                         <object class="sizeritem">
