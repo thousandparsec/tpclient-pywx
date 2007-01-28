@@ -45,8 +45,6 @@ class winServerBrowser(winServerBrowserBase, winMainBaseXRC):
 		Columns, Columns_Sizes = self.ServersColumns, self.ServersColumns_Sizes
 
 		if not game is None:
-			print game
-
 			i = ctrl.GetItemCount()
 			ctrl.InsertStringItem(i, "")
 			ctrl.SetItemPyData(i, game)
@@ -62,20 +60,24 @@ class winServerBrowser(winServerBrowserBase, winMainBaseXRC):
 				ctrl.SetStringItem(i, Columns.index("Server"),  "%s (%s)" % (game.sertype, game.server))
 			except AttributeError: pass
 
+#			try:
+#				ctrl.SetToolTipItem(i, game.cmt)
+#			except AttributeError: pass
+
 			try:
-				ctrl.SetToolTipItem(i, game.cmt)
+				ctrl.SetStringItem(i, Columns.index("C"),  str(game.cons))
 			except AttributeError: pass
 
 			try:
-				ctrl.SetStringItem(i, Columns.index("C"),  game.cons)
+				ctrl.SetStringItem(i, Columns.index("O"),  str(game.objs))
 			except AttributeError: pass
 
 			try:
-				ctrl.SetStringItem(i, Columns.index("O"),  game.cons)
+				ctrl.SetStringItem(i, Columns.index("P"),  str(game.plys))
 			except AttributeError: pass
 
 			try:
-				ctrl.SetStringItem(i, Columns.index("P"),  game.plys)
+				ctrl.SetStringItem(i, Columns.index("Other"), game.cmt)
 			except AttributeError: pass
 
 		if resize:
@@ -125,7 +127,6 @@ class winServerBrowser(winServerBrowserBase, winMainBaseXRC):
 		# Populate the columns with data
 		for type, addrs in game.locations.items():
 			for dns, ip, port in addrs:
-				print repr((type, dns, ip, port))
 				i = ctrl.GetItemCount()
 
 				ctrl.InsertStringItem(i, "")
