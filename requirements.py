@@ -1,9 +1,19 @@
 # This file checks you have installed the requirements for tpclient-pywx 
 # It can be run as standalone but is also run by the client at startup
 
-notfound = []
+notfound    = []
+recommended = []
+
+# Try and figure out what type of system this computer is running.
+import os
+result = os.system('apt-get --version > /dev/null 2>&1') 
+if result == 0:
+	system = "debian-based"
+elif result == 32512:
+	system = "unknown"
 
 from types import StringTypes
+import re
 def cmp(ver1, ver2):
 	if type(ver2) in StringTypes:
 		ver2 = [int(x) for x in ver2.split('.')]
@@ -32,7 +42,11 @@ def tostr(ver1):
 try:
 	import numpy
 except ImportError:
-	notfound.append("numpy or scipy")
+	if system == "debian-based":
+		notfound.append("python-numpy")
+		notfound.append("python-numpy-ext")
+	else:
+		notfound.append("NumPy or SciPy")
 
 wx_version = (2, 6, 0, 0)
 try:
@@ -49,7 +63,51 @@ try:
 	print "wxPython Version", wx.__version__
 except (ImportError, KeyError), e:
 	print e
-	notfound.append("wxPython > 2.6.0")
+
+	if system == "debian-based":
+		notfound.append("python-wxgtk2.6")
+	else:
+		notfound.append("wxPython > 2.6.0")
+
+import __builtin__
+try:
+	import gettext
+	
+	gettext.install("pywx-client")
+	__builtin__._ = gettext.gettext	
+except ImportError, e:
+	print e
+	def _(s):
+		return s
+	__builtin__._ = _
+
+	reason = "Without gettext support localisation will be disabled."
+	if system == "debian-based":
+		recommended.append(("python-gettext", reason))
+	else:
+		recommended.append(("Python with gettext enabled.", reason))
+
+try:
+	import psyco
+except ImportError, e:
+	print e
+
+	reason = "Installing pysco can give a 10-20% speed increase in starmap calculations."
+	if system == "debian-based":
+		recommended.append(("python-pysco", reason))
+	else:
+		recommended.append(("Pysco JIT compiler.", reason))
+
+try:
+	import Image
+except ImportError, e:
+	print e
+	reason = "Installing the PIL library will increase speed of displaying graphics."
+
+	if system == "debian-based":
+		recommended.append(("python-imaging", reason))
+	else:
+		recommended.append(("Python Imaging library.", reason))
 
 netlib_version = (0, 2, 1)
 try:
@@ -72,48 +130,78 @@ except (ImportError, KeyError), e:
 	print e
 	notfound.append("tp.client > " + tostr(client_version))
 
-import __builtin__
-try:
-	import gettext
-	
-	gettext.install("pywx-client")
-	__builtin__._ = gettext.gettext	
-except ImportError:
-	def _(s):
-		return s
-	__builtin__._ = _
+if len(notfound) == 0:
 
 
-try:
-	import Image
-except ImportError, e:
-	print e
-	print "It is highly recommended to install the PIL library, speed will be greatly improved."
+	import sys
+	if sys.platform == 'linux2':
+		import os.path, stat
+		location = os.path.join(os.path.dirname(os.path.join(os.path.abspath(__file__))), "tpclient-pywx")
+		if not os.path.exists(location):
+			print "Hrm, unable to find tpclient-pywx are you running outside a tpclient-pywx tree?"
+		else:
+			print location
+			# Check the file is executable
+			os.chmod(location, stat.S_IRUSR|stat.S_IWUSR|stat.S_IXUSR|stat.S_IRGRP|stat.S_IXGRP|stat.S_IROTH|stat.S_IXOTH)
 
-import sys
-if sys.platform == 'linux2':
-	# Check the file is executable
-	import os.path, stat
-	location = os.path.join(os.path.dirname(os.path.join(os.path.abspath(__file__))), "tpclient-pywx")
-	print location
-	os.chmod(location, stat.S_IRUSR|stat.S_IWUSR|stat.S_IXUSR|stat.S_IRGRP|stat.S_IXGRP|stat.S_IROTH|stat.S_IXOTH)
+			# Register the URL Handlers
+			try:
+				import gconf
+				for prefix in ['tp', 'tps', 'tphttp', 'tphttps']:
+					gconf.client_get_default().set_string('/desktop/gnome/url-handlers/%s/command' % prefix, location)
+					gconf.client_get_default().set_bool('/desktop/gnome/url-handlers/%s/enabled' % prefix, True)
+			except ImportError, e:
+				print e
 
-	# Register the URL Handlers
-	try:
-		import gconf
-		for prefix in ['tp', 'tps', 'tphttp', 'tphttps']:
-			gconf.client_get_default().set_string('/desktop/gnome/url-handlers/%s/command' % prefix, location)
-			gconf.client_get_default().set_bool('/desktop/gnome/url-handlers/%s/enabled' % prefix, True)
-	except ImportError, e:
-		print e
-		print "It is recommended that under gnome you have the python-gconf module installed so I can register URL handlers."
+				reason = "It is recommended that under gnome you have the Python Gconf module installed so I can register URL handlers."
+				if system == "debian-based":
+					recommended.append(("python-gconf", reason))
+				else:
+					recommended.append(("Recent version of pyGTK.", reason))
+
+	import os
+	if os.environ.has_key("TPCLIENT_MEDIA"):
+		graphics = os.environ["TPCLIENT_MEDIA"]
+	else:
+		graphics = '.'
 
 if len(notfound) > 0:
-	print "The following requirements where not met"
+	print
+	print "The following requirements where not met:"
 	for module in notfound:
-		print notfound
+		print '\t', module
 
+if len(recommended) > 0:
+	print
+	print "The following recommended modules where not found:"
+	for module, reason in recommended:
+		print '\t', module + ',\t', reason
+
+# Check for an apt-get based system,
+if system == "debian-based":
+	notfound_debian = []
+	for module in notfound:
+		if module.find(' ') == -1:
+			notfound_debian.append(module)
+	if len(notfound_debian) > 0:
+		print """
+You may be able to install some of the requirements by running the following
+command as root:
+
+	apt-get install %s
+""" % " ".join(notfound_debian)
+	if len(recommended) > 0:
+		print """
+To install the modules recommended for full functionality, run the following
+command as root:
+
+	apt-get install %s
+""" % " ".join(zip(*recommended)[0])
+
+
+if len(notfound) > 0:
 	import sys
 	sys.exit(1)
 
+# FIXME: This is here to extra is imported very early on.
 import extra
