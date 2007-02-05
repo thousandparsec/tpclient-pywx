@@ -91,6 +91,18 @@ except ImportError, e:
 		recommended.append(("Pysco JIT compiler.", reason))
 
 try:
+	import pyOpenSSL
+except ImportError, e:
+	print e
+
+	reason = "Installing pyOpenSSL allows the client to check if the host you are connecting to has a valid certificate."
+	if system == "debian-based":
+		recommended.append(("python-pyopenssl", reason))
+	else:
+		recommended.append(("pyOpenSSL", reason))
+
+
+try:
 	import Image
 except ImportError, e:
 	print e
@@ -130,8 +142,8 @@ if len(notfound) == 0:
 		if not os.path.exists(location):
 			print "Hrm, unable to find tpclient-pywx are you running outside a tpclient-pywx tree?"
 		else:
-			# Check the file is executable
 			print location
+			# Check the file is executable
 			os.chmod(location, stat.S_IRUSR|stat.S_IWUSR|stat.S_IXUSR|stat.S_IRGRP|stat.S_IXGRP|stat.S_IROTH|stat.S_IXOTH)
 
 			# Register the URL Handlers
@@ -165,7 +177,11 @@ if len(recommended) > 0:
 	print
 	print "The following recommended modules where not found:"
 	for module, reason in recommended:
-		print '\t', module + ',\t', reason
+		if len(module+',') > 16:
+			i = '\t'
+		else:
+			i = '\t\t'
+		print '\t', module + ',', i, reason
 
 # Check for an apt-get based system,
 if system == "debian-based":
