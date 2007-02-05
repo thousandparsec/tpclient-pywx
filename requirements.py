@@ -99,6 +99,18 @@ except ImportError, e:
 		recommended.append(("Pysco JIT compiler.", reason))
 
 try:
+	import pyOpenSSL
+except ImportError, e:
+	print e
+
+	reason = "Installing pyOpenSSL allows the client to check if the host you are connecting to has a valid certificate."
+	if system == "debian-based":
+		recommended.append(("python-pyopenssl", reason))
+	else:
+		recommended.append(("pyOpenSSL", reason))
+
+
+try:
 	import Image
 except ImportError, e:
 	print e
@@ -175,7 +187,11 @@ if len(recommended) > 0:
 	print
 	print "The following recommended modules where not found:"
 	for module, reason in recommended:
-		print '\t', module + ',\t', reason
+		if len(module+',') > 16:
+			i = '\t'
+		else:
+			i = '\t\t'
+		print '\t', module + ',', i, reason
 
 # Check for an apt-get based system,
 if system == "debian-based":
