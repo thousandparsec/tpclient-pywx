@@ -166,10 +166,10 @@
                             <border>5</border>
                             <size>5,5</size>
                         </object>
-                        <object platform="unix" class="sizeritem">
+                        <object class="sizeritem">
                             <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL</flag>
                             <border>0</border>
-                            <object platform="unix" class="wxButton" name="NewAccount">
+                            <object class="wxButton" name="NewAccount">
                                 <tooltip>Create a new account on the currently selected server.</tooltip>
                                 <label>&amp;New Account</label>
                                 <default>1</default>

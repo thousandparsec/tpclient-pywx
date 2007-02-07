@@ -6373,7 +6373,7 @@ You can either create a new account or connect to the server straight away."</st
                   <string name="proxy-Font">""</string>
                   <bool name="proxy-Hidden">0</bool>
                   <bool name="proxy-Enabled">1</bool>
-                  <string name="proxy-Platform">"__WXGTK__"</string>
+                  <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
                   <bool name="proxy-wxBU_LEFT">0</bool>
                   <bool name="proxy-wxBU_RIGHT">0</bool>
                   <bool name="proxy-wxBU_TOP">0</bool>
