@@ -272,7 +272,6 @@ class testFromPoints(unittest.TestCase):
                 ), N.float_ )
         B = fromPoints(Pts)
         #B = BBox( ( (1.0, 2.0), (5.0, 10.0) ) )
-        print BB[0,0]
         self.failUnless(B[0,0] == 1.0 and
                         B[0,1] == 2.0 and
                         B[1,0] == 5.0 and
@@ -284,7 +283,6 @@ class testFromPoints(unittest.TestCase):
                 (1,6),
                 ) )
         B = fromPoints(Pts)
-        print BB[0,0]
         self.failUnless(B[0,0] == 1.0 and
                         B[0,1] == 2.0 and
                         B[1,0] == 5.0 and
@@ -313,6 +311,32 @@ class testFromPoints(unittest.TestCase):
                         B[1,0] == 65.0 and
                         B[1,1] == 43.2
                         )
+class testMerge(unittest.TestCase):
+    A = BBox( ((-23.5, 456), (56, 532.0)) )
+    B = BBox( ((-20.3, 460), (54, 465  )) )# B should be completely inside A
+    C = BBox( ((-23.5, 456), (58, 540.0)) )# up and to the right or A
+    D = BBox( ((-26.5, 12), (56, 532.0)) )
+
+    def testInside(self):
+        C = self.A.copy()
+        C.Merge(self.B)
+        self.failUnless(C == self.A)
+
+    def testFullOutside(self):
+        C = self.B.copy()
+        C.Merge(self.A)
+        self.failUnless(C == self.A)
+
+    def testUpRight(self):
+        A = self.A.copy()
+        A.Merge(self.C)
+        self.failUnless(A[0] == self.A[0] and A[1] == self.C[1])
+
+    def testDownLeft(self):
+        A = self.A.copy()
+        A.Merge(self.D)
+        self.failUnless(A[0] == self.D[0] and A[1] == self.A[1])
+
 
 if __name__ == "__main__":
     unittest.main()

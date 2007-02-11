@@ -11,7 +11,7 @@ RubberBandBox: used to draw a RubberBand Box on the screen
 
 """
 import wx
-import FloatCanvas
+from floatcanvas import FloatCanvas
 
 class RubberBandBox:
     """
