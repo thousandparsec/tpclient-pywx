@@ -246,34 +246,42 @@ class Value(Overlay):
 		self[oid] = FloatCanvas.Circle(self.cache.objects[oid].pos[0:2], self.value(oid)*self.scale, FillColor="White", LineColor="Red")
 
 class RelativePoint(FloatCanvas.Point):
-    def __init__(self, XY, Color = "Black", Diameter =  1, InForeground = False, Offset=(0,0)):
-    	FloatCanvas.Point.__init__(self, XY, Color, Diameter, InForeground = False)
+	def __init__(self, XY, Color = "Black", Diameter =  1, InForeground = False, Offset=(0,0)):
+		FloatCanvas.Point.__init__(self, XY, Color, Diameter, InForeground = False)
 
-        self.Offset = N.array(Offset, N.float_)
-        self.Offset.shape = (2,) # Make sure it is a length 2 vector
+		self.SetOffset(Offset)
 
-    def _Draw(self, dc , WorldToPixel, ScaleWorldToPixel, HTdc=None):
-        dc.SetPen(self.Pen)
-        xy = WorldToPixel(self.XY) + self.Offset
-        if self.Diameter <= 1:
-            dc.DrawPoint(xy[0], xy[1])
-        else:
-            dc.SetBrush(self.Brush)
-            radius = int(round(self.Diameter/2))
-            dc.DrawCircle(xy[0],xy[1], radius)
-        if HTdc and self.HitAble:
-            HTdc.SetPen(self.HitPen)
-            if self.Diameter <= 1:
-                HTdc.DrawPoint(xy[0], xy[1])
-            else:
-                HTdc.SetBrush(self.HitBrush)
-                HTdc.DrawCircle(xy[0],xy[1], radius)
+	def SetOffset(self, Offset):
+		self.Offset = N.array(Offset, N.float_)
+		self.Offset.shape = (2,) # Make sure it is a length 2 vector
+
+	def _Draw(self, dc , WorldToPixel, ScaleWorldToPixel, HTdc=None):
+		dc.SetPen(self.Pen)
+		xy = WorldToPixel(self.XY) + self.Offset
+		if self.Diameter <= 1:
+			dc.DrawPoint(xy[0], xy[1])
+		else:
+			dc.SetBrush(self.Brush)
+			radius = int(round(self.Diameter/2))
+			dc.DrawCircle(xy[0],xy[1], radius)
+		if HTdc and self.HitAble:
+			HTdc.SetPen(self.HitPen)
+			if self.Diameter <= 1:
+				HTdc.DrawPoint(xy[0], xy[1])
+			else:
+				HTdc.SetBrush(self.HitBrush)
+				HTdc.DrawCircle(xy[0],xy[1], radius)
 
 class Icon(FloatCanvas.DrawObject, FloatCanvas.XYObjectMixin):
+
+	def __init__(self, point):
+		FloatCanvas.DrawObject.__init__(self)
+		self.SetPoint(point)
+
 	def _Draw(self, dc, WorldToPixel, ScaleWorldToPixel, HTdc=None):
 		# See how big the real object would be on the screen..
 		D = ScaleWorldToPixel(self.real[0].WH)[0]
-		if D <= 8:
+		if D <= self.MinSize:
 			things = self.icon
 		else:
 			things = self.real
@@ -282,101 +290,82 @@ class Icon(FloatCanvas.DrawObject, FloatCanvas.XYObjectMixin):
 		for i in things:
 			i._Draw(dc, WorldToPixel, ScaleWorldToPixel, HTdc)
 
+class OrbittedIcon(Icon):
+	def __init__(self, pos):
+		Icon.__init__(self, pos)
 
-class Planet(Icon):
-	def __init__(self, cache, planet):
-		self.SetPoint(planet.pos[0:2])
+		self.children = []
 
-		icon = []
+	def AddChild(self, child):
+		if hasattr(child, "SetCenter"):
+			child.SetCenter(self.XY)
 
-		# Need to find the StarSystem parent icon
-		parent = planet
-		while not isinstance(parent, StarSystem):
-			parent = cache.objects[parent.parent]
-		
-		# Find the number of objects this StarSystem has
-		contains = []
-		children = set(parent.contains)
-		while len(children) > 0:
-			child = children.pop(0)
-			contains.append(child)
-			children += cache.objects[child].children
+		self.children.append(child)
 
-		# Figure out where to put this child	
-		angle = ((2*pi)/len(contains))*(i-0.125)
-		x = int(cos(angle)*6)
-		y = int(sin(angle)*6)
-		icon.append(RelativePoint(parent.pos[0:2], "Blue", 3, Offset=(x,y)))
-
-		self.icon = icon
-
-		real = []
-		for planet in planets:		
-			# Figure out the "orbit"
-			middle = parent.pos[0:2]
-			outside = planet.pos[0:2]
-			diameter = 2*sqrt((outside[0]-middle[0])**2 + (outside[1]-middle[1])**2)
+		# Reposition all the children.
+		for i, child in enumerate(self.children):
+			angle = ((2*pi)/len(self.children))*(i-0.125)
 	
-			# The "orbit" of the planet
-			real.append(FloatCanvas.Circle(parent.pos[0:2], diameter, LineColor="Blue",  FillColor="Transparent"))
-			# The actual planet
-			real.append(FloatCanvas.Circle(planet.pos[0:2], planet.size*1000, LineColor="White", FillColor="White"))
-		self.real = real
+			x = int(cos(angle)*6)
+			y = int(sin(angle)*6)
 
-class System(FloatCanvas.DrawObject, FloatCanvas.XYObjectMixin):
+			child.SetOffset(self.XY, (x, y))
+
+class PlanetIcon(OrbittedIcon):
+	MinSize = 2
+
+	def __init__(self, planet):
+		OrbittedIcon.__init__(self, planet.pos[0:2])
+
+		self.Size = planet.size
+
+		self.icon = []
+		self.icon.append(RelativePoint(planet.pos[0:2], "Blue", 3))
+
+		self.real = []
+
+	def SetOffset(self, point, offset):
+		for icon in self.icon:
+			if hasattr(icon, "SetOffset"):
+				icon.SetPoint(point)
+				icon.SetOffset(offset)
+
+	def SetCenter(self, center):
+		# Figure out the "orbit"
+		diameter = 2*sqrt((self.XY[0]-center[0])**2 + (self.XY[1]-center[1])**2)
+
+		print self, center, self.XY, diameter, self.Size
+	
+		# The actual planet (FIXME: *1000 should be needed...)
+		self.real.append(FloatCanvas.Circle(self.XY, self.Size*1000, LineColor="White", FillColor="White"))
+		# The "orbit" of the planet
+		self.real.append(FloatCanvas.Circle(center, diameter, LineColor="Blue"))
+
+class SystemIcon(OrbittedIcon):
 	"""
 	An object which can only become so small before it reverts to "Icon" form.
 	"""
-	
-	def __init__(self, starsystem, planets=[]):
-		FloatCanvas.DrawObject.__init__(self)		
+	MinSize = 8
 
-		self.SetPoint(starsystem.pos[0:2])
+	def __init__(self, starsystem):
+		OrbittedIcon.__init__(self, starsystem.pos[0:2])
+
+		self.children = []
 
 		# Icon form consists of a central point, plus a circle plus a bunch of planet points
-		icon = []
-		icon.append(FloatCanvas.Point(starsystem.pos[0:2], "Yellow", 4))
+		self.icon = []
+		self.icon.append(FloatCanvas.Point(starsystem.pos[0:2], "Yellow", 4))
 
-		if len(planets) > 0:
-			icon.insert(0, FloatCanvas.Point(starsystem.pos[0:2], "Black", 8))
-			icon.insert(0, FloatCanvas.Point(starsystem.pos[0:2], "White", 9))
-		for i, planet in enumerate(planets):
-			angle = ((2*pi)/len(planets))*(i-0.125)
-	
-			print angle
-			x = int(cos(angle)*6)
-			y = int(sin(angle)*6)
-			icon.append(RelativePoint(starsystem.pos[0:2], "Blue", 3, Offset=(x,y)))
-		self.icon = icon
+		self.real = []
+		self.real.append(FloatCanvas.Circle(starsystem.pos[0:2], starsystem.size, LineColor="Red"))
 
-		obj = starsystem
+	def AddChild(self, child):
+		# If this is the first child, add the orbit indicater
+		if len(self.children) == 0:
+			self.icon.insert(0, FloatCanvas.Point(self.XY, "Black", 8))
+			self.icon.insert(0, FloatCanvas.Point(self.XY, "White", 9))
 
-		real = []
-		real.append(FloatCanvas.Circle(obj.pos[0:2], obj.size, LineColor="Red"))
-		for planet in planets:		
-			# Figure out the "orbit"
-			middle = obj.pos[0:2]
-			outside = planet.pos[0:2]
-
-			diameter = 2*sqrt((outside[0]-middle[0])**2 + (outside[1]-middle[1])**2)
-	
-			# The "orbit" of the planet
-			real.append(FloatCanvas.Circle(obj.pos[0:2], diameter, LineColor="Blue",  FillColor="Transparent"))
-			# The actual planet
-			real.append(FloatCanvas.Circle(planet.pos[0:2], planet.size*1000, LineColor="White", FillColor="White"))
-		self.real = real
-
-	def _Draw(self, dc, WorldToPixel, ScaleWorldToPixel, HTdc=None):
-		# See how big the real object would be on the screen..
-		D = ScaleWorldToPixel(self.real[0].WH)[0]
-		if D <= 8:
-			things = self.icon
-		else:
-			things = self.real
-
-		# Draw the things
-		for i in things:
-			i._Draw(dc, WorldToPixel, ScaleWorldToPixel, HTdc)
+		OrbittedIcon.AddChild(self, child)
 
 class Systems(Value):
 	def updateone(self, oid):
@@ -386,27 +375,35 @@ class Systems(Value):
 		obj = self.cache.objects[oid]
 
 		if isinstance(obj, StarSystem):
-			# Find all the children which are planets
-			planets = []
-			def pin(obj, cache=self.cache, planets=planets):
-				if isinstance(obj, Planet):
-					planets.append(obj)
+			fc = []
+			def pin(obj, cache=self.cache, fc=fc):
+				if isinstance(obj, (Planet, Fleet)):
+					o = PlanetIcon(obj)
+					fc.append(o)
+
+				if isinstance(obj, (StarSystem,)):
+					o = SystemIcon(obj)
+					fc.append(o)
 
 				for child in obj.contains:
-					pin(cache.objects[child])
+					r = pin(cache.objects[child])
+
+					if hasattr(o, "AddChild"):
+						if r != None:
+							o.AddChild(r)
+				return o
+
 			pin(obj)
 
-			print oid, obj.pos[0:2], obj.size, planets
-			self[oid] = System(obj, planets)
-
+			self[oid] = fc
 
 class Resource(Proportional):
 	"""\
 	Draws proportional circles for the relative number of resources.
 	"""
-	TOTAL        = -1
-	SURFACE      = 1
-	MINABLE      = 2
+	TOTAL		= -1
+	SURFACE	  = 1
+	MINABLE	  = 2
 	INACCESSABLE = 3	
 
 	def __init__(self, canvas, cache, resource, type=-1):
