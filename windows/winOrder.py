@@ -25,7 +25,7 @@ buttonSize = (wx.local.buttonSize[0], wx.local.buttonSize[1]+2)
 
 defaults = {
 	constants.ARG_ABS_COORD: [0,0,0],
-	constants.ARG_TIME: [0],
+	constants.ARG_TIME: [0, 0],
 	constants.ARG_OBJECT: [0],
 	constants.ARG_PLAYER: [0,0],
 	constants.ARG_STRING: [-1, ""],
@@ -485,7 +485,6 @@ class winOrder(winBase):
 			args += defaults[type]
 
 		# Create the new order
-		print args
 		new = objects.Order(*args)
 		new._dirty = True
 
@@ -910,7 +909,7 @@ def argTimePanel(parent, parent_panel, args):
 	panel.SetSizer(item0)
 	panel.SetAutoLayout( True )
 	
-	item1 = wx.SpinCtrl( panel, -1, str(args), min=min, max=max, size=(wx.local.spinSize[0]*2, wx.local.spinSize[1]) )
+	item1 = wx.SpinCtrl( panel, -1, str(args[0]), min=min, max=max, size=(wx.local.spinSize[0]*2, wx.local.spinSize[1]) )
 	item1.SetFont(wx.local.tinyFont)
 	item0.Add( item1, 0, wx.ALIGN_CENTRE|wx.LEFT, 1 )
 	
@@ -918,7 +917,7 @@ def argTimePanel(parent, parent_panel, args):
 	
 def argTimeGet(panel):
 	windows = panel.GetChildren()
-	return [windows[0].GetValue()]
+	return [windows[0].GetValue(), 0]
 
 def argCoordPanel(parent, parent_panel, args):
 
