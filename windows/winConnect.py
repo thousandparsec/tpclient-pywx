@@ -247,8 +247,8 @@ It appears you are using a different password for
 this account, would you like to update the saved 
 information?
 """
-				dlg = wx.MessageDialog(self, msg, _("Update Password?"), wx.OK|wx.CANCEL|wx.ICON_INFORMATION)
-				if dlg.ShowModal() == wx.ID_OK:
+				dlg = wx.MessageDialog(self, msg, _("Update Password?"), wx.YES_NO|wx.YES_DEFAULT|wx.ICON_INFORMATION)
+				if dlg.ShowModal() == wx.ID_YES:
 					# Update the password
 					self.config['details'][server][PASSWORD] = password
 					# Save the config now
@@ -259,10 +259,9 @@ information?
 			msg = """\
 Would you like to save this account's details?
 """
-			dlg = wx.MessageDialog(self, msg, _("Add Account?"), wx.OK|wx.CANCEL|wx.ICON_INFORMATION)
+			dlg = wx.MessageDialog(self, msg, _("Add Account?"), wx.YES_NO|wx.YES_DEFAULT|wx.ICON_INFORMATION)
 
-			rst = dlg.ShowModal()
-			if rst == wx.ID_OK:
+			if dlg.ShowModal() == wx.ID_YES:
 				# Add the account.
 				self.ConfigPanel.Servers.SetStrings([server,] + self.ConfigPanel.Servers.GetStrings())
 				self.config['details'][server] = (username, password, False)
