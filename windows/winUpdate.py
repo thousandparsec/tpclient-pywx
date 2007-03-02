@@ -72,12 +72,15 @@ class winUpdate(winUpdateBase, winMainBaseXRC):
 		self.TopText.SetLabel("")
 		self.Message.SetValue("")
 
+		self.ConnectingGauge.Enable()
 		self.ConnectingGauge.SetRange(1)
 		self.ConnectingGauge.SetValue(0)
 
+		self.ConnectingAnim.Enable()
 		self.ConnectingAnim.LoadFile(waiting)
 		self.ConnectingAnim.Play()
 
+		self.ConnectingText.Enable()
 		self.ConnectingText.SetLabel("")
 
 		self.ProgressTitle.SetLabel("")
@@ -166,6 +169,11 @@ class winUpdate(winUpdateBase, winMainBaseXRC):
 
 				# Set the progress text
 				self.ConnectingText.SetLabel("Done!")
+
+			elif state == "alreadydone":
+				self.ConnectingGauge.Disable()
+				self.ConnectingText.Disable()
+				animation.Disable()
 
 		elif mode == "finishing":
 			# Change the buttons

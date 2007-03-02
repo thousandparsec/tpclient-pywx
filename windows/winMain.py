@@ -133,14 +133,11 @@ class StatusBar(wx.StatusBar):
 			secs = math.floor((left - hours * sih - mins * sim))
 			self.StatusTextCtrl.SetValue("EOT: %02i:%02i:%02i" % (hours, mins, secs))
 		else:
-			if self.endtime != 0:
-				self.parent.UpdateEOT()
-				self.endtime = 0
 			self.StatusTextCtrl.SetValue("EOT: Unknown")
 	
 	def SetEndTime(self, endtime):
 		print endtime
-		self.endtime = endtime + time.time()
+		self.endtime = endtime
 
 	def Reposition(self):
 		rect = self.GetFieldRect(StatusBar.WIDGET_PROGRESS)
@@ -241,6 +238,8 @@ class winMain(winMDIBase):
 
 		self.mgr.Update()
 
+		self.updatepending = False
+
 	def OnMediaDownloadStart(self, evt):
 		self.statusbar.OnMediaDownloadStart(evt)
 	def OnMediaDownloadProgress(self, evt):
@@ -267,8 +266,6 @@ class winMain(winMDIBase):
 		wx.CallAfter(self.mgr.Update)
 		wx.CallAfter(self.ShowTips)
 
-		self.UpdateEOT()
-
 	def Hide(self, show=True):
 		if not show:
 			return self.Show()
@@ -276,12 +273,6 @@ class winMain(winMDIBase):
 		for window in self.children.values():
 			window.Hide()
 		super(self.__class__, self).Hide()
-
-#	def SetSizeHard(self, size):
-#		winMDIBase.SetSize(self, size)
-#		if wx.Platform != "__WXMSW__":
-#			self.SetClientSize(wx.Size(-1,0))
-#			winMDIBase.SetSizeHard(self, (-1, self.GetSize()[1]))
 
 	# Config Functions -----------------------------------------------------------------------------
 	def ConfigDefault(self, config=None):
@@ -421,7 +412,7 @@ class winMain(winMDIBase):
 		self.OnProgramExit(evt)
 
 	def OnProgramExit(self, evt):
-#		self.mgr.UnInit()
+		self.mgr.UnInit()
 		self.application.Exit()
 
 	def ShowTips(self, override=None):
@@ -439,6 +430,18 @@ class winMain(winMDIBase):
 	def UpdateCache(self, evt=None):
 		self.application.network.Call(self.application.network.CacheUpdate)
 
-	def UpdateEOT(self):
-		self.application.network.Call(self.application.network.EOTUpdate)
+	def OnNetworkTimeRemaining(self, evt):
+		if evt.remaining == 0:
+			if not self.updatepending:
+				self.updatepending = True
+				msg = """\
+The turn has ended. Would you like to download all the new details?
+"""
+				dlg = wx.MessageDialog(self.application.gui.current, msg, _("Update?"), wx.YES_NO|wx.YES_DEFAULT|wx.ICON_INFORMATION)
+				if dlg.ShowModal() == wx.ID_YES:
+					self.UpdateCache()
+				self.updatepending = False
+		else:
+			print "Got an updated EOT..."
+			self.statusbar.SetEndTime(evt.gotat + evt.remaining)
 

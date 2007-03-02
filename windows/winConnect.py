@@ -245,7 +245,7 @@ class winConnect(winConnectBase, winMainBaseXRC, usernameMixIn):
 				msg = """\
 It appears you are using a different password for 
 this account, would you like to update the saved 
-information?
+information with the new password?
 """
 				dlg = wx.MessageDialog(self, msg, _("Update Password?"), wx.YES_NO|wx.YES_DEFAULT|wx.ICON_INFORMATION)
 				if dlg.ShowModal() == wx.ID_YES:
@@ -257,6 +257,8 @@ information?
 		else:
 			# Popup a dialog asking if we want to add the account
 			msg = """\
+It appears you havn't access this account before.
+
 Would you like to save this account's details?
 """
 			dlg = wx.MessageDialog(self, msg, _("Add Account?"), wx.YES_NO|wx.YES_DEFAULT|wx.ICON_INFORMATION)

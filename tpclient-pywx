@@ -214,6 +214,7 @@ class GUI(wx.App):
 		Change to a certain main window.
 		"""
 		if window == self.current:
+			self.current.Show()
 			return
 
 		if self.current != None:
@@ -278,9 +279,10 @@ class Network(NetworkThread):
 		up("finishing", "finished", "")
 
 	def EOTUpdate(self):
-		# FIXME: This is bar :/
+		# FIXME: This should go away...
+		# FIXME: This is bad :/
 		gui = self.application.gui
-		timeRemaining = self.connection.time()
+		timeRemaining = self.connection.time() + time.time()
 
 		if failed(timeRemaining):
 			return
