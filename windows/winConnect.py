@@ -22,7 +22,6 @@ from tp.netlib.client import url2bits
 
 class usernameMixIn:
 	def __init__(self):
-
 		self.Username.Bind(wx.EVT_CHAR, self.OnUsernameChar)
 		self.Game.Bind(wx.EVT_CHAR, self.OnGameChar)
 
@@ -99,13 +98,11 @@ class usernameMixIn:
 			username = username[0]
 			game = ""
 
-		if self.GameShow.GetValue():
-			self.Username.SetValue(username)
-			self.Game.SetValue(game)
-		elif len(game) == 0:
+		if self.GameShow.GetValue() or len(game) == 0:
 			self.Username.SetValue(username)
 		else:
 			self.Username.SetValue("%s@%s" % (username, game))
+		self.Game.SetValue(game)
 
 class configConnect(configConnectBase, usernameMixIn):
 	def __init__(self, *args, **kw):
@@ -154,6 +151,12 @@ class configConnect(configConnectBase, usernameMixIn):
 		self.Password.SetValue("")
 		self.AutoConnect.Disable()
 
+USERNAME=0
+PASSWORD=1
+AUTOCONNECT=2
+
+# FIXME: The config should use proper URLs, currently you can't have more then one login to a server (and a server could have multiple games).
+
 class winConnect(winConnectBase, winMainBaseXRC, usernameMixIn):
 	title = _("Connect")
 
@@ -181,6 +184,15 @@ class winConnect(winConnectBase, winMainBaseXRC, usernameMixIn):
 	def OnExit(self, evt):
 		self.application.Exit()
 
+	def SetFromConfig(self, server):
+		if not server in self.config['servers'] or not self.config['details'].has_key(server):
+			raise RuntimeError("Server is not in the config settings!")
+
+		self.Server.SetValue(server)
+		self.SetUsername(self.config['details'][server][USERNAME])
+		self.Password.SetValue(self.config['details'][server][PASSWORD])
+		return self.config['details'][server][AUTOCONNECT]
+
 	def Show(self, show=True):
 		if not show:
 			return self.Hide()
@@ -191,11 +203,23 @@ class winConnect(winConnectBase, winMainBaseXRC, usernameMixIn):
 		
 		self.CenterOnScreen(wx.BOTH)
 
-		if self.attemps == 0:
-			for server, details in self.config['details'].items():
-				# We have been set to autoconnect to this server
-				if details[2]:
-					wx.CallAfter(self.OnOkay, None)
+		autoconnect = False
+		# If the server value is empty we should populate with a server item
+		if len(self.Server.GetValue()) == 0:
+			# Check that no other server is also set to autoconnect
+			for key in self.config['details'].keys():
+				if not self.config['details'][key][AUTOCONNECT]: 
+					continue
+				self.SetFromConfig(key)
+				autoconnect = True
+
+			# Is it still empty?
+			if len(self.Server.GetValue()) == 0 and len(self.config['servers']) > 0:
+				autoconnect = self.SetFromConfig(self.config['servers'][0])
+
+		# FIXME: Gross hack
+		if self.attemps == 0 and autoconnect:
+			wx.CallAfter(self.OnOkay, None)
 		self.attemps += 1
 
 		return winMainBaseXRC.Show(self)
@@ -207,6 +231,44 @@ class winConnect(winConnectBase, winMainBaseXRC, usernameMixIn):
 		password = self.Password.GetValue()
 		if server == "" or username == "":
 			return
+
+		# Check if this server exists in the config
+		print self.config['servers']
+		if server in self.config['servers']:
+			# Check the values are the same
+			(oldusername, oldpassword, oldautoconnect) = self.config['details'][server]
+
+			if oldusername != username:
+				print "Username doesn't match.."
+			if oldpassword != password:
+				print "Password doesn't match.."
+				msg = """\
+It appears you are using a different password for 
+this account, would you like to update the saved 
+information?
+"""
+				dlg = wx.MessageDialog(self, msg, _("Update Password?"), wx.OK|wx.CANCEL|wx.ICON_INFORMATION)
+				if dlg.ShowModal() == wx.ID_OK:
+					# Update the password
+					self.config['details'][server][PASSWORD] = password
+					# Save the config now
+					self.application.ConfigSave()
+
+		else:
+			# Popup a dialog asking if we want to add the account
+			msg = """\
+Would you like to save this account's details?
+"""
+			dlg = wx.MessageDialog(self, msg, _("Add Account?"), wx.OK|wx.CANCEL|wx.ICON_INFORMATION)
+
+			rst = dlg.ShowModal()
+			if rst == wx.ID_OK:
+				# Add the account.
+				self.ConfigPanel.Servers.SetStrings([server,] + self.ConfigPanel.Servers.GetStrings())
+				self.config['details'][server] = (username, password, False)
+
+				# Save the config now
+				self.application.ConfigSave()
 
 		self.application.network.Call(self.application.network.ConnectTo, server, username, password, debug=self.config['debug'])
 
@@ -281,7 +343,6 @@ class winConnect(winConnectBase, winMainBaseXRC, usernameMixIn):
 			if server not in config['details']:
 				config['details'][server] = ["guest@tp", "guest", False]
 
-
 		try:
 			if not isinstance(config['debug'], bool):
 				raise ValueError('Config-%s: a debug value of %s is not valid' % (self, config['debug']))
@@ -309,13 +370,7 @@ class winConnect(winConnectBase, winMainBaseXRC, usernameMixIn):
 		self.Server.Clear()
 		self.Server.AppendItems(self.config['servers'])
 
-		server = self.config['servers'][0]
-		self.Server.SetValue(server)
-		self.SetUsername(self.config['details'][server][0])
-		self.Password.SetValue(self.config['details'][server][1])
-
-		pprint.pprint(self.config)
-
+		self.Server.SetValue("")
 		self.ConfigDisplayUpdate(None)
 
 	def ConfigUpdate(self):
@@ -394,12 +449,11 @@ The client is already set to autoconnect to %s.
 
 Would you instead like to autoconnect to %s.
 """ % (key, server)
-				dlg = wx.MessageDialog(self.ConfigPanel, msg, _("Autoconnect to?"), wx.OK|wx.ICON_INFORMATION)
-				if not dlg.ShowModal():
-					evt.Veto()
-					return
-				else:
+				dlg = wx.MessageDialog(self.ConfigPanel, msg, _("Autoconnect to?"), wx.OK|wx.CANCEL|wx.ICON_INFORMATION)
+				if dlg.ShowModal() == wx.ID_OK:
 					details[2] = False
+					break
+
 		print "OnConfigAutoConnect", server, evt.Checked()
 		self.config['details'][server][2] = evt.Checked()
 		pprint.pprint(self.config)
