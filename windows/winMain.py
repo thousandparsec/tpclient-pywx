@@ -127,6 +127,8 @@ class StatusBar(wx.StatusBar):
 					self.StatusTextCtrl.SetOwnBackgroundColour(wx.NullColour)
 				else:
 					self.StatusTextCtrl.SetOwnBackgroundColour(wx.Colour(255,0,0))
+			else:
+				self.StatusTextCtrl.SetOwnBackgroundColour(wx.NullColour)
 
 			hours = math.floor(left / sih)
 			mins = math.floor((left - hours * sih) / sim)
