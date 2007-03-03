@@ -8,8 +8,8 @@ import os.path
 import wx
 from wx.xrc import XRCCTRL, XmlResourceWithHandlers
 
-class panelInformationBase(wx.Panel):
-	xrc = 'panelInformation.xrc'
+class panelPictureBase(wx.Panel):
+	xrc = 'panelPicture.xrc'
 
 	def PreCreate(self, pre):
 		""" This function is called during the class's initialization.
@@ -25,12 +25,14 @@ class panelInformationBase(wx.Panel):
 
 		# Two stage creation (see http://wiki.wxpython.org/index.cgi/TwoStageCreation)
 		pre = wx.PrePanel()
-		res.LoadOnPanel(pre, parent, "panelInformation")
+		res.LoadOnPanel(pre, parent, "panelPicture")
 		self.PreCreate(pre)
 		self.PostCreate(pre)
 
 		# Define variables for the controls
 		self.Title = XRCCTRL(self, "Title")
-		self.Details = XRCCTRL(self, "Details")
+		self.Background = XRCCTRL(self, "Background")
+		self.Static = XRCCTRL(self, "Static")
+		self.Animation = XRCCTRL(self, "Animation")
 
 

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource version="2.3.0.1" xmlns="http://www.wxwidgets.org/wxxrc">
+    <object class="wxPanel" name="panelPicture" subclass="Dialog">
+        <style>wxCAPTION|wxRESIZE_BORDER|wxSYSTEM_MENU|wxCLOSE_BOX</style>
+        <exstyle>wxWS_EX_BLOCK_EVENTS</exstyle>
+        <size>400,300</size>
+        <object class="wxFlexGridSizer">
+            <cols>1</cols>
+            <rows>2</rows>
+            <vgap>0</vgap>
+            <hgap>0</hgap>
+            <growablecols>0</growablecols>
+            <growablerows>1</growablerows>
+            <object class="sizeritem">
+                <flag>wxGROW|wxGROW|wxALL|wxADJUST_MINSIZE</flag>
+                <border>0</border>
+                <object class="wxStaticText" name="Title">
+                    <style>wxALIGN_CENTRE|wxST_NO_AUTORESIZE</style>
+                    <label>Name goes here</label>
+                </object>
+            </object>
+            <object class="sizeritem">
+                <flag>wxGROW|wxGROW|wxALL</flag>
+                <border>0</border>
+                <object class="wxPanel" name="Background">
+                    <size>128,128</size>
+                    <style>wxTAB_TRAVERSAL</style>
+                    <bg>#000000</bg>
+                    <object class="wxBoxSizer">
+                        <orient>wxVERTICAL</orient>
+                        <object class="sizeritem">
+                            <flag>wxALIGN_CENTER_HORIZONTAL|wxALL</flag>
+                            <border>0</border>
+                            <object class="wxStaticBitmap" name="Static">
+                                <size>128,128</size>
+                            </object>
+                        </object>
+                        <object class="sizeritem">
+                            <flag>wxALIGN_LEFT|wxALL</flag>
+                            <border>0</border>
+                            <object class="wxGIFAnimationCtrl" name="Animation">
+                                <size>128,128</size>
+                                <style>wxNO_BORDER</style>
+                                <bg>#000000</bg>
+                            </object>
+                        </object>
+                    </object>
+                </object>
+            </object>
+        </object>
+    </object>
+</resource>

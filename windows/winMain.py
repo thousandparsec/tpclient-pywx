@@ -127,6 +127,8 @@ class StatusBar(wx.StatusBar):
 					self.StatusTextCtrl.SetOwnBackgroundColour(wx.NullColour)
 				else:
 					self.StatusTextCtrl.SetOwnBackgroundColour(wx.Colour(255,0,0))
+			else:
+				self.StatusTextCtrl.SetOwnBackgroundColour(wx.NullColour)
 
 			hours = math.floor(left / sih)
 			mins = math.floor((left - hours * sih) / sim)
@@ -223,12 +225,13 @@ class winMain(winMDIBase):
 		self.mgr.SetFrame(self)
 
 		from windows.winInfo    import panelInformation
+		from windows.winPicture import panelPicture
 		from windows.winOrder   import panelOrder
 		from windows.winMessage import panelMessage
 		from windows.winStarMap import panelStarMap
 		from windows.winSystem  import panelSystem
 
-		for window in [panelInformation, panelOrder, panelMessage, panelStarMap, panelSystem]:
+		for window in [panelInformation, panelPicture, panelOrder, panelMessage, panelStarMap, panelSystem]:
 			title = window.title
 
 			instance = window(application, self)

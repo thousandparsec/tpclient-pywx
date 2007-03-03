@@ -18,51 +18,11 @@
                 </object>
             </object>
             <object class="sizeritem">
-                <flag>wxGROW|wxGROW|wxALL</flag>
+                <flag>wxGROW|wxGROW|wxLEFT</flag>
                 <border>5</border>
-                <object class="wxFlexGridSizer">
-                    <cols>2</cols>
-                    <rows>2</rows>
-                    <vgap>0</vgap>
-                    <hgap>0</hgap>
-                    <growablecols>1</growablecols>
-                    <growablerows>0</growablerows>
-                    <object class="sizeritem">
-                        <flag>wxGROW|wxGROW|wxALL</flag>
-                        <border>0</border>
-                        <object class="wxPanel" name="Background">
-                            <size>128,128</size>
-                            <style>wxTAB_TRAVERSAL</style>
-                            <bg>#000000</bg>
-                            <object class="wxBoxSizer">
-                                <orient>wxVERTICAL</orient>
-                                <object class="sizeritem">
-                                    <flag>wxALIGN_CENTER_HORIZONTAL|wxALL</flag>
-                                    <border>0</border>
-                                    <object class="wxStaticBitmap" name="Image">
-                                        <size>128,128</size>
-                                    </object>
-                                </object>
-                                <object class="sizeritem">
-                                    <flag>wxALIGN_LEFT|wxALL</flag>
-                                    <border>0</border>
-                                    <object class="wxGIFAnimationCtrl" name="Animation">
-                                        <size>128,128</size>
-                                        <style>wxNO_BORDER</style>
-                                        <bg>#000000</bg>
-                                    </object>
-                                </object>
-                            </object>
-                        </object>
-                    </object>
-                    <object class="sizeritem">
-                        <flag>wxGROW|wxGROW|wxLEFT</flag>
-                        <border>5</border>
-                        <object class="wxTextCtrl" name="Details">
-                            <size>-1,128</size>
-                            <style>wxTE_MULTILINE|wxTE_READONLY|wxNO_BORDER</style>
-                        </object>
-                    </object>
+                <object class="wxTextCtrl" name="Details">
+                    <size>-1,128</size>
+                    <style>wxTE_MULTILINE|wxTE_READONLY|wxNO_BORDER</style>
                 </object>
             </object>
         </object>
