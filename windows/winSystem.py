@@ -58,6 +58,9 @@ class panelSystem(wx.Panel):
 		info.MinSize(self.GetMinSize())
 		info.Bottom()
 		info.Layer(1)
+		info.PinButton(True)
+		info.MaximizeButton(True)
+#		info.MinimizeButton(True)
 		return info
 
 	def OnSize(self, evt):
