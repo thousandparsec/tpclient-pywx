@@ -133,14 +133,11 @@ class StatusBar(wx.StatusBar):
 			secs = math.floor((left - hours * sih - mins * sim))
 			self.StatusTextCtrl.SetValue("EOT: %02i:%02i:%02i" % (hours, mins, secs))
 		else:
-			if self.endtime != 0:
-				self.parent.UpdateEOT()
-				self.endtime = 0
 			self.StatusTextCtrl.SetValue("EOT: Unknown")
 	
 	def SetEndTime(self, endtime):
 		print endtime
-		self.endtime = endtime + time.time()
+		self.endtime = endtime
 
 	def Reposition(self):
 		rect = self.GetFieldRect(StatusBar.WIDGET_PROGRESS)
@@ -246,6 +243,8 @@ class winMain(winMDIBase):
 			for window in self.children.values():
 				window.SetMenuBar(self.Menu(window))
 
+		self.updatepending = False
+
 	def OnMediaDownloadStart(self, evt):
 		self.statusbar.OnMediaDownloadStart(evt)
 	def OnMediaDownloadProgress(self, evt):
@@ -271,8 +270,6 @@ class winMain(winMDIBase):
 		winMDIBase.Show(self)
 
 		wx.CallAfter(self.ShowTips)
-
-		self.UpdateEOT()
 
 	def Hide(self, show=True):
 		if not show:
@@ -586,6 +583,18 @@ class winMain(winMDIBase):
 	def UpdateCache(self, evt=None):
 		self.application.network.Call(self.application.network.CacheUpdate)
 
-	def UpdateEOT(self):
-		self.application.network.Call(self.application.network.EOTUpdate)
+	def OnNetworkTimeRemaining(self, evt):
+		if evt.remaining == 0:
+			if not self.updatepending:
+				self.updatepending = True
+				msg = """\
+The turn has ended. Would you like to download all the new details?
+"""
+				dlg = wx.MessageDialog(self.application.gui.current, msg, _("Update?"), wx.YES_NO|wx.YES_DEFAULT|wx.ICON_INFORMATION)
+				if dlg.ShowModal() == wx.ID_YES:
+					self.UpdateCache()
+				self.updatepending = False
+		else:
+			print "Got an updated EOT..."
+			self.statusbar.SetEndTime(evt.gotat + evt.remaining)
 

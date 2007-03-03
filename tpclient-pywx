@@ -109,7 +109,7 @@ class GUI(wx.App):
 			from windows.winSplash import winSplash
 			self.splash = winSplash(application)
 			self.Show(self.splash)
-			
+
 			# Load the other main windows
 			from windows.winMain import winMain
 			self.main = winMain(application)
@@ -220,6 +220,7 @@ class Network(NetworkThread):
 		gui.Call(gui.Show, gui.update)
 		if NetworkThread.ConnectTo(self, host, username, password, debug, up, cs="tpclient-pywx/%s.%s.%s" % version):
 			self.CacheUpdate()
+		self.EOTUpdate()
 
 		media = self.application.media
 		media.Call(media.ConnectTo, host, username)
@@ -237,8 +238,10 @@ class Network(NetworkThread):
 		self.application.Post(self.application.cache.CacheUpdateEvent(None))
 
 	def EOTUpdate(self):
+		# FIXME: This should go away...
+		# FIXME: This is bad :/
 		gui = self.application.gui
-		timeRemaining = self.connection.time()
+		timeRemaining = self.connection.time() + time.time()
 
 		if failed(timeRemaining):
 			return
