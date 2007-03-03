@@ -103,7 +103,6 @@ class ListCtrlXmlHandler(xrc.XmlResourceHandler):
 		return self.IsOfClass(node, "wxListCtrl") or self.IsOfClass(node, "ListCtrl")
 
 	def DoCreateResource(self):
-		print "DoCreateResource", self
 		# The simple method assumes that there is no existing
 		# instance.  Be sure of that with an assert.
 		if self.GetInstance() is None:
@@ -147,7 +146,6 @@ class ChoiceXmlHandler(xrc.XmlResourceHandler):
 		return self.IsOfClass(node, "wxChoice") or self.IsOfClass(node, "Choice")
 
 	def DoCreateResource(self):
-		print "DoCreateResource", self
 		# The simple method assumes that there is no existing
 		# instance.  Be sure of that with an assert.
 		if self.GetInstance() is None:
