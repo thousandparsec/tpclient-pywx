@@ -12753,13 +12753,13 @@ You can either create a new account or connect to the server straight away."</st
           <bool name="proxy-Enabled">1</bool>
           <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
           <bool name="proxy-wxDEFAULT_DIALOG_STYLE">0</bool>
-          <bool name="proxy-wxCAPTION">1</bool>
-          <bool name="proxy-wxRESIZE_BORDER">1</bool>
+          <bool name="proxy-wxCAPTION">0</bool>
+          <bool name="proxy-wxRESIZE_BORDER">0</bool>
           <bool name="proxy-wxTHICK_FRAME">0</bool>
-          <bool name="proxy-wxSYSTEM_MENU">1</bool>
+          <bool name="proxy-wxSYSTEM_MENU">0</bool>
           <bool name="proxy-wxSTAY_ON_TOP">0</bool>
           <bool name="proxy-wxDIALOG_NO_PARENT">0</bool>
-          <bool name="proxy-wxCLOSE_BOX">1</bool>
+          <bool name="proxy-wxCLOSE_BOX">0</bool>
           <bool name="proxy-wxMAXIMIZE_BOX">0</bool>
           <bool name="proxy-wxMINIMIZE_BOX">0</bool>
           <bool name="proxy-wxDIALOG_MODAL">0</bool>

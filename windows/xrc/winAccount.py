@@ -59,7 +59,6 @@ class winAccountBase:
 		self.Password1 = XRCCTRL(self, "Password1")
 		self.Password2 = XRCCTRL(self, "Password2")
 		self.Email = XRCCTRL(self, "Email")
-		self.ID_TEXTCTRL1 = XRCCTRL(self, "ID_TEXTCTRL1")
 		self.Okay = XRCCTRL(self, "wxID_OK")
 		if hasattr(self, "OnOkay"):
 			self.Bind(wx.EVT_BUTTON, self.OnOkay, self.Okay)
