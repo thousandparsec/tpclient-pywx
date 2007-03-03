@@ -228,7 +228,7 @@ class winMain(winMDIBase):
 		from windows.winPicture import panelPicture
 		from windows.winOrder   import panelOrder
 		from windows.winMessage import panelMessage
-		from windows.winStarMap import panelStarMap
+		from windows.winNewStarMap import panelStarMap
 		from windows.winSystem  import panelSystem
 
 		for window in [panelInformation, panelPicture, panelOrder, panelMessage, panelStarMap, panelSystem]:
