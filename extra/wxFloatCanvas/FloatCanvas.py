@@ -543,7 +543,6 @@ class XYObjectMixin:
     def SetPoint(self, xy):
         xy = N.array( xy, N.float_)
         xy.shape = (2,)
-        Delta = xy - self.XY
 
         self.XY = xy
         self.CalcBoundingBox()
