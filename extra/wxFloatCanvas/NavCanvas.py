@@ -40,7 +40,6 @@ class NavCanvas(wx.Panel):
                    size = wx.DefaultSize,
                    **kwargs): # The rest just get passed into FloatCanvas
         wx.Panel.__init__(self, parent, id, size=size)
-        
 
         self.BuildToolbar()
         ## Create the vertical sizer for the toolbar and Panel
@@ -60,11 +59,10 @@ class NavCanvas(wx.Panel):
 
         # default to Mouse mode
         #self.ToolBar.ToggleTool(ID_POINTER_BUTTON, 1)
-        self.ToolBar.ToggleTool(self.PointerTool.GetId(), True)
+        #self.ToolBar.ToggleTool(self.PointerTool.GetId(), True)
         self.Canvas.SetMode(self.GUIMouse)
 
         return None
-
 
     def BuildToolbar(self):
         tb = wx.ToolBar(self)
