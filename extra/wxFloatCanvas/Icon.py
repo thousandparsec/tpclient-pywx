@@ -29,7 +29,6 @@ class Icon(DrawObject, XYObjectMixin):
 		"""\
 		Draw the object as part of another Icon.
 		"""
-		print self, Offset
 		for icon in self.subicon:
 			icon.SetOffset(Offset)
 		icon._Draw(dc, WorldToPixel, ScaleWorldToPixel, HTdc)
@@ -46,7 +45,7 @@ class Icon(DrawObject, XYObjectMixin):
 		# Draw SubIcon of the children
 		children = self.FindChildren()
 		for i, child in enumerate(children):
-			angle = ((2*pi)/len(children))*(i-0.125)
+			angle = ((2.0*pi)/len(children))*(i-0.125)
 			offset = (int(cos(angle)*6), int(sin(angle)*6))
 
 			child._DrawSubIcon(dc, WorldToPixel, ScaleWorldToPixel, HTdc, Offset=offset)
@@ -61,36 +60,12 @@ class Icon(DrawObject, XYObjectMixin):
 		for child in self.children:
 			child._Draw(dc, WorldToPixel, ScaleWorldToPixel, HTdc)
 
-	def _DrawWeird(self, dc, WorldToPixel, ScaleWorldToPixel, HTdc=None):
-		"""\
-		FIXME: This shouldn't be needed.
-		"""
-		for i in self.real:
-			i._Draw(dc, WorldToPixel, ScaleWorldToPixel, HTdc)
-
-		# Draw SubIcon of the children
-		children = self.FindChildren()
-		for i, child in enumerate(children):
-			angle = ((2*pi)/len(children))*(i-0.125)
-			offset = (int(cos(angle)*6), int(sin(angle)*6))
-
-			child._DrawSubIcon(dc, WorldToPixel, ScaleWorldToPixel, HTdc, Offset=offset)
-
 	def _Draw(self, dc, WorldToPixel, ScaleWorldToPixel, HTdc=None):
 		# See how big the real object would be on the screen..
 		if self._DrawSize(WorldToPixel, ScaleWorldToPixel) <= self.MinSize:
 			self._DrawIcon(dc, WorldToPixel, ScaleWorldToPixel)
 		else:
-			t = False
-			for child in self.children:
-				if child._DrawSize(WorldToPixel, ScaleWorldToPixel) < self.MinSize:
-					t = True
-
-			print self, t
-			if t:
-				self._DrawWeird(dc, WorldToPixel, ScaleWorldToPixel, HTdc)
-			else:		
-				self._DrawFull(dc, WorldToPixel, ScaleWorldToPixel)
+			self._DrawFull(dc, WorldToPixel, ScaleWorldToPixel)
 
 	def AddChild(self, child):
 		self.children.append(child)

@@ -20,6 +20,9 @@ from extra.wxFloatCanvas.NavCanvas import NavCanvas
 from winBase import *
 from utils import *
 
+# FIXME: Float canvas has problems with the large sizes (when zoomed into planet level)
+# We should fix this by doing some prescaling...
+
 class StarMapCanvas(NavCanvas):
 	def BuildToolbar(self):
 		tb = wx.ToolBar(self)
