@@ -220,7 +220,7 @@ class Network(NetworkThread):
 		gui.Call(gui.Show, gui.update)
 		if NetworkThread.ConnectTo(self, host, username, password, debug, up, cs="tpclient-pywx/%s.%s.%s" % version):
 			self.CacheUpdate()
-		self.EOTUpdate()
+			self.EOTUpdate()
 
 		media = self.application.media
 		media.Call(media.ConnectTo, host, username)
