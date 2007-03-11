@@ -46,6 +46,53 @@
                     </object>
                 </object>
             </object>
+            <object class="sizeritem">
+                <flag>wxGROW|wxGROW|wxALL</flag>
+                <border>5</border>
+                <object class="wxFlexGridSizer">
+                    <cols>3</cols>
+                    <rows>2</rows>
+                    <vgap>0</vgap>
+                    <hgap>0</hgap>
+                    <growablecols>0</growablecols>
+                    <object class="sizeritem">
+                        <flag>wxGROW|wxGROW|wxALL</flag>
+                        <border>0</border>
+                        <object class="wxGauge" name="Progress">
+                            <size>-1,10</size>
+                            <style>wxGA_HORIZONTAL</style>
+                            <value>1</value>
+                            <range>100</range>
+                        </object>
+                    </object>
+                    <object class="sizeritem">
+                        <flag>wxGROW|wxGROW|wxLEFT|wxRIGHT|wxADJUST_MINSIZE</flag>
+                        <border>3</border>
+                        <object class="wxStaticText" name="Speed">
+                            <size>-1,10</size>
+                            <font>
+                                <size>8</size>
+                                <family>swiss</family>
+                                <face>Sans</face>
+                            </font>
+                            <label>10kb/s</label>
+                        </object>
+                    </object>
+                    <object class="sizeritem">
+                        <flag>wxALIGN_RIGHT|wxGROW|wxLEFT|wxRIGHT|wxADJUST_MINSIZE</flag>
+                        <border>3</border>
+                        <object class="wxStaticText" name="ETA">
+                            <size>-1,10</size>
+                            <font>
+                                <size>8</size>
+                                <family>swiss</family>
+                                <face>Sans</face>
+                            </font>
+                            <label>43s</label>
+                        </object>
+                    </object>
+                </object>
+            </object>
         </object>
     </object>
 </resource>
