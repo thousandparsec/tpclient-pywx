@@ -36,6 +36,13 @@ arguments = dict(
 				("graphics",	glob.glob("graphics/*.ico"))],
 )
 
+
+if not "py2app" in sys.argv and not "py2exe" in sys.argv:
+	print "This file is only provided to build,"
+	print "  py2exe executable bundles for windows"
+	print "  py2app dmg packages for Mac OS X"
+	sys.exit()
+
 if sys.platform == 'darwin':
 	import py2app
 
@@ -105,6 +112,9 @@ elif sys.platform == 'win32':
 			}
 		}, 
 	)
+else:
+	print "You shouldn't be running this (as it's only for Mac or Windows maintainers).."
+	sys.exit()
 
 arguments.update(extra_arguments)
 setup(**arguments)
