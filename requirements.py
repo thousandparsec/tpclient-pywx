@@ -1,3 +1,5 @@
+#! /usr/bin/env python
+
 # This file checks you have installed the requirements for tpclient-pywx 
 # It can be run as standalone but is also run by the client at startup
 
