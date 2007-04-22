@@ -480,7 +480,7 @@ class winOrder(winBase):
 		orderdesc = objects.OrderDescs()[type]	
 
 		# sequence, id, slot, type, turns, resources
-		args = [-1, self.oid, slot, type, -1, []]
+		args = [0, self.oid, slot, type, 0, []]
 		for name, type in orderdesc.names:
 			args += defaults[type]
 
