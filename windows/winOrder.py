@@ -28,7 +28,7 @@ defaults = {
 	constants.ARG_TIME: [0, 0],
 	constants.ARG_OBJECT: [0],
 	constants.ARG_PLAYER: [0,0],
-	constants.ARG_STRING: [-1, ""],
+	constants.ARG_STRING: [0, ""],
 	constants.ARG_LIST: [[], []],
 	constants.ARG_RANGE: [-1, -1, -1, -1],
 }
