@@ -1,0 +1,8 @@
+*~
+*.py[co]
+build
+dist
+MANIFEST
+build-stamp
+html
+tp
