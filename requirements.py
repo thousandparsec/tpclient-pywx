@@ -50,9 +50,15 @@ except ImportError:
 		notfound.append("numarray")
 
 wx_version = (2, 6, 0, 0)
+wx_version_str = '.'.join([str(x) for x in wx_version[0:2]])
+try:
+	import wxversion
+	wxversion.ensureMinimal(wx_version_str)
+except ImportError, e:
+	pass
+
 try:
 	import wx
-
 	if not cmp(wx_version, wx.__version__.split('.')):
 		raise ImportError("wxPython was too old")
 except (ImportError, KeyError), e:
@@ -61,7 +67,7 @@ except (ImportError, KeyError), e:
 	if system == "debian-based":
 		notfound.append("python-wxgtk2.6")
 	else:
-		notfound.append("wxPython > 2.6.0")
+		notfound.append("wxPython > " + wx_version_str)
 
 import __builtin__
 try:
@@ -93,7 +99,11 @@ except ImportError, e:
 		recommended.append(("Pysco JIT compiler.", reason))
 
 try:
-	import pyOpenSSL
+	try:
+		import pyOpenSSL
+	except ImportError, e:
+		# Maybe it's using a different name
+		import OpenSSL as pyOpenSSL
 except ImportError, e:
 	print e
 
