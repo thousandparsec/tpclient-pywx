@@ -1,8 +1,8 @@
 
+import os
 import wx
 
 try: 
-	import Image
 	import Image
 	import PngImagePlugin
 	import GifImagePlugin
@@ -107,6 +107,22 @@ except ImportError, e:
 	from wx.animate import GIFAnimationCtrl
 	print e
 
+	def LoadFile(self, file):
+		dc = wx.ClientDC(self)
+		dc.Clear()
+		del dc
+
+		if not file.endswith(".gif"):
+			new = file[:file.rfind('.')]+'.gif'
+			if os.path.exists(new):
+				print "Using low quality version", new + ". Install PIL for better version."
+				file = new
+			else:
+				print "Unable to display file", file + ". Install PIL to have it displayed."
+				return
+		GIFAnimationCtrl.__LoadFile(self, file)
+	GIFAnimationCtrl.__LoadFile = GIFAnimationCtrl.LoadFile
+	GIFAnimationCtrl.LoadFile = LoadFile
 import wx.xrc as xrc
 class GIFAnimationCtrlXmlHandler(xrc.XmlResourceHandler):
 	def __init__(self):

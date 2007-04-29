@@ -12,8 +12,8 @@ from winBase import winMainBaseXRC
 from xrc.winUpdate import winUpdateBase
 
 throbber = os.path.join("graphics", "downloading.gif")
-okay = os.path.join("graphics", "finished.gif")
-waiting = os.path.join("graphics", "waiting.gif")
+okay = os.path.join("graphics", "finished.png")
+waiting = os.path.join("graphics", "waiting.png")
 
 class winUpdate(winUpdateBase, winMainBaseXRC):
 	title = _("Updating")
