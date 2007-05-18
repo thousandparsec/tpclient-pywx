@@ -241,11 +241,12 @@ class Network(NetworkThread):
 		# FIXME: This should go away...
 		# FIXME: This is bad :/
 		gui = self.application.gui
-		timeRemaining = self.connection.time() + time.time()
+
+		timeRemaining = self.connection.time()
 
 		if failed(timeRemaining):
 			return
-		gui.Call( gui.main.statusbar.SetEndTime, timeRemaining)
+		gui.Call( gui.main.statusbar.SetEndTime, timeRemaining + time.time() )
 
 _Application = Application
 class Application(_Application):
