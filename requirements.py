@@ -94,7 +94,7 @@ except ImportError, e:
 
 	reason = "Without gettext support localisation will be disabled."
 	if system == "debian-based":
-		recommended.append(("python-gettext", reason))
+		recommended.append(("Python gettext should come with Python, please check your python install", reason))
 	else:
 		recommended.append(("Python with gettext enabled.", reason))
 
@@ -105,7 +105,7 @@ except ImportError, e:
 
 	reason = "Installing pysco can give a 10-20% speed increase in starmap calculations."
 	if system == "debian-based":
-		recommended.append(("python-pysco", reason))
+		recommended.append(("python-psyco", reason))
 	else:
 		recommended.append(("Pysco JIT compiler.", reason))
 
