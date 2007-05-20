@@ -92,7 +92,7 @@ try:
 except ImportError, e:
 	print e
 
-	reason = "Installing pysco can give a 10-20% speed increase in starmap calculations."
+	reason = "Installing pysco can give a 10-20% speed increase in starmap calculations. (Pysco is x86 only.)"
 	if system == "debian-based":
 		recommended.append(("python-psyco", reason))
 	else:
