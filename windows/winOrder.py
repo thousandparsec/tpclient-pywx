@@ -227,10 +227,10 @@ class winOrder(winBase):
 		"""
 		if self.clipboard != None:
 			for order in self.clipboard:
-				if not objects.OrderDescs().has_key(order.type):
+				if not objects.OrderDescs().has_key(order._subtype):
 					return False
 
-				slot = self.type_list.FindString(objects.OrderDescs()[order.type]._name)
+				slot = self.type_list.FindString(objects.OrderDescs()[order._subtype]._name)
 				if slot == wx.NOT_FOUND:
 					return False
 			return True
@@ -584,7 +584,7 @@ class winOrder(winBase):
 				#self.argument_panel.SetBackgroundColour(wx.BLUE)
 				pass
 		
-			orderdesc = objects.OrderDescs()[order.type]
+			orderdesc = objects.OrderDescs()[order._subtype]
 			
 			# List for the argument subpanels
 			self.argument_subpanels = []
@@ -648,9 +648,9 @@ class winOrder(winBase):
 		self.base_sizer.Layout()
 
 	def FromPanel(self, order):
-		orderdesc = objects.OrderDescs()[order.type]
+		orderdesc = objects.OrderDescs()[order._subtype]
 		
-		args = [order.sequence, order.id, order.slot, order.type, 0, []]
+		args = [order.sequence, order.id, order.slot, order._subtype, 0, []]
 		subpanels = copy.copy(self.argument_subpanels)
 		for name, type in orderdesc.names:
 			panel = subpanels.pop(0)

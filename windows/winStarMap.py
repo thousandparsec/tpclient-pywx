@@ -39,7 +39,7 @@ def getpath(application, object, overrides={}):
 		else:
 			order = overrides[slot]
 
-		if order.type == MOVE_TYPE:
+		if order._subtype == MOVE_TYPE:
 			points += [order.pos[0:2]]
 	
 	if len(points) > 1:
@@ -280,7 +280,7 @@ class winStarMap(winBase):
 		if self.path == None:
 			return
 
-		if isinstance(object, Fleet) and order.type == MOVE_TYPE:
+		if isinstance(object, Fleet) and order._subtype == MOVE_TYPE:
 			points = getpath(self.application, object, {evt.slot: evt.order})
 			if not points:
 				return
