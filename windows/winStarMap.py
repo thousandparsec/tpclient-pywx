@@ -18,7 +18,6 @@ from extra.wxFloatCanvas.CrossLine import CrossLine
 # Network imports
 from tp.netlib.objects.ObjectExtra.StarSystem import StarSystem
 from tp.netlib.objects.ObjectExtra.Fleet import Fleet
-from tp.netlib.objects.OrderExtra.Move import Move
 
 # Local imports
 from winBase import *
