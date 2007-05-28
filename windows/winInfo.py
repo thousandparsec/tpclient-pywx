@@ -230,18 +230,30 @@ class winInfo(winBase):
 						res = self.application.cache.resources[t]
 						s+="\t"
 						if surface > 0:
-							s+="%s%s of %s on surface," % (surface, \
+							if len(res.unit_singular) > 0:
+								s+="%s %s of %s on surface, " % (surface, \
 									[res.unit_singular, res.unit_plural][surface > 1],
 									[res.name_singular, res.name_plural][surface > 1])
+							else:
+								s+="%s %s on surface, " % (surface, [res.name_singular, res.name_plural][surface > 1])
+
 						if minable > 0:
-							s+="%s%s of %s minable," % (minable, \
+							if len(res.unit_singular) > 0:
+								s+="%s %s of %s minable, " % (minable, \
 									[res.unit_singular, res.unit_plural][minable > 1],
 									[res.name_singular, res.name_plural][minable > 1])
+							else:
+								s+="%s %s minable, " % (minable, [res.name_singular, res.name_plural][minable > 1])
+
 						if inaccess > 0:
-							s+="%s%s of %s inaccessible," % (inaccess, \
+							if len(res.unit_singular) > 0:
+								s+="%s %s of %s inaccessible, " % (inaccess, \
 									[res.unit_singular, res.unit_plural][inaccess > 1],
 									[res.name_singular, res.name_plural][inaccess > 1])
-						s = s[:-1]+"\n"
+							else:
+								s+="%s %s inaccessible, " % (inaccess, [res.name_singular, res.name_plural][inaccess > 1])
+
+						s = s[:-2]+"\n"
 					else:
 						s+= "\tUnknown Resource %i, S: %i, M: %i, I: %s\n" % (t, surface, minable, inaccess)
 				continue
