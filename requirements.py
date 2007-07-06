@@ -136,6 +136,18 @@ except ImportError, e:
 	else:
 		recommended.append(("Python Imaging library.", reason))
 
+try:
+	import pygame
+except ImportError, e:
+	print e
+	reason = "Installing the Pygame library will allow you to see the intro movie and hear sounds."
+
+	if system == "debian-based":
+		recommended.append(("python-game", reason))
+	else:
+		recommended.append(("Pygame library.", reason))
+
+
 netlib_version = (0, 2, 1)
 try:
 	import tp.netlib
@@ -158,8 +170,6 @@ except (ImportError, KeyError), e:
 	notfound.append("tp.client > " + tostr(client_version))
 
 if len(notfound) == 0:
-
-
 	import sys
 	if sys.platform == 'linux2':
 		import os.path, stat
@@ -174,7 +184,8 @@ if len(notfound) == 0:
 			# Register the URL Handlers
 			try:
 				import gconf
-				for prefix in ['tp', 'tps', 'tphttp', 'tphttps']:
+				for prefix in ['tp', 'tps', 'tphttp', 'tphttps', 'tp+http', 'tp+https']:
+					prefix = gconf.escape_key(prefix, len(prefix))
 					gconf.client_get_default().set_string('/desktop/gnome/url-handlers/%s/command' % prefix, location)
 					gconf.client_get_default().set_bool('/desktop/gnome/url-handlers/%s/enabled' % prefix, True)
 			except ImportError, e:

@@ -134,7 +134,6 @@ class GUI(wx.App):
 
 			from windows.winUpdate import winUpdate
 			self.update = winUpdate(application)
-#			self.update.Show()
 
 			from windows.winDebug import winDebug
 			self.debug = winDebug(application)
@@ -223,7 +222,8 @@ class GUI(wx.App):
 			except Exception, e:
 				utils.do_traceback()
 
-		self.SetTopWindow(window)
+		if isinstance(window, wx.Window):
+			self.SetTopWindow(window)
 
 		self.current = window
 		r = self.current.Show()
