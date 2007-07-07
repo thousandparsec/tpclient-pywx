@@ -8,6 +8,7 @@ import os
 import os.path
 from types import *
 
+import time
 import pprint
 
 # wxPython imports
@@ -41,7 +42,7 @@ def splitall(start):
 	return bits
 
 WAITING = os.path.join(".", "graphics", "loading.gif")
-class winInfo(winBase):
+class winPicture(winBase):
 	
 	def __init__(self, application, parent):
 		winBase.__init__(self, application, parent)
@@ -71,6 +72,9 @@ class panelPicture(panelPictureBase):
 		# Find the images
 		self.images = {'nebula':{'still':[]}, 'star':{'still':[]}, 'planet':{'still':[]}}
 
+		self.progress = []
+		self.averages = []
+
 	def GetPaneInfo(self):
 		info = wx.aui.AuiPaneInfo()
 		info.MinSize(self.GetBestSize())
@@ -80,7 +84,8 @@ class panelPicture(panelPictureBase):
 
 	def OnMediaUpdate(self, evt):
 		files = {}
-		for file, timestamp in evt.files:
+		for file in evt.files:
+			print '-->', file
 			bits = splitall(file)
 	
 			if bits[-2] in ['animation', 'still']:
@@ -97,10 +102,54 @@ class panelPicture(panelPictureBase):
 					files[key] = {}
 				if not files[key].has_key(type):
 					files[key][type] = []
-				files[key][type].append((file, timestamp))
+				files[key][type].append(file)
 		self.images = files
 	
+	def OnMediaDownloadProgress(self, evt):
+		print "winPicture.MediaDownloadProgress", evt.file
+
+		self.progress.append((time.time(), evt.amount))
+		# Trim off the oldest samples
+		while len(self.progress) > 10:
+			self.progress.pop(0)
+
+		if len(self.progress) < 2:
+			return
+
+		# Calculate an average
+		pt, average = self.progress[0][0], 0
+		for t, s in self.progress[1:]:
+			average += s*1.0/(t-pt)			
+		average /= len(self.progress)-1
+
+		self.Progress.SetRange(evt.size)
+		self.Progress.SetValue(evt.progress)
+
+		if average < 1e5:
+			self.Speed.SetLabel("%.2f kb/s" % (average/1e3))
+		else:
+			self.Speed.SetLabel("%.2f mb/s" % (average/1e6))
+
+		self.averages.append(average)
+
+		aaverage = reduce(float.__add__, self.averages)/len(self.averages)
+		
+		eta = (evt.size - evt.progress)/aaverage
+		if eta > 60:
+			eta = (int(eta)//60, eta-int(eta)//60*60)
+			self.ETA.SetLabel("%im %is" % eta)
+		else:
+			self.ETA.SetLabel("eta %is" % eta)
+
+		self.Layout()
+
 	def OnMediaDownloadDone(self, evt):
+		self.Progress.SetRange(evt.size)
+		self.Progress.SetValue(evt.progress)
+		self.Speed.SetLabel('')
+		self.Layout()
+		self.ETA.SetLabel('')
+
 		print "winInfo.MediaDownloadDone - Finished D", evt.file, evt.localfile
 		print "winInfo.MediaDownloadDone - Waiting On", self.image_waiting
 		if evt.file == self.image_waiting:
@@ -171,7 +220,7 @@ class panelPicture(panelPictureBase):
 			image = images[object.id % len(images)]
 			print "Choose:", image
 
-			file = self.application.media.GetFile(*image)
+			file = self.application.media.GetFile(image)
 		except ZeroDivisionError, e:
 			file = os.path.join("graphics", "unknown.png")
 		except Exception, e:
@@ -179,7 +228,7 @@ class panelPicture(panelPictureBase):
 			file = None
 
 		if file is None:
-			self.image_waiting = image[0]
+			self.image_waiting = image
 			self.DisplayImage(os.path.join("graphics", "loading.png"), wx.NullColour)
 		else:
 			self.image_waiting = None
