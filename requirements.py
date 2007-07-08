@@ -6,7 +6,8 @@
 # Preference the local directory first...
 import sys
 sys.path.insert(0, '.')
-print sys.path
+
+import os.path
 
 notfound    = []
 recommended = []
@@ -64,7 +65,6 @@ except ImportError, e:
 	pass
 
 try:
-	import os.path
 	if os.path.exists("wxversion"):
 		import wxversion
 		wxversion.select(open("wxversion").read())
@@ -156,7 +156,8 @@ except ImportError, e:
 netlib_version = (0, 2, 1)
 try:
 	import tp.netlib
-	print "Thousand Parsec Protocol Library Version", tp.netlib.__version__, "(installed at %s)" % tp.netlib.__path__[0]
+
+	print "Thousand Parsec Protocol Library Version", tp.netlib.__version__, "(installed at %s)" % tp.netlib.__installpath__
 	if not cmp(netlib_version, tp.netlib.__version__):
 		raise ImportError("Thousand Parsec Network Library (libtpproto-py) is to old")
 
@@ -167,7 +168,8 @@ except (ImportError, KeyError), e:
 client_version = (0, 3, 0)
 try:
 	import tp.client
-	print "Thousand Parsec Client Library Version", tp.client.__version__, "(installed at %s)" % tp.client.__path__[0]
+
+	print "Thousand Parsec Client Library Version", tp.client.__version__, "(installed at %s)" % tp.client.__installpath__
 	if not cmp(client_version, tp.client.__version__):
 		raise ImportError("Thousand Parsec Client Library (libtpclient-py) is to old")
 except (ImportError, KeyError), e:
