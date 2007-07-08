@@ -3,6 +3,11 @@
 # This file checks you have installed the requirements for tpclient-pywx 
 # It can be run as standalone but is also run by the client at startup
 
+# Preference the local directory first...
+import sys
+sys.path.insert(0, '.')
+print sys.path
+
 notfound    = []
 recommended = []
 
