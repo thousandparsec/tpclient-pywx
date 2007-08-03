@@ -70,3 +70,19 @@ class winConnectBase:
 
 
 
+def strings():
+	_("TP: Connect to a Server");
+	_("Connect to Thousand Parsec Server");
+	_("Server");
+	_("The URL for the Thousand Parsec server.");
+	_("Username");
+	_("The username for the account on the Thousand Parsec server.");
+	_("Show seperate game box.");
+	_("G");
+	_("Game");
+	_("Password");
+	_("The password for the account on the Thousand Parsec Server");
+	_("&OK");
+	_("&Cancel");
+	_("&Find");
+	_("&Preferences");

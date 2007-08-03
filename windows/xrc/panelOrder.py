@@ -53,3 +53,10 @@ class panelOrderBase(wx.Panel):
 
 
 
+def strings():
+	_("Insert new order.");
+	_("&New");
+	_("&Save");
+	_("&Revert");
+	_("Delete the currently selected order(s)");
+	_("&Delete");

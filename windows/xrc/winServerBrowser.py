@@ -68,3 +68,21 @@ class winServerBrowserBase:
 
 
 
+def strings():
+	_("TP: Server Browser");
+	_("Thousand Parsec Server Browser");
+	_("Servers");
+	_("List of all the servers registered on the metaserver.");
+	_("Locations");
+	_("List of all the servers found on the local network.");
+	_("URL");
+	_("URL of the currently selected server.");
+	_("Copy the URL to the clipboard.");
+	_("&Copy");
+	_("Force a refresh of the server list.");
+	_("&Refresh");
+	_("Create a new account on the currently selected server.");
+	_("&New Account");
+	_("Connect to the currently selected server.");
+	_("C&onnect");
+	_("&Cancel");

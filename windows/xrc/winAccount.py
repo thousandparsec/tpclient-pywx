@@ -69,3 +69,23 @@ class winAccountBase:
 
 
 
+def strings():
+	_("TP: Connect to a Server");
+	_("Create an Account");
+	_("Server");
+	_("The URL for the Thousand Parsec server.");
+	_("Choose a server to create an account on.");
+	_("Check");
+	_("Username");
+	_("The username for the account on the Thousand Parsec server.");
+	_("Show seperate game box.");
+	_("G");
+	_("Game");
+	_("Password");
+	_("Choose your password here.");
+	_(" ");
+	_("Repeat the password");
+	_("Email ");
+	_("Repeat the password");
+	_("&OK");
+	_("&Cancel");

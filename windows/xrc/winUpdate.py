@@ -78,3 +78,27 @@ class winUpdateBase:
 
 
 
+def strings():
+	_("TP: Downloading Universe");
+	_("Universe Download");
+	_("Done!");
+	_("Progress");
+	_("Done!");
+	_("Objects Descs");
+	_("Order Descs");
+	_("Objects");
+	_("Orders");
+	_("Boards");
+	_("Messages");
+	_("Categories");
+	_("Designs");
+	_("Components");
+	_("Properties");
+	_("Players");
+	_("Resources");
+	_("Continue to the main game window.");
+	_("&OK");
+	_("Save a copy of the message box window to a file.");
+	_("&Save");
+	_("Cancel the current update and go back to the connect screen.");
+	_("&Cancel");

@@ -162,7 +162,7 @@ class panelPicture(panelPictureBase):
 		print "Displaying", file
 		if file.endswith(".gif"):
 			print "Animated image!"
-			self.Image.Hide()
+			self.Static.Hide()
 			print "Showing the Image"	
 			self.Animation.Show()
 			print "Loading Image"

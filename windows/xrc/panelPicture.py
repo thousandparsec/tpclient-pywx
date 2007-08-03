@@ -39,3 +39,7 @@ class panelPictureBase(wx.Panel):
 		self.ETA = XRCCTRL(self, "ETA")
 
 
+def strings():
+	_("Name goes here");
+	_("10kb/s");
+	_("43s");

@@ -34,3 +34,5 @@ class panelInformationBase(wx.Panel):
 		self.Details = XRCCTRL(self, "Details")
 
 
+def strings():
+	_("Name of object goes here");

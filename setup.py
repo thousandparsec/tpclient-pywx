@@ -12,6 +12,7 @@ from version import version
 version = ("%s.%s.%s" % version) 
 print "Version is %s" % version
 
+
 arguments = dict(
 # Meta data
 	name="tpclient-pywx",
@@ -42,6 +43,9 @@ if not "py2app" in sys.argv and not "py2exe" in sys.argv:
 	print "  py2exe executable bundles for windows"
 	print "  py2app dmg packages for Mac OS X"
 	sys.exit()
+
+if sys.platform == 'darwin' and sys.platform == 'win32':
+	pass
 
 if sys.platform == 'darwin':
 	import py2app
@@ -85,7 +89,6 @@ if sys.platform == 'darwin':
 			}
 		}
 	)
-
 
 elif sys.platform == 'win32':
 	import py2exe

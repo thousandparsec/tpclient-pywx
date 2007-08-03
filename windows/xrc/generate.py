@@ -120,7 +120,7 @@ def Generate_wxFrame(xrcFile, topWindow, outFile):
 	windowClass = re.sub("^wx", "wx.", windowClass)
 
 	windowName = topWindow.getAttribute("name")
-	print "'%s' '%s'"% (windowClass, windowName)
+	print "'%s' is a '%s'"% (windowName, windowClass)
 	print >> outFile, frameTemplate % locals()
 	
 	eventFunctions = [] # a list to store the code for the event functions
@@ -141,7 +141,7 @@ def Generate_wxFrame(xrcFile, topWindow, outFile):
 		if "wx" in controlName:
 			continue
 		if controlName != "" and controlClass != "":
-			print controlName, controlClass
+			print '\t', controlName, (3-(len(controlName)+1)/8)*'\t', "is a", controlClass
 			try:
 				template = globals()["Template_%s" % controlClass.replace('wx.', '')]
 			except KeyError:
@@ -151,7 +151,6 @@ def Generate_wxFrame(xrcFile, topWindow, outFile):
 
 	print >> outFile
 	print >> outFile, "\n".join(eventFunctions)
-	print eventFunctions
 
 def Generate_wxPanel(xrcFile, topWindow, outFile):
 	fileName = os.path.basename(xrcFile.name)
@@ -162,7 +161,7 @@ def Generate_wxPanel(xrcFile, topWindow, outFile):
 	windowClass = re.sub("^wx", "wx.", windowClass)
 
 	windowName = topWindow.getAttribute("name")
-	print "'%s' '%s'"% (windowClass, windowName)
+	print "'%s' is a '%s'"% (windowName, windowClass)
 	print >> outFile, panelTemplate % locals()
 	
 	eventFunctions = [] # a list to store the code for the event functions
@@ -183,7 +182,7 @@ def Generate_wxPanel(xrcFile, topWindow, outFile):
 		if "wx" in controlName:
 			continue
 		if controlName != "" and controlClass != "":
-			print controlName, controlClass
+			print '\t', controlName, (3-(len(controlName)+1)/8)*'\t', "is a", controlClass
 			try:
 				template = globals()["Template_%s" % controlClass.replace('wx.', '')]
 			except KeyError:
@@ -193,9 +192,6 @@ def Generate_wxPanel(xrcFile, topWindow, outFile):
 
 	print >> outFile
 	print >> outFile, "\n".join(eventFunctions)
-	print eventFunctions
-
-
 
 
 #Generate_wxWizard = Generate_wxDialog
@@ -206,7 +202,6 @@ def GeneratePython(xrcFile, outFile):
 	resource = xmldoc.childNodes[0]
 	topWindows = [e for e in resource.childNodes
 				  if e.nodeType == e.ELEMENT_NODE and e.tagName == "object"]
-	print topWindows
 	print >> outFile, fileHeaderTemplate
 
 	# Generate a class for each top-window object (Frame, Panel, Dialog, etc.)
@@ -228,6 +223,8 @@ Usage : python pyxrc.py <resource.xrc>
 The Python code is printed to the standard output.
 """
 
+from wx.tools.pywxrc import XmlResourceCompiler
+
 def main():
 	if len(sys.argv) != 2:
 		Usage()
@@ -243,9 +240,24 @@ def main():
 				print >> sys.stderr, "Can't open '%s'!" % outFilename
 			else:
 				GeneratePython(inStream, outStream)
+
+				comp = XmlResourceCompiler()
+				comp.MakeGetTextOutput([inFilename], '.translation')
+
+				transStream = file('.translation', 'r')
+				outStream.write('def strings():\n')
+				outStream.write(transStream.read().replace('_(', '\t_('))
+
+				os.unlink('.translation')
+
 				print "Result stored in %s." % outFilename
 		except IOError:
 			print >> sys.stderr, "Can't open '%s'!" % inFilename
+		except KeyError, e:
+			print >> sys.stderr, "There was an error outputting .py file for '%s'" % inFilename
+			print >> sys.stderr, "No such key %s" % e
+			os.unlink(outFilename)
+		print >> sys.stderr
 
 
 if __name__  == "__main__":

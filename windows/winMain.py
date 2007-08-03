@@ -336,15 +336,15 @@ class winMain(winMDIBase):
 		file.AppendSeparator()
 		file.Append( ID_EXIT, _("Exit"), _("Exit") )
 
-		# Statistics Menu
-		stat = wx.Menu()
-		stat.Append( ID_STAT_EAAG, _("Empire at a Glance"), _("") )
-		stat.AppendSeparator()
-		stat.Append( ID_STAT_SYSTEM, _("Systems"), _("") )
-		stat.Append( ID_STAT_PLANET, _("Planets"), _("") )
-		stat.Append( ID_STAT_FLEET,  _("Fleets"),  _("") )
-		stat.AppendSeparator()
-		stat.Append( ID_STAT_BATTLE, _("Battles"), _("") )
+##		# Statistics Menu
+##		stat = wx.Menu()
+##		stat.Append( ID_STAT_EAAG, _("Empire at a Glance"), _("") )
+##		stat.AppendSeparator()
+##		stat.Append( ID_STAT_SYSTEM, _("Systems"), _("") )
+##		stat.Append( ID_STAT_PLANET, _("Planets"), _("") )
+##		stat.Append( ID_STAT_FLEET,  _("Fleets"),  _("") )
+##		stat.AppendSeparator()
+##		stat.Append( ID_STAT_BATTLE, _("Battles"), _("") )
 
 		# Windows Menu
 		win = wx.Menu()
@@ -437,9 +437,9 @@ class winMain(winMDIBase):
 		if evt.remaining == 0:
 			if not self.updatepending:
 				self.updatepending = True
-				msg = """\
+				msg = _("""\
 The turn has ended. Would you like to download all the new details?
-"""
+""")
 				dlg = wx.MessageDialog(self.application.gui.current, msg, _("Update?"), wx.YES_NO|wx.YES_DEFAULT|wx.ICON_INFORMATION)
 				if dlg.ShowModal() == wx.ID_YES:
 					self.UpdateCache()

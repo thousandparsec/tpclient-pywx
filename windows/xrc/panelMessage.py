@@ -63,3 +63,14 @@ class panelMessageBase(wx.Panel):
 
 
 
+def strings():
+	_("Filter");
+	_("Static text");
+	_("100 of 100");
+	_("<html>\n<body>\n<center>\n\t<table cols=1 width=\"100%\">\n\t\t<tr>\n\t\t\t<td><b>Subject:</b> You are unloved!\n\t\t</tr>\n\t\t<tr>\n\t\t\t<td>\n\t\t\tYou have recived no messages this turn!<br><br>\n\t\t\tActually if you didn't recive any messages it most proberly\n\t\t\tmeans that your client couldn't load the results from the server.\n\t\t\tTry reload/restart the client.\n\t\t\t</td>\n\t\t</tr>\n\t </table>\n</center>\n</body>\n</html>");
+	_("Prev");
+	_("First");
+	_("Goto");
+	_("Next");
+	_("Last");
+	_("Delete");
