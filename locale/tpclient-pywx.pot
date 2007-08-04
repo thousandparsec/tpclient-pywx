@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-08-05 02:06+0930\n"
+"POT-Creation-Date: 2007-08-05 02:54+0930\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -31,7 +31,7 @@ msgid "Account Created"
 msgstr ""
 
 #: windows/winAccount.py:182 windows/winBase.py:369 tpclient-pywx:264
-#: windows/winAccount.py:182 windows/winBase.py:369
+#: tpclient-pywx:268 windows/winAccount.py:182 windows/winBase.py:369
 msgid "Network Error"
 msgstr ""
 
@@ -898,4 +898,238 @@ msgstr ""
 
 #: windows/xrc/winUpdate.py:103 windows/xrc/winUpdate.py:103
 msgid "Cancel the current update and go back to the connect screen."
+msgstr ""
+
+#: windows/winInfo.py:83 windows/winInfo.py:83
+msgid "SelectObject: No such object."
+msgstr ""
+
+#: windows/winInfo.py:96 windows/winInfo.py:96
+msgid "Ships: "
+msgstr ""
+
+#: windows/winInfo.py:103 windows/winInfo.py:103
+msgid "Unknown Design id:"
+msgstr ""
+
+#: windows/winInfo.py:104 windows/winInfo.py:104
+#, python-format
+msgid "Unknown (type: %s)"
+msgstr ""
+
+#: tp/client/cache.py:348
+msgid "Getting order descriptions..."
+msgstr ""
+
+#: tp/client/cache.py:349
+msgid "Working out the number of order descriptions to get.."
+msgstr ""
+
+#: tp/client/cache.py:363
+#, python-format
+msgid "Got order description %s (ID: %i) (last modified at %s)..."
+msgstr ""
+
+#: tp/client/cache.py:367
+#, python-format
+msgid "Failed to get order description with id, %i (last modified at %s)..."
+msgstr ""
+
+#: tp/client/cache.py:368
+msgid "Finished getting order descriptions..."
+msgstr ""
+
+#: tp/client/cache.py:387
+msgid "Getting your player object..."
+msgstr ""
+
+#: tp/client/cache.py:389
+msgid "Gotten your player object..."
+msgstr ""
+
+#: tp/client/cache.py:411
+#, python-format
+msgid "Getting %s..."
+msgstr ""
+
+#: tp/client/cache.py:414
+#, python-format
+msgid "Working out the number of %s to get.."
+msgstr ""
+
+#: tp/client/cache.py:429
+#, python-format
+msgid "Got %s %s (id: %i) (last modified at %s)..."
+msgstr ""
+
+#: tp/client/cache.py:432
+#, python-format
+msgid "No %s to get, skipping..."
+msgstr ""
+
+#: tp/client/cache.py:437
+#, python-format
+msgid "Have %i %s to get..."
+msgstr ""
+
+#: tp/client/cache.py:448
+#, python-format
+msgid "Failed to get the %s which was previously called %s."
+msgstr ""
+
+#: tp/client/cache.py:452
+#, python-format
+msgid "Failed to get the %s with id %s."
+msgstr ""
+
+#: tp/client/cache.py:454
+#, python-format
+msgid "Cleaning up %s which have disappeared..."
+msgstr ""
+
+#: tp/client/cache.py:461
+#, python-format
+msgid "Removing %s %s as it has disappeared..."
+msgstr ""
+
+#: tp/client/cache.py:466
+msgid "Building two way tree of the universe for speed..."
+msgstr ""
+
+#: tp/client/cache.py:475
+#, python-format
+msgid "Gotten all %s..."
+msgstr ""
+
+#: tp/client/cache.py:493
+#, python-format
+msgid "Getting %s.."
+msgstr ""
+
+#: tp/client/cache.py:494
+#, python-format
+msgid "Have to get %s for %i %s.."
+msgstr ""
+
+#: tp/client/cache.py:504
+#, python-format
+msgid "Sending a request for all %s on %s.."
+msgstr ""
+
+#: tp/client/cache.py:508
+#, python-format
+msgid "Skipping requesting %s on %s as there are none!"
+msgstr ""
+
+#: tp/client/cache.py:526
+#, python-format
+msgid "Failed to get %s for %s (id: %s) (%s)..."
+msgstr ""
+
+#: tp/client/cache.py:530
+#, python-format
+msgid "Got %i %s for %s (id: %s)..."
+msgstr ""
+
+#: tp/client/cache.py:533
+#, python-format
+msgid "Cleaning up any stray %s.."
+msgstr ""
+
+#: tp/client/cache.py:536
+#, python-format
+msgid "Found stray %s for %s.."
+msgstr ""
+
+#: tp/client/cache.py:540
+#, python-format
+msgid "Gotten all the %s.."
+msgstr ""
+
+#: tp/client/threads.py:286 tp/client/threads.py:550
+msgid "There was an unknown network error.\n"
+msgstr ""
+
+#: tp/client/threads.py:287 tp/client/threads.py:551
+msgid "Any changes since last save have been lost.\n"
+msgstr ""
+
+#: tp/client/threads.py:289
+msgid "A traceback of the error was printed to the console.\n"
+msgstr ""
+
+#: tp/client/threads.py:317
+msgid "The client was unable to connect to the host.\n"
+msgstr ""
+
+#: tp/client/threads.py:318
+msgid ""
+"This could be because the server is down or there is a problem with the "
+"network.\n"
+msgstr ""
+
+#: tp/client/threads.py:322
+msgid "The client could not connect to the host.\n"
+msgstr ""
+
+#: tp/client/threads.py:323
+msgid ""
+"This could be because the server is down or you mistyped the server "
+"address.\n"
+msgstr ""
+
+#: tp/client/threads.py:326
+msgid "Successfully connected to the host..."
+msgstr ""
+
+#: tp/client/threads.py:329
+msgid "Looking for Thousand Parsec Server..."
+msgstr ""
+
+#: tp/client/threads.py:333 tp/client/threads.py:342
+msgid ""
+"The client connected to the host but it did not appear to be a Thousand "
+"Parsec server.\n"
+msgstr ""
+
+#: tp/client/threads.py:334 tp/client/threads.py:343
+msgid ""
+"This could be because the server is down or the connection details are "
+"incorrect.\n"
+msgstr ""
+
+#: tp/client/threads.py:337
+msgid "Found a Thousand Parsec Server..."
+msgstr ""
+
+#: tp/client/threads.py:339
+msgid "Looking for supported features..."
+msgstr ""
+
+#: tp/client/threads.py:346
+msgid "Got the supported features..."
+msgstr ""
+
+#: tp/client/threads.py:355
+msgid "Connecting..."
+msgstr ""
+
+#: tp/client/threads.py:361
+msgid "Trying to Login to the server..."
+msgstr ""
+
+#: tp/client/threads.py:363
+msgid ""
+"The client connected to the host but could not login because the username of "
+"password was incorrect.\n"
+msgstr ""
+
+#: tp/client/threads.py:364
+msgid ""
+"This could be because you are connecting to the wrong server or mistyped the "
+"username or password.\n"
+msgstr ""
+
+#: tp/client/threads.py:367
+msgid "Logged in okay!"
 msgstr ""
