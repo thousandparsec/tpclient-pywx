@@ -33,9 +33,6 @@ from tp.client.cache import Cache
 
 ############
 # Setup the translation stuff...
-import locale
-print locale.getlocale()
-
 import gettext
 # Hack to get the locale directory
 basepath = os.path.abspath(os.path.dirname(__file__))
