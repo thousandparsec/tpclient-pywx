@@ -75,12 +75,12 @@ class winDesign(winReportBase, winShiftMixIn):
 		self.top = wx.BoxSizer( wx.HORIZONTAL )
 		
 		# The title (editable version)
-		self.titleedit = wx.TextCtrl( panel, -1, "Title", size=(-1,wx.local.buttonSize[1]), style=wx.TE_CENTRE)
+		self.titleedit = wx.TextCtrl( panel, -1, _("Title"), size=(-1,wx.local.buttonSize[1]), style=wx.TE_CENTRE)
 		self.titleedit.SetFont(wx.local.normalFont)
 		self.top.Add( self.titleedit, 1, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
 		
 		# The title (noneditable version)
-		self.titletext = wx.StaticText( panel, -1, "Title", size=(-1,wx.local.buttonSize[1]), style=wx.ALIGN_CENTRE|wx.ST_NO_AUTORESIZE)
+		self.titletext = wx.StaticText( panel, -1, _("Title"), size=(-1,wx.local.buttonSize[1]), style=wx.ALIGN_CENTRE|wx.ST_NO_AUTORESIZE)
 		self.titletext.SetFont(wx.local.normalFont)
 		self.top.Add( self.titletext, 1, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1)
 
@@ -103,7 +103,7 @@ class winDesign(winReportBase, winShiftMixIn):
 		# The components in the design
 		self.parts = wx.ListCtrl(panel, -1, wx.DefaultPosition, wx.DefaultSize, wx.LC_REPORT|wx.SUNKEN_BORDER|wx.LC_EDIT_LABELS )
 		self.parts.InsertColumn(0, "#", format=wx.LIST_FORMAT_RIGHT, width=20)
-		self.parts.InsertColumn(1, "Component")
+		self.parts.InsertColumn(1, _("Component"))
 		self.parts.SetFont(wx.local.normalFont)
 		self.designsizer.Add(self.parts, 2, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
 
@@ -234,12 +234,12 @@ class winDesign(winReportBase, winShiftMixIn):
 	def BuildDesignList(self, evt=None):
 		self.designs.DeleteAllItems()
 
-		root = self.designs.AddRoot("Designs")
+		root = self.designs.AddRoot(_("Designs"))
 		self.designs.SetPyData(root, None)
 		self.designs.SetItemImage(root, 0, wx.TreeItemIcon_Normal)
 		self.designs.SetItemImage(root, 1, wx.TreeItemIcon_Expanded)
 
-		blank = Design(-1, -1, -1, [1], "New Design", "", -1, -1, [], "", [])
+		blank = Design(-1, -1, -1, [1], _("New Design"), "", -1, -1, [], "", [])
 		self.TreeAddItem(self.designs, root, blank)
 
 		# FIXME: Designs which have no categories are not shown.
@@ -264,7 +264,7 @@ class winDesign(winReportBase, winShiftMixIn):
 
 		self.comps.DeleteAllItems()
 
-		root = self.comps.AddRoot("Components")
+		root = self.comps.AddRoot(_("Components"))
 		self.comps.SetPyData(root, None)
 		self.comps.SetItemImage(root, 0, wx.TreeItemIcon_Normal)
 		self.comps.SetItemImage(root, 1, wx.TreeItemIcon_Expanded)
@@ -395,10 +395,10 @@ class winDesign(winReportBase, winShiftMixIn):
 	
 		if self.selected.used == -1:
 			if amount > 1 or len(components) > 1:
-				reason = self.selected.feedback + "\nWould you like to continue adding these components?"
+				reason = self.selected.feedback + _("\nWould you like to continue adding these components?")
 			else:
-				reason = self.selected.feedback + "\nWould you like to continue adding this component?"
-			dlg = wx.MessageDialog(self, reason, 'Design Warning', wx.YES_NO|wx.NO_DEFAULT|wx.ICON_ERROR)
+				reason = self.selected.feedback + _("\nWould you like to continue adding this component?")
+			dlg = wx.MessageDialog(self, reason, _('Design Warning'), wx.YES_NO|wx.NO_DEFAULT|wx.ICON_ERROR)
 			
 			if dlg.ShowModal() == wx.ID_NO:
 				for component in components:

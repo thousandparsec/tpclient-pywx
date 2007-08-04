@@ -47,7 +47,7 @@ class winUpdate(winUpdateBase, winMainBaseXRC):
 		self.application.gui.Show(self.application.gui.connectto)
 
 	def OnSave(self, evt):
-		dlg = wx.FileDialog(self, message="Save log as ...", defaultDir=os.getcwd(), 
+		dlg = wx.FileDialog(self, message=_("Save log as ..."), defaultDir=os.getcwd(), 
 								defaultFile="update.log", wildcard="Log file (*.log)|*.log", style=wx.SAVE)
 		dlg.SetFilterIndex(0)
 		if dlg.ShowModal() != wx.ID_OK:
@@ -168,7 +168,7 @@ class winUpdate(winUpdateBase, winMainBaseXRC):
 				self.ConnectingGauge.SetValue(self.ConnectingGauge.GetRange())
 
 				# Set the progress text
-				self.ConnectingText.SetLabel("Done!")
+				self.ConnectingText.SetLabel(_("Done!"))
 
 			elif state == "alreadydone":
 				self.ConnectingGauge.Disable()
@@ -191,7 +191,7 @@ class winUpdate(winUpdateBase, winMainBaseXRC):
 
 			if state == "start":
 				# Set the progress title
-				self.ProgressTitle.SetLabel("Getting %s" % mode.title())
+				self.ProgressTitle.SetLabel(_("Getting %s" % mode.title()))
 
 				# Set the progress guage to be empty
 				self.ProgressGauge.Enable()
@@ -219,7 +219,7 @@ class winUpdate(winUpdateBase, winMainBaseXRC):
 					self.ProgressGauge.SetRange(todownload)
 
 				# Update the text
-				self.ProgressText.SetLabel("%s of %s" % (0, todownload))
+				self.ProgressText.SetLabel(_("%s of %s") % (0, todownload))
 
 			elif state == "progress":
 				# Nothing to do...
@@ -230,7 +230,7 @@ class winUpdate(winUpdateBase, winMainBaseXRC):
 				self.ProgressGauge.SetValue(self.ProgressGauge.GetValue()+amount)
 
 				# Update the text
-				self.ProgressText.SetLabel("%s of %s" % \
+				self.ProgressText.SetLabel(_("%s of %s") % \
 					(self.ProgressGauge.GetValue(), self.ProgressGauge.GetRange()))
 				
 			elif state == "finished":
@@ -242,7 +242,7 @@ class winUpdate(winUpdateBase, winMainBaseXRC):
 				self.ProgressGauge.SetValue(self.ProgressGauge.GetRange())
 
 				# Set the progress text
-				self.ProgressText.SetLabel("Done!")
+				self.ProgressText.SetLabel(_("Done!"))
 
 				# Stop the progress animation
 				self.ProgressAnim.Stop()

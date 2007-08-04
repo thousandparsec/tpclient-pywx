@@ -166,7 +166,7 @@ class winConfigMixIn(ConfigMixIn):
 			if self.DefaultShow.has_key((SCREEN_X, SCREEN_Y)):
 				config['show'] = self.DefaultShow[(SCREEN_X, SCREEN_Y)]
 			else:
-				print "Config-%s: Did not find a default show for your resolution (using 1024x768 defaults)" % (self,)
+				print _("Config-%s: Did not find a default show for your resolution (using 1024x768 defaults)") % (self,)
 				config['show'] = self.DefaultShow[(1024, 768)]
 
 		# Where is the window position
@@ -179,7 +179,7 @@ class winConfigMixIn(ConfigMixIn):
 			if self.DefaultPosition.has_key((SCREEN_X, SCREEN_Y)):
 				config['position'] = self.DefaultPosition[(SCREEN_X, SCREEN_Y)]
 			else:
-				print "Config-%s: Did not find a default position for your resolution (using 1024x768 defaults)" % (self,)
+				print _("Config-%s: Did not find a default position for your resolution (using 1024x768 defaults)") % (self,)
 				config['position'] = self.DefaultPosition[(1024, 768)]
 
 		# How big is the window
@@ -190,7 +190,7 @@ class winConfigMixIn(ConfigMixIn):
 			if self.DefaultSize.has_key((SCREEN_X, SCREEN_Y)):
 				config['size'] = self.DefaultSize[(SCREEN_X, SCREEN_Y)]
 			else:
-				print "Config-%s: Did not find a default size for your resolution (using 1024x768 defaults)" % (self,)
+				print _("Config-%s: Did not find a default size for your resolution (using 1024x768 defaults)") % (self,)
 				config['size'] = self.DefaultSize[(1024, 768)]
 
 		return config

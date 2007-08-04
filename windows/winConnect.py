@@ -133,7 +133,7 @@ class configConnect(configConnectBase, usernameMixIn):
 			button.SetBitmapDisabled(bmp)
 
 	def EnableDetails(self, label):
-		self.ServerDetails.SetLabel("Login for " + label)
+		self.ServerDetails.SetLabel(_("Login for %s") % (label,))
 		self.Username.Enable()
 		self.Game.Enable()
 		self.GameShow.Enable()
@@ -242,11 +242,11 @@ class winConnect(winConnectBase, winMainBaseXRC, usernameMixIn):
 				print "Username doesn't match.."
 			if oldpassword != password:
 				print "Password doesn't match.."
-				msg = """\
+				msg = _("""\
 It appears you are using a different password for 
 this account, would you like to update the saved 
 information with the new password?
-"""
+""")
 				dlg = wx.MessageDialog(self, msg, _("Update Password?"), wx.YES_NO|wx.YES_DEFAULT|wx.ICON_INFORMATION)
 				if dlg.ShowModal() == wx.ID_YES:
 					# Update the password
@@ -256,11 +256,11 @@ information with the new password?
 
 		else:
 			# Popup a dialog asking if we want to add the account
-			msg = """\
+			msg = _("""\
 It appears you havn't access this account before.
 
 Would you like to save this account's details?
-"""
+""")
 			dlg = wx.MessageDialog(self, msg, _("Add Account?"), wx.YES_NO|wx.YES_DEFAULT|wx.ICON_INFORMATION)
 
 			if dlg.ShowModal() == wx.ID_YES:
@@ -445,11 +445,11 @@ Would you like to save this account's details?
 			for key, details in self.config['details'].items():
 				if not details[2]: 
 					continue
-				msg = """
+				msg = _("""
 The client is already set to autoconnect to %s.
 
 Would you instead like to autoconnect to %s.
-""" % (key, server)
+""") % (key, server)
 				dlg = wx.MessageDialog(self.ConfigPanel, msg, _("Autoconnect to?"), wx.OK|wx.CANCEL|wx.ICON_INFORMATION)
 				if dlg.ShowModal() == wx.ID_OK:
 					details[2] = False

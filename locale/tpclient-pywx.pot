@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-08-05 00:16+0930\n"
+"POT-Creation-Date: 2007-08-05 00:30+0930\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,6 +22,10 @@ msgstr ""
 msgid "Account"
 msgstr ""
 
+#: windows/winAccount.py:174
+msgid "This server does not support account creation."
+msgstr ""
+
 #: windows/winAccount.py:178
 msgid "Account Created"
 msgstr ""
@@ -30,8 +34,37 @@ msgstr ""
 msgid "Network Error"
 msgstr ""
 
+#: windows/winAccount.py:195
+msgid "All fields are required."
+msgstr ""
+
 #: windows/winAccount.py:195 windows/winAccount.py:199
 msgid "Fields Required"
+msgstr ""
+
+#: windows/winAccount.py:199
+msgid "Password fields do not match."
+msgstr ""
+
+#: windows/winBase.py:169
+#, python-format
+msgid ""
+"Config-%s: Did not find a default show for your resolution (using 1024x768 "
+"defaults)"
+msgstr ""
+
+#: windows/winBase.py:182
+#, python-format
+msgid ""
+"Config-%s: Did not find a default position for your resolution (using "
+"1024x768 defaults)"
+msgstr ""
+
+#: windows/winBase.py:193
+#, python-format
+msgid ""
+"Config-%s: Did not find a default size for your resolution (using 1024x768 "
+"defaults)"
 msgstr ""
 
 #: windows/winBase.py:237
@@ -58,12 +91,31 @@ msgstr ""
 msgid "Config"
 msgstr ""
 
+#: windows/winConnect.py:136
+#, python-format
+msgid "Login for %s"
+msgstr ""
+
 #: windows/winConnect.py:161
 msgid "Connect"
 msgstr ""
 
+#: windows/winConnect.py:245
+msgid ""
+"It appears you are using a different password for \n"
+"this account, would you like to update the saved \n"
+"information with the new password?\n"
+msgstr ""
+
 #: windows/winConnect.py:250
 msgid "Update Password?"
+msgstr ""
+
+#: windows/winConnect.py:259
+msgid ""
+"It appears you havn't access this account before.\n"
+"\n"
+"Would you like to save this account's details?\n"
 msgstr ""
 
 #: windows/winConnect.py:264
@@ -73,6 +125,15 @@ msgstr ""
 #: windows/winConnect.py:431 windows/winConnect.py:436
 #: windows/winConnect.py:441
 msgid "Login for "
+msgstr ""
+
+#: windows/winConnect.py:448
+#, python-format
+msgid ""
+"\n"
+"The client is already set to autoconnect to %s.\n"
+"\n"
+"Would you instead like to autoconnect to %s.\n"
 msgstr ""
 
 #: windows/winConnect.py:453
@@ -85,6 +146,14 @@ msgstr ""
 
 #: windows/winDesign.py:43
 msgid "Design"
+msgstr ""
+
+#: windows/winDesign.py:78 windows/winDesign.py:83
+msgid "Title"
+msgstr ""
+
+#: windows/winDesign.py:106
+msgid "Component"
 msgstr ""
 
 #: windows/winDesign.py:129
@@ -114,6 +183,34 @@ msgstr ""
 
 #: windows/winDesign.py:169
 msgid "Add Many"
+msgstr ""
+
+#: windows/winDesign.py:237 windows/xrc/winUpdate.py:94
+msgid "Designs"
+msgstr ""
+
+#: windows/winDesign.py:242
+msgid "New Design"
+msgstr ""
+
+#: windows/winDesign.py:267 windows/xrc/winUpdate.py:95
+msgid "Components"
+msgstr ""
+
+#: windows/winDesign.py:398
+msgid ""
+"\n"
+"Would you like to continue adding these components?"
+msgstr ""
+
+#: windows/winDesign.py:400
+msgid ""
+"\n"
+"Would you like to continue adding this component?"
+msgstr ""
+
+#: windows/winDesign.py:401
+msgid "Design Warning"
 msgstr ""
 
 #: windows/winInfo.py:57
@@ -265,6 +362,15 @@ msgstr ""
 msgid "Paste"
 msgstr ""
 
+#: windows/winOrder.py:274
+msgid "Cant paste because the orders arn't valid on this object."
+msgstr ""
+
+#: windows/winOrder.py:315
+#, python-format
+msgid "Warning: Object %s does not exist!"
+msgstr ""
+
 #: windows/winOrder.py:335
 #, python-format
 msgid "Current orders on %s."
@@ -282,6 +388,24 @@ msgstr ""
 msgid "No object selected."
 msgstr ""
 
+#: windows/winOrder.py:486
+#, python-format
+msgid "OrderSave: No order selected for save. (%s)"
+msgstr ""
+
+#: windows/winOrder.py:528
+#, python-format
+msgid "OrderSave: No order selected for update. (%s))"
+msgstr ""
+
+#: windows/winOrder.py:651
+msgid "Argument type (ARG_PLAYER) not implimented yet."
+msgstr ""
+
+#: windows/winOrder.py:653
+msgid "Argument type (ARG_RANGE) not implimented yet."
+msgstr ""
+
 #: windows/winOrder.py:676
 msgid "Not implimented."
 msgstr ""
@@ -294,7 +418,8 @@ msgstr ""
 msgid "At "
 msgstr ""
 
-#: windows/winOrder.py:744
+#: windows/winOrder.py:744 windows/winServerBrowser.py:26
+#: windows/winServerBrowser.py:133
 msgid "Type"
 msgstr ""
 
@@ -302,7 +427,32 @@ msgstr ""
 msgid "D"
 msgstr ""
 
-#: windows/winOrder.py:940
+#: windows/winOrder.py:791 windows/winOrder.py:835
+msgid "ListAdd: No type selected."
+msgstr ""
+
+#: windows/winOrder.py:824
+msgid "ListDel: No selection selected."
+msgstr ""
+
+#: windows/winOrder.py:855
+msgid "ListSelect: No selection selected."
+msgstr ""
+
+#: windows/winOrder.py:916
+msgid "X"
+msgstr ""
+
+#: windows/winOrder.py:924
+msgid "Y"
+msgstr ""
+
+#: windows/winOrder.py:932
+msgid "Z"
+msgstr ""
+
+#: windows/winOrder.py:940 windows/winServerBrowser.py:21
+#: windows/winServerBrowser.py:76
 msgid "P"
 msgstr ""
 
@@ -314,12 +464,68 @@ msgstr ""
 msgid "Updating"
 msgstr ""
 
+#: windows/winServerBrowser.py:21 windows/winServerBrowser.py:52
+msgid "Name"
+msgstr ""
+
+#: windows/winServerBrowser.py:21 windows/winServerBrowser.py:57
+msgid "Playing"
+msgstr ""
+
+#: windows/winServerBrowser.py:21 windows/winServerBrowser.py:60
+#: windows/xrc/winAccount.py:75 windows/xrc/winConnect.py:76
+msgid "Server"
+msgstr ""
+
+#: windows/winServerBrowser.py:21 windows/winServerBrowser.py:68
+msgid "C"
+msgstr ""
+
+#: windows/winServerBrowser.py:21 windows/winServerBrowser.py:72
+msgid "O"
+msgstr ""
+
+#: windows/winServerBrowser.py:21 windows/winServerBrowser.py:80
+msgid "Other"
+msgstr ""
+
+#: windows/winServerBrowser.py:26 windows/winServerBrowser.py:134
+msgid "DNS"
+msgstr ""
+
+#: windows/winServerBrowser.py:26 windows/winServerBrowser.py:135
+msgid "IP"
+msgstr ""
+
+#: windows/winServerBrowser.py:26 windows/winServerBrowser.py:136
+msgid "Port"
+msgstr ""
+
 #: windows/winSystem.py:23
 msgid "System"
 msgstr ""
 
 #: windows/winSystem.py:126
 msgid "Known Universe"
+msgstr ""
+
+#: windows/winUpdate.py:50
+msgid "Save log as ..."
+msgstr ""
+
+#: windows/winUpdate.py:171 windows/winUpdate.py:245
+#: windows/xrc/winUpdate.py:84 windows/xrc/winUpdate.py:86
+msgid "Done!"
+msgstr ""
+
+#: windows/winUpdate.py:194
+#, python-format
+msgid "Getting %s"
+msgstr ""
+
+#: windows/winUpdate.py:222 windows/winUpdate.py:233
+#, python-format
+msgid "%s of %s"
 msgstr ""
 
 #: windows/xrc/panelInformation.py:38
@@ -423,10 +629,6 @@ msgstr ""
 
 #: windows/xrc/winAccount.py:74
 msgid "Create an Account"
-msgstr ""
-
-#: windows/xrc/winAccount.py:75 windows/xrc/winConnect.py:76
-msgid "Server"
 msgstr ""
 
 #: windows/xrc/winAccount.py:76 windows/xrc/winConnect.py:77
@@ -579,10 +781,6 @@ msgstr ""
 msgid "Universe Download"
 msgstr ""
 
-#: windows/xrc/winUpdate.py:84 windows/xrc/winUpdate.py:86
-msgid "Done!"
-msgstr ""
-
 #: windows/xrc/winUpdate.py:85
 msgid "Progress"
 msgstr ""
@@ -605,14 +803,6 @@ msgstr ""
 
 #: windows/xrc/winUpdate.py:93
 msgid "Categories"
-msgstr ""
-
-#: windows/xrc/winUpdate.py:94
-msgid "Designs"
-msgstr ""
-
-#: windows/xrc/winUpdate.py:95
-msgid "Components"
 msgstr ""
 
 #: windows/xrc/winUpdate.py:96

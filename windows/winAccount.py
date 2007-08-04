@@ -171,7 +171,7 @@ class winAccount(winAccountBase, winMainBaseXRC, usernameMixIn):
 		if features.FEATURE_ACCOUNT_REGISTER in evt.args[0]:
 			self.State("details")
 		else:
-			self.OnNetworkFailure("This server does not support account creation.")
+			self.OnNetworkFailure(_("This server does not support account creation."))
 
 	def OnNetworkAccount(self, evt):
 		self.application.gui.Show(self.application.gui.connectto)
@@ -192,11 +192,11 @@ class winAccount(winAccountBase, winMainBaseXRC, usernameMixIn):
 
 		# Check the values are sensible
 		if username == "" or password1 == "" or password2 == "" or email == "":
-			dlg = wx.MessageDialog(self.application.gui.current, "All fields are required.", _("Fields Required"), wx.OK|wx.ICON_ERROR)
+			dlg = wx.MessageDialog(self.application.gui.current, _("All fields are required."), _("Fields Required"), wx.OK|wx.ICON_ERROR)
 			dlg.ShowModal()
 			return
 		if password1 != password2:
-			dlg = wx.MessageDialog(self.application.gui.current, "Password fields do not match.", _("Fields Required"), wx.OK|wx.ICON_ERROR)
+			dlg = wx.MessageDialog(self.application.gui.current, _("Password fields do not match."), _("Fields Required"), wx.OK|wx.ICON_ERROR)
 			dlg.ShowModal()
 			return
 

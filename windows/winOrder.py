@@ -271,7 +271,7 @@ class panelOrder(panelOrderBase):
 				
 		elif t.startswith(_("Paste")):
 			if self.CheckClipBoard() == False:
-				print "Cant paste because the orders arn't valid on this object."
+				print _("Cant paste because the orders arn't valid on this object.")
 				return
 				
 			# Figure out whats out new position
@@ -312,7 +312,7 @@ class panelOrder(panelOrderBase):
 		try:
 			object = self.application.cache.objects[evt.id]
 		except KeyError:
-			print "Warning: Object %s does not exist!" % (evt.id)
+			print _("Warning: Object %s does not exist!" % (evt.id))
 			evt = None
 	
 		# Do the clean up first
@@ -483,7 +483,7 @@ class panelOrder(panelOrderBase):
 		# Figure out which slot is selected
 		slots = self.Orders.GetSelected()
 		if len(slots) != 1:
-			debug(DEBUG_WINDOWS, "OrderSave: No order selected for save. (%s)" % str(slots))
+			debug(DEBUG_WINDOWS, _("OrderSave: No order selected for save. (%s)") % str(slots))
 			return
 		slot = slots[0]
 		
@@ -525,7 +525,7 @@ class panelOrder(panelOrderBase):
 		# Figure out which slot to use
 		slots = self.Orders.GetSelected()
 		if len(slots) != 1:
-			debug(DEBUG_WINDOWS, "OrderSave: No order selected for update. (%s)" % str(slots))
+			debug(DEBUG_WINDOWS, _("OrderSave: No order selected for update. (%s))" % str(slots))
 			return
 		slot = slots[0]
 
@@ -648,9 +648,9 @@ class panelOrder(panelOrderBase):
 			elif type == constants.ARG_OBJECT:
 				args += argObjectGet( panel )
 			elif type == constants.ARG_PLAYER:
-				debug(DEBUG_WINDOWS, "Argument type (ARG_PLAYER) not implimented yet.")
+				debug(DEBUG_WINDOWS, _("Argument type (ARG_PLAYER) not implimented yet."))
 			elif type == constants.ARG_RANGE:
-				debug(DEBUG_WINDOWS, "Argument type (ARG_RANGE) not implimented yet.")
+				debug(DEBUG_WINDOWS, _("Argument type (ARG_RANGE) not implimented yet."))
 			elif type == constants.ARG_LIST:
 				args += argListGet( panel )
 			elif type == constants.ARG_STRING:
@@ -788,7 +788,7 @@ def argListPanel(parent, parent_panel, args):
 	
 		type = type_list.GetSelection()
 		if type == wx.NOT_FOUND:
-			debug(DEBUG_WINDOWS, "ListAdd: No type selected.")
+			debug(DEBUG_WINDOWS, _("ListAdd: No type selected."))
 			return
 		type = type_list.GetClientData(type)
 
@@ -821,7 +821,7 @@ def argListPanel(parent, parent_panel, args):
 		"""
 		slot = selected.GetNextItem(-1, wx.LIST_NEXT_ALL, wx.LIST_STATE_SELECTED)
 		if slot == wx.NOT_FOUND:
-			debug(DEBUG_WINDOWS, "ListDel: No selection selected.")
+			debug(DEBUG_WINDOWS, _("ListDel: No selection selected."))
 			return
 
 		selected.DeleteItem(slot)
@@ -832,7 +832,7 @@ def argListPanel(parent, parent_panel, args):
 		"""
 		type = type_list.GetSelection()
 		if type == wx.NOT_FOUND:
-			debug(DEBUG_WINDOWS, "ListAdd: No type selected.")
+			debug(DEBUG_WINDOWS, _("ListAdd: No type selected."))
 			number.SetRange(0, 0)
 		else:
 			current = 0
@@ -852,7 +852,7 @@ def argListPanel(parent, parent_panel, args):
 	def selectf(evt, selected=selected, type_list=type_list, typef=typef):
 		slot = selected.GetNextItem(-1, wx.LIST_NEXT_ALL, wx.LIST_STATE_SELECTED)
 		if slot == wx.NOT_FOUND:
-			debug(DEBUG_WINDOWS, "ListSelect: No selection selected.")
+			debug(DEBUG_WINDOWS, _("ListSelect: No selection selected."))
 			return
 
 		type = selected.GetItemPyData(slot)
@@ -913,7 +913,7 @@ def argCoordPanel(parent, parent_panel, args):
 	panel.SetSizer(item0)
 	panel.SetAutoLayout( True )
 	
-	item1 = wx.StaticText( panel, -1, "X")
+	item1 = wx.StaticText( panel, -1, _("X"))
 	item1.SetFont(wx.local.normalFont)
 	item0.Add( item1, 0, wx.ALIGN_CENTRE|wx.LEFT, 0 )
 
@@ -921,7 +921,7 @@ def argCoordPanel(parent, parent_panel, args):
 	item2.SetFont(wx.local.tinyFont)
 	item0.Add( item2, 0, wx.ALIGN_CENTRE|wx.LEFT, 1 )
 
-	item3 = wx.StaticText( panel, -1, "Y")
+	item3 = wx.StaticText( panel, -1, _("Y"))
 	item3.SetFont(wx.local.normalFont)
 	item0.Add( item3, 0, wx.ALIGN_CENTRE|wx.LEFT, 3 )
 
@@ -929,7 +929,7 @@ def argCoordPanel(parent, parent_panel, args):
 	item4.SetFont(wx.local.tinyFont)
 	item0.Add( item4, 0, wx.ALIGN_CENTRE|wx.LEFT, 1 )
 
-	item5 = wx.StaticText( panel, -1, "Z")
+	item5 = wx.StaticText( panel, -1, _("Z"))
 	item5.SetFont(wx.local.normalFont)
 	item0.Add( item5, 0, wx.ALIGN_CENTRE|wx.LEFT, 3 )
 

@@ -18,12 +18,12 @@ notokay = os.path.join("graphics", "waiting.gif")
 class winServerBrowser(winServerBrowserBase, winMainBaseXRC):
 	title = _("Updating")
 	
-	ServersColumns = ["Name", "Playing", "Server", "P", "C", "O", "Other"]
+	ServersColumns = [_("Name"), _("Playing"), _("Server"), _("P"), _("C"), _("O"), _("Other")]
 	ServersColumns_Sizes = [
 			wx.LIST_AUTOSIZE, wx.LIST_AUTOSIZE, 100, 
 			wx.LIST_AUTOSIZE, wx.LIST_AUTOSIZE, wx.LIST_AUTOSIZE, 
 			-1]
-	LocationsColumns = ["Type", "DNS", "IP", "Port"]
+	LocationsColumns = [_("Type"), _("DNS"), _("IP"), _("Port")]
 	LocationsColumns_Sizes = [
 			wx.LIST_AUTOSIZE, wx.LIST_AUTOSIZE, wx.LIST_AUTOSIZE, wx.LIST_AUTOSIZE]
 
@@ -49,15 +49,15 @@ class winServerBrowser(winServerBrowserBase, winMainBaseXRC):
 			ctrl.InsertStringItem(i, "")
 			ctrl.SetItemPyData(i, game)
 
-			ctrl.SetStringItem(i, Columns.index("Name"), game.name)
+			ctrl.SetStringItem(i, Columns.index(_("Name")), game.name)
 			if game.where == "local":
 				ctrl.SetItemTextColour(i, wx.Color(0,0,255))
 
 			try:
-				ctrl.SetStringItem(i, Columns.index("Playing"), "%s (%s)" % (game.rule, game.rulever))
+				ctrl.SetStringItem(i, Columns.index(_("Playing")), "%s (%s)" % (game.rule, game.rulever))
 			except AttributeError: pass
 			try:
-				ctrl.SetStringItem(i, Columns.index("Server"),  "%s (%s)" % (game.sertype, game.server))
+				ctrl.SetStringItem(i, Columns.index(_("Server")),  "%s (%s)" % (game.sertype, game.server))
 			except AttributeError: pass
 
 #			try:
@@ -65,19 +65,19 @@ class winServerBrowser(winServerBrowserBase, winMainBaseXRC):
 #			except AttributeError: pass
 
 			try:
-				ctrl.SetStringItem(i, Columns.index("C"),  str(game.cons))
+				ctrl.SetStringItem(i, Columns.index(_("C")),  str(game.cons))
 			except AttributeError: pass
 
 			try:
-				ctrl.SetStringItem(i, Columns.index("O"),  str(game.objs))
+				ctrl.SetStringItem(i, Columns.index(_("O")),  str(game.objs))
 			except AttributeError: pass
 
 			try:
-				ctrl.SetStringItem(i, Columns.index("P"),  str(game.plys))
+				ctrl.SetStringItem(i, Columns.index(_("P")),  str(game.plys))
 			except AttributeError: pass
 
 			try:
-				ctrl.SetStringItem(i, Columns.index("Other"), game.cmt)
+				ctrl.SetStringItem(i, Columns.index(_("Other")), game.cmt)
 			except AttributeError: pass
 
 		if resize:
@@ -130,10 +130,10 @@ class winServerBrowser(winServerBrowserBase, winMainBaseXRC):
 				i = ctrl.GetItemCount()
 
 				ctrl.InsertStringItem(i, "")
-				ctrl.SetStringItem(i, Columns.index("Type"), type)
-				ctrl.SetStringItem(i, Columns.index("DNS"),  dns)
-				ctrl.SetStringItem(i, Columns.index("IP"),	 ip)
-				ctrl.SetStringItem(i, Columns.index("Port"), str(port))
+				ctrl.SetStringItem(i, Columns.index(_("Type")), type)
+				ctrl.SetStringItem(i, Columns.index(_("DNS")),  dns)
+				ctrl.SetStringItem(i, Columns.index(_("IP")),	 ip)
+				ctrl.SetStringItem(i, Columns.index(_("Port")), str(port))
 
 				ctrl.SetItemPyData(i, (game, (type, dns, ip, port)))
 		# Set the column widths
