@@ -1,0 +1,640 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#: windows/winMain.py:370 windows/winMain.py:377 windows/winMain.py:378
+#: windows/winMessage.py:227 windows/winMessage.py:236
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2007-08-05 00:16+0930\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: windows/winAccount.py:30
+msgid "Account"
+msgstr ""
+
+#: windows/winAccount.py:178
+msgid "Account Created"
+msgstr ""
+
+#: windows/winAccount.py:182 windows/winBase.py:369 tpclient-pywx:244
+msgid "Network Error"
+msgstr ""
+
+#: windows/winAccount.py:195 windows/winAccount.py:199
+msgid "Fields Required"
+msgstr ""
+
+#: windows/winBase.py:237
+msgid "Show?"
+msgstr ""
+
+#: windows/winBase.py:246
+msgid "X Pos"
+msgstr ""
+
+#: windows/winBase.py:255
+msgid "Y Pos"
+msgstr ""
+
+#: windows/winBase.py:264
+msgid "Width"
+msgstr ""
+
+#: windows/winBase.py:273
+msgid "Height"
+msgstr ""
+
+#: windows/winConfig.py:14
+msgid "Config"
+msgstr ""
+
+#: windows/winConnect.py:161
+msgid "Connect"
+msgstr ""
+
+#: windows/winConnect.py:250
+msgid "Update Password?"
+msgstr ""
+
+#: windows/winConnect.py:264
+msgid "Add Account?"
+msgstr ""
+
+#: windows/winConnect.py:431 windows/winConnect.py:436
+#: windows/winConnect.py:441
+msgid "Login for "
+msgstr ""
+
+#: windows/winConnect.py:453
+msgid "Autoconnect to?"
+msgstr ""
+
+#: windows/winDebug.py:8
+msgid "Debug"
+msgstr ""
+
+#: windows/winDesign.py:43
+msgid "Design"
+msgstr ""
+
+#: windows/winDesign.py:129
+msgid "Edit"
+msgstr ""
+
+#: windows/winDesign.py:134
+msgid "Duplicate"
+msgstr ""
+
+#: windows/winDesign.py:139 windows/winOrder.py:220 windows/winOrder.py:253
+#: windows/xrc/panelMessage.py:76
+msgid "Delete"
+msgstr ""
+
+#: windows/winDesign.py:144
+msgid "Revert"
+msgstr ""
+
+#: windows/winDesign.py:149
+msgid "Save"
+msgstr ""
+
+#: windows/winDesign.py:165 windows/winOrder.py:766
+msgid "Add"
+msgstr ""
+
+#: windows/winDesign.py:169
+msgid "Add Many"
+msgstr ""
+
+#: windows/winInfo.py:57
+msgid "Information"
+msgstr ""
+
+#: windows/winMain.py:212
+msgid "Thousand Parsec"
+msgstr ""
+
+#: windows/winMain.py:332
+msgid "Connect to Game\tCtrl-O"
+msgstr ""
+
+#: windows/winMain.py:332
+msgid "Connect to a diffrent Game"
+msgstr ""
+
+#: windows/winMain.py:333
+msgid "Download the Universe\tCtrl-U"
+msgstr ""
+
+#: windows/winMain.py:333
+msgid "Download the Universe"
+msgstr ""
+
+#: windows/winMain.py:335
+msgid "Preferences"
+msgstr ""
+
+#: windows/winMain.py:335
+msgid "Configure the Client"
+msgstr ""
+
+#: windows/winMain.py:337
+msgid "Exit"
+msgstr ""
+
+#: windows/winMain.py:370
+msgid "Show "
+msgstr ""
+
+#: windows/winMain.py:377
+msgid "Show Tips"
+msgstr ""
+
+#: windows/winMain.py:378
+msgid "Help"
+msgstr ""
+
+#: windows/winMain.py:382
+msgid "File"
+msgstr ""
+
+#: windows/winMain.py:383
+msgid "Statistics"
+msgstr ""
+
+#: windows/winMain.py:384
+msgid "Windows"
+msgstr ""
+
+#: windows/winMain.py:385
+msgid "&Help"
+msgstr ""
+
+#: windows/winMain.py:440
+msgid "The turn has ended. Would you like to download all the new details?\n"
+msgstr ""
+
+#: windows/winMain.py:443
+msgid "Update?"
+msgstr ""
+
+#: windows/winMessage.py:93 windows/xrc/winUpdate.py:92
+msgid "Messages"
+msgstr ""
+
+#: windows/winMessage.py:226
+msgid "No messages"
+msgstr ""
+
+#: windows/winMessage.py:235
+msgid "All filtered"
+msgstr ""
+
+#: windows/winMessage.py:281
+#, python-format
+msgid "%i of %i"
+msgstr ""
+
+#: windows/winNewStarMap.py:51 windows/winStarMap.py:69
+msgid "StarMap"
+msgstr ""
+
+#: windows/winOrder.py:38 windows/xrc/winUpdate.py:90
+msgid "Orders"
+msgstr ""
+
+#: windows/winOrder.py:53
+msgid "Turns"
+msgstr ""
+
+#: windows/winOrder.py:55
+msgid "Order Information"
+msgstr ""
+
+#: windows/winOrder.py:203
+msgid "Top"
+msgstr ""
+
+#: windows/winOrder.py:211 windows/winOrder.py:295
+msgid "Before"
+msgstr ""
+
+#: windows/winOrder.py:212
+msgid "New Before"
+msgstr ""
+
+#: windows/winOrder.py:216 windows/winOrder.py:280
+msgid "After"
+msgstr ""
+
+#: windows/winOrder.py:217
+msgid "New After"
+msgstr ""
+
+#: windows/winOrder.py:224 windows/winOrder.py:255 windows/winOrder.py:269
+msgid "Cut"
+msgstr ""
+
+#: windows/winOrder.py:225 windows/winOrder.py:255
+msgid "Copy"
+msgstr ""
+
+#: windows/winOrder.py:228 windows/winOrder.py:229
+msgid "Paste Before"
+msgstr ""
+
+#: windows/winOrder.py:230 windows/winOrder.py:231
+msgid "Paste After"
+msgstr ""
+
+#: windows/winOrder.py:234 windows/winOrder.py:235
+msgid "New"
+msgstr ""
+
+#: windows/winOrder.py:239 windows/winOrder.py:240 windows/winOrder.py:272
+msgid "Paste"
+msgstr ""
+
+#: windows/winOrder.py:335
+#, python-format
+msgid "Current orders on %s."
+msgstr ""
+
+#: windows/winOrder.py:347
+msgid "Order type to create"
+msgstr ""
+
+#: windows/winOrder.py:413
+msgid "Multiple orders selected."
+msgstr ""
+
+#: windows/winOrder.py:417
+msgid "No object selected."
+msgstr ""
+
+#: windows/winOrder.py:676
+msgid "Not implimented."
+msgstr ""
+
+#: windows/winOrder.py:709
+msgid "No object"
+msgstr ""
+
+#: windows/winOrder.py:714
+msgid "At "
+msgstr ""
+
+#: windows/winOrder.py:744
+msgid "Type"
+msgstr ""
+
+#: windows/winOrder.py:769
+msgid "D"
+msgstr ""
+
+#: windows/winOrder.py:940
+msgid "P"
+msgstr ""
+
+#: windows/winPicture.py:60
+msgid "Picture"
+msgstr ""
+
+#: windows/winServerBrowser.py:19 windows/winUpdate.py:19
+msgid "Updating"
+msgstr ""
+
+#: windows/winSystem.py:23
+msgid "System"
+msgstr ""
+
+#: windows/winSystem.py:126
+msgid "Known Universe"
+msgstr ""
+
+#: windows/xrc/panelInformation.py:38
+msgid "Name of object goes here"
+msgstr ""
+
+#: windows/xrc/panelMessage.py:67
+msgid "Filter"
+msgstr ""
+
+#: windows/xrc/panelMessage.py:68
+msgid "Static text"
+msgstr ""
+
+#: windows/xrc/panelMessage.py:69
+msgid "100 of 100"
+msgstr ""
+
+#: windows/xrc/panelMessage.py:70
+msgid ""
+"<html>\n"
+"<body>\n"
+"<center>\n"
+"\t<table cols=1 width=\"100%\">\n"
+"\t\t<tr>\n"
+"\t\t\t<td><b>Subject:</b> You are unloved!\n"
+"\t\t</tr>\n"
+"\t\t<tr>\n"
+"\t\t\t<td>\n"
+"\t\t\tYou have recived no messages this turn!<br><br>\n"
+"\t\t\tActually if you didn't recive any messages it most proberly\n"
+"\t\t\tmeans that your client couldn't load the results from the server.\n"
+"\t\t\tTry reload/restart the client.\n"
+"\t\t\t</td>\n"
+"\t\t</tr>\n"
+"\t </table>\n"
+"</center>\n"
+"</body>\n"
+"</html>"
+msgstr ""
+
+#: windows/xrc/panelMessage.py:71
+msgid "Prev"
+msgstr ""
+
+#: windows/xrc/panelMessage.py:72
+msgid "First"
+msgstr ""
+
+#: windows/xrc/panelMessage.py:73
+msgid "Goto"
+msgstr ""
+
+#: windows/xrc/panelMessage.py:74
+msgid "Next"
+msgstr ""
+
+#: windows/xrc/panelMessage.py:75
+msgid "Last"
+msgstr ""
+
+#: windows/xrc/panelOrder.py:57
+msgid "Insert new order."
+msgstr ""
+
+#: windows/xrc/panelOrder.py:58
+msgid "&New"
+msgstr ""
+
+#: windows/xrc/panelOrder.py:59 windows/xrc/winUpdate.py:102
+msgid "&Save"
+msgstr ""
+
+#: windows/xrc/panelOrder.py:60
+msgid "&Revert"
+msgstr ""
+
+#: windows/xrc/panelOrder.py:61
+msgid "Delete the currently selected order(s)"
+msgstr ""
+
+#: windows/xrc/panelOrder.py:62
+msgid "&Delete"
+msgstr ""
+
+#: windows/xrc/panelPicture.py:43
+msgid "Name goes here"
+msgstr ""
+
+#: windows/xrc/panelPicture.py:44
+msgid "10kb/s"
+msgstr ""
+
+#: windows/xrc/panelPicture.py:45
+msgid "43s"
+msgstr ""
+
+#: windows/xrc/winAccount.py:73 windows/xrc/winConnect.py:74
+msgid "TP: Connect to a Server"
+msgstr ""
+
+#: windows/xrc/winAccount.py:74
+msgid "Create an Account"
+msgstr ""
+
+#: windows/xrc/winAccount.py:75 windows/xrc/winConnect.py:76
+msgid "Server"
+msgstr ""
+
+#: windows/xrc/winAccount.py:76 windows/xrc/winConnect.py:77
+msgid "The URL for the Thousand Parsec server."
+msgstr ""
+
+#: windows/xrc/winAccount.py:77
+msgid "Choose a server to create an account on."
+msgstr ""
+
+#: windows/xrc/winAccount.py:78
+msgid "Check"
+msgstr ""
+
+#: windows/xrc/winAccount.py:79 windows/xrc/winConnect.py:78
+msgid "Username"
+msgstr ""
+
+#: windows/xrc/winAccount.py:80 windows/xrc/winConnect.py:79
+msgid "The username for the account on the Thousand Parsec server."
+msgstr ""
+
+#: windows/xrc/winAccount.py:81 windows/xrc/winConnect.py:80
+msgid "Show seperate game box."
+msgstr ""
+
+#: windows/xrc/winAccount.py:82 windows/xrc/winConnect.py:81
+msgid "G"
+msgstr ""
+
+#: windows/xrc/winAccount.py:83 windows/xrc/winConnect.py:82
+msgid "Game"
+msgstr ""
+
+#: windows/xrc/winAccount.py:84 windows/xrc/winConnect.py:83
+msgid "Password"
+msgstr ""
+
+#: windows/xrc/winAccount.py:85
+msgid "Choose your password here."
+msgstr ""
+
+#: windows/xrc/winAccount.py:86
+msgid " "
+msgstr ""
+
+#: windows/xrc/winAccount.py:87 windows/xrc/winAccount.py:89
+msgid "Repeat the password"
+msgstr ""
+
+#: windows/xrc/winAccount.py:88
+msgid "Email "
+msgstr ""
+
+#: windows/xrc/winAccount.py:90 windows/xrc/winConnect.py:85
+#: windows/xrc/winUpdate.py:100
+msgid "&OK"
+msgstr ""
+
+#: windows/xrc/winAccount.py:91 windows/xrc/winConnect.py:86
+#: windows/xrc/winServerBrowser.py:88 windows/xrc/winUpdate.py:104
+msgid "&Cancel"
+msgstr ""
+
+#: windows/xrc/winConnect.py:75
+msgid "Connect to Thousand Parsec Server"
+msgstr ""
+
+#: windows/xrc/winConnect.py:84
+msgid "The password for the account on the Thousand Parsec Server"
+msgstr ""
+
+#: windows/xrc/winConnect.py:87
+msgid "&Find"
+msgstr ""
+
+#: windows/xrc/winConnect.py:88
+msgid "&Preferences"
+msgstr ""
+
+#: windows/xrc/winServerBrowser.py:72
+msgid "TP: Server Browser"
+msgstr ""
+
+#: windows/xrc/winServerBrowser.py:73
+msgid "Thousand Parsec Server Browser"
+msgstr ""
+
+#: windows/xrc/winServerBrowser.py:74
+msgid "Servers"
+msgstr ""
+
+#: windows/xrc/winServerBrowser.py:75
+msgid "List of all the servers registered on the metaserver."
+msgstr ""
+
+#: windows/xrc/winServerBrowser.py:76
+msgid "Locations"
+msgstr ""
+
+#: windows/xrc/winServerBrowser.py:77
+msgid "List of all the servers found on the local network."
+msgstr ""
+
+#: windows/xrc/winServerBrowser.py:78
+msgid "URL"
+msgstr ""
+
+#: windows/xrc/winServerBrowser.py:79
+msgid "URL of the currently selected server."
+msgstr ""
+
+#: windows/xrc/winServerBrowser.py:80
+msgid "Copy the URL to the clipboard."
+msgstr ""
+
+#: windows/xrc/winServerBrowser.py:81
+msgid "&Copy"
+msgstr ""
+
+#: windows/xrc/winServerBrowser.py:82
+msgid "Force a refresh of the server list."
+msgstr ""
+
+#: windows/xrc/winServerBrowser.py:83
+msgid "&Refresh"
+msgstr ""
+
+#: windows/xrc/winServerBrowser.py:84
+msgid "Create a new account on the currently selected server."
+msgstr ""
+
+#: windows/xrc/winServerBrowser.py:85
+msgid "&New Account"
+msgstr ""
+
+#: windows/xrc/winServerBrowser.py:86
+msgid "Connect to the currently selected server."
+msgstr ""
+
+#: windows/xrc/winServerBrowser.py:87
+msgid "C&onnect"
+msgstr ""
+
+#: windows/xrc/winUpdate.py:82
+msgid "TP: Downloading Universe"
+msgstr ""
+
+#: windows/xrc/winUpdate.py:83
+msgid "Universe Download"
+msgstr ""
+
+#: windows/xrc/winUpdate.py:84 windows/xrc/winUpdate.py:86
+msgid "Done!"
+msgstr ""
+
+#: windows/xrc/winUpdate.py:85
+msgid "Progress"
+msgstr ""
+
+#: windows/xrc/winUpdate.py:87
+msgid "Objects Descs"
+msgstr ""
+
+#: windows/xrc/winUpdate.py:88
+msgid "Order Descs"
+msgstr ""
+
+#: windows/xrc/winUpdate.py:89
+msgid "Objects"
+msgstr ""
+
+#: windows/xrc/winUpdate.py:91
+msgid "Boards"
+msgstr ""
+
+#: windows/xrc/winUpdate.py:93
+msgid "Categories"
+msgstr ""
+
+#: windows/xrc/winUpdate.py:94
+msgid "Designs"
+msgstr ""
+
+#: windows/xrc/winUpdate.py:95
+msgid "Components"
+msgstr ""
+
+#: windows/xrc/winUpdate.py:96
+msgid "Properties"
+msgstr ""
+
+#: windows/xrc/winUpdate.py:97
+msgid "Players"
+msgstr ""
+
+#: windows/xrc/winUpdate.py:98
+msgid "Resources"
+msgstr ""
+
+#: windows/xrc/winUpdate.py:99
+msgid "Continue to the main game window."
+msgstr ""
+
+#: windows/xrc/winUpdate.py:101
+msgid "Save a copy of the message box window to a file."
+msgstr ""
+
+#: windows/xrc/winUpdate.py:103
+msgid "Cancel the current update and go back to the connect screen."
+msgstr ""
