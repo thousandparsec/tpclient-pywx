@@ -107,6 +107,11 @@ class usernameMixIn:
 class configConnect(configConnectBase, usernameMixIn):
 	def __init__(self, *args, **kw):
 		configConnectBase.__init__(self, *args, **kw)
+
+		print self
+		print self.Username
+		print self.Password
+
 		usernameMixIn.__init__(self)
 		self.Panel = self
 

@@ -380,7 +380,7 @@ class winMain(winMDIBase):
 		help = wx.Menu()
 
 		bar.Append( file, _("File") )
-		bar.Append( stat, _("Statistics") )
+		#bar.Append( stat, _("Statistics") )
 		bar.Append( win,  _("Windows") )
 		bar.Append( help, _("&Help") )
 

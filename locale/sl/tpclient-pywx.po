@@ -1,133 +1,138 @@
-# SOME DESCRIPTIVE TITLE.
+# translation of tpclient-pywx.po to Slovenian
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
 #: windows/winMain.py:370 windows/winMain.py:377 windows/winMain.py:378
 #: windows/winMessage.py:227 windows/winMessage.py:236
-#, fuzzy
+# Jure Repinc <jlp@holodeck1.com>, 2007.
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: tpclient-pywx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-08-05 01:58+0930\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"POT-Creation-Date: 2007-08-05 00:30+0930\n"
+"PO-Revision-Date: 2007-08-04 17:54+0200\n"
+"Last-Translator: Jure Repinc <jlp@holodeck1.com>\n"
+"Language-Team: Slovenian <lugos-slo@lugos.si>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.11.4\n"
+"Plural-Forms:  nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n%100==4 ? 2 : 3);\n"
 
 #: windows/winAccount.py:30
 msgid "Account"
-msgstr ""
+msgstr "Račun"
 
 #: windows/winAccount.py:174
 msgid "This server does not support account creation."
-msgstr ""
+msgstr "Ta strežnik ne podpira ustvarjanja računov."
 
 #: windows/winAccount.py:178
 msgid "Account Created"
-msgstr ""
+msgstr "Račun ustvarjen"
 
-#: windows/winAccount.py:182 windows/winBase.py:369 tpclient-pywx:267
+#: windows/winAccount.py:182 windows/winBase.py:369 tpclient-pywx:244
 msgid "Network Error"
-msgstr ""
+msgstr "Napaka glede omrežja"
 
 #: windows/winAccount.py:195
 msgid "All fields are required."
-msgstr ""
+msgstr "Vsa polja so obvezna."
 
 #: windows/winAccount.py:195 windows/winAccount.py:199
 msgid "Fields Required"
-msgstr ""
+msgstr "Obvezna polja"
 
 #: windows/winAccount.py:199
 msgid "Password fields do not match."
-msgstr ""
+msgstr "Gesli se ne ujemata."
 
 #: windows/winBase.py:169
 #, python-format
 msgid ""
 "Config-%s: Did not find a default show for your resolution (using 1024x768 "
 "defaults)"
-msgstr ""
+msgstr "Nastavitev-%s: Ni bilo moč najti privzetega prikaza za vašo ločljivost (uporabljam privzetosti za 1024x768)"
 
 #: windows/winBase.py:182
 #, python-format
 msgid ""
 "Config-%s: Did not find a default position for your resolution (using "
 "1024x768 defaults)"
-msgstr ""
+msgstr "Nastavitev-%s: Ni bilo moč najti privzetega položaja za vašo ločljivost (uporabljam privzetosti za 1024x768)"
 
 #: windows/winBase.py:193
 #, python-format
 msgid ""
 "Config-%s: Did not find a default size for your resolution (using 1024x768 "
 "defaults)"
-msgstr ""
+msgstr "Nastavitev-%s: Ni bilo moč najti privzete velikosti za vašo ločljivost (uporabljam privzetosti za 1024x768)"
 
 #: windows/winBase.py:237
 msgid "Show?"
-msgstr ""
+msgstr "Prikažem?"
 
 #: windows/winBase.py:246
 msgid "X Pos"
-msgstr ""
+msgstr "Vodoravno"
 
 #: windows/winBase.py:255
 msgid "Y Pos"
-msgstr ""
+msgstr "Navpično"
 
 #: windows/winBase.py:264
 msgid "Width"
-msgstr ""
+msgstr "Širina"
 
 #: windows/winBase.py:273
 msgid "Height"
-msgstr ""
+msgstr "Višina"
 
 #: windows/winConfig.py:14
 msgid "Config"
-msgstr ""
+msgstr "Nastavitve"
 
-#: windows/winConnect.py:141
+#: windows/winConnect.py:136
 #, python-format
 msgid "Login for %s"
-msgstr ""
+msgstr "Prijava za %s"
 
-#: windows/winConnect.py:166
+#: windows/winConnect.py:161
 msgid "Connect"
-msgstr ""
+msgstr "Poveži se"
 
-#: windows/winConnect.py:250
+#: windows/winConnect.py:245
 msgid ""
 "It appears you are using a different password for \n"
 "this account, would you like to update the saved \n"
 "information with the new password?\n"
 msgstr ""
+"Izgleda, da uporabljate drugo geslo za ta račun.\n"
+"Želite zamenjati staro geslo z novim?\n"
 
-#: windows/winConnect.py:255
+#: windows/winConnect.py:250
 msgid "Update Password?"
-msgstr ""
+msgstr "Zamenjam geslo?"
 
-#: windows/winConnect.py:264
+#: windows/winConnect.py:259
 msgid ""
 "It appears you havn't access this account before.\n"
 "\n"
 "Would you like to save this account's details?\n"
 msgstr ""
+"Izgleda, da tega računa še niste uporabljali.\n"
+"\n"
+"Želite shraniti podatke o tem računu?\n"
 
-#: windows/winConnect.py:269
+#: windows/winConnect.py:264
 msgid "Add Account?"
-msgstr ""
+msgstr "Dodam račun?"
 
-#: windows/winConnect.py:436 windows/winConnect.py:441
-#: windows/winConnect.py:446
+#: windows/winConnect.py:431 windows/winConnect.py:436
+#: windows/winConnect.py:441
 msgid "Login for "
-msgstr ""
+msgstr "Prijava za "
 
-#: windows/winConnect.py:453
+#: windows/winConnect.py:448
 #, python-format
 msgid ""
 "\n"
@@ -135,289 +140,301 @@ msgid ""
 "\n"
 "Would you instead like to autoconnect to %s.\n"
 msgstr ""
+"\n"
+"Odjemalec je že nastavljen za samodejno povezavo z %s.\n"
+"\n"
+"Želite zamenjati strežnik za samodejno povezavo z %s?\n"
 
-#: windows/winConnect.py:458
+#: windows/winConnect.py:453
 msgid "Autoconnect to?"
-msgstr ""
+msgstr "Samodejna povezava?"
 
 #: windows/winDebug.py:8
 msgid "Debug"
-msgstr ""
+msgstr "Razhroščevanje"
 
 #: windows/winDesign.py:43
 msgid "Design"
-msgstr ""
+msgstr "Načrt"
 
 #: windows/winDesign.py:78 windows/winDesign.py:83
 msgid "Title"
-msgstr ""
+msgstr "Naslov"
 
 #: windows/winDesign.py:106
 msgid "Component"
-msgstr ""
+msgstr "Komponenta"
 
 #: windows/winDesign.py:129
 msgid "Edit"
-msgstr ""
+msgstr "Uredi"
 
 #: windows/winDesign.py:134
 msgid "Duplicate"
-msgstr ""
+msgstr "Podvoji"
 
 #: windows/winDesign.py:139 windows/winOrder.py:220 windows/winOrder.py:253
 #: windows/xrc/panelMessage.py:76
 msgid "Delete"
-msgstr ""
+msgstr "Izbriši"
 
 #: windows/winDesign.py:144
 msgid "Revert"
-msgstr ""
+msgstr "Povrni"
 
 #: windows/winDesign.py:149
 msgid "Save"
-msgstr ""
+msgstr "Shrani"
 
 #: windows/winDesign.py:165 windows/winOrder.py:766
 msgid "Add"
-msgstr ""
+msgstr "Dodaj"
 
 #: windows/winDesign.py:169
 msgid "Add Many"
-msgstr ""
+msgstr "Dodaj več"
 
 #: windows/winDesign.py:237 windows/xrc/winUpdate.py:94
 msgid "Designs"
-msgstr ""
+msgstr "Načrti"
 
 #: windows/winDesign.py:242
 msgid "New Design"
-msgstr ""
+msgstr "Nov načrt"
 
 #: windows/winDesign.py:267 windows/xrc/winUpdate.py:95
 msgid "Components"
-msgstr ""
+msgstr "Komponente"
 
 #: windows/winDesign.py:398
 msgid ""
 "\n"
 "Would you like to continue adding these components?"
 msgstr ""
+"\n"
+"Želite še naprej dodajati te komponente?"
 
 #: windows/winDesign.py:400
 msgid ""
 "\n"
 "Would you like to continue adding this component?"
 msgstr ""
+"\n"
+"Želite še naprej dodajati to komponento?"
 
 #: windows/winDesign.py:401
 msgid "Design Warning"
-msgstr ""
+msgstr "Opozorilo glede načrta"
 
 #: windows/winInfo.py:57
 msgid "Information"
-msgstr ""
+msgstr "Informacije"
 
 #: windows/winMain.py:212
 msgid "Thousand Parsec"
-msgstr ""
+msgstr "Thousand Parsec"
 
 #: windows/winMain.py:332
 msgid "Connect to Game\tCtrl-O"
-msgstr ""
+msgstr "Poveži se z igro\tCtrl-O"
 
 #: windows/winMain.py:332
 msgid "Connect to a diffrent Game"
-msgstr ""
+msgstr "Poveži se z drugo igro"
 
 #: windows/winMain.py:333
 msgid "Download the Universe\tCtrl-U"
-msgstr ""
+msgstr "Prenesi vesolje\tCtrl-V"
 
 #: windows/winMain.py:333
 msgid "Download the Universe"
-msgstr ""
+msgstr "Prenesi vesolje"
 
 #: windows/winMain.py:335
 msgid "Preferences"
-msgstr ""
+msgstr "Nastavitve"
 
 #: windows/winMain.py:335
 msgid "Configure the Client"
-msgstr ""
+msgstr "Nastavi program"
 
 #: windows/winMain.py:337
 msgid "Exit"
-msgstr ""
+msgstr "Izhod"
 
 #: windows/winMain.py:370
 msgid "Show "
-msgstr ""
+msgstr "Prikaži"
 
 #: windows/winMain.py:377
 msgid "Show Tips"
-msgstr ""
+msgstr "Prikaži nasvete"
 
 #: windows/winMain.py:378
 msgid "Help"
-msgstr ""
+msgstr "Pomoč"
 
 #: windows/winMain.py:382
 msgid "File"
-msgstr ""
+msgstr "Datoteka"
+
+#: windows/winMain.py:383
+msgid "Statistics"
+msgstr "Statistika"
 
 #: windows/winMain.py:384
 msgid "Windows"
-msgstr ""
+msgstr "Okna"
 
 #: windows/winMain.py:385
 msgid "&Help"
-msgstr ""
+msgstr "&Pomoč"
 
 #: windows/winMain.py:440
 msgid "The turn has ended. Would you like to download all the new details?\n"
-msgstr ""
+msgstr "Poteza je zaključena. Ali želite prenesti vse nove podatke?\n"
 
 #: windows/winMain.py:443
 msgid "Update?"
-msgstr ""
+msgstr "Posodobim?"
 
 #: windows/winMessage.py:93 windows/xrc/winUpdate.py:92
 msgid "Messages"
-msgstr ""
+msgstr "Sporočila"
 
 #: windows/winMessage.py:226
 msgid "No messages"
-msgstr ""
+msgstr "Ni sporočil"
 
 #: windows/winMessage.py:235
 msgid "All filtered"
-msgstr ""
+msgstr "Vsa so filtrirana"
 
 #: windows/winMessage.py:281
 #, python-format
 msgid "%i of %i"
-msgstr ""
+msgstr "%i od %i"
 
 #: windows/winNewStarMap.py:51 windows/winStarMap.py:69
 msgid "StarMap"
-msgstr ""
+msgstr "Zvezdna karta"
 
 #: windows/winOrder.py:38 windows/xrc/winUpdate.py:90
 msgid "Orders"
-msgstr ""
+msgstr "Ukazi"
 
 #: windows/winOrder.py:53
 msgid "Turns"
-msgstr ""
+msgstr "Potez"
 
 #: windows/winOrder.py:55
 msgid "Order Information"
-msgstr ""
+msgstr "Podatku o ukazu"
 
 #: windows/winOrder.py:203
 msgid "Top"
-msgstr ""
+msgstr "Na vrh"
 
 #: windows/winOrder.py:211 windows/winOrder.py:295
 msgid "Before"
-msgstr ""
+msgstr "Pred"
 
 #: windows/winOrder.py:212
 msgid "New Before"
-msgstr ""
+msgstr "Nov pred"
 
 #: windows/winOrder.py:216 windows/winOrder.py:280
 msgid "After"
-msgstr ""
+msgstr "Za"
 
 #: windows/winOrder.py:217
 msgid "New After"
-msgstr ""
+msgstr "Nov za"
 
 #: windows/winOrder.py:224 windows/winOrder.py:255 windows/winOrder.py:269
 msgid "Cut"
-msgstr ""
+msgstr "Izreži"
 
 #: windows/winOrder.py:225 windows/winOrder.py:255
 msgid "Copy"
-msgstr ""
+msgstr "Kopiraj"
 
 #: windows/winOrder.py:228 windows/winOrder.py:229
 msgid "Paste Before"
-msgstr ""
+msgstr "Prilepi pred"
 
 #: windows/winOrder.py:230 windows/winOrder.py:231
 msgid "Paste After"
-msgstr ""
+msgstr "Prilepi za"
 
 #: windows/winOrder.py:234 windows/winOrder.py:235
 msgid "New"
-msgstr ""
+msgstr "Nov"
 
 #: windows/winOrder.py:239 windows/winOrder.py:240 windows/winOrder.py:272
 msgid "Paste"
-msgstr ""
+msgstr "Prilepi"
 
 #: windows/winOrder.py:274
 msgid "Cant paste because the orders arn't valid on this object."
-msgstr ""
+msgstr "Ni moč prilepiti, ker ukazi za ta objekt niso ustrezni."
 
 #: windows/winOrder.py:315
 #, python-format
 msgid "Warning: Object %s does not exist!"
-msgstr ""
+msgstr "Opozorilo: objekt %s ne obstaja!"
 
 #: windows/winOrder.py:335
 #, python-format
 msgid "Current orders on %s."
-msgstr ""
+msgstr "Trenutni ukazi za %s."
 
 #: windows/winOrder.py:347
 msgid "Order type to create"
-msgstr ""
+msgstr "Vrsta novega ukaza"
 
 #: windows/winOrder.py:413
 msgid "Multiple orders selected."
-msgstr ""
+msgstr "Izbranih je več ukazov."
 
 #: windows/winOrder.py:417
 msgid "No object selected."
-msgstr ""
+msgstr "Izbran ni noben objekt."
 
 #: windows/winOrder.py:486
 #, python-format
 msgid "OrderSave: No order selected for save. (%s)"
-msgstr ""
+msgstr "Shranjevanje ukazov: Za shranjevanje ni izbranega nobenega ukaza. (%s)"
 
 #: windows/winOrder.py:528
 #, python-format
 msgid "OrderSave: No order selected for update. (%s))"
-msgstr ""
+msgstr "Shranjevanje ukazov: Za posodabljanje ni izbranega nobenega ukaza. (%s)"
 
 #: windows/winOrder.py:651
 msgid "Argument type (ARG_PLAYER) not implimented yet."
-msgstr ""
+msgstr "Vrsta argumenta (ARG_PLAYER) še ni podprta."
 
 #: windows/winOrder.py:653
 msgid "Argument type (ARG_RANGE) not implimented yet."
-msgstr ""
+msgstr "Vrsta argumenta (ARG_RANGE) še ni podprta."
 
 #: windows/winOrder.py:676
 msgid "Not implimented."
-msgstr ""
+msgstr "Ni še narejeno."
 
 #: windows/winOrder.py:709
 msgid "No object"
-msgstr ""
+msgstr "Ni objekta"
 
 #: windows/winOrder.py:714
 msgid "At "
-msgstr ""
+msgstr "Na "
 
 #: windows/winOrder.py:744 windows/winServerBrowser.py:26
 #: windows/winServerBrowser.py:133
 msgid "Type"
-msgstr ""
+msgstr "Vrsta"
 
 #: windows/winOrder.py:769
 msgid "D"
@@ -425,15 +442,15 @@ msgstr ""
 
 #: windows/winOrder.py:791 windows/winOrder.py:835
 msgid "ListAdd: No type selected."
-msgstr ""
+msgstr "Dodajanje na seznam: Izbrane ni nobene vrste."
 
 #: windows/winOrder.py:824
 msgid "ListDel: No selection selected."
-msgstr ""
+msgstr "Brisanje s seznama: Izbranega ni ničesar."
 
 #: windows/winOrder.py:855
 msgid "ListSelect: No selection selected."
-msgstr ""
+msgstr "Izbiranje s seznama: Izbranega ni ničesar."
 
 #: windows/winOrder.py:916
 msgid "X"
@@ -454,24 +471,24 @@ msgstr ""
 
 #: windows/winPicture.py:60
 msgid "Picture"
-msgstr ""
+msgstr "Slika"
 
 #: windows/winServerBrowser.py:19 windows/winUpdate.py:19
 msgid "Updating"
-msgstr ""
+msgstr "Posodabljanje"
 
 #: windows/winServerBrowser.py:21 windows/winServerBrowser.py:52
 msgid "Name"
-msgstr ""
+msgstr "Ime"
 
 #: windows/winServerBrowser.py:21 windows/winServerBrowser.py:57
 msgid "Playing"
-msgstr ""
+msgstr "Igranje"
 
 #: windows/winServerBrowser.py:21 windows/winServerBrowser.py:60
 #: windows/xrc/winAccount.py:75 windows/xrc/winConnect.py:76
 msgid "Server"
-msgstr ""
+msgstr "Strežnik"
 
 #: windows/winServerBrowser.py:21 windows/winServerBrowser.py:68
 msgid "C"
@@ -483,104 +500,62 @@ msgstr ""
 
 #: windows/winServerBrowser.py:21 windows/winServerBrowser.py:80
 msgid "Other"
-msgstr ""
+msgstr "Drugo"
 
 #: windows/winServerBrowser.py:26 windows/winServerBrowser.py:134
 msgid "DNS"
-msgstr ""
+msgstr "DNS"
 
 #: windows/winServerBrowser.py:26 windows/winServerBrowser.py:135
 msgid "IP"
-msgstr ""
+msgstr "IP"
 
 #: windows/winServerBrowser.py:26 windows/winServerBrowser.py:136
 msgid "Port"
-msgstr ""
+msgstr "Vrata"
 
 #: windows/winSystem.py:23
 msgid "System"
-msgstr ""
+msgstr "Sistem"
 
 #: windows/winSystem.py:126
 msgid "Known Universe"
-msgstr ""
+msgstr "Znano vesolje"
 
 #: windows/winUpdate.py:50
 msgid "Save log as ..."
-msgstr ""
+msgstr "Shrani dnevnik kot ..."
 
 #: windows/winUpdate.py:171 windows/winUpdate.py:245
 #: windows/xrc/winUpdate.py:84 windows/xrc/winUpdate.py:86
 msgid "Done!"
-msgstr ""
+msgstr "Zaključeno!"
 
 #: windows/winUpdate.py:194
 #, python-format
 msgid "Getting %s"
-msgstr ""
+msgstr "Pridobivanje %s"
 
 #: windows/winUpdate.py:222 windows/winUpdate.py:233
 #, python-format
 msgid "%s of %s"
-msgstr ""
-
-#: windows/xrc/configConnect.py:54
-msgid "Login for"
-msgstr ""
-
-#: windows/xrc/configConnect.py:55 windows/xrc/winAccount.py:79
-#: windows/xrc/winConnect.py:78
-msgid "Username"
-msgstr ""
-
-#: windows/xrc/configConnect.py:56 windows/xrc/winAccount.py:80
-#: windows/xrc/winConnect.py:79
-msgid "The username for the account on the Thousand Parsec server."
-msgstr ""
-
-#: windows/xrc/configConnect.py:57 windows/xrc/winAccount.py:81
-#: windows/xrc/winConnect.py:80
-msgid "Show seperate game box."
-msgstr ""
-
-#: windows/xrc/configConnect.py:58 windows/xrc/winAccount.py:82
-#: windows/xrc/winConnect.py:81
-msgid "G"
-msgstr ""
-
-#: windows/xrc/configConnect.py:59 windows/xrc/winAccount.py:83
-#: windows/xrc/winConnect.py:82
-msgid "Game"
-msgstr ""
-
-#: windows/xrc/configConnect.py:60 windows/xrc/winAccount.py:84
-#: windows/xrc/winConnect.py:83
-msgid "Password"
-msgstr ""
-
-#: windows/xrc/configConnect.py:61
-msgid "Autoconnect"
-msgstr ""
-
-#: windows/xrc/configConnect.py:62
-msgid "Debug Output"
-msgstr ""
+msgstr "%s od %s"
 
 #: windows/xrc/panelInformation.py:38
 msgid "Name of object goes here"
-msgstr ""
+msgstr "Sem gre ime objekta"
 
 #: windows/xrc/panelMessage.py:67
 msgid "Filter"
-msgstr ""
+msgstr "Filter"
 
 #: windows/xrc/panelMessage.py:68
 msgid "Static text"
-msgstr ""
+msgstr "Statično besedilo"
 
 #: windows/xrc/panelMessage.py:69
 msgid "100 of 100"
-msgstr ""
+msgstr "100 od 100"
 
 #: windows/xrc/panelMessage.py:70
 msgid ""
@@ -604,241 +579,285 @@ msgid ""
 "</body>\n"
 "</html>"
 msgstr ""
+"<html>\n"
+"<body>\n"
+"<center>\n"
+"\t<table cols=1 width=\"100%\">\n"
+"\t\t<tr>\n"
+"\t\t\t<td><b>Zadeva:</b> Nihče vas nima rad!\n"
+"\t\t</tr>\n"
+"\t\t<tr>\n"
+"\t\t\t<td>\n"
+"\t\t\tMed to potezo niste dobili nobenega sporočila!<br><br>\n"
+"\t\t\tČe niste dobili nobenega sporočila, to najverjetneje pomeni,\n"
+"\t\t\tda vaš odjemalec ni pravilno prenesel rezultatov s strežnika.\n"
+"\t\t\tPoskusite ponovno zagnati odjemalca.\n"
+"\t\t\t</td>\n"
+"\t\t</tr>\n"
+"\t </table>\n"
+"</center>\n"
+"</body>\n"
+"</html>"
 
 #: windows/xrc/panelMessage.py:71
 msgid "Prev"
-msgstr ""
+msgstr "Pred."
 
 #: windows/xrc/panelMessage.py:72
 msgid "First"
-msgstr ""
+msgstr "Prvo"
 
 #: windows/xrc/panelMessage.py:73
 msgid "Goto"
-msgstr ""
+msgstr "Pojdi"
 
 #: windows/xrc/panelMessage.py:74
 msgid "Next"
-msgstr ""
+msgstr "Nasl."
 
 #: windows/xrc/panelMessage.py:75
 msgid "Last"
-msgstr ""
+msgstr "Zadnje"
 
 #: windows/xrc/panelOrder.py:57
 msgid "Insert new order."
-msgstr ""
+msgstr "Vstavi nov ukaz."
 
 #: windows/xrc/panelOrder.py:58
 msgid "&New"
-msgstr ""
+msgstr "&Nov"
 
 #: windows/xrc/panelOrder.py:59 windows/xrc/winUpdate.py:102
 msgid "&Save"
-msgstr ""
+msgstr "&Shrani"
 
 #: windows/xrc/panelOrder.py:60
 msgid "&Revert"
-msgstr ""
+msgstr "&Povrni"
 
 #: windows/xrc/panelOrder.py:61
 msgid "Delete the currently selected order(s)"
-msgstr ""
+msgstr "Izbriši trenutno izbrana sporočila"
 
 #: windows/xrc/panelOrder.py:62
 msgid "&Delete"
-msgstr ""
+msgstr "&Izbriši"
 
 #: windows/xrc/panelPicture.py:43
 msgid "Name goes here"
-msgstr ""
+msgstr "Sem gre ime"
 
 #: windows/xrc/panelPicture.py:44
 msgid "10kb/s"
-msgstr ""
+msgstr "10 kb/s"
 
 #: windows/xrc/panelPicture.py:45
 msgid "43s"
-msgstr ""
+msgstr "43 s"
 
 #: windows/xrc/winAccount.py:73 windows/xrc/winConnect.py:74
 msgid "TP: Connect to a Server"
-msgstr ""
+msgstr "TP: Poveži se s strežnikom"
 
 #: windows/xrc/winAccount.py:74
 msgid "Create an Account"
-msgstr ""
+msgstr "Ustvari račun"
 
 #: windows/xrc/winAccount.py:76 windows/xrc/winConnect.py:77
 msgid "The URL for the Thousand Parsec server."
-msgstr ""
+msgstr "URL strežnika za Thousand Parsec."
 
 #: windows/xrc/winAccount.py:77
 msgid "Choose a server to create an account on."
-msgstr ""
+msgstr "Izberite strežnik, na katerem se bo ustvaril račun."
 
 #: windows/xrc/winAccount.py:78
 msgid "Check"
+msgstr "Preveri"
+
+#: windows/xrc/winAccount.py:79 windows/xrc/winConnect.py:78
+msgid "Username"
+msgstr "Uporabnik"
+
+#: windows/xrc/winAccount.py:80 windows/xrc/winConnect.py:79
+msgid "The username for the account on the Thousand Parsec server."
+msgstr "Uporabniško ime za račun na strežniku za Thousand Parsec."
+
+#: windows/xrc/winAccount.py:81 windows/xrc/winConnect.py:80
+msgid "Show seperate game box."
+msgstr "Prikaži ločeno okno za igro."
+
+#: windows/xrc/winAccount.py:82 windows/xrc/winConnect.py:81
+msgid "G"
 msgstr ""
+
+#: windows/xrc/winAccount.py:83 windows/xrc/winConnect.py:82
+msgid "Game"
+msgstr "Igra"
+
+#: windows/xrc/winAccount.py:84 windows/xrc/winConnect.py:83
+msgid "Password"
+msgstr "Geslo"
 
 #: windows/xrc/winAccount.py:85
 msgid "Choose your password here."
-msgstr ""
+msgstr "Sem vnesite svoje geslo."
 
 #: windows/xrc/winAccount.py:86
 msgid " "
-msgstr ""
+msgstr " "
 
 #: windows/xrc/winAccount.py:87 windows/xrc/winAccount.py:89
 msgid "Repeat the password"
-msgstr ""
+msgstr "Ponovite geslo"
 
 #: windows/xrc/winAccount.py:88
 msgid "Email "
-msgstr ""
+msgstr "E-pošta "
 
 #: windows/xrc/winAccount.py:90 windows/xrc/winConnect.py:85
 #: windows/xrc/winUpdate.py:100
 msgid "&OK"
-msgstr ""
+msgstr "&V redu"
 
 #: windows/xrc/winAccount.py:91 windows/xrc/winConnect.py:86
 #: windows/xrc/winServerBrowser.py:88 windows/xrc/winUpdate.py:104
 msgid "&Cancel"
-msgstr ""
+msgstr "&Prekliči"
 
 #: windows/xrc/winConnect.py:75
 msgid "Connect to Thousand Parsec Server"
-msgstr ""
+msgstr "Poveži se s strežnikom za Thousand Parsec"
 
 #: windows/xrc/winConnect.py:84
 msgid "The password for the account on the Thousand Parsec Server"
-msgstr ""
+msgstr "Geslo za račun na strežniku za Thousand Parsec"
 
 #: windows/xrc/winConnect.py:87
 msgid "&Find"
-msgstr ""
+msgstr "&Najdi"
 
 #: windows/xrc/winConnect.py:88
 msgid "&Preferences"
-msgstr ""
+msgstr "&Nastavitve"
 
 #: windows/xrc/winServerBrowser.py:72
 msgid "TP: Server Browser"
-msgstr ""
+msgstr "TP: Brskalnik po strežnikih"
 
 #: windows/xrc/winServerBrowser.py:73
 msgid "Thousand Parsec Server Browser"
-msgstr ""
+msgstr "Brskalnik po strežnikih za Thousand Parsec"
 
 #: windows/xrc/winServerBrowser.py:74
 msgid "Servers"
-msgstr ""
+msgstr "Strežniki"
 
 #: windows/xrc/winServerBrowser.py:75
 msgid "List of all the servers registered on the metaserver."
-msgstr ""
+msgstr "Seznam vseh strežnikov registriranih pri metastrežniku."
 
 #: windows/xrc/winServerBrowser.py:76
 msgid "Locations"
-msgstr ""
+msgstr "Lokacije"
 
 #: windows/xrc/winServerBrowser.py:77
 msgid "List of all the servers found on the local network."
-msgstr ""
+msgstr "Seznam vseh strežnikov najdenih na krajevnem omrežju."
 
 #: windows/xrc/winServerBrowser.py:78
 msgid "URL"
-msgstr ""
+msgstr "URL"
 
 #: windows/xrc/winServerBrowser.py:79
 msgid "URL of the currently selected server."
-msgstr ""
+msgstr "URL trenutno izbranega strežnika."
 
 #: windows/xrc/winServerBrowser.py:80
 msgid "Copy the URL to the clipboard."
-msgstr ""
+msgstr "Kopiraj URL na odložišče."
 
 #: windows/xrc/winServerBrowser.py:81
 msgid "&Copy"
-msgstr ""
+msgstr "&Kopiraj"
 
 #: windows/xrc/winServerBrowser.py:82
 msgid "Force a refresh of the server list."
-msgstr ""
+msgstr "Vsili posodobitev seznama strežnikov."
 
 #: windows/xrc/winServerBrowser.py:83
 msgid "&Refresh"
-msgstr ""
+msgstr "&Posodobi"
 
 #: windows/xrc/winServerBrowser.py:84
 msgid "Create a new account on the currently selected server."
-msgstr ""
+msgstr "Ustvari nov račun na trenutno izbranem strežniku."
 
 #: windows/xrc/winServerBrowser.py:85
 msgid "&New Account"
-msgstr ""
+msgstr "&Nov račun"
 
 #: windows/xrc/winServerBrowser.py:86
 msgid "Connect to the currently selected server."
-msgstr ""
+msgstr "Poveži se s trenutno izbranim strežnikom."
 
 #: windows/xrc/winServerBrowser.py:87
 msgid "C&onnect"
-msgstr ""
+msgstr "P&oveži se"
 
 #: windows/xrc/winUpdate.py:82
 msgid "TP: Downloading Universe"
-msgstr ""
+msgstr "TP: Prenašanje vesolja"
 
 #: windows/xrc/winUpdate.py:83
 msgid "Universe Download"
-msgstr ""
+msgstr "Prenašanje vesolja"
 
 #: windows/xrc/winUpdate.py:85
 msgid "Progress"
-msgstr ""
+msgstr "Napredek"
 
 #: windows/xrc/winUpdate.py:87
 msgid "Objects Descs"
-msgstr ""
+msgstr "Opisi objektov"
 
 #: windows/xrc/winUpdate.py:88
 msgid "Order Descs"
-msgstr ""
+msgstr "Opisi ukazov"
 
 #: windows/xrc/winUpdate.py:89
 msgid "Objects"
-msgstr ""
+msgstr "Objekti"
 
 #: windows/xrc/winUpdate.py:91
 msgid "Boards"
-msgstr ""
+msgstr "Deske"
 
 #: windows/xrc/winUpdate.py:93
 msgid "Categories"
-msgstr ""
+msgstr "Kategorije"
 
 #: windows/xrc/winUpdate.py:96
 msgid "Properties"
-msgstr ""
+msgstr "Lastnosti"
 
 #: windows/xrc/winUpdate.py:97
 msgid "Players"
-msgstr ""
+msgstr "Igralci"
 
 #: windows/xrc/winUpdate.py:98
 msgid "Resources"
-msgstr ""
+msgstr "Viri"
 
 #: windows/xrc/winUpdate.py:99
 msgid "Continue to the main game window."
-msgstr ""
+msgstr "Nadaljuj v glavno okno igre."
 
 #: windows/xrc/winUpdate.py:101
 msgid "Save a copy of the message box window to a file."
-msgstr ""
+msgstr "Shrani kopijo okna s sporočilom v datoteko."
 
 #: windows/xrc/winUpdate.py:103
 msgid "Cancel the current update and go back to the connect screen."
-msgstr ""
+msgstr "Prekliči trenutno posodobitev in se vrni na okno za povezovanje."
+

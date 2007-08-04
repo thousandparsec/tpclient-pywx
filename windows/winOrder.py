@@ -525,7 +525,7 @@ class panelOrder(panelOrderBase):
 		# Figure out which slot to use
 		slots = self.Orders.GetSelected()
 		if len(slots) != 1:
-			debug(DEBUG_WINDOWS, _("OrderSave: No order selected for update. (%s))" % str(slots))
+			debug(DEBUG_WINDOWS, _("OrderSave: No order selected for update. (%s))") % str(slots))
 			return
 		slot = slots[0]
 

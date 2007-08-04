@@ -50,3 +50,13 @@ class configConnectBase(wx.Panel):
 
 
 
+def strings():
+	_("Login for");
+	_("Username");
+	_("The username for the account on the Thousand Parsec server.");
+	_("Show seperate game box.");
+	_("G");
+	_("Game");
+	_("Password");
+	_("Autoconnect");
+	_("Debug Output");
