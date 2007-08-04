@@ -88,8 +88,6 @@ except (ImportError, KeyError), e:
 import __builtin__
 try:
 	import gettext
-	
-	gettext.install("pywx-client")
 	__builtin__._ = gettext.gettext	
 except ImportError, e:
 	print e

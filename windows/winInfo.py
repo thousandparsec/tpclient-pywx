@@ -80,7 +80,7 @@ class panelInformation(panelInformationBase):
 			object = self.application.cache.objects[evt.id]
 		except:
 			do_traceback()
-			debug(DEBUG_WINDOWS, "SelectObject: No such object.")
+			debug(DEBUG_WINDOWS, _("SelectObject: No such object."))
 			return
 
 		self.Title.SetLabel(object.name)
@@ -93,15 +93,15 @@ class panelInformation(panelInformationBase):
 				continue
 
 			if key == "ships":
-				s += "Ships: "
+				s += _("Ships: ")
 				# FIXME: This is a hack :/
 				for t, number in value:
 					if self.application.cache.designs.has_key(t):
 						design = self.application.cache.designs[t]
 						s += "%s %s, " % (number, design.name)
 					else:
-						print "Unknown Design id:", t
-						s += "%s %s, " % (number, "Unknown (type: %s)" % t)
+						print _("Unknown Design id:"), t
+						s += "%s %s, " % (number, _("Unknown (type: %s)") % t)
 				s = s[:-2] + "\n"
 				continue
 
