@@ -39,8 +39,6 @@ class winServerBrowser(winServerBrowserBase, winMainBaseXRC):
 		self.OnToggleLocation(False)
 
 	def AddGame(self, game=None, resize=True):
-		print "AddGame", self, game, resize
-
 		ctrl = self.Servers
 		Columns, Columns_Sizes = self.ServersColumns, self.ServersColumns_Sizes
 
@@ -188,7 +186,7 @@ class winServerBrowser(winServerBrowserBase, winMainBaseXRC):
 		self.application.gui.Show(self.application.gui.account)
 
 	def OnConnectTo(self, evt):
-		print "OnConnectTo", evt
+		pass
 
 	def Show(self, show=True):
 		if not show:
@@ -212,7 +210,6 @@ class winServerBrowser(winServerBrowserBase, winMainBaseXRC):
 		self.application.gui.Show(self.application.gui.connectto)	
 
 	def OnRefresh(self, evt=None):
-		print "Refresh!"
 		self.Progress.LoadFile(throbber)
 		self.Progress.Play()
 

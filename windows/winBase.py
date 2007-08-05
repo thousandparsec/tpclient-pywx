@@ -129,7 +129,6 @@ class winBaseMixIn(winMixIn):
 				utils.do_traceback()
 
 	def PreCreate(self, pre):
-		print "PreCreate", self.title
 		pre.SetTitle('TP: ' + self.title)
 
 class winSubMixIn(winMixIn):

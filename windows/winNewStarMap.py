@@ -39,8 +39,6 @@ class StarMapCanvas(NavCanvas):
 		return tb
 
 	def OnZoomTool(self, evt):
-#		print evt, #self.ZoomButton.GetPosition()
-
 		# Popup a menu
 		menu = wx.Menu()
 		menu.Append(100, "Testing")	
@@ -87,8 +85,6 @@ class panelStarMap(wx.Panel):
 		"""\
 		Called when the cache has been updated.
 		"""
-		print self.application
-		print self.application.cache
 		from overlays.Systems import Systems
 		self.Overlay = Systems(self.Canvas, self.application.cache)
 		self.Overlay.update()

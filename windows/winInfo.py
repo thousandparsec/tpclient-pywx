@@ -80,7 +80,6 @@ class panelInformation(panelInformationBase):
 			object = self.application.cache.objects[evt.id]
 		except:
 			do_traceback()
-			debug(DEBUG_WINDOWS, _("SelectObject: No such object."))
 			return
 
 		self.Title.SetLabel(object.name)

@@ -247,21 +247,17 @@ class panelStarMap(wx.Panel):
 	####################################################
 	def RemovePath(self):
 		if self.path != None:
-			print "Removing Path", self.path
 			self.Canvas.RemoveObject(self.path)
 			self.path = None
 
 	def SetPath(self, path):
 		self.RemovePath()
-
-		print "Setting path", path
 		self.path = path
 
 	def OnCacheUpdate(self, evt):
 		"""\
 		Called when the cache has been updated.
 		"""
-		print self, "OnCacheUpdate"
 		if evt.what is None:
 			self.Rebuild()
 			return
@@ -273,7 +269,6 @@ class panelStarMap(wx.Panel):
 		"""\
 		Called when an object is selected.
 		"""
-		print self, "OnSelectObject"
 		if evt.id == self.current:
 			return
 		self.current = evt.id

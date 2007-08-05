@@ -6,7 +6,6 @@ person enter the server/username/password.
 # Python imports
 import string
 import re
-import pprint
 
 # wxPython Imports
 import wx
@@ -107,10 +106,6 @@ class usernameMixIn:
 class configConnect(configConnectBase, usernameMixIn):
 	def __init__(self, *args, **kw):
 		configConnectBase.__init__(self, *args, **kw)
-
-		print self
-		print self.Username
-		print self.Password
 
 		usernameMixIn.__init__(self)
 		self.Panel = self
@@ -238,7 +233,6 @@ class winConnect(winConnectBase, winMainBaseXRC, usernameMixIn):
 			return
 
 		# Check if this server exists in the config
-		print self.config['servers']
 		if server in self.config['servers']:
 			# Check the values are the same
 			(oldusername, oldpassword, oldautoconnect) = self.config['details'][server]
@@ -339,7 +333,6 @@ Would you like to save this account's details?
 						not isinstance(details[0], (str, unicode)) or \
 						not isinstance(details[1], (str, unicode)) or \
 						not isinstance(details[2], bool):
-					print "deleteing", server, details
 					del config[server]
 
 		except (ValueError, KeyError), e:
@@ -435,12 +428,10 @@ Would you like to save this account's details?
 	def OnConfigUsername(self, evt):
 		server = self.ConfigPanel.ServerDetails.GetLabel()[len(_("Login for ")):]
 		self.config['details'][server][0] = self.ConfigPanel.GetUsername()
-		pprint.pprint(self.config)
 
 	def OnConfigPassword(self, evt):
 		server = self.ConfigPanel.ServerDetails.GetLabel()[len(_("Login for ")):]
 		self.config['details'][server][1] = self.ConfigPanel.Password.GetValue()
-		pprint.pprint(self.config)
 
 	def OnConfigAutoConnect(self, evt):
 		server = self.ConfigPanel.ServerDetails.GetLabel()[len(_("Login for ")):]
@@ -460,9 +451,7 @@ Would you instead like to autoconnect to %s.
 					details[2] = False
 					break
 
-		print "OnConfigAutoConnect", server, evt.Checked()
 		self.config['details'][server][2] = evt.Checked()
-		pprint.pprint(self.config)
 
 	def OnConfigDebug(self, evt):
 		self.config['debug'] = evt.Checked()

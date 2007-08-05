@@ -209,7 +209,6 @@ class winAccount(winAccountBase, winMainBaseXRC, usernameMixIn):
 
 		username, game = self.GetUsernameGame()
 		fullurl = "%s%s:%s@%s/%s" % (url[:p], username, password1, url[p:], game)
-		print fullurl
 		self.application.gui.connectto.ShowURL(fullurl)
 
 		#self.application.network.Call(self.application.network.ConnectTo, host, username, password, debug=self.config['debug'])

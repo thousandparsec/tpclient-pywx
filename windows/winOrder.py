@@ -324,7 +324,6 @@ class panelOrder(panelOrderBase):
 			self.OnOrderSelect(None)
 			return
 		
-		print "Orders", object.order_number, "Order Types", object.order_types
 #		if object.order_number == 0 and len(object.order_types) == 0:
 #			self.Hide()
 #		else:
@@ -394,7 +393,6 @@ class panelOrder(panelOrderBase):
 			self.RemoveListItem(evt.slot)
 
 			slots = self.Orders.GetSelected()
-			print "slots", slots
 			if evt.slot in slots or len(slots) == 0:
 				self.OnOrderSelect(None)
 
@@ -457,7 +455,6 @@ class panelOrder(panelOrderBase):
 			args += defaults[type]
 
 		# Create the new order
-		print args
 		new = objects.Order(*args)
 		new._dirty = True
 
@@ -483,7 +480,6 @@ class panelOrder(panelOrderBase):
 		# Figure out which slot is selected
 		slots = self.Orders.GetSelected()
 		if len(slots) != 1:
-			debug(DEBUG_WINDOWS, _("OrderSave: No order selected for save. (%s)") % str(slots))
 			return
 		slot = slots[0]
 		
@@ -510,7 +506,6 @@ class panelOrder(panelOrderBase):
 		self.OnOrderSelect(evt, force=True)
 
 	def DockBestSize(self):
-		print "DockBestSize", self.GetBestSize()
 		return wx.Size(*self.GetBestSize())
 	min_size = property(DockBestSize)
 
@@ -525,7 +520,6 @@ class panelOrder(panelOrderBase):
 		# Figure out which slot to use
 		slots = self.Orders.GetSelected()
 		if len(slots) != 1:
-			debug(DEBUG_WINDOWS, _("OrderSave: No order selected for update. (%s))") % str(slots))
 			return
 		slot = slots[0]
 
@@ -648,9 +642,9 @@ class panelOrder(panelOrderBase):
 			elif type == constants.ARG_OBJECT:
 				args += argObjectGet( panel )
 			elif type == constants.ARG_PLAYER:
-				debug(DEBUG_WINDOWS, _("Argument type (ARG_PLAYER) not implimented yet."))
+				pass
 			elif type == constants.ARG_RANGE:
-				debug(DEBUG_WINDOWS, _("Argument type (ARG_RANGE) not implimented yet."))
+				pass
 			elif type == constants.ARG_LIST:
 				args += argListGet( panel )
 			elif type == constants.ARG_STRING:
@@ -788,7 +782,6 @@ def argListPanel(parent, parent_panel, args):
 	
 		type = type_list.GetSelection()
 		if type == wx.NOT_FOUND:
-			debug(DEBUG_WINDOWS, _("ListAdd: No type selected."))
 			return
 		type = type_list.GetClientData(type)
 
@@ -821,7 +814,6 @@ def argListPanel(parent, parent_panel, args):
 		"""
 		slot = selected.GetNextItem(-1, wx.LIST_NEXT_ALL, wx.LIST_STATE_SELECTED)
 		if slot == wx.NOT_FOUND:
-			debug(DEBUG_WINDOWS, _("ListDel: No selection selected."))
 			return
 
 		selected.DeleteItem(slot)
@@ -832,7 +824,6 @@ def argListPanel(parent, parent_panel, args):
 		"""
 		type = type_list.GetSelection()
 		if type == wx.NOT_FOUND:
-			debug(DEBUG_WINDOWS, _("ListAdd: No type selected."))
 			number.SetRange(0, 0)
 		else:
 			current = 0
@@ -852,7 +843,6 @@ def argListPanel(parent, parent_panel, args):
 	def selectf(evt, selected=selected, type_list=type_list, typef=typef):
 		slot = selected.GetNextItem(-1, wx.LIST_NEXT_ALL, wx.LIST_STATE_SELECTED)
 		if slot == wx.NOT_FOUND:
-			debug(DEBUG_WINDOWS, _("ListSelect: No selection selected."))
 			return
 
 		type = selected.GetItemPyData(slot)

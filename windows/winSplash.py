@@ -22,6 +22,7 @@ try:
 			pygame.display.flip()
 
 		def Hide(self, *args, **kw):
+			print "Entered splash hide!"
 			while True:
 				if not self.movie.get_busy():
 					break

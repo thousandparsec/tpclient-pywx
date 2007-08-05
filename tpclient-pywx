@@ -41,14 +41,12 @@ mytranslation = gettext.translation(domain, localedir, [mylocale.GetCanonicalNam
 mytranslation.install()
 
 __builtins__._ = wx.GetTranslation
-print _, id(_)
 ##############
 
 # Local imports
 from version import version
 
 import utils
-from utils import debug, DEBUG_MAIN, DEBUG_GUI, DEBUG_NETWORK
 
 from tp.netlib import Connection, failed, constants
 from tp.client.threads import Application, NetworkThread, MediaThread, FinderThread, ThreadStop, NotImportantEvent
@@ -169,7 +167,6 @@ class GUI(wx.App):
 
 		except:
 			utils.do_traceback()
-		print "Finished init..."
 		self.Call(self.Show, self.connectto)
 
 	def __str__(self):

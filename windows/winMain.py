@@ -57,7 +57,6 @@ class MediaProgress(wx.PopupCtrl):
 
 	def OnSelect(self, evt):
 		self.PopDown()
-		print "OnSelect", evt.GetString()
 
 	def OnButton(self,evt):
 		if len(self.listitems) > 1: 
@@ -131,7 +130,6 @@ class StatusBar(wx.StatusBar):
 			self.StatusTextCtrl.SetValue("EOT: Unknown")
 	
 	def SetEndTime(self, endtime):
-		print endtime
 		self.endtime = endtime
 
 	def Reposition(self):
@@ -215,7 +213,7 @@ class winMain(winMDIBase):
 		winDesign(application, self)
 
 		self.mgr = wx.aui.AuiManager()
-		self.mgr.SetFrame(self)
+		self.mgr.SetManagedWindow(self)
 
 		from windows.winInfo    import panelInformation
 		from windows.winPicture import panelPicture
@@ -428,6 +426,5 @@ The turn has ended. Would you like to download all the new details?
 					self.UpdateCache()
 				self.updatepending = False
 		else:
-			print "Got an updated EOT..."
 			self.statusbar.SetEndTime(evt.gotat + evt.remaining)
 
