@@ -24,13 +24,6 @@ ID_CONFIG = 10047
 ID_EXIT = 10049
 ID_FILE = 10050
 
-ID_STAT_EAAG = 10051
-ID_STAT_SYSTEM = 10052
-ID_STAT_PLANET = 10053
-ID_STAT_FLEET = 10054
-ID_STAT_BATTLE = 10055
-ID_STATS = 10056
-
 ID_WIN_TIPS	 = 11006
 ID_WIN_HELP = 1105
 
@@ -335,16 +328,6 @@ class winMain(winMDIBase):
 		file.Append( wx.ID_PREFERENCES, _("Preferences"), _("Configure the Client") )
 		file.AppendSeparator()
 		file.Append( ID_EXIT, _("Exit"), _("Exit") )
-
-##		# Statistics Menu
-##		stat = wx.Menu()
-##		stat.Append( ID_STAT_EAAG, _("Empire at a Glance"), _("") )
-##		stat.AppendSeparator()
-##		stat.Append( ID_STAT_SYSTEM, _("Systems"), _("") )
-##		stat.Append( ID_STAT_PLANET, _("Planets"), _("") )
-##		stat.Append( ID_STAT_FLEET,  _("Fleets"),  _("") )
-##		stat.AppendSeparator()
-##		stat.Append( ID_STAT_BATTLE, _("Battles"), _("") )
 
 		# Windows Menu
 		win = wx.Menu()
