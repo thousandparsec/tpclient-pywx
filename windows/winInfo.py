@@ -106,7 +106,7 @@ class panelInformation(panelInformationBase):
 				continue
 
 			if key == "resources":
-				s += "Resources:\n"
+				s += _("Resources:\n")
 				for t, surface, minable, inaccess in value:
 					if surface+minable+inaccess == 0:
 						continue
@@ -115,31 +115,31 @@ class panelInformation(panelInformationBase):
 						s+="\t"
 						if surface > 0:
 							if len(res.unit_singular) > 0:
-								s+="%s %s of %s on surface, " % (surface, \
+								s+=_("%s %s of %s on surface, ") % (surface, \
 									[res.unit_singular, res.unit_plural][surface > 1],
 									[res.name_singular, res.name_plural][surface > 1])
 							else:
-								s+="%s %s on surface, " % (surface, [res.name_singular, res.name_plural][surface > 1])
+								s+=_("%s %s on surface, ") % (surface, [res.name_singular, res.name_plural][surface > 1])
 
 						if minable > 0:
 							if len(res.unit_singular) > 0:
-								s+="%s %s of %s minable, " % (minable, \
+								s+=_("%s %s of %s minable, ") % (minable, \
 									[res.unit_singular, res.unit_plural][minable > 1],
 									[res.name_singular, res.name_plural][minable > 1])
 							else:
-								s+="%s %s minable, " % (minable, [res.name_singular, res.name_plural][minable > 1])
+								s+=_("%s %s minable, ") % (minable, [res.name_singular, res.name_plural][minable > 1])
 
 						if inaccess > 0:
 							if len(res.unit_singular) > 0:
-								s+="%s %s of %s inaccessible, " % (inaccess, \
+								s+=_("%s %s of %s inaccessible, ") % (inaccess, \
 									[res.unit_singular, res.unit_plural][inaccess > 1],
 									[res.name_singular, res.name_plural][inaccess > 1])
 							else:
-								s+="%s %s inaccessible, " % (inaccess, [res.name_singular, res.name_plural][inaccess > 1])
+								s+=_("%s %s inaccessible, ") % (inaccess, [res.name_singular, res.name_plural][inaccess > 1])
 
 						s = s[:-2]+"\n"
 					else:
-						s+= "\tUnknown Resource %i, S: %i, M: %i, I: %s\n" % (t, surface, minable, inaccess)
+						s+= _("\tUnknown Resource %i, S: %i, M: %i, I: %s\n") % (t, surface, minable, inaccess)
 				continue
 
 			key = key.title()
