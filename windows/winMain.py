@@ -13,6 +13,7 @@ import wx
 import wx.lib.popupctl as pop
 
 # Local imports
+from requirements import docdir
 from winBase import *
 from utils import *
 
@@ -405,7 +406,7 @@ class winMain(winMDIBase):
 			config = [True, 0]
 
 		if config[0] or override != None:
-			tp = wx.CreateFileTipProvider(os.path.join("doc", "tips.txt"), config[1])
+			tp = wx.CreateFileTipProvider(os.path.join(docdir, "tips.txt"), config[1])
 			config[0] = wx.ShowTip(None, tp)
 			config[1] = tp.GetCurrentTip()
 

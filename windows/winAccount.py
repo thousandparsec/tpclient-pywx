@@ -11,6 +11,8 @@ import os
 import wx
 import wx.gizmos
 
+from requirements import graphicsdir
+
 try:
 	from extra.GIFAnimationCtrl import GIFAnimationCtrl
 except ImportError:
@@ -23,8 +25,8 @@ from winBase import winMainBaseXRC
 from winConnect import usernameMixIn
 from xrc.winAccount import winAccountBase
 
-throbber = os.path.join("graphics", "downloading.gif")
-okay = os.path.join("graphics", "finished.gif")
+throbber = os.path.join(graphicsdir, "downloading.gif")
+okay = os.path.join(graphicsdir, "finished.gif")
 
 class winAccount(winAccountBase, winMainBaseXRC, usernameMixIn):
 	title = _("Account")

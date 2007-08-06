@@ -5,12 +5,14 @@ at this current location and "quick" details about them.
 
 # Python imports
 import random
+import os.path
 
 # wxPython imports
 import wx
 import wx.gizmos
 
 # Local imports
+from requirements import graphicsdir
 import defaults
 from winBase import *
 from utils import *
@@ -34,16 +36,16 @@ class panelSystem(wx.Panel):
 		self.tree = wx.OrderedTreeCtrl(self, -1, style=wx.TR_DEFAULT_STYLE | wx.TR_HAS_VARIABLE_ROW_HEIGHT)
 
 		self.icons = {}
-		self.icons['Blank'] = wx.Image("graphics/blank-icon.png").ConvertToBitmap()
-		self.icons['Root'] = wx.Image("graphics/tp-icon.png").ConvertToBitmap()
-		self.icons['Container'] = wx.Image("graphics/link-icon.png").ConvertToBitmap()
-		self.icons['StarSystem'] = wx.Image("graphics/system-icon.png").ConvertToBitmap()
-		self.icons['Fleet'] = wx.Image("graphics/ship-icon.png").ConvertToBitmap()
-		self.icons['Planet'] = wx.Image("graphics/planet-icon.png").ConvertToBitmap()
-		self.icons['Unknown'] = wx.Image("graphics/starbase-icon.png").ConvertToBitmap()
+		self.icons['Blank'] = wx.Image(os.path.join(graphicsdir, "blank-icon.png")).ConvertToBitmap()
+		self.icons['Root'] = wx.Image(os.path.join(graphicsdir, "tp-icon.png")).ConvertToBitmap()
+		self.icons['Container'] = wx.Image(os.path.join(graphicsdir, "link-icon.png")).ConvertToBitmap()
+		self.icons['StarSystem'] = wx.Image(os.path.join(graphicsdir, "system-icon.png")).ConvertToBitmap()
+		self.icons['Fleet'] = wx.Image(os.path.join(graphicsdir, "ship-icon.png")).ConvertToBitmap()
+		self.icons['Planet'] = wx.Image(os.path.join(graphicsdir, "planet-icon.png")).ConvertToBitmap()
+		self.icons['Unknown'] = wx.Image(os.path.join(graphicsdir, "starbase-icon.png")).ConvertToBitmap()
 
 		self.il = wx.ImageList(16, 16)
-		self.il.Add(wx.Image("graphics/blank.png").ConvertToBitmap())
+		self.il.Add(wx.Image(os.path.join(graphicsdir, "blank.png")).ConvertToBitmap())
 		for i in self.icons.keys():
 			self.icons[i] = self.il.Add(self.icons[i])
 		self.tree.SetImageList(self.il)

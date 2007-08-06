@@ -7,6 +7,8 @@ and raising all the other windows when one is clicked.
 import wx
 import os.path
 
+from requirements import graphicsdir
+
 import utils
 
 class Blank:
@@ -85,7 +87,7 @@ class winMixIn(object):
 		self.config = self.ConfigDefault()
 
 		icon = wx.EmptyIcon()
-		icon.CopyFromBitmap(wx.Bitmap(os.path.join("graphics", "icon.ico"), wx.BITMAP_TYPE_ANY))
+		icon.CopyFromBitmap(wx.Bitmap(os.path.join(graphicsdir, "icon.ico"), wx.BITMAP_TYPE_ANY))
 		self.SetIcon(icon)
 
 	def SetSizeHard(self, pos):

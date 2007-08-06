@@ -8,12 +8,13 @@ import time
 import wx
 
 # Local Imports
+from requirements import graphicsdir
 from winBase import winMainBaseXRC
 from xrc.winUpdate import winUpdateBase
 
-throbber = os.path.join("graphics", "downloading.gif")
-okay = os.path.join("graphics", "finished.png")
-waiting = os.path.join("graphics", "waiting.png")
+throbber = os.path.join(graphicsdir, "downloading.gif")
+okay = os.path.join(graphicsdir, "finished.png")
+waiting = os.path.join(graphicsdir, "waiting.png")
 
 class winUpdate(winUpdateBase, winMainBaseXRC):
 	title = _("Updating")

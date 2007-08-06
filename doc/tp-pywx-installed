@@ -3,6 +3,7 @@
 TMP=/tmp/to-search
 echo $LD_LIBRARY_PATH | sed -e's/:/\n/g'	 > $TMP 2> /dev/null
 cat /etc/ld.so.conf 						>> $TMP 2> /dev/null
+echo /home/tim/temp5/lib 					>> $TMP 2> /dev/null
 echo /usr/local/lib							>> $TMP 2> /dev/null
 echo /usr/lib 								>> $TMP
 echo /lib									>> $TMP
@@ -18,8 +19,13 @@ while read LIB_DIR; do
 
 		if [ -e "$TPDIR" ]; then
 			echo "Found the client in $TPDIR"
+			export TPCLIENT_GRAPHICS=`dirname $LIB_DIR`/share/tpclient-pywx
+			export TPCLIENT_DOC=`dirname $LIB_DIR`/share/doc/tpclient-pywx
+			#echo "Graphics  are in $TPCLIENT_GRAPHICS"
+			#echo "Documents are in $TPCLIENT_DOC"
+
 			cd $TPDIR
-			./tpclient $ARGS
+			./tpclient-pywx $ARGS
 		fi
 	fi
 done < $TMP

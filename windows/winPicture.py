@@ -27,6 +27,8 @@ from tp.netlib.objects.ObjectExtra.Planet import Planet
 from tp.netlib.objects.ObjectExtra.Fleet import Fleet
 
 # Local imports
+from requirements import graphicsdir
+
 from winBase import *
 from utils import *
 
@@ -41,7 +43,7 @@ def splitall(start):
 	bits.reverse()
 	return bits
 
-WAITING = os.path.join(".", "graphics", "loading.gif")
+WAITING = os.path.join(graphicsdir, "loading.gif")
 class winPicture(winBase):
 	
 	def __init__(self, application, parent):
@@ -222,14 +224,14 @@ class panelPicture(panelPictureBase):
 
 			file = self.application.media.GetFile(image)
 		except ZeroDivisionError, e:
-			file = os.path.join("graphics", "unknown.png")
+			file = os.path.join(graphicsdir, "unknown.png")
 		except Exception, e:
 			print e
 			file = None
 
 		if file is None:
 			self.image_waiting = image
-			self.DisplayImage(os.path.join("graphics", "loading.png"), wx.NullColour)
+			self.DisplayImage(os.path.join(graphicsdir, "loading.png"), wx.NullColour)
 		else:
 			self.image_waiting = None
 			self.DisplayImage(file)

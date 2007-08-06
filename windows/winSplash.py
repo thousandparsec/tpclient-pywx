@@ -1,7 +1,9 @@
 
 import os
+from requirements import graphicsdir
 
 try:
+
 	import time
 
 	os.environ['SDL_VIDEO_WINDOW_POS'] = "center"
@@ -16,7 +18,7 @@ try:
 			screen = pygame.display.set_mode((640,480), pygame.NOFRAME)
 			pygame.mixer.quit()
 
-			self.movie = pygame.movie.Movie(os.path.join("graphics", "intro-high.mpg"))
+			self.movie = pygame.movie.Movie(os.path.join(graphicsdir, "intro-high.mpg"))
 			self.movie.set_display(screen, (0,0), )
 			self.movie.play()
 			pygame.display.flip()
@@ -46,7 +48,7 @@ except ImportError:
 
 	class winSplash(wx.SplashScreen):
 		def __init__(self, application):
-			image = wx.Image("graphics/splash.png").ConvertToBitmap()
+			image = wx.Image(os.path.join(graphicsdir, "splash.png")).ConvertToBitmap()
 			wx.SplashScreen.__init__(self, image, wx.SPLASH_CENTRE_ON_SCREEN | wx.SPLASH_TIMEOUT, 2500, None, -1)
 
 			self.application = application

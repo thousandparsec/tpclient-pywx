@@ -28,8 +28,6 @@ class PopupDialog(wx.Dialog):
 		selfSize = self.GetSize()
 		tcSize = self.ctrl.GetSize()
 
-		print pos, dSize, selfSize, tcSize
-
 		pos.x -= (selfSize.width - tcSize.width) / 2
 		if pos.x + selfSize.width > dSize.width:
 			pos.x = dSize.width - selfSize.width
@@ -41,8 +39,6 @@ class PopupDialog(wx.Dialog):
 			pos.y = dSize.height - selfSize.height
 		if pos.y < 0:
 			pos.y = 0
-
-		print pos
 
 		self.Move(pos)
 		self.ShowModal()
@@ -77,7 +73,6 @@ class PopupCtrl(wx.PyControl):
 			self.pop.SetContent(content)
 
 	def OnButton(self,evt):
-		print self, "OnButton"
 		self.PopUp()
 
 	def FormatContent(self):

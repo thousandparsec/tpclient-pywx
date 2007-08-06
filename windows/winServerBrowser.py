@@ -11,9 +11,11 @@ import wx
 from winBase import winMainBaseXRC
 from xrc.winServerBrowser import winServerBrowserBase
 
-throbber = os.path.join("graphics", "downloading.gif")
-okay = os.path.join("graphics", "finished.gif")
-notokay = os.path.join("graphics", "waiting.gif")
+from requirements import graphicsdir
+
+throbber = os.path.join(graphicsdir, "downloading.gif")
+okay = os.path.join(graphicsdir, "finished.gif")
+notokay = os.path.join(graphicsdir, "waiting.gif")
 
 class winServerBrowser(winServerBrowserBase, winMainBaseXRC):
 	title = _("Updating")

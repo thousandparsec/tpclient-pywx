@@ -203,10 +203,24 @@ if len(notfound) == 0:
 					recommended.append(("Recent version of pyGTK.", reason))
 
 	import os
-	if os.environ.has_key("TPCLIENT_MEDIA"):
-		graphics = os.environ["TPCLIENT_MEDIA"]
-	else:
-		graphics = '.'
+	print os.environ
+	try:
+		graphicsdir = os.environ["TPCLIENT_GRAPHICS"]
+	except KeyError:
+		graphicsdir = 'graphics'
+	print "Graphics are in %s" % graphicsdir
+	if not os.path.exists(os.path.join(graphicsdir, 'blank.png')):
+		print "Can not find graphics required by this client."
+		sys.exit()
+
+	try:
+		docdir = os.environ["TPCLIENT_DOC"]
+	except KeyError:
+		docdir = 'doc'
+	print "Documents are in %s" % docdir
+	if not os.path.exists(os.path.join(docdir, 'tips.txt')):
+		print "Can not find help documentation required by this client."
+		sys.exit()
 
 if len(notfound) > 0:
 	print

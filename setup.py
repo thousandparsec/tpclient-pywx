@@ -12,7 +12,6 @@ from version import version
 version = ("%s.%s.%s" % version) 
 print "Version is %s" % version
 
-
 arguments = dict(
 # Meta data
 	name="tpclient-pywx",
@@ -37,15 +36,91 @@ arguments = dict(
 				("graphics",	glob.glob("graphics/*.ico"))],
 )
 
+if sys.platform.startswith('linux') and "install" in sys.argv:
+	import os, shutil
 
-if not "py2app" in sys.argv and not "py2exe" in sys.argv:
-	print "This file is only provided to build,"
-	print "  py2exe executable bundles for windows"
-	print "  py2app dmg packages for Mac OS X"
+	# Clean up locally
+	os.system('rm `find -name \*.pyc`')
+
+	def makedirs(s):
+		try:
+			os.makedirs(s)
+		except OSError, e:
+			if e.errno != 17:
+				raise
+		return
+
+	prefix = "/usr/local"
+	if "--prefix" in sys.argv:
+		prefix = sys.argv[sys.argv.index('--prefix')+1]
+	for arg in sys.argv:
+		if arg.startswith('--prefix='):
+			trash, prefix = arg.split('=')
+
+	print "Installing too...", prefix
+
+	# Documentation goes to
+	docpath  = os.path.join(prefix, "share/doc/tpclient-pywx")
+	print 'docpath', docpath
+	makedirs(docpath)
+
+	docfiles = ['AUTHORS', 'COPYING', 'LICENSE', 'doc/tips.txt']
+	for file in docfiles:
+		shutil.copy2(file, docpath)
+
+	# Locale files
+	localepath = os.path.join(prefix, "share/locale/%s/LC_MESSAGES/")
+	print 'localepath', localepath
+	for dir in os.listdir('locale'):
+		if os.path.isfile(os.path.join('locale', dir)):
+			continue
+		print "Installing language files for %s" % dir
+
+		llocalepath = localepath % dir
+		makedirs(llocalepath)
+		shutil.copy2(os.path.join('locale', dir, 'tpclient-pywx.mo'), llocalepath)
+
+	# Graphics files
+	graphicspath = os.path.join(prefix, "share/tpclient-pywx")
+	print 'graphicspath', graphicspath
+	shutil.copytree('graphics', graphicspath)
+
+	# Private python file
+	privatepath = os.path.join(prefix, "lib/tpclient-pywx/")
+	print 'librarypath', privatepath
+	makedirs(privatepath)
+
+	privatefiles = ['tpclient-pywx', 'version.py', 'requirements.py', 'utils.py', 'windows', 'extra']
+	for file in privatefiles:
+		if os.path.isfile(file):
+			shutil.copy2(file, privatepath)
+		if os.path.isdir(file):
+			shutil.copytree(file, os.path.join(privatepath, file))
+
+	os.symlink(os.path.join(os.path.abspath(os.curdir), 'tp'), os.path.join(privatepath, 'tp'))
+
+	# Cleanup some files which shouldn't have been copied...
+	cleanupfiles = ['windows/xrc/generate.sh', 'windows/xrc/tp.pjd', 'windows/xrc/tp.xrc']
+	for file in cleanupfiles:
+		os.unlink(os.path.join(privatepath, file))
+
+	# Copy the startup script
+	shutil.copy2(os.path.join('doc', 'tp-pywx-installed'), os.path.join(privatepath, 'tp-pywx-installed'))
+
+	# Executables
+	binpath     = os.path.join(prefix, "bin")
+	print 'binpath', binpath
+	makedirs(binpath)
+	os.symlink(os.path.join(privatepath, 'tp-pywx-installed'), os.path.join(binpath, 'tpclient-pywx'))
+
 	sys.exit()
 
-if sys.platform == 'darwin' and sys.platform == 'win32':
-	pass
+if not "py2app" in sys.argv and not "py2exe" in sys.argv:
+	print "This file is only provided to do the following,"
+	print "  py2exe executable bundles for windows"
+	print "  py2app dmg packages for Mac OS X"
+	print "  install on a unix system"
+	sys.exit()
 
 if sys.platform == 'darwin':
 	import py2app
@@ -53,6 +128,7 @@ if sys.platform == 'darwin':
 	from setuptools import find_packages
 	print find_packages()
 
+	os.copy('tpclient-pywx', 'tpclient-pywx.py')
 	arguments['scripts']=["tpclient-pywx.py"]
 	
 	# Py2App stuff
