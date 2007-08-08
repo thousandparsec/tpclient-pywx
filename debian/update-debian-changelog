@@ -19,6 +19,8 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
+import sys; sys.path.insert(0,'..');
+	
 import version as vi;
 	
 from debian_bundle.changelog import Changelog, Version
@@ -26,7 +28,7 @@ from debian_bundle.changelog import Changelog, Version
 changelog = Changelog()
 
 changelog.new_block(package='tpclient-pywx',
-                    version='%i.%i.%i' % vi.version,
+                    version="%s+%s" % (vi.version_str,vi.version_target_str),
                     distributions='unstable',
                     urgency='low',
                     author='Paul Schulz <paul@rocksoft.com>',
