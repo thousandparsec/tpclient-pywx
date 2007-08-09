@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tpclient-pywx\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-08-05 00:30+0930\n"
-"PO-Revision-Date: 2007-08-04 17:54+0200\n"
+"POT-Creation-Date: 2007-08-05 02:54+0930\n"
+"PO-Revision-Date: 2007-08-09 15:17+0200\n"
 "Last-Translator: Jure Repinc <jlp@holodeck1.com>\n"
 "Language-Team: Slovenian <lugos-slo@lugos.si>\n"
 "MIME-Version: 1.0\n"
@@ -30,7 +30,8 @@ msgstr "Ta strežnik ne podpira ustvarjanja računov."
 msgid "Account Created"
 msgstr "Račun ustvarjen"
 
-#: windows/winAccount.py:182 windows/winBase.py:369 tpclient-pywx:244
+#: windows/winAccount.py:182 windows/winBase.py:369 tpclient-pywx:264
+#: tpclient-pywx:268
 msgid "Network Error"
 msgstr "Napaka glede omrežja"
 
@@ -51,21 +52,27 @@ msgstr "Gesli se ne ujemata."
 msgid ""
 "Config-%s: Did not find a default show for your resolution (using 1024x768 "
 "defaults)"
-msgstr "Nastavitev-%s: Ni bilo moč najti privzetega prikaza za vašo ločljivost (uporabljam privzetosti za 1024x768)"
+msgstr ""
+"Nastavitev-%s: Ni bilo moč najti privzetega prikaza za vašo ločljivost "
+"(uporabljam privzetosti za 1024x768)"
 
 #: windows/winBase.py:182
 #, python-format
 msgid ""
 "Config-%s: Did not find a default position for your resolution (using "
 "1024x768 defaults)"
-msgstr "Nastavitev-%s: Ni bilo moč najti privzetega položaja za vašo ločljivost (uporabljam privzetosti za 1024x768)"
+msgstr ""
+"Nastavitev-%s: Ni bilo moč najti privzetega položaja za vašo ločljivost "
+"(uporabljam privzetosti za 1024x768)"
 
 #: windows/winBase.py:193
 #, python-format
 msgid ""
 "Config-%s: Did not find a default size for your resolution (using 1024x768 "
 "defaults)"
-msgstr "Nastavitev-%s: Ni bilo moč najti privzete velikosti za vašo ločljivost (uporabljam privzetosti za 1024x768)"
+msgstr ""
+"Nastavitev-%s: Ni bilo moč najti privzete velikosti za vašo ločljivost "
+"(uporabljam privzetosti za 1024x768)"
 
 #: windows/winBase.py:237
 msgid "Show?"
@@ -91,16 +98,16 @@ msgstr "Višina"
 msgid "Config"
 msgstr "Nastavitve"
 
-#: windows/winConnect.py:136
+#: windows/winConnect.py:141
 #, python-format
 msgid "Login for %s"
 msgstr "Prijava za %s"
 
-#: windows/winConnect.py:161
+#: windows/winConnect.py:166
 msgid "Connect"
 msgstr "Poveži se"
 
-#: windows/winConnect.py:245
+#: windows/winConnect.py:250
 msgid ""
 "It appears you are using a different password for \n"
 "this account, would you like to update the saved \n"
@@ -109,11 +116,11 @@ msgstr ""
 "Izgleda, da uporabljate drugo geslo za ta račun.\n"
 "Želite zamenjati staro geslo z novim?\n"
 
-#: windows/winConnect.py:250
+#: windows/winConnect.py:255
 msgid "Update Password?"
 msgstr "Zamenjam geslo?"
 
-#: windows/winConnect.py:259
+#: windows/winConnect.py:264
 msgid ""
 "It appears you havn't access this account before.\n"
 "\n"
@@ -123,16 +130,16 @@ msgstr ""
 "\n"
 "Želite shraniti podatke o tem računu?\n"
 
-#: windows/winConnect.py:264
+#: windows/winConnect.py:269
 msgid "Add Account?"
 msgstr "Dodam račun?"
 
-#: windows/winConnect.py:431 windows/winConnect.py:436
-#: windows/winConnect.py:441
+#: windows/winConnect.py:436 windows/winConnect.py:441
+#: windows/winConnect.py:446
 msgid "Login for "
 msgstr "Prijava za "
 
-#: windows/winConnect.py:448
+#: windows/winConnect.py:453
 #, python-format
 msgid ""
 "\n"
@@ -145,7 +152,7 @@ msgstr ""
 "\n"
 "Želite zamenjati strežnik za samodejno povezavo z %s?\n"
 
-#: windows/winConnect.py:453
+#: windows/winConnect.py:458
 msgid "Autoconnect to?"
 msgstr "Samodejna povezava?"
 
@@ -277,10 +284,6 @@ msgstr "Pomoč"
 #: windows/winMain.py:382
 msgid "File"
 msgstr "Datoteka"
-
-#: windows/winMain.py:383
-msgid "Statistics"
-msgstr "Statistika"
 
 #: windows/winMain.py:384
 msgid "Windows"
@@ -438,7 +441,7 @@ msgstr "Vrsta"
 
 #: windows/winOrder.py:769
 msgid "D"
-msgstr ""
+msgstr "I"
 
 #: windows/winOrder.py:791 windows/winOrder.py:835
 msgid "ListAdd: No type selected."
@@ -454,15 +457,15 @@ msgstr "Izbiranje s seznama: Izbranega ni ničesar."
 
 #: windows/winOrder.py:916
 msgid "X"
-msgstr ""
+msgstr "X"
 
 #: windows/winOrder.py:924
 msgid "Y"
-msgstr ""
+msgstr "Y"
 
 #: windows/winOrder.py:932
 msgid "Z"
-msgstr ""
+msgstr "Z"
 
 #: windows/winOrder.py:940 windows/winServerBrowser.py:21
 #: windows/winServerBrowser.py:76
@@ -540,6 +543,48 @@ msgstr "Pridobivanje %s"
 #, python-format
 msgid "%s of %s"
 msgstr "%s od %s"
+
+#: windows/xrc/configConnect.py:54
+msgid "Login for"
+msgstr "Prijava za"
+
+#: windows/xrc/configConnect.py:55 windows/xrc/winAccount.py:79
+#: windows/xrc/winConnect.py:78
+msgid "Username"
+msgstr "Uporabnik"
+
+#: windows/xrc/configConnect.py:56 windows/xrc/winAccount.py:80
+#: windows/xrc/winConnect.py:79
+msgid "The username for the account on the Thousand Parsec server."
+msgstr "Uporabniško ime za račun na strežniku za Thousand Parsec."
+
+#: windows/xrc/configConnect.py:57 windows/xrc/winAccount.py:81
+#: windows/xrc/winConnect.py:80
+msgid "Show seperate game box."
+msgstr "Prikaži ločeno okno za igro."
+
+#: windows/xrc/configConnect.py:58 windows/xrc/winAccount.py:82
+#: windows/xrc/winConnect.py:81
+msgid "G"
+msgstr "I"
+
+#: windows/xrc/configConnect.py:59 windows/xrc/winAccount.py:83
+#: windows/xrc/winConnect.py:82
+msgid "Game"
+msgstr "Igra"
+
+#: windows/xrc/configConnect.py:60 windows/xrc/winAccount.py:84
+#: windows/xrc/winConnect.py:83
+msgid "Password"
+msgstr "Geslo"
+
+#: windows/xrc/configConnect.py:61
+msgid "Autoconnect"
+msgstr "Samodejna povezava"
+
+#: windows/xrc/configConnect.py:62
+msgid "Debug Output"
+msgstr "Razhroščevalni izhod"
 
 #: windows/xrc/panelInformation.py:38
 msgid "Name of object goes here"
@@ -674,30 +719,6 @@ msgstr "Izberite strežnik, na katerem se bo ustvaril račun."
 #: windows/xrc/winAccount.py:78
 msgid "Check"
 msgstr "Preveri"
-
-#: windows/xrc/winAccount.py:79 windows/xrc/winConnect.py:78
-msgid "Username"
-msgstr "Uporabnik"
-
-#: windows/xrc/winAccount.py:80 windows/xrc/winConnect.py:79
-msgid "The username for the account on the Thousand Parsec server."
-msgstr "Uporabniško ime za račun na strežniku za Thousand Parsec."
-
-#: windows/xrc/winAccount.py:81 windows/xrc/winConnect.py:80
-msgid "Show seperate game box."
-msgstr "Prikaži ločeno okno za igro."
-
-#: windows/xrc/winAccount.py:82 windows/xrc/winConnect.py:81
-msgid "G"
-msgstr ""
-
-#: windows/xrc/winAccount.py:83 windows/xrc/winConnect.py:82
-msgid "Game"
-msgstr "Igra"
-
-#: windows/xrc/winAccount.py:84 windows/xrc/winConnect.py:83
-msgid "Password"
-msgstr "Geslo"
 
 #: windows/xrc/winAccount.py:85
 msgid "Choose your password here."
@@ -860,4 +881,246 @@ msgstr "Shrani kopijo okna s sporočilom v datoteko."
 #: windows/xrc/winUpdate.py:103
 msgid "Cancel the current update and go back to the connect screen."
 msgstr "Prekliči trenutno posodobitev in se vrni na okno za povezovanje."
+
+#: windows/winInfo.py:83
+msgid "SelectObject: No such object."
+msgstr "Izbiranje objektov: Tega objekta ni."
+
+#: windows/winInfo.py:96
+msgid "Ships: "
+msgstr "Ladje: "
+
+#: windows/winInfo.py:103
+msgid "Unknown Design id:"
+msgstr "Neznan ID načrta:"
+
+#: windows/winInfo.py:104
+#, python-format
+msgid "Unknown (type: %s)"
+msgstr "Neznano (vrsta: %s)"
+
+#: tp/client/cache.py:348
+msgid "Getting order descriptions..."
+msgstr "Pridobivanje opisov ukazov ..."
+
+#: tp/client/cache.py:349
+msgid "Working out the number of order descriptions to get.."
+msgstr "Ugotavljanje števila opisov ukazov za pridobivanje ..."
+
+#: tp/client/cache.py:363
+#, python-format
+msgid "Got order description %s (ID: %i) (last modified at %s)..."
+msgstr "Dobil opis ukaza %s (ID: %i) (zadnja sprememba: %s)."
+
+#: tp/client/cache.py:367
+#, python-format
+msgid "Failed to get order description with id, %i (last modified at %s)..."
+msgstr "Pridobivanje opisa ukaza z ID %i je spodletelo (zadnja sprememba: %s)."
+
+#: tp/client/cache.py:368
+msgid "Finished getting order descriptions..."
+msgstr "Pridobivanje opisov ukazov je zaključeno."
+
+#: tp/client/cache.py:387
+msgid "Getting your player object..."
+msgstr "Pridobivanje objekta vašega igralca ..."
+
+#: tp/client/cache.py:389
+msgid "Gotten your player object..."
+msgstr "Objekt vašega igralca pridobljen."
+
+#: tp/client/cache.py:411
+#, python-format
+msgid "Getting %s..."
+msgstr "Pridobivanje %s ..."
+
+#: tp/client/cache.py:414
+#, python-format
+msgid "Working out the number of %s to get.."
+msgstr "Ugotavljanje števila %s za pridobivanje ..."
+
+#: tp/client/cache.py:429
+#, python-format
+msgid "Got %s %s (id: %i) (last modified at %s)..."
+msgstr "Pridobil %s %s (ID: %i) (zadnja sprememba: %s)."
+
+#: tp/client/cache.py:432
+#, python-format
+msgid "No %s to get, skipping..."
+msgstr "Nobenega %s za pridobiti, izpuščam ..."
+
+#: tp/client/cache.py:437
+#, python-format
+msgid "Have %i %s to get..."
+msgstr "Za pridobiti je %i %s."
+
+#: tp/client/cache.py:448
+#, python-format
+msgid "Failed to get the %s which was previously called %s."
+msgstr "Pridobivanje %s, ki se je prej imenoval %s, je spodletelo."
+
+#: tp/client/cache.py:452
+#, python-format
+msgid "Failed to get the %s with id %s."
+msgstr "Pridobivanje %s z ID %s je spodletelo."
+
+#: tp/client/cache.py:454
+#, python-format
+msgid "Cleaning up %s which have disappeared..."
+msgstr "Čiščenje %s, ki so izginili ..."
+
+#: tp/client/cache.py:461
+#, python-format
+msgid "Removing %s %s as it has disappeared..."
+msgstr "Odstranjevanje %s %s, ker je izginil ..."
+
+#: tp/client/cache.py:466
+msgid "Building two way tree of the universe for speed..."
+msgstr "Grajenje dvosmernega drevesa vesolja, zaradi hitrosti ..."
+
+#: tp/client/cache.py:475
+#, python-format
+msgid "Gotten all %s..."
+msgstr "Pridobil vse %s."
+
+#: tp/client/cache.py:493
+#, python-format
+msgid "Getting %s.."
+msgstr "Pridobivanje %s..."
+
+#: tp/client/cache.py:494
+#, python-format
+msgid "Have to get %s for %i %s.."
+msgstr "Pridobiti je potrebno %s za %i %s."
+
+#: tp/client/cache.py:504
+#, python-format
+msgid "Sending a request for all %s on %s.."
+msgstr "Pošiljanje zahtevka za vse %s na %s ..."
+
+#: tp/client/cache.py:508
+#, python-format
+msgid "Skipping requesting %s on %s as there are none!"
+msgstr "Preskakujem zahtevo po %s na %s, ker ne obstaja!"
+
+#: tp/client/cache.py:526
+#, python-format
+msgid "Failed to get %s for %s (id: %s) (%s)..."
+msgstr "Spodletelo je pridobivanje %s za %s (ID: %s) (%s)."
+
+#: tp/client/cache.py:530
+#, python-format
+msgid "Got %i %s for %s (id: %s)..."
+msgstr "Dobil %i %s za %s (ID: %s)."
+
+#: tp/client/cache.py:533
+#, python-format
+msgid "Cleaning up any stray %s.."
+msgstr "Čiščenje izgubljenih %s ..."
+
+#: tp/client/cache.py:536
+#, python-format
+msgid "Found stray %s for %s.."
+msgstr "Našel izgubljenega %s za %s."
+
+#: tp/client/cache.py:540
+#, python-format
+msgid "Gotten all the %s.."
+msgstr "Dobil vse %s."
+
+#: tp/client/threads.py:286 tp/client/threads.py:550
+msgid "There was an unknown network error.\n"
+msgstr "Prišlo je do neznane omrežne napake.\n"
+
+#: tp/client/threads.py:287 tp/client/threads.py:551
+msgid "Any changes since last save have been lost.\n"
+msgstr "Vse spremembe, ki niso shranjene, so se izgubile.\n"
+
+#: tp/client/threads.py:289
+msgid "A traceback of the error was printed to the console.\n"
+msgstr "Povratna sled napake se je izpisala v konzoli.\n"
+
+#: tp/client/threads.py:317
+msgid "The client was unable to connect to the host.\n"
+msgstr "Odjemalec se ni mogel povezati z gostiteljem.\n"
+
+#: tp/client/threads.py:318
+msgid ""
+"This could be because the server is down or there is a problem with the "
+"network.\n"
+msgstr "Mogoče strežnik ne deluje, ali pa ime omrežje težave.\n"
+
+#: tp/client/threads.py:322
+msgid "The client could not connect to the host.\n"
+msgstr "Odjemalec se ni mogel povezati z gostiteljem.\n"
+
+#: tp/client/threads.py:323
+msgid ""
+"This could be because the server is down or you mistyped the server "
+"address.\n"
+msgstr ""
+"Mogoče strežnik ne deluje, ali pa ste se zatipkali pri vnašanju naslova "
+"strežnika.\n"
+
+#: tp/client/threads.py:326
+msgid "Successfully connected to the host..."
+msgstr "Uspešna povezava z gostiteljem."
+
+#: tp/client/threads.py:329
+msgid "Looking for Thousand Parsec Server..."
+msgstr "Iskanje strežnika za Thousand Parsec ..."
+
+#: tp/client/threads.py:333 tp/client/threads.py:342
+msgid ""
+"The client connected to the host but it did not appear to be a Thousand "
+"Parsec server.\n"
+msgstr ""
+"Odjemalec se je povezal z gostiteljem, a kot kaže ta ni strežnik za "
+"Thousand Parsec.\n"
+
+#: tp/client/threads.py:334 tp/client/threads.py:343
+msgid ""
+"This could be because the server is down or the connection details are "
+"incorrect.\n"
+msgstr "Mogoče strežnik ne deluje, ali pa so podatki o povezavi napačne.\n"
+
+#: tp/client/threads.py:337
+msgid "Found a Thousand Parsec Server..."
+msgstr "Našel strežnik za Thousand Parsec."
+
+#: tp/client/threads.py:339
+msgid "Looking for supported features..."
+msgstr "Preverjanje podprtih zmožnosti ..."
+
+#: tp/client/threads.py:346
+msgid "Got the supported features..."
+msgstr "Dobil podprte zmožnosti."
+
+#: tp/client/threads.py:355
+msgid "Connecting..."
+msgstr "Povezovanje ..."
+
+#: tp/client/threads.py:361
+msgid "Trying to Login to the server..."
+msgstr "Poskušanje prijave na strežnik ..."
+
+#: tp/client/threads.py:363
+msgid ""
+"The client connected to the host but could not login because the username of "
+"password was incorrect.\n"
+msgstr ""
+"Odjemalec se je povezal z gostiteljem, a se ni mogel prijaviti, ker "
+"je uporabniško ime ali pa geslo napačno.\n"
+
+#: tp/client/threads.py:364
+msgid ""
+"This could be because you are connecting to the wrong server or mistyped the "
+"username or password.\n"
+msgstr ""
+"Mogoče ste se povezali z napačnim strežnikom ali pa ste se "
+"zatipkali pri vpisovanju uporabniškega imena ali gesla.\n"
+
+#: tp/client/threads.py:367
+msgid "Logged in okay!"
+msgstr "Prijava je uspela!"
 
