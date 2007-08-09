@@ -146,7 +146,7 @@ except ImportError, e:
 	reason = "Installing the Pygame library will allow you to see the intro movie and hear sounds."
 
 	if system == "debian-based":
-		recommended.append(("python-game", reason))
+		recommended.append(("python-pygame", reason))
 	else:
 		recommended.append(("Pygame library.", reason))
 
