@@ -21,27 +21,7 @@ import threading
 import traceback
 from types import *
 
-############
-# Setup the translation stuff...
-import gettext
-# Hack to get the locale directory
-basepath = os.path.abspath(os.path.dirname(__file__))
-localedir = os.path.join(basepath, "locale")
 
-langid = wx.LANGUAGE_DEFAULT    # use OS default; or use LANGUAGE_JAPANESE, etc.
-domain = "tpclient-pywx"        # the translation file is tpclient-pywx.mo
-
-# Set locale for wxWidgets
-mylocale = wx.Locale(langid)
-mylocale.AddCatalogLookupPathPrefix(localedir)
-mylocale.AddCatalog(domain)
-
-# Set up Python's gettext
-mytranslation = gettext.translation(domain, localedir, [mylocale.GetCanonicalName()], fallback = True)
-mytranslation.install()
-
-__builtins__._ = wx.GetTranslation
-##############
 
 # Local imports
 from version import version
@@ -126,6 +106,27 @@ class GUI(wx.App):
 		else:
 			wx.App.__init__(self)
 
+		############
+		# Setup the translation stuff...
+		import gettext
+		# Hack to get the locale directory
+		basepath = os.path.abspath(os.path.dirname(__file__))
+		localedir = os.path.join(basepath, "locale")
+
+		langid = wx.LANGUAGE_DEFAULT    # use OS default; or use LANGUAGE_JAPANESE, etc.
+		domain = "tpclient-pywx"        # the translation file is tpclient-pywx.mo
+
+		# Set locale for wxWidgets
+		mylocale = wx.Locale(langid)
+		mylocale.AddCatalogLookupPathPrefix(localedir)
+		mylocale.AddCatalog(domain)
+
+		# Set up Python's gettext
+		mytranslation = gettext.translation(domain, localedir, [mylocale.GetCanonicalName()], fallback = True)
+		mytranslation.install()
+
+		__builtins__._ = wx.GetTranslation
+		##############
 		self.start = self.MainLoop
 
 		self.application = application

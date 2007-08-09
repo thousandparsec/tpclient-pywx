@@ -102,7 +102,7 @@ class panelMessage(panelMessageBase, winShiftMixIn):
 		if wx.Platform != "__WXMAC__":
 			self.Message.SetFonts("Swiss", "Courier", [4, 6, 8, 10, 12, 14, 16])
 		else:
-			self.Message.SetFonts("Swiss", "Courier", [10, 12, 14, 16, 20, 24])
+			self.Message.SetFonts("Courier", "Courier", [10, 12, 14, 16, 20, 24])
 		self.Message.SetPage("")
 
 		# The current message slot
