@@ -1,0 +1,15 @@
+Source: tpclient-pywx
+Section: python
+Priority: optional
+Maintainer: Paul Schulz <paul@mawsonlakes.org>
+Build-Depends: cdbs (>= 0.4.43), debhelper (>= 5), python-all-dev(>=2.3.5-11), python-support (>= 0.5.3)
+Standards-Version: 3.7.2
+
+Package: tpclient-pywx
+Architecture: all
+Depends: ${python:Depends}
+Provides: ${python:Provides}
+Description: Thousand Parsec client written in Python
+ This Thousand Parsec client, written in python, is an easy way to
+ join and start playing in a Thousand Parsec game.
+
