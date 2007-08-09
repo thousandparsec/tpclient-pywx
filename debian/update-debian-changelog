@@ -20,6 +20,8 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 import sys; sys.path.insert(0,'..');
+import time;
+import os;
 	
 import version as vi;
 	
@@ -28,16 +30,36 @@ from debian_bundle.changelog import Changelog, Version
 changelog = Changelog()
 
 changelog.new_block(package='tpclient-pywx',
-                    version="%s+%s" % (vi.version_str,vi.version_target_str),
+                    version="%s+%s-1auto1" % (vi.version_str,vi.version_target_str),
                     distributions='unstable',
                     urgency='low',
-                    author='Paul Schulz <paul@rocksoft.com>',
-                    date='Thu,  3 Aug 2006 19:16:22 +0100',
+                    author='Paul Schulz <paul@mawsonlakes.org>',
+		    date=time.strftime("%a, %e %b %Y %H:%M:%S %z"),
+#                    date='Thu,  3 Aug 2006 19:16:22 +0100',
                     )
 
 changelog.add_change('');
 changelog.add_change('  * Daily build');
+changelog.add_change("  * Git version: %s" % (vi.version_git));
 changelog.add_change('');
 
-print changelog
+try:
+  filename =  'changelog'
+#  filename = sys.argv[1]
+except IndexError:
+  print "No 'changelog' file found."
+  sys.exit(1)
+
+os.rename('changelog','changelog.old');
+
+f = open(filename, 'w')
+
+try:
+  changelog.write_to_open_file(f)
+finally:
+  f.close()
+
+file(filename, 'a').write(file("%s.old" % filename, 'r').read())
+
+os.unlink("%s.old" % filename );
 
