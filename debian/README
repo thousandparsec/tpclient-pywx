@@ -1,0 +1,12 @@
+Initial debian packaging
+
+To automagically update changelog..
+  (cd debian; ./update-debian-changelog)
+
+  This requires the package: python-debian
+
+To build debian package..
+  dpkg-buildpackage -rfakeroot -uc -us
+
+  This requires the package: fakeroot
+
