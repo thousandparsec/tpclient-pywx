@@ -97,7 +97,7 @@ if sys.platform.startswith('linux') and "install" in sys.argv:
 		if os.path.isdir(file):
 			shutil.copytree(file, os.path.join(privatepath, file))
 
-	os.symlink(os.path.join(os.path.abspath(os.curdir), 'tp'), os.path.join(privatepath, 'tp'))
+	#os.symlink(os.path.join(os.path.abspath(os.curdir), 'tp'), os.path.join(privatepath, 'tp'))
 
 	# Cleanup some files which shouldn't have been copied...
 	cleanupfiles = ['windows/xrc/generate.sh', 'windows/xrc/tp.pjd', 'windows/xrc/tp.xrc']
