@@ -163,7 +163,7 @@ except (ImportError, KeyError), e:
 	print e
 	notfound.append("tp.netlib > " + tostr(netlib_version))
 
-client_version = (0, 3, 0)
+client_version = (0, 2, 99)
 try:
 	import tp.client
 
