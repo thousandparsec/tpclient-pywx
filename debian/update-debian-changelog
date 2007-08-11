@@ -20,28 +20,68 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 import sys; sys.path.insert(0,'..');
-import time;
-import os;
+import time
+import os
 	
-import version as vi;
+import version as vi
 	
 from debian_bundle.changelog import Changelog, Version
 
 changelog = Changelog()
 
-changelog.new_block(package='tpclient-pywx',
-                    version="%s+%s-1auto1" % (vi.version_str,vi.version_target_str),
+if not hasattr(vi, 'version_target'):
+	raise SyntaxError("Cant not use this script on a non-development version!")
+
+currentdir = os.path.realpath(os.curdir)
+print "Currently in %s" % currentdir
+
+############################################################################
+# Get the git version, depends on git being installed!
+############################################################################
+# Make sure we are in the right directory...
+os.chdir('..')
+# Get the git-describe version..
+import popen2
+
+gitread, gitwrite, giterror = popen2.popen3('git-describe')
+
+giterrorstr = giterror.read()
+if len(giterrorstr) > 0:
+	raise SyntaxError("git-describe failed! Error follows\n%s" % giterrorstr)
+
+gitdescribe = gitread.read()
+if len(gitdescribe) < 5:
+	raise SyntaxError("git-describe didn't output what it should, got %r" % gitdescribe)
+
+# Split the tag apart,
+tag, commits, gitcommit = gitdescribe.strip().split('-')
+packagea, packageb, a, b, c = tag.split('_')
+
+if "_".join([packagea, packageb]) != 'TPCLIENT_PYWX':
+	raise SyntaxError("Tag must be 'TPCLIENT_PYWX'")
+
+tag_version = (int(a), int(b), int(c))
+if tag_version != vi.version:
+	raise SyntaxError("Version %s doesn't match latest tag %r!" % (vi.version, tag_version))
+
+os.chdir(currentdir)
+##############################################################################
+
+debversion = "%s+%s+git.%s.%s-1auto1" % (vi.version_str, vi.version_target_str, commits, gitcommit)
+print "This version of this deb will be %s" % debversion
+changelog.new_block(package='libtpproto-py',
+                    version=debversion,
                     distributions='unstable',
                     urgency='low',
                     author='Paul Schulz <paul@mawsonlakes.org>',
-		    date=time.strftime("%a, %e %b %Y %H:%M:%S %z"),
-#                    date='Thu,  3 Aug 2006 19:16:22 +0100',
+				    date=time.strftime("%a, %e %b %Y %H:%M:%S %z"),
                     )
 
-changelog.add_change('');
-changelog.add_change('  * Daily build');
-changelog.add_change("  * Git version: %s" % (vi.version_git));
-changelog.add_change('');
+changelog.add_change('')
+changelog.add_change('  * Daily build')
+changelog.add_change("  * Git 'describe': %s" % (gitdescribe))
+changelog.add_change("  * Git Commit: %s" % (vi.version_git))
+changelog.add_change('')
 
 try:
   filename =  'changelog'
@@ -61,5 +101,4 @@ finally:
 
 file(filename, 'a').write(file("%s.old" % filename, 'r').read())
 
-os.unlink("%s.old" % filename );
-
+os.unlink("%s.old" % filename )

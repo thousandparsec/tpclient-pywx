@@ -20,16 +20,16 @@ if os.path.exists(os.path.join(installpath, '.git')):
 	# What version are we trying to get too?
 	import time
 	if version[2] >= 99:
-		version_target = (version[0], version[1]+1, 0, time.strftime('%Y%m%d'))
+		version_target = (version[0], version[1]+1, 0)
 	else:
-		version_target = (version[0], version[1], version[2]+1, time.strftime('%Y%m%d'))
+		version_target = (version[0], version[1], version[2]+1)
 
-	version_target_str = "%i.%i.%i.%s" % version_target
+	version_target_str = "%i.%i.%i" % version_target
 
 version_str = "%i.%i.%i" % version[:3]
 
 if __name__ == "__main__":
-	if os.path.exists(".git"):
+	if os.path.exists(os.path.join(installpath, '.git')):
 		print version_str+'+'+version_target_str, "(git %s)" % version_git
 	else:
 		print version_str
