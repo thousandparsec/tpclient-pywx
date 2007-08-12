@@ -69,7 +69,7 @@ os.chdir(currentdir)
 
 debversion = "%s+%s+git.%s.%s-1auto1" % (vi.version_str, vi.version_target_str, commits, gitcommit)
 print "This version of this deb will be %s" % debversion
-changelog.new_block(package='libtpproto-py',
+changelog.new_block(package='tpclient-pywx',
                     version=debversion,
                     distributions='unstable',
                     urgency='low',
