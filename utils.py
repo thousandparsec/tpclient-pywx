@@ -25,8 +25,9 @@ def do_traceback():
 DEBUG_NETWORK = "NETWORK:"
 DEBUG_MAIN = "MAIN:"
 DEBUG_GUI = "GUI:"
+DEBUG_WINDOWS = "WINDOWS:"
 
-DEBUGGING = [DEBUG_MAIN, DEBUG_GUI, DEBUG_NETWORK]
+DEBUGGING = [DEBUG_MAIN, DEBUG_GUI, DEBUG_NETWORK, DEBUG_WINDOWS]
 
 def warn(string):
 	print "WARNING:", string
@@ -78,5 +79,5 @@ def save_data(file, data):
 
 __all__ = [
 	'Blank', 'save_data', 'load_data', 'configpath', # Config functions
-	'debug', 'do_traceback', 'DEBUG_NETWORK', 'DEBUG_MAIN', 'DEBUG_GUI', # Debugging functions
+	'debug', 'do_traceback', 'DEBUG_NETWORK', 'DEBUG_MAIN', 'DEBUG_GUI', 'DEBUG_WINDOWS', # Debugging functions
 	]
