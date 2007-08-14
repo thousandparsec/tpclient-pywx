@@ -880,7 +880,7 @@ def argListPanel(parent, parent_panel, args):
 	parent.Bind(wx.EVT_LIST_ITEM_SELECTED, selectf, selected)
 	parent.Bind(wx.EVT_BUTTON, addf, add)
 	parent.Bind(wx.EVT_BUTTON, deletef, delete)
-	parent.Bind(wx.EVT_CHOICE, typef, type_list)
+	type_list.Bind(wx.EVT_CHOICE, typef)
 	
 	return panel
 
