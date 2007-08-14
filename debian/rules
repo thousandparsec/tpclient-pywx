@@ -34,7 +34,7 @@ install:
 	dh_testdir
 	dh_installdirs
 	#$(MAKE) DESTDIR=$(CURDIR)/debian/tpclient-pywx install
-	python setup.py install --prefix=$(CURDIR)/debian/tpclient-pywx
+	python setup.py install --prefix=$(CURDIR)/debian/tpclient-pywx/usr
 
 #install: build $(PYVERS:%=install-python%)
 
@@ -56,8 +56,8 @@ binary-indep: build install
 	dh_testroot
 	dh_installchangelogs
 	dh_installdocs README
-#	dh_pycentral
-#	dh_compress -X.py
+	dh_pycentral
+	dh_compress -X.py
 	dh_fixperms
 	dh_installdeb
 	dh_gencontrol
