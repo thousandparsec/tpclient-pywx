@@ -17,13 +17,12 @@ class Arrow(Polygon):
 		self.Offset = N.array(Offset, N.float_)
 		self.Offset.shape = (2,) # Make sure it is a length 2 vector
 
-    def _Draw(self, dc , WorldToPixel, ScaleWorldToPixel = None, HTdc=None):
-        Points = WorldToPixel(self.Points) + self.Offset
-        dc.SetPen(self.Pen)
-        dc.SetBrush(self.Brush)
-        dc.DrawPolygon(Points)
-        if HTdc and self.HitAble:
-            HTdc.SetPen(self.HitPen)
-            HTdc.SetBrush(self.HitBrush)
-            HTdc.DrawPolygon(Points)
-
+	def _Draw(self, dc , WorldToPixel, ScaleWorldToPixel = None, HTdc=None):
+		Points = WorldToPixel(self.Points) + self.Offset
+		dc.SetPen(self.Pen)
+		dc.SetBrush(self.Brush)
+		dc.DrawPolygon(Points)
+		if HTdc and self.HitAble:
+			HTdc.SetPen(self.HitPen)
+			HTdc.SetBrush(self.HitBrush)
+			HTdc.DrawPolygon(Points)
