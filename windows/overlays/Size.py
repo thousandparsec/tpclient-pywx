@@ -1,7 +1,7 @@
 """\
 Draws circles proportional to the actual size of the object.
 """
- wxPython imports
+# wxPython imports
 from Value import Value
 
 # Network imports
