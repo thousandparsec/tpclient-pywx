@@ -203,7 +203,6 @@ if len(notfound) == 0:
 					recommended.append(("Recent version of pyGTK.", reason))
 
 	import os
-	print os.environ
 	try:
 		graphicsdir = os.environ["TPCLIENT_GRAPHICS"]
 	except KeyError:
