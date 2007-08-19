@@ -37,6 +37,8 @@ class panelMessage(panelMessageBase, winShiftMixIn):
 			self.Message.SetFonts("Swiss", "Courier", [10, 12, 14, 16, 20, 24])
 #		else:
 #			self.Message.SetFonts("Swiss", "Courier", [4, 6, 8, 10, 12, 14, 16])
+		print self.Message.Bind.__doc__
+		self.Message.Bind(wx.html.EVT_HTML_LINK_CLICKED, self.OnLinkEvent)
 
 		# The current message slot
 		self.slot = 0
@@ -45,6 +47,12 @@ class panelMessage(panelMessageBase, winShiftMixIn):
 
 		# Contains the message types to be filtered
 		self.filtered = Set()
+
+	def OnLinkEvent(self, evt):
+		link = evt.GetLinkInfo().GetHref()
+		print link
+		from extra.Opener import open
+		open(link)
 
 	html_filtered = """\
 <html>
