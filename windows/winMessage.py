@@ -19,13 +19,38 @@ from winBase import *
 # Protocol Imports
 from tp.netlib import failed, GenericRS
 
+from requirements import graphicsdir
+
 from xrc.panelMessage import panelMessageBase
 class panelMessage(panelMessageBase, winShiftMixIn):
+	title = _("Messages")
+	from defaults import winMessageDefaultSize as DefaultSize
+
+	def __init__(self, application, parent):
+		panelMessageBase.__init__(self, parent)
+		winShiftMixIn.__init__(self)
+
+		self.application = application
+
+		if wx.Platform != "__WXMAC__":
+#			pass
+			self.Message.SetFonts("Swiss", "Courier", [10, 12, 14, 16, 20, 24])
+#		else:
+#			self.Message.SetFonts("Swiss", "Courier", [4, 6, 8, 10, 12, 14, 16])
+
+		# The current message slot
+		self.slot = 0
+		self.position = 0
+		self.dirty = True
+
+		# Contains the message types to be filtered
+		self.filtered = Set()
+
 	html_filtered = """\
 <html>
 <body>
 <center>
-	<table cols=1 width="100%%" background="./graphics/filtered.png">
+	<table cols=1 width="100%%" background="%GRAPHICS/graphics/filtered.png">
 		<tr>
 			<td><b>Subject:</b> %(subject)s</td>
 		</tr>
@@ -35,7 +60,7 @@ class panelMessage(panelMessageBase, winShiftMixIn):
 	</table>
 </center>
 </body>
-</html>"""
+</html>""".replace("%GRAPHICS", graphicsdir)
 
 	html_message = """\
 <html>
@@ -51,7 +76,7 @@ class panelMessage(panelMessageBase, winShiftMixIn):
 	</table>
 </center>
 </body>
-</html>"""
+</html>""".replace("%GRAPHICS", graphicsdir)
 
 	html_nomessage = """\
 <html>
@@ -63,8 +88,8 @@ class panelMessage(panelMessageBase, winShiftMixIn):
 		</tr>
 		<tr>
 			<td>
-			You have recived no messages this turn!<br><br>
-			Actually if you didn't recive any messages it most proberly
+			You have received no messages this turn!<br><br>
+			Actually if you didn't receive any messages it most probably
 			means that your client couldn't load the results from the server.
 			Try reload/restart the client.
 			</td>
@@ -78,40 +103,17 @@ class panelMessage(panelMessageBase, winShiftMixIn):
 <html>
 <body>
 <center>
-	<table cols=1 width="100%" background="./graphics/filtered.png">
+	<table cols=1 width="100%" background="%GRAPHICS/graphics/filtered.png">
 		<tr>
 			<td><b>Subject:</b> All messages filtered
 		</tr>
 		<tr>
-			<td>All messages you have recived this turn have been filtered.</td>
+			<td>All messages you have received this turn have been filtered.</td>
 		</tr>
 	</table>
 </center>
 </body>
-</html>"""
-
-	title = _("Messages")
-	from defaults import winMessageDefaultSize as DefaultSize
-
-	def __init__(self, application, parent):
-		panelMessageBase.__init__(self, parent)
-		winShiftMixIn.__init__(self)
-
-		self.application = application
-
-		if wx.Platform != "__WXMAC__":
-			self.Message.SetFonts("Swiss", "Courier", [4, 6, 8, 10, 12, 14, 16])
-		else:
-			self.Message.SetFonts("Courier", "Courier", [10, 12, 14, 16, 20, 24])
-		self.Message.SetPage("")
-
-		# The current message slot
-		self.slot = 0
-		self.position = 0
-		self.dirty = True
-
-		# Contains the message types to be filtered
-		self.filtered = Set()
+</html>""".replace("%GRAPHICS", graphicsdir)
 
 	def GetPaneInfo(self):
 		info = wx.aui.AuiPaneInfo()
@@ -346,5 +348,8 @@ class panelMessage(panelMessageBase, winShiftMixIn):
 		id = int(item.GetLabel().split('(')[-1][:-1])
 		self.application.Post(self.application.gui.SelectObjectEvent(id))
 
+	def MessageNew(self, evt=None):
+		pass
+	
 	def MessageFilter(self):
 		pass
