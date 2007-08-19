@@ -60,14 +60,10 @@ wx_version = (2, 6, 0, 0)
 wx_version_str = '.'.join([str(x) for x in wx_version[0:2]])
 try:
 	import wxversion
-	wxversion.ensureMinimal(wx_version_str)
-except ImportError, e:
-	pass
-
-try:
 	if os.path.exists("wxversion"):
-		import wxversion
 		wxversion.select(open("wxversion").read())
+	else:
+		wxversion.ensureMinimal(wx_version_str)
 except ImportError, e:
 	pass
 

@@ -2507,7 +2507,8 @@ class FrameManager(wx.EvtHandler):
 
             self.AddPane(client_window, PaneInfo().Name("mdiclient").
                          CenterPane().PaneBorder(False))
-        
+
+    SetManagedWindow = SetFrame
 
     def GetFrame(self):
         """ GetFrame() returns the frame pointer being managed by FrameManager. """
