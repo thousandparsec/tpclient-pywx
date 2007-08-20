@@ -4,6 +4,9 @@ from requirements import graphicsdir
 
 try:
 
+	if os.path.exists("NOSPLASHMOVIE"):
+		raise ImportError('Splash movie disabled...')
+
 	import time
 
 	os.environ['SDL_VIDEO_WINDOW_POS'] = "center"
