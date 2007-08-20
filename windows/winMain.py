@@ -258,7 +258,13 @@ class winMain(winMDIBase):
 
 		winMDIBase.Show(self)
 
+		# FIXME: Hack until perspective loading is done..
+		self.Maximize()
+
+		# Make the windows all reposition themselves...
 		wx.CallAfter(self.mgr.Update)
+
+		# Show the tips..
 		wx.CallAfter(self.ShowTips)
 
 	def Hide(self, show=True):
