@@ -555,8 +555,7 @@ class panelOrder(panelOrderBase):
 			# Create a new panel
 			self.ArgumentsPanel = wx.Panel(self.DetailsPanel, -1)
 			self.ArgumentsPanel.SetAutoLayout( True )
-			self.ArgumentsSizer = wx.FlexGridSizer( 0, 2, 0, 0)
-			
+			self.ArgumentsSizer = wx.FlexGridSizer( 0, 1, 0, 0)
 			self.ArgumentsPanel.SetSizer(self.ArgumentsSizer)
 			self.ArgumentsSizer.AddGrowableCol( 1 )
 
@@ -575,9 +574,9 @@ class panelOrder(panelOrderBase):
 				name_text = wx.StaticText( self.ArgumentsPanel, -1, name.title().replace("_","") )
 				name_text.SetFont(wx.local.normalFont)
 
-				self.ArgumentsSizer.Add( name_text, 0, wx.ALIGN_CENTER|wx.RIGHT, 4 )
 
 				# Add the arguments bit
+				namepos = wx.TOP
 				if type == constants.ARG_ABS_COORD:
 					subpanel = argCoordPanel( self, self.ArgumentsPanel, getattr(order, name) )
 				elif type == constants.ARG_TIME:
@@ -587,18 +586,29 @@ class panelOrder(panelOrderBase):
 				elif type == constants.ARG_LIST:
 					subpanel = argListPanel( self, self.ArgumentsPanel, getattr(order, name) )
 				elif type == constants.ARG_STRING:
+					namepos = wx.LEFT
 					subpanel = argStringPanel( self, self.ArgumentsPanel, getattr(order, name) )
 				else:
 					subpanel = argNotImplimentedPanel( self, self.ArgumentsPanel, None )
 
 				subpanel.SetToolTip(wx.ToolTip(getattr(orderdesc, name+'__doc__')))
-
 				subpanel.SetFont(wx.local.normalFont)
 				self.ArgumentsChildren.append( subpanel )
 				
-				self.ArgumentsSizer.Add( subpanel, 0, wx.GROW|wx.ALIGN_CENTER)
-				self.ArgumentsSizer.AddGrowableRow( len(self.ArgumentsChildren) - 1 )
-			
+				if namepos == wx.TOP:
+					self.ArgumentsSizer.Add( name_text, 0, wx.ALIGN_CENTER|wx.RIGHT, 4 )
+					self.ArgumentsSizer.Add( subpanel, 0,  wx.GROW|wx.ALIGN_CENTER)
+		
+				elif namepos == wx.LEFT:
+					ArgumentSubSizer = wx.BoxSizer(wx.HORIZONTAL)
+					ArgumentSubSizer.Add( name_text, 0, wx.ALIGN_CENTER|wx.RIGHT, 4 )
+					ArgumentSubSizer.Add( subpanel,  0, wx.GROW|wx.ALIGN_CENTER)
+
+					self.ArgumentsSizer.Add(ArgumentSubSizer)
+
+				else:
+					raise TypeError('WTF?')
+	
 			self.DetailsPanel.SetClientSize(self.ArgumentsPanel.GetBestSize())
 			self.DetailsSizer.Add( self.ArgumentsPanel, 0, wx.GROW|wx.ALIGN_CENTER|wx.ALL, 0 )
 
