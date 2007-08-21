@@ -1,78 +1,28 @@
 
 TODO
 =======================================================
+
+See also - https://sourceforge.net/tracker/?group_id=132078&atid=829724
+
 Short Term
-
 	* Remove all the print states - make debug output go to the debug window
-
-	* Add more Order Argument panel types
-		* ARG_ABS_COORD (DONE)
-			* Get the P button to work
-		* ARG_OBJECT (HALF DONE) - Need to fix it
-		* ARG_TIME (DONE)
-		* ARG_RANGE
-		* ARG_PLAYER
-		* ARG_LIST (DONE)
-		* ARG_STRING (DONE)
-
-	* Get order save to work :) (DONE)
-	
-	* Add ships to the StarMap (DONE)
-		* Need to make sure i don't draw orbiting starships (DONE)
-	* Let a person unselect an order so they can insert a position 0 (DONE ???)
-
-	* Put up screenshots on www.thousandparsec.net (DONE)
-	* Put more screenshots on www.thousandparsec.net (DONE)
-
-	* Tool tips on orders arguments (and other stuff)
-		* Argument Panels (DONE)
-		* Order List Items (DONE)
-		* Order Type Items (DONE - as far as wx will let me)
-	* Allow tooltips to be disabled in the config
-	
-	* Right Click on orders lets you insert (DONE)
-		* Right Click copy/paste works (DONE)
-
-	* Better default positioning of windows (DONE)
-		* Have better default position for a wide range of configurations
-
-	* Add starting tips (DONE)
+	* Convert Order Argument panel types to XRC
+	* Put up screenshots on www.thousandparsec.net
+	* Better default positioning of windows 
 	* Allow starting tips to be disabled in the config
-
 	* Stop annoying flicker on save
-
-	* Fixup and cleanup the Config dialog.. (PARTIAL DONE)
-	* Fixup and cleanup the Main dialog...
-
-	* Remove the lang stuff and fix it to use gettext or something (DONE)
+	* Fixup and cleanup the Config dialog
 
 Longer Term
-	* Add a info panel (DONE)
-		* Add data to the info panel (DONE)
-		* Make data in the info panel good looking
+	* Make data in the info panel good looking
 		
-	* Add ship "path" to StarMap (DONE)
-		* Maybe see if we can get antialias lines
-		* Realtime changes?
-
-	* Check time till end of turn (DONE)
-		* Pop-up message when getting close
-		* Reload the Universe cache after turn
-
 	* Add right click pop-up menu to starmap
 		* Include useful options on this menu, Quick add Order?
-		* Mouse wheel should zoom in/out the starmap (DONE)
 		* Left (or right) click and hold for pan?
 
-	* Use non-blocking version of the protocol stack <- Not need?
-
 	* Add option to not use MDI interface under windows
-	* Make the little windows not appear on the task bar (DONE)
-		* Add option to let the above be enabled/disabled
-	
 	* Let the fonts be selected
 	* Fix the default fonts
 
 Longest Term
 	* Check what it looks like under windows / MacOSX
-	* Make the windows dockable on the side of the screen	
