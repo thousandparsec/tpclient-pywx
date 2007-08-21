@@ -207,6 +207,8 @@ class panelPicture(panelPictureBase):
 				images = self.images['star']
 			elif isinstance(object, Planet):
 				images = self.images['planet']
+			elif isinstance(object, Fleet):
+				images = self.images['ship']
 			else:
 				images = {'still': []}
 		except KeyError, e:
