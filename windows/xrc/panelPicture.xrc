@@ -1,98 +1,100 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resource version="2.3.0.1" xmlns="http://www.wxwidgets.org/wxxrc">
-    <object class="wxPanel" name="panelPicture" subclass="Dialog">
-        <exstyle>wxWS_EX_BLOCK_EVENTS</exstyle>
-        <size>400,300</size>
-        <object class="wxFlexGridSizer">
-            <cols>1</cols>
+  <object class="wxPanel" name="panelPicture" subclass="Dialog">
+    <exstyle>wxWS_EX_BLOCK_EVENTS</exstyle>
+    <size>400,300</size>
+    <object class="wxFlexGridSizer">
+      <cols>1</cols>
+      <rows>2</rows>
+      <vgap>0</vgap>
+      <hgap>0</hgap>
+      <growablecols>0</growablecols>
+      <growablerows>1</growablerows>
+      <object class="sizeritem">
+        <flag>wxGROW|wxGROW|wxALL|wxADJUST_MINSIZE</flag>
+        <border>0</border>
+        <object class="wxStaticText" name="Title">
+          <style>wxALIGN_CENTRE|wxST_NO_AUTORESIZE</style>
+          <label>Name goes here</label>
+        </object>
+      </object>
+      <object class="sizeritem">
+        <flag>wxGROW|wxGROW|wxALL</flag>
+        <border>0</border>
+        <object class="wxPanel" name="Background">
+          <size>128,128</size>
+          <style>wxTAB_TRAVERSAL</style>
+          <bg>#000000</bg>
+          <object class="wxBoxSizer">
+            <orient>wxVERTICAL</orient>
+            <object class="sizeritem">
+              <flag>wxALIGN_CENTER_HORIZONTAL|wxALL</flag>
+              <border>0</border>
+              <object class="wxStaticBitmap" name="Static">
+                <size>128,128</size>
+              </object>
+            </object>
+            <object class="sizeritem">
+              <flag>wxALIGN_LEFT|wxALL</flag>
+              <border>0</border>
+              <object class="wxGIFAnimationCtrl" name="Animation">
+                <size>128,128</size>
+                <style>wxNO_BORDER</style>
+                <bg>#000000</bg>
+              </object>
+            </object>
+          </object>
+        </object>
+      </object>
+      <object class="sizeritem">
+        <object class="wxPanel" name="Download">
+          <object class="wxFlexGridSizer">
+            <cols>3</cols>
             <rows>2</rows>
             <vgap>0</vgap>
             <hgap>0</hgap>
             <growablecols>0</growablecols>
-            <growablerows>1</growablerows>
             <object class="sizeritem">
-                <flag>wxGROW|wxGROW|wxALL|wxADJUST_MINSIZE</flag>
-                <border>0</border>
-                <object class="wxStaticText" name="Title">
-                    <style>wxALIGN_CENTRE|wxST_NO_AUTORESIZE</style>
-                    <label>Name goes here</label>
-                </object>
+              <flag>wxALL|wxEXPAND|wxGROW</flag>
+              <border>0</border>
+              <object class="wxGauge" name="Progress">
+                <size>10,10</size>
+                <style>wxGA_HORIZONTAL</style>
+                <value>1</value>
+                <range>100</range>
+              </object>
             </object>
             <object class="sizeritem">
-                <flag>wxGROW|wxGROW|wxALL</flag>
-                <border>0</border>
-                <object class="wxPanel" name="Background">
-                    <size>128,128</size>
-                    <style>wxTAB_TRAVERSAL</style>
-                    <bg>#000000</bg>
-                    <object class="wxBoxSizer">
-                        <orient>wxVERTICAL</orient>
-                        <object class="sizeritem">
-                            <flag>wxALIGN_CENTER_HORIZONTAL|wxALL</flag>
-                            <border>0</border>
-                            <object class="wxStaticBitmap" name="Static">
-                                <size>128,128</size>
-                            </object>
-                        </object>
-                        <object class="sizeritem">
-                            <flag>wxALIGN_LEFT|wxALL</flag>
-                            <border>0</border>
-                            <object class="wxGIFAnimationCtrl" name="Animation">
-                                <size>128,128</size>
-                                <style>wxNO_BORDER</style>
-                                <bg>#000000</bg>
-                            </object>
-                        </object>
-                    </object>
-                </object>
+              <flag>wxGROW|wxGROW|wxLEFT|wxRIGHT|wxADJUST_MINSIZE</flag>
+              <border>3</border>
+              <object class="wxStaticText" name="Speed">
+                <size>-1,10</size>
+                <font>
+                  <size>8</size>
+                  <family>swiss</family>
+                  <face>Sans</face>
+                </font>
+                <label>10kb/s</label>
+              </object>
             </object>
             <object class="sizeritem">
-                <flag>wxGROW|wxGROW|wxALL</flag>
-                <border>5</border>
-                <object class="wxFlexGridSizer">
-                    <cols>3</cols>
-                    <rows>2</rows>
-                    <vgap>0</vgap>
-                    <hgap>0</hgap>
-                    <growablecols>0</growablecols>
-                    <object class="sizeritem">
-                        <flag>wxGROW|wxGROW|wxALL</flag>
-                        <border>0</border>
-                        <object class="wxGauge" name="Progress">
-                            <size>-1,10</size>
-                            <style>wxGA_HORIZONTAL</style>
-                            <value>1</value>
-                            <range>100</range>
-                        </object>
-                    </object>
-                    <object class="sizeritem">
-                        <flag>wxGROW|wxGROW|wxLEFT|wxRIGHT|wxADJUST_MINSIZE</flag>
-                        <border>3</border>
-                        <object class="wxStaticText" name="Speed">
-                            <size>-1,10</size>
-                            <font>
-                                <size>8</size>
-                                <family>swiss</family>
-                                <face>Sans</face>
-                            </font>
-                            <label>10kb/s</label>
-                        </object>
-                    </object>
-                    <object class="sizeritem">
-                        <flag>wxALIGN_RIGHT|wxGROW|wxLEFT|wxRIGHT|wxADJUST_MINSIZE</flag>
-                        <border>3</border>
-                        <object class="wxStaticText" name="ETA">
-                            <size>-1,10</size>
-                            <font>
-                                <size>8</size>
-                                <family>swiss</family>
-                                <face>Sans</face>
-                            </font>
-                            <label>43s</label>
-                        </object>
-                    </object>
-                </object>
+              <flag>wxALIGN_RIGHT|wxGROW|wxLEFT|wxRIGHT|wxADJUST_MINSIZE</flag>
+              <border>3</border>
+              <object class="wxStaticText" name="ETA">
+                <size>-1,10</size>
+                <font>
+                  <size>8</size>
+                  <family>swiss</family>
+                  <face>Sans</face>
+                </font>
+                <label>43s</label>
+              </object>
             </object>
+          </object>
         </object>
+        <flag>wxEXPAND|wxGROW</flag>
+        <border>3</border>
+      </object>
     </object>
+  </object>
 </resource>

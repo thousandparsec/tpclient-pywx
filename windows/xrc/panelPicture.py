@@ -34,6 +34,7 @@ class panelPictureBase(wx.Panel):
 		self.Background = XRCCTRL(self, "Background")
 		self.Static = XRCCTRL(self, "Static")
 		self.Animation = XRCCTRL(self, "Animation")
+		self.Download = XRCCTRL(self, "Download")
 		self.Progress = XRCCTRL(self, "Progress")
 		self.Speed = XRCCTRL(self, "Speed")
 		self.ETA = XRCCTRL(self, "ETA")

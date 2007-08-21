@@ -77,6 +77,8 @@ class panelPicture(panelPictureBase):
 		self.progress = []
 		self.averages = []
 
+		self.OnMediaDownloadDone(None)
+
 	def GetPaneInfo(self):
 		info = wx.aui.AuiPaneInfo()
 		info.MinSize(self.GetBestSize())
@@ -87,7 +89,6 @@ class panelPicture(panelPictureBase):
 	def OnMediaUpdate(self, evt):
 		files = {}
 		for file in evt.files:
-			print '-->', file
 			bits = splitall(file)
 	
 			if bits[-2] in ['animation', 'still']:
@@ -108,27 +109,30 @@ class panelPicture(panelPictureBase):
 		self.images = files
 	
 	def OnMediaDownloadProgress(self, evt):
+		self.Download.Show()
+		self.Layout()
+
 		print "winPicture.MediaDownloadProgress", evt.file
 
 		self.progress.append((time.time(), evt.amount))
 		# Trim off the oldest samples
-		while len(self.progress) > 10:
+		while len(self.progress) > 200:
 			self.progress.pop(0)
 
 		if len(self.progress) < 2:
 			return
 
 		# Calculate an average
-		pt, average = self.progress[0][0], 0
-		for t, s in self.progress[1:]:
-			average += s*1.0/(t-pt)			
-		average /= len(self.progress)-1
+		start, end = self.progress[0][0], self.progress[-1][0]
+		average = sum(zip(*self.progress)[1])/(end-start)
 
 		self.Progress.SetRange(evt.size)
 		self.Progress.SetValue(evt.progress)
 
-		if average < 1e5:
+		if average < 10e3:
 			self.Speed.SetLabel("%.2f kb/s" % (average/1e3))
+		elif average < 1e6:
+			self.Speed.SetLabel("%.0f kb/s" % (average/1e3))
 		else:
 			self.Speed.SetLabel("%.2f mb/s" % (average/1e6))
 
@@ -141,16 +145,21 @@ class panelPicture(panelPictureBase):
 			eta = (int(eta)//60, eta-int(eta)//60*60)
 			self.ETA.SetLabel("%im %is" % eta)
 		else:
-			self.ETA.SetLabel("eta %is" % eta)
+			self.ETA.SetLabel("%is" % eta)
 
-		self.Layout()
+		self.Download.Layout()
 
 	def OnMediaDownloadDone(self, evt):
-		self.Progress.SetRange(evt.size)
-		self.Progress.SetValue(evt.progress)
+		self.Progress.SetRange(0)
+		self.Progress.SetValue(0)
 		self.Speed.SetLabel('')
-		self.Layout()
 		self.ETA.SetLabel('')
+
+		self.Download.Hide()
+		self.Layout()
+
+		if evt is None:
+			return
 
 		print "winInfo.MediaDownloadDone - Finished D", evt.file, evt.localfile
 		print "winInfo.MediaDownloadDone - Waiting On", self.image_waiting
