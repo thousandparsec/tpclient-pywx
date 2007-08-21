@@ -30,6 +30,7 @@ class panelOrderBase(wx.Panel):
 		self.PostCreate(pre)
 
 		# Define variables for the controls
+		self.Master = XRCCTRL(self, "Master")
 		self.Orders = XRCCTRL(self, "Orders")
 		self.Possible = XRCCTRL(self, "Possible")
 		self.New = XRCCTRL(self, "New")

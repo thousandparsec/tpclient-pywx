@@ -323,11 +323,12 @@ class panelOrder(panelOrderBase):
 			self.oid = None
 			self.OnOrderSelect(None)
 			return
-		
-#		if object.order_number == 0 and len(object.order_types) == 0:
-#			self.Hide()
-#		else:
-#			self.Show()
+	
+		if object.order_number == 0 and len(object.order_types) == 0:
+			self.Master.Hide()
+		else:
+			self.Master.Show()
+			self.Master.Layout()
 
 		# We now point to this object
 		self.oid = evt.id 
@@ -344,8 +345,10 @@ class panelOrder(panelOrderBase):
 
 		# Set which orders can be added to this object
 		self.Possible.SetToolTipDefault(_("Order type to create"))
+		print repr(object), object.order_types
 		for type in object.order_types:
 			if not objects.OrderDescs().has_key(type):
+				print "WARNING: Unknown order type with id %s" % type
 				continue
 
 			od = objects.OrderDescs()[type]
@@ -362,7 +365,7 @@ class panelOrder(panelOrderBase):
 			self.Possible.SetSelection(0)
 
 		# Select no orders
-		self.OnOrderSelect(None)
+		self.OnOrderSelect(None, True)
 
 	def OnCacheUpdate(self, evt):
 		"""\
@@ -406,15 +409,22 @@ class panelOrder(panelOrderBase):
 		slots = self.Orders.GetSelected()
 		if self.slots == slots and not force:
 			return
-			
-		if len(slots) > 1:
-			order = _("Multiple orders selected.")
-		elif len(slots) < 1:
-			order = None
-		elif self.oid == None:
+
+		try:
+			object = self.application.cache.objects[self.oid]
+
+			if object.order_number == 0 and len(object.order_types) == 0:
+				order = _("No orders avaliable")
+			elif len(slots) > 1:
+				order = _("Multiple orders selected.")
+			elif len(slots) < 1:
+				order = None
+			else:
+				order = self.Orders.GetItemPyData(slots[0])
+		except KeyError:
 			order = _("No object selected.")
-		else:
-			order = self.Orders.GetItemPyData(slots[0])
+
+		print 'Order!', repr(order)
 
 		self.slots = slots
 		self.BuildPanel(order)
@@ -540,6 +550,8 @@ class panelOrder(panelOrderBase):
 		"""\
 		Builds a panel for the entering of orders arguments.
 		"""
+		print "BuildPanel", type(order), repr(order)
+
 		# Remove the previous panel and stuff
 		if hasattr(self, "ArgumentsPanel"):
 			self.ArgumentsPanel.Hide()
@@ -550,6 +562,7 @@ class panelOrder(panelOrderBase):
 		# Show the details panel
 		self.DetailsPanel.Show()
 		self.Message.SetLabel("")
+		self.Message.Hide()
 
 		if isinstance(order, objects.Order):
 			# Create a new panel
@@ -569,23 +582,22 @@ class panelOrder(panelOrderBase):
 			# List for the argument subpanels
 			self.ArgumentsChildren = []
 				
-			for name, type in orderdesc.names:
+			for name, subtype in orderdesc.names:
 				# Add there name..
 				name_text = wx.StaticText( self.ArgumentsPanel, -1, name.title().replace("_","") )
 				name_text.SetFont(wx.local.normalFont)
 
-
 				# Add the arguments bit
 				namepos = wx.TOP
-				if type == constants.ARG_ABS_COORD:
+				if subtype == constants.ARG_ABS_COORD:
 					subpanel = argCoordPanel( self, self.ArgumentsPanel, getattr(order, name) )
-				elif type == constants.ARG_TIME:
+				elif subtype == constants.ARG_TIME:
 					subpanel = argTimePanel( self, self.ArgumentsPanel, getattr(order, name) )
-				elif type == constants.ARG_OBJECT:
+				elif subtype == constants.ARG_OBJECT:
 					subpanel = argObjectPanel( self, self.ArgumentsPanel, getattr(order, name), self.application.cache )
-				elif type == constants.ARG_LIST:
+				elif subtype == constants.ARG_LIST:
 					subpanel = argListPanel( self, self.ArgumentsPanel, getattr(order, name) )
-				elif type == constants.ARG_STRING:
+				elif subtype == constants.ARG_STRING:
 					namepos = wx.LEFT
 					subpanel = argStringPanel( self, self.ArgumentsPanel, getattr(order, name) )
 				else:
@@ -618,6 +630,7 @@ class panelOrder(panelOrderBase):
 			self.Delete.Show()		
 	
 		elif isinstance(order, (unicode, str)):
+			self.Message.Show()
 			self.Message.SetLabel(order)
 
 			# Hide the Save/Revert buttons
@@ -635,6 +648,7 @@ class panelOrder(panelOrderBase):
 			self.Delete.Hide()
 		
 		self.DetailsPanel.Layout()
+		self.Master.Layout()
 		self.Layout()
 
 	def FromPanel(self, order):
