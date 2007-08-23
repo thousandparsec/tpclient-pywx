@@ -3,6 +3,8 @@
 import os
 import os.path
 import sys
+
+# Ignore warnings when we are a binary
 if hasattr(sys, 'frozen'):
 	import warnings
 	warnings.simplefilter('ignore', DeprecationWarning)
@@ -14,28 +16,19 @@ import wx
 import extra
 
 # Python Imports
-import pprint
-import socket
 import time
 import threading
 import traceback
-from types import *
-
-
 
 # Local imports
-from version import version
-
 import utils
-
-from tp.netlib import Connection, failed, constants
-from tp.client.threads import Application, NetworkThread, MediaThread, FinderThread, ThreadStop, NotImportantEvent
-from tp.client.cache import Cache
-
+from version import version
+from tp.netlib import failed
 
 class ThreadExited(Exception):
 	pass
 
+from tp.client.threads import ThreadStop
 def make(me, thread, method):
 	def t(*args, **kw):
 		if me.reset:
@@ -224,6 +217,7 @@ class GUI(wx.App):
 		self.current.Post(event)
 
 		# If it's not a GUI event also post to all the other windows...
+		from tp.client.threads import NotImportantEvent
 		if not isinstance(event, (wx.PyEvent, NotImportantEvent)):
 			for window in self.windows:
 				if window is self.current:
@@ -267,6 +261,7 @@ class GUI(wx.App):
 			dlg.ShowModal()
 			dlg.Destroy()
 
+from tp.client.threads import NetworkThread
 class Network(NetworkThread):
 	def ConnectTo(self, host, username, password, debug=False):
 		"""\
@@ -300,6 +295,8 @@ class Network(NetworkThread):
 		NetworkThread.CacheUpdate(self, up)
 		up("finishing", "finished", "")
 
+		self.EOTUpdate()
+
 	def EOTUpdate(self):
 		# FIXME: This should go away...
 		# FIXME: This is bad :/
@@ -310,10 +307,25 @@ class Network(NetworkThread):
 			return
 		gui.Call( gui.main.statusbar.SetEndTime, timeRemaining)
 
-_Application = Application
-class Application(_Application):
+from tp.client.threads import Application as ClientApplication
+class Application(ClientApplication):
+	# We used custom GUI and Network threads
+	GUIClass = GUI
+	NetworkClass = Network
+
+	# We just use the default threads from libtpclient-py
+	from tp.client.threads import MediaThread, FinderThread
+	MediaClass = MediaThread
+	FinderClass = FinderThread
+
+	ConfigFile = "pywx_preferences"
+
 	def __init__(self, url=None):
-		_Application.__init__(self)
+		# self.gui       is initialised from this Application.GUIClass
+		# self.network   is initialised from this Application.NetworkClass
+		# self.media     is initialised from this Application.MediaClass
+		# self.finder    is initialised from this Application.FinderClass
+		ClientApplication.__init__(self)
 		if url != None:
 			self.gui.connectto.ShowURL(url)		
 
@@ -322,19 +334,13 @@ class Application(_Application):
 		Set the application running.
 		"""
 		self.gui.Show(self.gui.connectto)
-		_Application.Run(self)
+		ClientApplication.Run(self)
 
 	def ConfigDisplay(self):
 		"""\
 		Pop-up the configuration window.
 		"""
 		self.gui.ConfigDisplay()
-
-	GUIClass = GUI
-	NetworkClass = Network
-	MediaClass = MediaThread
-	FinderClass = FinderThread
-	ConfigFile = "pywx_preferences"
 
 if __name__ == '__main__':
 	try:
