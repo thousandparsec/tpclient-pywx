@@ -26,7 +26,7 @@ class GenericIcon(Group):
 	Unowned   = "White"
 	Contested = "Yellow"
 
-	PrimarySize = 4
+	PrimarySize = 3
 	ChildSize   = 3
 
 	def __init__(self, pos, type, children=[]):
@@ -82,34 +82,45 @@ def FindOwners(cache, obj):
 		owners.add(owner)
 	return owners
 
+def OwnerColor(pid, owners):
+	"""
+
+	"""
+	type = (GenericIcon.Unowned, GenericIcon.Enemy)[len(owners)>0]
+	if pid in owners:
+		type = (GenericIcon.Friendly, GenericIcon.Contested)[len(owners)>1]
+
+	return type
+
 from Overlay import Overlay
 
-class TestPopup(wx.PopupWindow):
+from wx.lib.fancytext import StaticFancyText
+class NamePopup(wx.PopupWindow):
+	Padding = 2
+
 	def __init__(self, parent, style):
 		wx.PopupWindow.__init__(self, parent, style)
 		self.SetBackgroundColour("CADET BLUE")
 
-		st = wx.StaticText(self, -1,
-						  "This is a special kind of top level\n"
-						  "window that can be used for\n"
-						  "popup menus, combobox popups\n"
-						  "and such.\n\n"
-						  "Try positioning the demo near\n"
-						  "the bottom of the screen and \n"
-						  "hit the button again.\n\n"
-						  "In this demo this window can\n"
-						  "be dragged with the left button\n"
-						  "and closed with the right."
-						  ,
-						  pos=(10,10))
-
-		sz = st.GetBestSize()
-		self.SetSize( (sz.width+20, sz.height+20) )
-
 		wx.CallAfter(self.Refresh)
+
+	def SetText(self, text):
+		try:
+			self.st.Destroy()
+		except AttributeError:
+			pass
+
+		self.st = StaticFancyText(self, -1, text, pos=(self.Padding, self.Padding))
+		sz = self.st.GetSize()
+		self.SetSize( (sz.width+2*self.Padding, sz.height+2*self.Padding) )
 
 class Systems(Overlay):
 	toplevel = Galaxy, Universe
+
+	def __init__(self, *args, **kw):
+		Overlay.__init__(self, *args, **kw)
+
+		self.PopupText = NamePopup(self.canvas, wx.SIMPLE_BORDER)
 
 	def updateone(self, oid):
 		"""\
@@ -127,16 +138,12 @@ class Systems(Overlay):
 			return
 
 		types = []
-		for child in [obj.id]+FindChildren(self.cache, obj):
-			owners = FindOwners(self.cache, self.cache.objects[child])
+		for cid in [obj.id]+FindChildren(self.cache, obj):
+			cobj = self.cache.objects[cid]
+			types.append(OwnerColor(pid, FindOwners(self.cache, cobj)))
 
-			type = (GenericIcon.Unowned, GenericIcon.Enemy)[len(owners)>0]
-			if pid in owners:
-				type = (GenericIcon.Friendly, GenericIcon.Contested)[len(owners)>1]
-
-			types.append(type)
-
-		self[oid] = GenericIcon(obj.pos[0:2], types[0], types[1:])
+		self[oid]    = GenericIcon(obj.pos[0:2], types[0], types[1:])
+		self[oid].id = oid
 
 		# These pop-up the name of the object
 		# Also do a "preview" event after X seconds
@@ -145,17 +152,30 @@ class Systems(Overlay):
 
 	def SystemEnter(self, obj):
 		print "SystemEnter", obj
+		pid = self.cache.players[0].id
 
-		win = TestPopup(self.canvas, wx.SIMPLE_BORDER)
 		screen = self.canvas.WorldToPixel(obj.XY)
 		pos	= self.canvas.ClientToScreen( screen )
-		win.Position(pos, (GenericIcon.PrimarySize, GenericIcon.PrimarySize))
-		win.Show(True)
 
-		self.win = win
+		# Build the string
+		s = "<font size='%s'>" % wx.local.tinyFont.GetPointSize()
+		for cid in [obj.id]+FindChildren(self.cache, self.cache.objects[obj.id]):
+			cobj = self.cache.objects[cid]
+
+			type = OwnerColor(pid, FindOwners(self.cache, cobj))
+			s += "<font color='%s'>%s" % (type, cobj.name)
+			if isinstance(cobj, Fleet):
+				for shipid, amount in cobj.ships:
+					s+= "\n  %s %ss" % (amount, self.cache.designs[shipid].name)
+			s += "</font>\n"
+
+		s = s[:-1]+"</font>"
+
+		self.PopupText.SetText(s)
+		self.PopupText.Position(pos, (GenericIcon.PrimarySize, GenericIcon.PrimarySize))
+		self.PopupText.Show(True)
 
 	def SystemLeave(self, evt):
 		print "SystemLeave", evt
 
-		self.win.Hide()
-		del self.win
+		self.PopupText.Hide()
