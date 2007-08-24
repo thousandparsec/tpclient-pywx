@@ -4,16 +4,8 @@ A Panel that includes the FloatCanvas and Navigation controls
 """
 
 import wx
-#import GUIMode
 import FloatCanvas, Resources
 
-#~ ID_ZOOM_IN_BUTTON = wx.NewId()
-#~ ID_ZOOM_OUT_BUTTON = wx.NewId()
-#~ ID_MOVE_MODE_BUTTON = wx.NewId()
-#~ ID_POINTER_BUTTON = wx.NewId()
-
-
-#---------------------------------------------------------------------------
 
 class NavCanvas(wx.Panel):
     """
@@ -21,16 +13,6 @@ class NavCanvas(wx.Panel):
 
     This is a high level window that encloses the FloatCanvas in a panel
     and adds a Navigation toolbar.
-
-    Copyright: Christopher Barker
-
-    License: Same as the version of wxPython you are using it with
-
-    Please let me know if you're using this!!!
-
-    Contact me at:
-
-    Chris.Barker@noaa.gov
 
     """
 
@@ -51,6 +33,7 @@ class NavCanvas(wx.Panel):
 
         self.SetSizerAndFit(box)
 
+
         import GUIMode # here so that it doesn't get imported before wx.App()
         self.GUIZoomIn  =  GUIMode.GUIZoomIn(self.Canvas)
         self.GUIZoomOut =  GUIMode.GUIZoomOut(self.Canvas)
@@ -58,8 +41,7 @@ class NavCanvas(wx.Panel):
         self.GUIMouse   =  GUIMode.GUIMouse(self.Canvas)
 
         # default to Mouse mode
-        #self.ToolBar.ToggleTool(ID_POINTER_BUTTON, 1)
-        #self.ToolBar.ToggleTool(self.PointerTool.GetId(), True)
+        self.ToolBar.ToggleTool(self.PointerTool.GetId(), True)
         self.Canvas.SetMode(self.GUIMouse)
 
         return None
@@ -67,7 +49,6 @@ class NavCanvas(wx.Panel):
     def BuildToolbar(self):
         tb = wx.ToolBar(self)
         self.ToolBar = tb
-
         tb.SetToolBitmapSize((24,24))
 
         self.PointerTool = tb.AddRadioTool(wx.ID_ANY, bitmap=Resources.getPointerBitmap(), shortHelp = "Pointer")
@@ -89,14 +70,22 @@ class NavCanvas(wx.Panel):
         self.ZoomButton.Bind(wx.EVT_BUTTON, self.ZoomToFit)
 
         tb.Realize()
-        # fixme: why was this there is it needed on some platfroms?
-        #S = tb.GetSize()
-        #tb.SetSizeHints(*S)#[0],S[1])
+        ## fixme: remove this when the bug is fixed!
+        wx.CallAfter(self.HideShowHack) # this required on wxPython 2.8.3 on OS-X
+
         return tb
+
+    def HideShowHack(self):
+        ##fixme: remove this when the bug is fixed!
+        """
+        Hack to hide and show button on toolbar to get around OS-X bug on
+        wxPython2.8 on OS-X
+        """
+        self.ZoomButton.Hide()
+        self.ZoomButton.Show()
 
     def SetMode(self, Mode):
         self.Canvas.SetMode(Mode)
-
 
     def ZoomToFit(self,Event):
         self.Canvas.ZoomToBB()

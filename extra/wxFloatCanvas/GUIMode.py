@@ -12,7 +12,8 @@ version of the code.
 """
 
 import wx
-## fixme: events should live in there own module,so FloatCanvas wouldn't have to be imported here.
+## fixme: events should live in their own module, so all of FloatCanvas
+##        wouldn't have to be imported here.
 import FloatCanvas, Resources
 import numpy as N
 
@@ -60,34 +61,24 @@ class GUIBase:
     # Handlers
     def OnLeftDown(self, event):
         pass
-
     def OnLeftUp(self, event):
         pass
-
     def OnLeftDouble(self, event):
         pass
-
     def OnRightDown(self, event):
         pass
-
     def OnRightUp(self, event):
         pass
-
     def OnRightDouble(self, event):
         pass
-
     def OnMiddleDown(self, event):
         pass
-
     def OnMiddleUp(self, event):
         pass
-
     def OnMiddleDouble(self, event):
         pass
-
     def OnWheel(self, event):
         pass
-
     def OnMove(self, event):
         pass
             
@@ -168,7 +159,6 @@ class GUIMove(GUIBase):
 
     Cursor = HandCursor
     GrabCursor = GrabHandCursor
-
     def __init__(self, parent):
         GUIBase.__init__(self, parent)
         self.StartMove = None
@@ -250,6 +240,9 @@ class GUIMove(GUIBase):
             dc.EndDrawing()
 
     def OnWheel(self, event):
+        """
+           By default, zoom in/out by a 0.1 factor per Wheel event.
+        """
         if event.GetWheelRotation() < 0:
             self.parent.Zoom(0.9)
         else:

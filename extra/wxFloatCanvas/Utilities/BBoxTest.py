@@ -21,7 +21,7 @@ class testCreator(unittest.TestCase):
 
     def testDataType(self):
         B = BBox(((0,0),(5,5)))
-        self.failUnless(B.dtype == N.dtype('<f8'))
+        self.failUnless(B.dtype == N.float)
 
     def testShape(self):
         B = BBox((0,0,5,5))
@@ -336,6 +336,52 @@ class testMerge(unittest.TestCase):
         A = self.A.copy()
         A.Merge(self.D)
         self.failUnless(A[0] == self.D[0] and A[1] == self.A[1])
+
+class testWidthHeight(unittest.TestCase):
+    B = BBox( ( (1.0, 2.0), (5.0, 10.0) ) )
+    def testWidth(self):
+        self.failUnless(self.B.Width == 4.0)
+
+    def testWidth(self):
+        self.failUnless(self.B.Height == 8.0)
+
+    def attemptSetWidth(self):
+        self.B.Width = 6
+
+    def attemptSetHeight(self):
+        self.B.Height = 6
+
+    def testSetW(self):
+        self.failUnlessRaises(AttributeError, self.attemptSetWidth)
+        
+    def testSetH(self):
+        self.failUnlessRaises(AttributeError, self.attemptSetHeight)
+        
+class testCenter(unittest.TestCase):
+    B = BBox( ( (1.0, 2.0), (5.0, 10.0) ) )
+    def testCenter(self):
+        print self.B.Center 
+        self.failUnless( (self.B.Center == (3.0, 6.0)).all() )
+
+    def attemptSetCenter(self):
+        self.B.Center = (6, 5)
+
+    def testSetCenter(self):
+        self.failUnlessRaises(AttributeError, self.attemptSetCenter)
+        
+
+class testBBarray(unittest.TestCase):
+    BBarray = N.array( ( ((-23.5, 456), (56, 532.0)),
+                         ((-20.3, 460), (54, 465  )),
+                         ((-23.5, 456), (58, 540.0)),
+                         ((-26.5,  12), (56, 532.0)),
+                       ),
+                       dtype=N.float)
+    BB = asBBox( ((-26.5,  12.), ( 58. , 540.)) )
+
+    def testJoin(self):
+        BB = fromBBArray(self.BBarray)
+        self.failUnless(BB == self.BB, "Wrong BB was created. It was:\n%s \nit should have been:\n%s"%(BB, self.BB))
 
 
 if __name__ == "__main__":
