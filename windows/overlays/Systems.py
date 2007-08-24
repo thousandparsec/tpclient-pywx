@@ -11,6 +11,8 @@ import wx
 from extra.wxFloatCanvas.FloatCanvas import Point, Group
 from extra.wxFloatCanvas.RelativePoint import RelativePoint, RelativePointSet
 
+from extra.wxFloatCanvas.FloatCanvas import EVT_FC_ENTER_OBJECT, EVT_FC_LEAVE_OBJECT
+
 # tp imports
 from tp.netlib.objects.ObjectExtra.Galaxy import Galaxy
 from tp.netlib.objects.ObjectExtra.Universe import Universe
@@ -47,6 +49,13 @@ class GenericIcon(Group):
 
 		Group.__init__(self, ObjectList, True)
 
+	def XY(self):
+		return self.ObjectList[0].XY
+	XY = property(XY)
+
+class FleetIcon(Group):
+	pass
+
 def FindChildren(cache, obj):
 	"""
 	Figure out all the children of this object.
@@ -73,8 +82,33 @@ def FindOwners(cache, obj):
 		owners.add(owner)
 	return owners
 
-from Value import Value
-class Systems(Value):
+from Overlay import Overlay
+
+class TestPopup(wx.PopupWindow):
+	def __init__(self, parent, style):
+		wx.PopupWindow.__init__(self, parent, style)
+		self.SetBackgroundColour("CADET BLUE")
+
+		st = wx.StaticText(self, -1,
+						  "This is a special kind of top level\n"
+						  "window that can be used for\n"
+						  "popup menus, combobox popups\n"
+						  "and such.\n\n"
+						  "Try positioning the demo near\n"
+						  "the bottom of the screen and \n"
+						  "hit the button again.\n\n"
+						  "In this demo this window can\n"
+						  "be dragged with the left button\n"
+						  "and closed with the right."
+						  ,
+						  pos=(10,10))
+
+		sz = st.GetBestSize()
+		self.SetSize( (sz.width+20, sz.height+20) )
+
+		wx.CallAfter(self.Refresh)
+
+class Systems(Overlay):
 	toplevel = Galaxy, Universe
 
 	def updateone(self, oid):
@@ -92,21 +126,36 @@ class Systems(Value):
 		if not isinstance(parent, Systems.toplevel):
 			return
 
-		
-		owners = FindOwners(self.cache, obj)
-		type = (GenericIcon.Unowned, GenericIcon.Enemy)[len(owners)>0]
-		if pid in owners:
-			type = (GenericIcon.Friendly, GenericIcon.Contested)[len(owners)>1]
-
-		childtypes = []
-		for child in FindChildren(self.cache, obj):
+		types = []
+		for child in [obj.id]+FindChildren(self.cache, obj):
 			owners = FindOwners(self.cache, self.cache.objects[child])
 
-			childtype = (GenericIcon.Unowned, GenericIcon.Enemy)[len(owners)>0]
+			type = (GenericIcon.Unowned, GenericIcon.Enemy)[len(owners)>0]
 			if pid in owners:
-				childtype = (GenericIcon.Friendly, GenericIcon.Contested)[len(owners)>1]
+				type = (GenericIcon.Friendly, GenericIcon.Contested)[len(owners)>1]
 
-			childtypes.append(childtype)
+			types.append(type)
 
-		self[oid] = GenericIcon(obj.pos[0:2], type, childtypes)
+		self[oid] = GenericIcon(obj.pos[0:2], types[0], types[1:])
 
+		# These pop-up the name of the object
+		# Also do a "preview" event after X seconds
+		self[oid].Bind(EVT_FC_ENTER_OBJECT, self.SystemEnter)
+		self[oid].Bind(EVT_FC_LEAVE_OBJECT, self.SystemLeave)
+
+	def SystemEnter(self, obj):
+		print "SystemEnter", obj
+
+		win = TestPopup(self.canvas, wx.SIMPLE_BORDER)
+		screen = self.canvas.WorldToPixel(obj.XY)
+		pos	= self.canvas.ClientToScreen( screen )
+		win.Position(pos, (GenericIcon.PrimarySize, GenericIcon.PrimarySize))
+		win.Show(True)
+
+		self.win = win
+
+	def SystemLeave(self, evt):
+		print "SystemLeave", evt
+
+		self.win.Hide()
+		del self.win

@@ -66,11 +66,10 @@ class panelStarMap(wx.Panel):
 		self.StarMap.ZoomToFit(None)
 		self.Canvas = self.StarMap.Canvas
 
-#		self.Canvas = FloatCanvas.FloatCanvas(self, BackgroundColor="black")
 		self.Overlays = []
 
 		self.Bind(wx.EVT_SIZE, self.OnSize)
-#		self.Bind(wx.EVT_ACTIVATE, self.OnShow)
+		self.Bind(wx.EVT_ACTIVATE, self.OnShow)
 
 	def GetPaneInfo(self):
 		info = wx.aui.AuiPaneInfo()

@@ -72,7 +72,10 @@ class Overlay(dict):
 		"""\
 		Updates all objects on the Canvas.
 		"""
-		pass
+		# Remove all the objects.
+		self.cleanup()
+		for oid in self.cache.objects.keys():
+			self.updateone(oid)
 
 	def updateone(self, oid):
 		"""\
