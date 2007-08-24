@@ -12,6 +12,7 @@ from extra.wxFloatCanvas.FloatCanvas import Point, Group
 from extra.wxFloatCanvas.RelativePoint import RelativePoint, RelativePointSet
 
 from extra.wxFloatCanvas.FloatCanvas import EVT_FC_ENTER_OBJECT, EVT_FC_LEAVE_OBJECT
+from extra.wxFloatCanvas.FloatCanvas import EVT_FC_LEFT_UP, EVT_FC_RIGHT_UP
 
 # tp imports
 from tp.netlib.objects.ObjectExtra.Galaxy import Galaxy
@@ -33,25 +34,27 @@ class GenericIcon(Group):
 		ObjectList = []
 
 		# The center Point
-		ObjectList.append(Point(pos, type, self.PrimarySize, True))
+		ObjectList.append(Point(pos, type, self.PrimarySize, False))
 
 		if len(children) > 0:
 			# The orbit bits
 			ObjectList.insert(0, Point(pos, "Black", 8))
-			ObjectList.insert(0, Point(pos, "Grey",  9, True))
+			ObjectList.insert(0, Point(pos, "Grey",  9, False))
 	
 			# The orbiting children
 			for i, childtype in enumerate(children):
-				angle = ((2.0*pi)/len(children))*(i-0.125)
-				offset = (int(cos(angle)*6), int(sin(angle)*6))
+				ObjectList.append(RelativePoint(pos, childtype, self.ChildSize, False, 
+									self.ChildOffset(i, len(children))))
 
-				ObjectList.append(RelativePoint(pos, childtype, self.ChildSize, True, offset))
-
-		Group.__init__(self, ObjectList, True)
+		Group.__init__(self, ObjectList, False)
 
 	def XY(self):
 		return self.ObjectList[0].XY
 	XY = property(XY)
+
+	def ChildOffset(self, i, num):
+		angle = ((2.0*pi)/num)*(i-0.125)
+		return (int(cos(angle)*6), int(sin(angle)*6))
 
 class FleetIcon(Group):
 	pass
@@ -94,30 +97,30 @@ def OwnerColor(pid, owners):
 
 from Overlay import Overlay
 
+if wx.Platform == '__WXMAC__':
+	class FakePopupWindow(wx.Frame):
+		def __init__(self, parent, style):
+			wx.Frame.__init__(self, parent, style = wx.NO_BORDER | wx.FRAME_NO_TASKBAR | wx.STAY_ON_TOP)
+			self.Panel = wx.Panel(self)
+
+		def Position(self, position, size):
+			self.Move((position[0]+size[0], position[1]+size[1]))
+
+		def SetBackgroundColour(self, colour):
+			self.Panel.SetBackgroundColour(colour)
+
+		def me(self):
+			return self.Panel
+		me = property(me)
+
+	PopupWindow = FakePopupWindow
+else:
+	class PopupWindow(wx.PopupWindow):
+		def me(self):
+			return self
+		me = property(me)
+
 from wx.lib.fancytext import StaticFancyText
-
-class FakePopupWindow(wx.Frame):
-	def __init__(self, parent, style):
-		wx.Frame.__init__(self, parent, style = wx.NO_BORDER | wx.FRAME_NO_TASKBAR | wx.STAY_ON_TOP)
-		self.Panel = wx.Panel(self)
-
-	def Position(self, position, size):
-		self.Move((position[0]+size[0], position[1]+size[1]))
-
-	def SetBackgroundColour(self, colour):
-		self.Panel.SetBackgroundColour(colour)
-
-	def me(self):
-		return self.Panel
-	me = property(me)
-
-class PopupWindow(wx.PopupWindow):
-	def me(self):
-		return self
-	me = property(me)
-
-PopupWindow = FakePopupWindow
-
 class NamePopup(PopupWindow):
 	Padding = 2
 
@@ -149,7 +152,15 @@ class Systems(Overlay):
 		Overlay.__init__(self, *args, **kw)
 
 		self.canvas.SetCursor(wx.StockCursor(wx.CURSOR_RIGHT_ARROW))
+		self.current = [None, 0]
+
 		self.PopupText = NamePopup(self.canvas, wx.SIMPLE_BORDER)
+
+	def updateall(self):
+		Overlay.updateall(self)
+
+		from extra.wxFloatCanvas.Arrow import Arrow
+		self['arrow'] = Arrow((0,0), "Red", True)
 
 	def updateone(self, oid):
 		"""\
@@ -178,6 +189,30 @@ class Systems(Overlay):
 		# Also do a "preview" event after X seconds
 		self[oid].Bind(EVT_FC_ENTER_OBJECT, self.SystemEnter)
 		self[oid].Bind(EVT_FC_LEAVE_OBJECT, self.SystemLeave)
+		self[oid].Bind(EVT_FC_LEFT_UP, self.SystemLeftClick)
+
+	def SystemLeftClick(self, obj):
+		print "SystemClick", obj
+
+		# Cycle throught the children on each click
+		choices = [obj.id] + FindChildren(self.cache, self.cache.objects[obj.id])
+
+		if self.current[0] == obj.id:
+			self.current[1] = (self.current[1]+1) % len(choices)
+		else:
+			self.current = [obj.id, 0]
+
+		rid = choices[self.current[1]]
+		
+		self['arrow'].SetPoint(self.cache.objects[obj.id].pos[0:2])
+		self['arrow'].SetOffset((0,0))
+		if self.current[1] > 0:
+			self['arrow'].SetOffset(obj.ChildOffset(self.current[1], len(choices)-1))
+
+		self.canvas.Draw(True)
+
+		self.SystemLeave(obj)
+		self.SystemEnter(obj)
 
 	def SystemEnter(self, obj):
 		print "SystemEnter", obj
@@ -188,11 +223,16 @@ class Systems(Overlay):
 
 		# Build the string
 		s = "<font size='%s'>" % wx.local.normalFont.GetPointSize()
-		for cid in [obj.id]+FindChildren(self.cache, self.cache.objects[obj.id]):
+		for i, cid in enumerate([obj.id]+FindChildren(self.cache, self.cache.objects[obj.id])):
 			cobj = self.cache.objects[cid]
 
+			style = 'normal'
+			if [obj.id, i] == self.current:
+				style = 'italic'
+
 			type = OwnerColor(pid, FindOwners(self.cache, cobj))
-			s += "<font color='%s'>%s" % (type, cobj.name)
+
+			s += "<font style='%s' color='%s'>%s" % (style, type, cobj.name)
 			if isinstance(cobj, Fleet):
 				for shipid, amount in cobj.ships:
 					s+= "\n  %s %ss" % (amount, self.cache.designs[shipid].name)
