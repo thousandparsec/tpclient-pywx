@@ -99,13 +99,15 @@ class NamePopup(wx.PopupWindow):
 	Padding = 2
 
 	def __init__(self, parent, style):
+		self.parent = parent
 		wx.PopupWindow.__init__(self, parent, style)
 		self.SetBackgroundColour("CADET BLUE")
 
-		wx.CallAfter(self.Refresh)
+		self.Bind(wx.EVT_MOTION, parent.MotionEvent)
 
 	def SetText(self, text):
 		try:
+			self.st.Unbind(wx.EVT_MOTION)
 			self.st.Destroy()
 		except AttributeError:
 			pass
@@ -114,9 +116,7 @@ class NamePopup(wx.PopupWindow):
 		sz = self.st.GetSize()
 		self.SetSize( (sz.width+2*self.Padding, sz.height+2*self.Padding) )
 
-#	def Position(self, pos, offset):
-#		sz = self.st.GetSize()
-#		wx.PopupWindow.Position(self, pos, (0,0))
+		self.st.Bind(wx.EVT_MOTION, self.parent.MotionEvent)
 
 class Systems(Overlay):
 	toplevel = Galaxy, Universe
@@ -179,6 +179,8 @@ class Systems(Overlay):
 		self.PopupText.SetText(s)
 		self.PopupText.Position(pos, (GenericIcon.PrimarySize, GenericIcon.PrimarySize))
 		self.PopupText.Show(True)
+
+	
 
 	def SystemLeave(self, evt):
 		print "SystemLeave", evt
