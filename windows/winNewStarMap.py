@@ -22,6 +22,14 @@ from utils import *
 
 # FIXME: Float canvas has problems with the large sizes (when zoomed into planet level)
 # We should fix this by doing some prescaling...
+ 
+
+if False:
+	"""
+	When a mouse hovers over an object,
+		- Display the "paths" of each child
+		- Display a quick box with details about the object
+	"""
 
 class StarMapCanvas(NavCanvas):
 	def BuildToolbar(self):
@@ -79,7 +87,6 @@ class panelStarMap(wx.Panel):
 		self.StarMap.SetSize(self.GetClientSize())
 #		self.Canvas.OnSize(evt)
 		self.Canvas.ZoomToBB()
-#		self.Canvas.ZoomToBB()
 
 	def OnCacheUpdate(self, evt):
 		"""\
@@ -106,3 +113,6 @@ class panelStarMap(wx.Panel):
 		Called when the order has been updated but not yet saved.
 		"""
 		pass
+
+
+

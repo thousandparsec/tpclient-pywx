@@ -8,76 +8,75 @@ import numpy as N
 
 # wxPython imports
 import wx
-from extra.wxFloatCanvas.FloatCanvas	import Circle, Point
-from extra.wxFloatCanvas.RelativePoint 	import RelativePoint
-from extra.wxFloatCanvas.Icon 			import Icon
+from extra.wxFloatCanvas.FloatCanvas import Point, Group
+from extra.wxFloatCanvas.RelativePoint import RelativePoint, RelativePointSet
 
 # tp imports
+from tp.netlib.objects.ObjectExtra.Galaxy import Galaxy
+from tp.netlib.objects.ObjectExtra.Universe import Universe
 from tp.netlib.objects.ObjectExtra.StarSystem import StarSystem
 from tp.netlib.objects.ObjectExtra.Planet import Planet
 from tp.netlib.objects.ObjectExtra.Fleet import Fleet
 
-class PlanetIcon(Icon):
-	MinSize = 2
+class GenericIcon(Group):
+	Friendly  = "Green"
+	Enemy     = "Red"
+	Unowned   = "White"
+	Contested = "Yellow"
 
-	Friendly 	= "Green"
-	Enemy 		= "Red"
-	Unowned		= "Blue"
+	PrimarySize = 4
+	ChildSize   = 3
 
-	def __init__(self, planet, type):
-		Icon.__init__(self, planet.pos[0:2])
+	def __init__(self, pos, type, children=[]):
+		ObjectList = []
 
-		self.type = type
-		self.planet = planet
+		# The center Point
+		ObjectList.append(Point(pos, type, self.PrimarySize, True))
 
-	def SetCenter(self, center):
-		# Create the subicon
-		self.subicon.append(RelativePoint(center, self.type, 3))
+		if len(children) > 0:
+			# The orbit bits
+			ObjectList.insert(0, Point(pos, "Black", 8))
+			ObjectList.insert(0, Point(pos, "Grey",  9, True))
+	
+			# The orbiting children
+			for i, childtype in enumerate(children):
+				angle = ((2.0*pi)/len(children))*(i-0.125)
+				offset = (int(cos(angle)*6), int(sin(angle)*6))
 
-		# Figure out the "orbit"
-		diameter = 2*sqrt((self.XY[0]-center[0])**2 + (self.XY[1]-center[1])**2)
+				ObjectList.append(RelativePoint(pos, childtype, self.ChildSize, True, offset))
 
-		# The actual planet (FIXME: *1000 shouldn't be needed...)
-		self.real.append(Circle(self.XY, self.planet.size*100, LineColor=self.type, FillColor=self.type))
-		self.real.append(Circle(center, diameter, LineColor="Grey"))
+		Group.__init__(self, ObjectList, True)
 
-		# The icon mode of the planet
-		self.icon.append(Point(self.planet.pos[0:2], self.type, 2))
-		self.icon.append(Circle(center, diameter, LineColor="Grey"))
-
-class SystemIcon(Icon):
+def FindChildren(cache, obj):
 	"""
-	An object which can only become so small before it reverts to "Icon" form.
+	Figure out all the children of this object.
 	"""
-	MinSize = 8
+	kids = set()
+	for child in obj.contains:
+		kids.update(FindChildren(cache, cache.objects[child]))
+		kids.add(child)
 
-	Contested 	= "Yellow"
-	Friendly 	= "Green"
-	Enemy 		= "Red"
-	Unowned 	= "Blue"
+	return list(kids)
 
-	def __init__(self, starsystem, type):
-		Icon.__init__(self, starsystem.pos[0:2])
+def FindOwners(cache, obj):
+	"""
+	Figure out the owners of this object (and it's children).
+	"""
+	owners = set()
+	for child in [obj.id]+FindChildren(cache, obj):
+		if not hasattr(cache.objects[child], 'owner'):
+			continue
 
-		self.children = []
-
-		# Icon form consists of a central point, plus a circle plus a bunch of planet points
-		self.icon = []
-		self.icon.append(Point(starsystem.pos[0:2], type, 4))
-
-		self.real = []
-		self.real.append(Circle(starsystem.pos[0:2], starsystem.size, LineColor=type))
-
-	def AddChild(self, child):
-		# If this is the first child, add the orbit indicater
-		if len(self.children) == 0:
-			self.icon.insert(0, Point(self.XY, "Black", 8))
-			self.icon.insert(0, Point(self.XY, "Grey", 9))
-
-		Icon.AddChild(self, child)
+		owner = cache.objects[child].owner
+		if owner in (0, -1):
+			continue
+		owners.add(owner)
+	return owners
 
 from Value import Value
 class Systems(Value):
+	toplevel = Galaxy, Universe
+
 	def updateone(self, oid):
 		"""\
 
@@ -85,45 +84,29 @@ class Systems(Value):
 		pid = self.cache.players[0].id
 		obj = self.cache.objects[oid]
 
-		if isinstance(obj, StarSystem):
-			def pin(obj, cache=self.cache):
-				# Figure out the owners of the system
-				owners = set()
-				for child in obj.contains:
-					if not hasattr(cache.objects[child], 'owner'):
-						continue
+		# Only draw top level objects
+		if isinstance(obj, Systems.toplevel):
+			return
 
-					owner = cache.objects[child].owner
-					if owner in (0, -1):
-						continue
-					owners.add(owner)
+		parent = self.cache.objects[obj.parent]
+		if not isinstance(parent, Systems.toplevel):
+			return
 
-				print repr(obj), pid, owners,
+		
+		owners = FindOwners(self.cache, obj)
+		type = (GenericIcon.Unowned, GenericIcon.Enemy)[len(owners)>0]
+		if pid in owners:
+			type = (GenericIcon.Friendly, GenericIcon.Contested)[len(owners)>1]
 
-				if isinstance(obj, (Planet, Fleet)):
-					print obj.owner
-					if obj.owner in (-1, 0):
-						o = PlanetIcon(obj, PlanetIcon.Unowned)
-					else:
-						o = PlanetIcon(obj, (PlanetIcon.Enemy, PlanetIcon.Friendly)[obj.owner == pid])
+		childtypes = []
+		for child in FindChildren(self.cache, obj):
+			owners = FindOwners(self.cache, self.cache.objects[child])
 
-				if isinstance(obj, (StarSystem,)):
-					print
-					if pid in owners:
-						o = SystemIcon(obj, (SystemIcon.Friendly, SystemIcon.Contested)[len(owners)>1])
-					else:
-						o = SystemIcon(obj, (SystemIcon.Unowned, SystemIcon.Enemy)[len(owners)>0])
+			childtype = (GenericIcon.Unowned, GenericIcon.Enemy)[len(owners)>0]
+			if pid in owners:
+				childtype = (GenericIcon.Friendly, GenericIcon.Contested)[len(owners)>1]
 
-				for child in obj.contains:
-					r = pin(cache.objects[child])
-					if r == None:
-						continue
+			childtypes.append(childtype)
 
-					if hasattr(o, "AddChild"):
-						o.AddChild(r)
-
-				return o
-
-			self[oid] = pin(obj)
-
+		self[oid] = GenericIcon(obj.pos[0:2], type, childtypes)
 
