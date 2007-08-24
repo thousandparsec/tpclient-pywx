@@ -95,14 +95,38 @@ def OwnerColor(pid, owners):
 from Overlay import Overlay
 
 from wx.lib.fancytext import StaticFancyText
-class NamePopup(wx.PopupWindow):
+
+class FakePopupWindow(wx.Frame):
+	def __init__(self, parent, style):
+		wx.Frame.__init__(self, parent, style = wx.NO_BORDER | wx.FRAME_NO_TASKBAR | wx.STAY_ON_TOP)
+		self.Panel = wx.Panel(self)
+
+	def Position(self, position, size):
+		self.Move((position[0]+size[0], position[1]+size[1]))
+
+	def SetBackgroundColour(self, colour):
+		self.Panel.SetBackgroundColour(colour)
+
+	def me(self):
+		return self.Panel
+	me = property(me)
+
+class PopupWindow(wx.PopupWindow):
+	def me(self):
+		return self
+	me = property(me)
+
+PopupWindow = FakePopupWindow
+
+class NamePopup(PopupWindow):
 	Padding = 2
 
 	def __init__(self, parent, style):
-		self.parent = parent
-		wx.PopupWindow.__init__(self, parent, style)
-		self.SetBackgroundColour("CADET BLUE")
+		PopupWindow.__init__(self, parent, style)
 
+		self.parent = parent
+
+		self.SetBackgroundColour("CADET BLUE")
 		self.Bind(wx.EVT_MOTION, parent.MotionEvent)
 
 	def SetText(self, text):
@@ -112,7 +136,7 @@ class NamePopup(wx.PopupWindow):
 		except AttributeError:
 			pass
 
-		self.st = StaticFancyText(self, -1, text, pos=(self.Padding, self.Padding))
+		self.st = StaticFancyText(self.me, -1, text, pos=(self.Padding, self.Padding))
 		sz = self.st.GetSize()
 		self.SetSize( (sz.width+2*self.Padding, sz.height+2*self.Padding) )
 
@@ -179,8 +203,6 @@ class Systems(Overlay):
 		self.PopupText.SetText(s)
 		self.PopupText.Position(pos, (GenericIcon.PrimarySize, GenericIcon.PrimarySize))
 		self.PopupText.Show(True)
-
-	
 
 	def SystemLeave(self, evt):
 		print "SystemLeave", evt
