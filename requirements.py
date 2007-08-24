@@ -47,6 +47,12 @@ def tostr(ver1):
 		s += "."+str(a)
 	return s[1:]
 
+import version
+try:
+	print "My version", version.version_str+'+'+version.version_target_str, "(git %s)" % version.version_git
+except AttributeError:
+	print "My version", version.version_str
+
 try:
 	import numpy
 except ImportError:
@@ -151,7 +157,13 @@ netlib_version = (0, 2, 1)
 try:
 	import tp.netlib
 
-	print "Thousand Parsec Protocol Library Version", tp.netlib.__version__, "(installed at %s)" % tp.netlib.__installpath__
+	print "Thousand Parsec Protocol Library Version", tp.netlib.__version__, "(installed at %s)" % tp.netlib.__installpath__,
+	try:
+		from tp.netlib.version import version_git
+		print "(git %s)" % version_git
+	except ImportError:
+		print
+
 	if not cmp(netlib_version, tp.netlib.__version__):
 		raise ImportError("Thousand Parsec Network Library (libtpproto-py) is to old")
 
@@ -163,7 +175,13 @@ client_version = (0, 2, 99)
 try:
 	import tp.client
 
-	print "Thousand Parsec Client Library Version", tp.client.__version__, "(installed at %s)" % tp.client.__installpath__
+	print "Thousand Parsec Client Library Version", tp.client.__version__, "(installed at %s)" % tp.client.__installpath__,
+	try:
+		from tp.client.version import version_git
+		print "(git %s)" % version_git
+	except ImportError:
+		print
+
 	if not cmp(client_version, tp.client.__version__):
 		raise ImportError("Thousand Parsec Client Library (libtpclient-py) is to old")
 except (ImportError, KeyError), e:
