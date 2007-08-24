@@ -114,12 +114,17 @@ class NamePopup(wx.PopupWindow):
 		sz = self.st.GetSize()
 		self.SetSize( (sz.width+2*self.Padding, sz.height+2*self.Padding) )
 
+#	def Position(self, pos, offset):
+#		sz = self.st.GetSize()
+#		wx.PopupWindow.Position(self, pos, (0,0))
+
 class Systems(Overlay):
 	toplevel = Galaxy, Universe
 
 	def __init__(self, *args, **kw):
 		Overlay.__init__(self, *args, **kw)
 
+		self.canvas.SetCursor(wx.StockCursor(wx.CURSOR_RIGHT_ARROW))
 		self.PopupText = NamePopup(self.canvas, wx.SIMPLE_BORDER)
 
 	def updateone(self, oid):
@@ -158,7 +163,7 @@ class Systems(Overlay):
 		pos	= self.canvas.ClientToScreen( screen )
 
 		# Build the string
-		s = "<font size='%s'>" % wx.local.tinyFont.GetPointSize()
+		s = "<font size='%s'>" % wx.local.normalFont.GetPointSize()
 		for cid in [obj.id]+FindChildren(self.cache, self.cache.objects[obj.id]):
 			cobj = self.cache.objects[cid]
 
