@@ -561,6 +561,15 @@ else:
 
 	wx.PopupWindow = PopupWindow
 
+########################
+# Monkey Patch fancy text so it supports all forms of specifying colors...
+########################
+from wx.lib.fancytext import Renderer
+def getCurrentColor(self):
+		font = self.fonts[-1]
+		return font.get("color", self.defaultColor)
+Renderer.getCurrentColor = getCurrentColor
+
 wx.ListCtrl = wxListCtrl
 wx.Choice = wxChoice
 wx.ComboBox = wxComboBox

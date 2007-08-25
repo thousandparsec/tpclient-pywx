@@ -22,11 +22,6 @@ from tp.netlib.objects.ObjectExtra.Planet import Planet
 from tp.netlib.objects.ObjectExtra.Fleet import Fleet
 
 class GenericIcon(Group):
-	Friendly  = "Green"
-	Enemy     = "Red"
-	Unowned   = "White"
-	Contested = "Yellow"
-
 	PrimarySize = 3
 	ChildSize   = 3
 
@@ -56,26 +51,70 @@ class GenericIcon(Group):
 		angle = ((2.0*pi)/num)*(i-0.125)
 		return (int(cos(angle)*6), int(sin(angle)*6))
 
-class FleetIcon(Group):
-	pass
+from Colorizer import *
+class Holder(list):
+	def __init__(self, cache, parent, children=[]):
+		"""
 
-def FindChildren(cache, obj):
+		"""
+		self.cache = cache
+
+		if not isinstance(parent, (int, long)):
+			raise TypeError("Parent must be an ID's not %r" % parent) 
+		for i, child in enumerate(children):
+			if not isinstance(child, (int, long)):
+				raise TypeError("Child %i must be an ID's not %r" % (i, child)) 
+
+		self.extend([parent] + children)
+		self.ResetLoop()
+
+	def ResetLoop(self):
+		self.current = -1
+
+	def NextLoop(self):
+		self.current = (self.current + 1) % len(self)
+		return self.current, self[self.current]
+
+	def SetColorizer(self, colorizer):
+		if not isinstance(colorizer, Colorizer):
+			raise TypeError('Colorizer must be of Colorizer type!')
+		self.Colorizer = colorizer
+
+	def GetColors(self):
+		parentcolor = self.Colorizer(FindOwners(self.cache, self[0]))
+		
+		childrencolors = []
+		for child in self[1:]:
+			childrencolors.append(self.Colorizer(FindOwners(self.cache, child)))
+	
+		return parentcolor, childrencolors
+
+	def __eq__(self, value):
+		return [self[0], self.current] == value
+
+def FindChildren(cache, oid):
 	"""
 	Figure out all the children of this object.
 	"""
+	if not isinstance(oid, (int, long)):
+		raise TypeError("oid must be a oid not %r" % oid)
+
 	kids = set()
-	for child in obj.contains:
-		kids.update(FindChildren(cache, cache.objects[child]))
+	for child in cache.objects[oid].contains:
+		kids.update(FindChildren(cache, child))
 		kids.add(child)
 
 	return list(kids)
 
-def FindOwners(cache, obj):
+def FindOwners(cache, oid):
 	"""
-	Figure out the owners of this object (and it's children).
+	Figure out the owners of this oidect (and it's children).
 	"""
+	if not isinstance(oid, (int, long)):
+		raise TypeError("oid must be a oid not %r" % oid)
+
 	owners = set()
-	for child in [obj.id]+FindChildren(cache, obj):
+	for child in [oid]+FindChildren(cache, oid):
 		if not hasattr(cache.objects[child], 'owner'):
 			continue
 
@@ -83,17 +122,7 @@ def FindOwners(cache, obj):
 		if owner in (0, -1):
 			continue
 		owners.add(owner)
-	return owners
-
-def OwnerColor(pid, owners):
-	"""
-
-	"""
-	type = (GenericIcon.Unowned, GenericIcon.Enemy)[len(owners)>0]
-	if pid in owners:
-		type = (GenericIcon.Friendly, GenericIcon.Contested)[len(owners)>1]
-
-	return type
+	return list(owners)
 
 from Overlay import Overlay
 
@@ -106,7 +135,7 @@ class NamePopup(wx.PopupWindow):
 
 		self.parent = parent
 
-		self.SetBackgroundColour("CADET BLUE")
+		self.SetBackgroundColour("#202020")
 		self.Bind(wx.EVT_MOTION, parent.MotionEvent)
 
 	def SetText(self, text):
@@ -129,11 +158,14 @@ class Systems(Overlay):
 		Overlay.__init__(self, *args, **kw)
 
 		self.canvas.SetCursor(wx.StockCursor(wx.CURSOR_RIGHT_ARROW))
-		self.current = [None, 0]
+		self.Selected = None
 
 		self.PopupText = NamePopup(self.canvas, wx.SIMPLE_BORDER)
 
 	def updateall(self):
+		#self.Colorizer = ColorVerses(self.cache.players[0].id)
+		self.Colorizer = ColorEach()
+
 		Overlay.updateall(self)
 
 		from extra.wxFloatCanvas.Arrow import Arrow
@@ -143,27 +175,24 @@ class Systems(Overlay):
 		"""\
 
 		"""
-		pid = self.cache.players[0].id
 		obj = self.cache.objects[oid]
 
 		# Only draw top level objects
 		if isinstance(obj, Systems.toplevel):
 			return
 
+		# Don't draw objects which parent's are not top level objects
 		parent = self.cache.objects[obj.parent]
 		if not isinstance(parent, Systems.toplevel):
 			return
 
-		types = []
-		for cid in [obj.id]+FindChildren(self.cache, obj):
-			cobj = self.cache.objects[cid]
-			types.append(OwnerColor(pid, FindOwners(self.cache, cobj)))
+		holder = Holder(self.cache, oid, FindChildren(self.cache, oid))
+		holder.SetColorizer(self.Colorizer)
 
-		self[oid]    = GenericIcon(obj.pos[0:2], types[0], types[1:])
-		self[oid].id = oid
+		self[oid] = GenericIcon(obj.pos[0:2], *holder.GetColors())
+		self[oid].holder = holder
 
 		# These pop-up the name of the object
-		# Also do a "preview" event after X seconds
 		self[oid].Bind(EVT_FC_ENTER_OBJECT, self.SystemEnter)
 		self[oid].Bind(EVT_FC_LEAVE_OBJECT, self.SystemLeave)
 		self[oid].Bind(EVT_FC_LEFT_UP, self.SystemLeftClick)
@@ -171,20 +200,18 @@ class Systems(Overlay):
 	def SystemLeftClick(self, obj):
 		print "SystemClick", obj
 
+		# Are we clicking on the same object?
+		if self.Selected != obj.holder:
+			self.Selected = obj.holder
+			self.Selected.ResetLoop()
+
 		# Cycle throught the children on each click
-		choices = [obj.id] + FindChildren(self.cache, self.cache.objects[obj.id])
-
-		if self.current[0] == obj.id:
-			self.current[1] = (self.current[1]+1) % len(choices)
-		else:
-			self.current = [obj.id, 0]
-
-		rid = choices[self.current[1]]
+		i, rid = self.Selected.NextLoop()
 		
-		self['arrow'].SetPoint(self.cache.objects[obj.id].pos[0:2])
+		self['arrow'].SetPoint(self.cache.objects[obj.holder[0]].pos[0:2])
 		self['arrow'].SetOffset((0,0))
-		if self.current[1] > 0:
-			self['arrow'].SetOffset(obj.ChildOffset(self.current[1], len(choices)-1))
+		if i > 0:
+			self['arrow'].SetOffset(obj.ChildOffset(i-1, len(obj.holder)-1))
 
 		self.canvas.Draw(True)
 
@@ -193,23 +220,21 @@ class Systems(Overlay):
 
 	def SystemEnter(self, obj):
 		print "SystemEnter", obj
-		pid = self.cache.players[0].id
-
 		screen = self.canvas.WorldToPixel(obj.XY)
 		pos	= self.canvas.ClientToScreen( screen )
 
 		# Build the string
 		s = "<font size='%s'>" % wx.local.normalFont.GetPointSize()
-		for i, cid in enumerate([obj.id]+FindChildren(self.cache, self.cache.objects[obj.id])):
+		for i, cid in enumerate(obj.holder):
 			cobj = self.cache.objects[cid]
 
 			style = 'normal'
-			if [obj.id, i] == self.current:
+			if [obj.holder[0], i] == self.Selected:
 				style = 'italic'
 
-			type = OwnerColor(pid, FindOwners(self.cache, cobj))
+			color = obj.holder.Colorizer(FindOwners(self.cache, cid))
 
-			s += "<font style='%s' color='%s'>%s" % (style, type, cobj.name)
+			s += "<font style='%s' color='%s'>%s" % (style, color, cobj.name)
 			if isinstance(cobj, Fleet):
 				for shipid, amount in cobj.ships:
 					s+= "\n  %s %ss" % (amount, self.cache.designs[shipid].name)
@@ -220,6 +245,8 @@ class Systems(Overlay):
 		self.PopupText.SetText(s)
 		self.PopupText.Position(pos, (GenericIcon.PrimarySize, GenericIcon.PrimarySize))
 		self.PopupText.Show(True)
+
+		# Also do a "preview" event after X seconds
 
 	def SystemLeave(self, evt):
 		print "SystemLeave", evt
