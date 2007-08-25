@@ -55,6 +55,9 @@ class GUI(wx.App):
 			return "<SelectObjectEvent id=%s>" % self.id
 		__repr__ = __str__
 	
+	class PreviewObjectEvent(SelectObjectEvent):
+		pass
+
 	class SelectPositionEvent(wx.PyEvent):
 		"""\
 		Raised when a position is selected.

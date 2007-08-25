@@ -98,11 +98,16 @@ class panelStarMap(wx.Panel):
 	def PostSelectObject(self, oid):
 		self.application.gui.Post(self.application.gui.SelectObjectEvent(oid))
 
+	def PostPreviewObject(self, oid):
+		self.application.gui.Post(self.application.gui.PreviewObjectEvent(oid))
+
 	def OnSelectObject(self, evt):
 		"""\
 		Called when an object is selected.
 		"""
-		pass
+		if isinstance(evt, self.application.gui.PreviewObjectEvent):
+			return
+		self.Overlay.SelectObject(evt.id)
 
 	def OnUpdateOrder(self, evt):
 		"""\

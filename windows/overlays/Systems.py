@@ -87,6 +87,10 @@ class Holder(list):
 		self.current = (self.current + 1) % len(self)
 		return self.current, self[self.current]
 
+	def SetLoop(self, v):
+		self.current = self.index(v)
+		return self.current
+
 	def SetColorizer(self, colorizer):
 		if not isinstance(colorizer, Colorizer):
 			raise TypeError('Colorizer must be of Colorizer type!')
@@ -185,7 +189,8 @@ class Systems(Overlay):
 		Overlay.updateall(self)
 
 		self['selected-arrow'] = PolygonArrow((0,0), "Red", True)
-		self['preview-arrow'] = PolygonArrow((0,0), "#555555", True)
+		self['preview-arrow']  = PolygonArrow((0,0), "#555555", True)
+		self['preview-arrow'].Hide()
 
 	def updateone(self, oid):
 		"""\
@@ -216,23 +221,39 @@ class Systems(Overlay):
 		self[oid].Bind(EVT_FC_LEAVE_OBJECT, self.SystemLeave)
 		self[oid].Bind(EVT_FC_LEFT_UP, self.SystemLeftClick)
 
+	def ArrowTo(self, arrow, obj, i):
+		arrow.SetPoint(self.cache.objects[obj.holder[0]].pos[0:2])
+		arrow.SetOffset((0,0))
+		if i > 0:
+			arrow.SetOffset(obj.ChildOffset(i-1, len(obj.holder)-1))
+		self.canvas.Draw()
+
+	def SelectObject(self, oid):
+		pid = oid
+		while not self.has_key(pid):
+			try:
+				pid = self.cache.objects[pid].parent
+			except AttributeError:
+				return
+
+		obj = self[pid]
+		i   = obj.holder.SetLoop(oid)
+
+		self.Selected = obj
+		self.ArrowTo(self['selected-arrow'], obj, i)
+
 	def SystemLeftClick(self, obj):
 		print "SystemClick", obj
 
 		# Are we clicking on the same object?
-		if self.Selected != obj.holder:
-			self.Selected = obj.holder
-			self.Selected.ResetLoop()
+		if self.Selected != obj:
+			self.Selected = obj
+			self.Selected.holder.ResetLoop()
 
 		# Cycle throught the children on each click
-		i, rid = self.Selected.NextLoop()
-	
-		self['selected-arrow'].SetPoint(self.cache.objects[obj.holder[0]].pos[0:2])
-		self['selected-arrow'].SetOffset((0,0))
-		if i > 0:
-			self['selected-arrow'].SetOffset(obj.ChildOffset(i-1, len(obj.holder)-1))
-
-		self.canvas.Draw()
+		i, rid = self.Selected.holder.NextLoop()
+		
+		self.ArrowTo(self['selected-arrow'], obj, i)
 
 		self.SystemLeave(obj)
 		self.SystemEnter(obj)
@@ -250,7 +271,7 @@ class Systems(Overlay):
 			cobj = self.cache.objects[cid]
 
 			style = 'normal'
-			if [obj.holder[0], i] == self.Selected:
+			if [obj.holder[0], i] == self.Selected.holder:
 				style = 'italic'
 
 			color = obj.holder.Colorizer(FindOwners(self.cache, cid))
@@ -268,7 +289,7 @@ class Systems(Overlay):
 		self.PopupText.Show(True)
 
 		# Start the "preview" mode
-		if obj.holder != self.Selected:
+		if obj != self.Selected:
 			self.Hovering = obj
 			self.Hovering.holder.ResetLoop()
 
@@ -282,20 +303,15 @@ class Systems(Overlay):
 		self['preview-arrow'].Hide()
 		self.canvas.Draw()
 
-		self.parent.PostSelectObject(self.Selected[0])
+		self.parent.PostSelectObject(self.Selected.holder[self.Selected.holder.current])
 
 	def OnHover(self, evt):
 		H = self.Hovering.holder
 
 		i, rid = H.NextLoop()
-		self.parent.PostSelectObject(rid)
+		self.parent.PostPreviewObject(rid)
 
 		self['preview-arrow'].Show()
-		self['preview-arrow'].SetPoint(self.cache.objects[H[0]].pos[0:2])
-		self['preview-arrow'].SetOffset((0,0))
-		if i > 0:
-			self['preview-arrow'].SetOffset(self.Hovering.ChildOffset(i-1, len(H)-1))
-		self.canvas.Draw()
-
+		self.ArrowTo(self['preview-arrow'], self.Hovering, i)
 		self.Timer.Start(2000)
 		
