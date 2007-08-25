@@ -77,11 +77,17 @@ class panelPicture(panelPictureBase):
 		self.progress = []
 		self.averages = []
 
-		self.OnMediaDownloadDone(None)
+		self.Static.Show()
+		self.Animation.Hide()
+		self.Layout()
 
 	def GetPaneInfo(self):
 		info = wx.aui.AuiPaneInfo()
-		info.MinSize(self.GetBestSize())
+		info.MinSize(wx.Size(128,150))
+		info.MaxSize(wx.Size(128,150))
+		info.FloatingSize(wx.Size(128,150))
+		info.Fixed()
+
 		info.Left()
 		info.Layer(2)
 		return info

@@ -223,7 +223,7 @@ class winMain(winMDIBase):
 		from windows.winNewStarMap import panelStarMap
 		from windows.winSystem  import panelSystem
 
-		for window in [panelInformation, panelPicture, panelOrder, panelMessage, panelStarMap, panelSystem]:
+		for window in [panelStarMap, panelSystem, panelMessage, panelInformation, panelPicture, panelOrder]:
 			title = window.title
 
 			instance = window(application, self)

@@ -57,12 +57,12 @@ class panelSystem(wx.Panel):
 
 	def GetPaneInfo(self):
 		info = wx.aui.AuiPaneInfo()
-		info.MinSize(self.GetMinSize())
-		info.Bottom()
+
+		info.MinSize(wx.Size(200,-1))
+
+		info.Right()
 		info.Layer(1)
 		info.PinButton(True)
-		info.MaximizeButton(True)
-#		info.MinimizeButton(True)
 		return info
 
 	def OnSize(self, evt):

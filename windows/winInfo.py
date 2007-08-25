@@ -66,8 +66,8 @@ class panelInformation(panelInformationBase):
 	def GetPaneInfo(self):
 		info = wx.aui.AuiPaneInfo()
 		info.MinSize(self.GetBestSize())
-		info.Left()
-		info.Layer(2)
+		info.Bottom()
+		info.Layer(1)
 		return info
 
 	def OnSelectObject(self, evt):
