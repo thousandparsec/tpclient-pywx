@@ -531,6 +531,36 @@ class wxSimpleValidator(wx.PyValidator):
 		# gets to the text control
 		return
 
+########################
+# PopupWindow doesn't exist on Mac, this fakes it
+########################
+wx.PopupWindowOrig = wx.PopupWindow
+
+if wx.Platform == '__WXMAC__':
+	class FakePopupWindow(wx.Frame):
+		def __init__(self, parent, style):
+			wx.Frame.__init__(self, parent, style = wx.NO_BORDER | wx.FRAME_NO_TASKBAR | wx.STAY_ON_TOP)
+			self.Panel = wx.Panel(self)
+
+		def Position(self, position, size):
+			self.Move((position[0]+size[0], position[1]+size[1]))
+
+		def SetBackgroundColour(self, colour):
+			self.Panel.SetBackgroundColour(colour)
+
+		def Window(self):
+			return self.Panel
+		Window = property(Window)
+
+	wx.PopupWindow = FakePopupWindow
+else:
+	class PopupWindow(wx.PopupWindowOrig):
+		def Window(self):
+			return self
+		Window = property(Window)
+
+	wx.PopupWindow = PopupWindow
+
 wx.ListCtrl = wxListCtrl
 wx.Choice = wxChoice
 wx.ComboBox = wxComboBox

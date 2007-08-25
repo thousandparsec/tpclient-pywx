@@ -97,35 +97,12 @@ def OwnerColor(pid, owners):
 
 from Overlay import Overlay
 
-if wx.Platform == '__WXMAC__':
-	class FakePopupWindow(wx.Frame):
-		def __init__(self, parent, style):
-			wx.Frame.__init__(self, parent, style = wx.NO_BORDER | wx.FRAME_NO_TASKBAR | wx.STAY_ON_TOP)
-			self.Panel = wx.Panel(self)
-
-		def Position(self, position, size):
-			self.Move((position[0]+size[0], position[1]+size[1]))
-
-		def SetBackgroundColour(self, colour):
-			self.Panel.SetBackgroundColour(colour)
-
-		def me(self):
-			return self.Panel
-		me = property(me)
-
-	PopupWindow = FakePopupWindow
-else:
-	class PopupWindow(wx.PopupWindow):
-		def me(self):
-			return self
-		me = property(me)
-
 from wx.lib.fancytext import StaticFancyText
-class NamePopup(PopupWindow):
+class NamePopup(wx.PopupWindow):
 	Padding = 2
 
 	def __init__(self, parent, style):
-		PopupWindow.__init__(self, parent, style)
+		wx.PopupWindow.__init__(self, parent, style)
 
 		self.parent = parent
 
@@ -139,7 +116,7 @@ class NamePopup(PopupWindow):
 		except AttributeError:
 			pass
 
-		self.st = StaticFancyText(self.me, -1, text, pos=(self.Padding, self.Padding))
+		self.st = StaticFancyText(self.Window, -1, text, pos=(self.Padding, self.Padding))
 		sz = self.st.GetSize()
 		self.SetSize( (sz.width+2*self.Padding, sz.height+2*self.Padding) )
 
@@ -246,5 +223,4 @@ class Systems(Overlay):
 
 	def SystemLeave(self, evt):
 		print "SystemLeave", evt
-
 		self.PopupText.Hide()
