@@ -77,6 +77,7 @@ class panelPicture(panelPictureBase):
 		self.progress = []
 		self.averages = []
 
+		self.Download.Hide()
 		self.Static.Show()
 		self.Animation.Hide()
 		self.Layout()
