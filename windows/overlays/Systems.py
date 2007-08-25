@@ -170,7 +170,11 @@ class Systems(Overlay):
 		Overlay.__init__(self, *args, **kw)
 
 		self.canvas.SetCursor(wx.StockCursor(wx.CURSOR_RIGHT_ARROW))
+
 		self.Selected = None
+		self.Hovering = None
+		self.Timer = wx.Timer()
+		self.Timer.Bind(wx.EVT_TIMER, self.OnHover)
 
 		self.PopupText = NamePopup(self.canvas, wx.SIMPLE_BORDER)
 
@@ -180,7 +184,8 @@ class Systems(Overlay):
 
 		Overlay.updateall(self)
 
-		self['arrow'] = PolygonArrow((0,0), "Red", True)
+		self['selected-arrow'] = PolygonArrow((0,0), "Red", True)
+		self['preview-arrow'] = PolygonArrow((0,0), "#555555", True)
 
 	def updateone(self, oid):
 		"""\
@@ -222,13 +227,12 @@ class Systems(Overlay):
 		# Cycle throught the children on each click
 		i, rid = self.Selected.NextLoop()
 	
-		print "Arrow", id(self['arrow'])	
-		self['arrow'].SetPoint(self.cache.objects[obj.holder[0]].pos[0:2])
-		self['arrow'].SetOffset((0,0))
+		self['selected-arrow'].SetPoint(self.cache.objects[obj.holder[0]].pos[0:2])
+		self['selected-arrow'].SetOffset((0,0))
 		if i > 0:
-			self['arrow'].SetOffset(obj.ChildOffset(i-1, len(obj.holder)-1))
+			self['selected-arrow'].SetOffset(obj.ChildOffset(i-1, len(obj.holder)-1))
 
-		self.canvas.Draw(True)
+		self.canvas.Draw()
 
 		self.SystemLeave(obj)
 		self.SystemEnter(obj)
@@ -263,8 +267,35 @@ class Systems(Overlay):
 		self.PopupText.Position(pos, (GenericIcon.PrimarySize, GenericIcon.PrimarySize))
 		self.PopupText.Show(True)
 
-		# Also do a "preview" event after X seconds
+		# Start the "preview" mode
+		if obj.holder != self.Selected:
+			self.Hovering = obj
+			self.Hovering.holder.ResetLoop()
 
-	def SystemLeave(self, evt):
-		print "SystemLeave", evt
+			self.Timer.Start(2000)
+
+	def SystemLeave(self, obj):
 		self.PopupText.Hide()
+
+		# Stop the "preview"
+		self.Timer.Stop()
+		self['preview-arrow'].Hide()
+		self.canvas.Draw()
+
+		self.parent.PostSelectObject(self.Selected[0])
+
+	def OnHover(self, evt):
+		H = self.Hovering.holder
+
+		i, rid = H.NextLoop()
+		self.parent.PostSelectObject(rid)
+
+		self['preview-arrow'].Show()
+		self['preview-arrow'].SetPoint(self.cache.objects[H[0]].pos[0:2])
+		self['preview-arrow'].SetOffset((0,0))
+		if i > 0:
+			self['preview-arrow'].SetOffset(self.Hovering.ChildOffset(i-1, len(H)-1))
+		self.canvas.Draw()
+
+		self.Timer.Start(2000)
+		
