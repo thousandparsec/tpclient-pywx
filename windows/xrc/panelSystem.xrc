@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource version="2.3.0.1" xmlns="http://www.wxwidgets.org/wxxrc">
+  <object class="wxPanel" name="panelSystem" subclass="Dialog">
+    <size>400,300</size>
+    <object class="wxFlexGridSizer">
+      <cols>1</cols>
+      <rows>2</rows>
+      <vgap>0</vgap>
+      <hgap>0</hgap>
+      <growablecols>0</growablecols>
+      <object class="sizeritem">
+        <object class="wxOrderedTreeCtrl" name="Tree"/>
+        <flag>wxEXPAND|wxGROW</flag>
+      </object>
+      <object class="sizeritem">
+        <object class="wxTextCtrl" name="Search"/>
+        <flag>wxEXPAND|wxGROW</flag>
+      </object>
+      <growablerows>0</growablerows>
+    </object>
+  </object>
+</resource>

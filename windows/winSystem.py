@@ -20,40 +20,48 @@ from utils import *
 NAME = 0
 DESC = 1
 
-# Show the universe
-class panelSystem(wx.Panel):
+##class winSystem(winBase):
+##	def __init__(self, application, parent):
+##		winBase.__init__(self, application, parent)
+##
+##		self.Panel = panelSystem(application, self)
+##
+##	def __getattr__(self, key):
+##		try:
+##			return winBase.__getattr__(self, key)
+##		except AttributeError:
+##			return getattr(self.Panel, key)
+
+from xrc.panelSystem import panelSystemBase
+class panelSystem(panelSystemBase):
 	title = _("System")
 
-	from defaults import winSystemDefaultSize as DefaultSize
-	
 	def __init__(self, application, parent):
-		wx.Panel.__init__(self, parent)
+		panelSystemBase.__init__(self, parent)
 
 		# Setup to recieve game events
 		self.application = application
 		self.ignore = False
 
-		self.tree = wx.OrderedTreeCtrl(self, -1, style=wx.TR_DEFAULT_STYLE | wx.TR_HAS_VARIABLE_ROW_HEIGHT)
+		self.Tree.SetWindowStyle(wx.TR_DEFAULT_STYLE | wx.TR_HAS_VARIABLE_ROW_HEIGHT)
 
 		self.icons = {}
-		self.icons['Blank'] = wx.Image(os.path.join(graphicsdir, "blank-icon.png")).ConvertToBitmap()
-		self.icons['Root'] = wx.Image(os.path.join(graphicsdir, "tp-icon.png")).ConvertToBitmap()
-		self.icons['Container'] = wx.Image(os.path.join(graphicsdir, "link-icon.png")).ConvertToBitmap()
+		self.icons['Blank']      = wx.Image(os.path.join(graphicsdir, "blank-icon.png")).ConvertToBitmap()
+		self.icons['Root']       = wx.Image(os.path.join(graphicsdir, "tp-icon.png")).ConvertToBitmap()
+		self.icons['Container']  = wx.Image(os.path.join(graphicsdir, "link-icon.png")).ConvertToBitmap()
 		self.icons['StarSystem'] = wx.Image(os.path.join(graphicsdir, "system-icon.png")).ConvertToBitmap()
-		self.icons['Fleet'] = wx.Image(os.path.join(graphicsdir, "ship-icon.png")).ConvertToBitmap()
-		self.icons['Planet'] = wx.Image(os.path.join(graphicsdir, "planet-icon.png")).ConvertToBitmap()
-		self.icons['Unknown'] = wx.Image(os.path.join(graphicsdir, "starbase-icon.png")).ConvertToBitmap()
+		self.icons['Fleet']      = wx.Image(os.path.join(graphicsdir, "ship-icon.png")).ConvertToBitmap()
+		self.icons['Planet']     = wx.Image(os.path.join(graphicsdir, "planet-icon.png")).ConvertToBitmap()
+		self.icons['Unknown']    = wx.Image(os.path.join(graphicsdir, "starbase-icon.png")).ConvertToBitmap()
 
 		self.il = wx.ImageList(16, 16)
 		self.il.Add(wx.Image(os.path.join(graphicsdir, "blank.png")).ConvertToBitmap())
 		for i in self.icons.keys():
 			self.icons[i] = self.il.Add(self.icons[i])
-		self.tree.SetImageList(self.il)
+		self.Tree.SetImageList(self.il)
 
-		self.tree.SetFont(wx.local.normalFont)
-		self.Bind(wx.EVT_TREE_SEL_CHANGED, self.OnSelectItem)
-
-		self.Bind(wx.EVT_SIZE, self.OnSize)
+		self.Tree.SetFont(wx.local.normalFont)
+		self.Tree.Bind(wx.EVT_TREE_SEL_CHANGED, self.OnSelectItem)
 
 	def GetPaneInfo(self):
 		info = wx.aui.AuiPaneInfo()
@@ -65,15 +73,12 @@ class panelSystem(wx.Panel):
 		info.PinButton(True)
 		return info
 
-	def OnSize(self, evt):
-		self.tree.SetSize(self.GetClientSize())
-
 	def Rebuild(self):
 		"""\
 		Rebuilds the list of objects.
 		"""
 		try:
-			selected_id = self.tree.GetPyData(self.tree.GetSelection())
+			selected_id = self.Tree.GetPyData(self.Tree.GetSelection())
 		except:
 			selected_id = -1
 
@@ -81,16 +86,16 @@ class panelSystem(wx.Panel):
 			selected_id = -1
 			
 		# Remove all the current items
-		self.tree.DeleteAllItems()
+		self.Tree.DeleteAllItems()
 
 		universe = self.application.cache.objects[0]
 		selected = self.Add(None, universe, selected_id)
 	
-		self.tree.SortChildren(self.tree.GetRootItem())
+		self.Tree.SortChildren(self.Tree.GetRootItem())
 	
 		if selected:
-			self.tree.SelectItem(selected)
-			self.tree.EnsureVisible(selected)
+			self.Tree.SelectItem(selected)
+			self.Tree.EnsureVisible(selected)
 		
 	def ObjectTurnSummary(self, object):
 		"""\
@@ -125,16 +130,16 @@ class panelSystem(wx.Panel):
 			caption += "  [" + self.ObjectTurnSummary(object) + "]"
 		
 		if root == None:
-			new_root = self.tree.AddRoot(_("Known Universe"), self.icons['Root'])
+			new_root = self.Tree.AddRoot(_("Known Universe"), self.icons['Root'])
 		else:
 			if object != None:
 				if self.icons.has_key(object.__class__.__name__):
-					new_root = self.tree.AppendItem(root, caption, self.icons[object.__class__.__name__])
+					new_root = self.Tree.AppendItem(root, caption, self.icons[object.__class__.__name__])
 				else:
-					new_root = self.tree.AppendItem(root, caption, self.icons['Unknown'])
+					new_root = self.Tree.AppendItem(root, caption, self.icons['Unknown'])
 		
 		if object != None and hasattr(object, "owner") and object.owner != -1:
-			self.tree.SetItemTextColour(new_root, object.owner == self.application.cache.players[0].id and 'DarkGreen' or 'DarkRed')
+			self.Tree.SetItemTextColour(new_root, object.owner == self.application.cache.players[0].id and 'DarkGreen' or 'DarkRed')
 
 		if hasattr(object, "contains"):
 			for id in object.contains:
@@ -147,7 +152,7 @@ class panelSystem(wx.Panel):
 					selected = temp
 		
 		if new_root:
-			self.tree.SetPyData(new_root, object.id)
+			self.Tree.SetPyData(new_root, object.id)
 
 			if object.id == selected_id:
 				return new_root
@@ -163,7 +168,7 @@ class panelSystem(wx.Panel):
 			return
 
 		# Figure out which item it is
-		id = self.tree.GetPyData(evt.GetItem())
+		id = self.Tree.GetPyData(evt.GetItem())
 		
 		# Okay we need to post an event now
 		self.application.Post(self.application.gui.SelectObjectEvent(id))
@@ -180,19 +185,19 @@ class panelSystem(wx.Panel):
 		"""\
 		When somebody selects an object.
 		"""
-		id = self.tree.GetPyData(self.tree.GetSelection())
+		id = self.Tree.GetPyData(self.Tree.GetSelection())
 		if id == evt.id:
 			return
 		
-		item = self.tree.FindItemByData(evt.id)
+		item = self.Tree.FindItemByData(evt.id)
 		if item:
 			self.ignore = True
 			
-			#self.tree.CollapseAll()			# Collapse all the other stuff
-			self.tree.SelectItem(item)		# Select Item
-			if not self.tree.IsVisible(item):
-				self.tree.EnsureVisible(item)
-			self.tree.Expand(item)			# Expand the Item
+			#self.Tree.CollapseAll()		# Collapse all the other stuff
+			self.Tree.SelectItem(item)		# Select Item
+			if not self.Tree.IsVisible(item):
+				self.Tree.EnsureVisible(item)
+			self.Tree.Expand(item)			# Expand the Item
 
 			self.ignore = False
 	

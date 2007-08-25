@@ -180,6 +180,53 @@ class ChoiceXmlHandler(xrc.XmlResourceHandler):
 		return ctrl
 xrc.ExtraHandlers.append(ChoiceXmlHandler)
 
+class OrderedTreeCtrlXmlHandler(xrc.XmlResourceHandler):
+	def __init__(self):
+		xrc.XmlResourceHandler.__init__(self)
+		# Specify the styles recognized by objects of this type
+		self.AddWindowStyles()
+
+	# This method and the next one are required for XmlResourceHandlers
+	def CanHandle(self, node):
+		return self.IsOfClass(node, "wxOrderedTreeCtrl") or self.IsOfClass(node, "OrderedTreeCtrl")
+
+	def DoCreateResource(self):
+		# The simple method assumes that there is no existing
+		# instance.  Be sure of that with an assert.
+		if self.GetInstance() is None:
+			# (self, parent, id, pos, size, style, validator, name) 
+			ctrl = wx.OrderedTreeCtrl(self.GetParentAsWindow(),
+									self.GetID(),
+									self.GetPosition(),
+									self.GetSize(),
+									self.GetStyle(),
+									name=self.GetName(),
+									)
+		else:
+			ctrl = self.GetInstance()
+
+			# Now call the ctrl's Create method to actually create the window
+			ctrl.Create(self.GetParentAsWindow(),
+						 self.GetID(),
+						 self.GetPosition(),
+						 self.GetSize(),
+						 [],
+						 self.GetStyle(),
+						 name = self.GetName()
+						 )
+
+
+		# These two things should be done in either case:
+		# Set standard window attributes
+		self.SetupWindow(ctrl)
+		# Create any child windows of this node
+		self.CreateChildren(ctrl)
+
+		return ctrl
+xrc.ExtraHandlers.append(OrderedTreeCtrlXmlHandler)
+
+
+
 
 ########################
 # This fix allows me to have tooltips on individual items rather then just the whole control.
@@ -476,7 +523,6 @@ class OrderedTreeCtrl(wx.TreeCtrl):
 				cookieo = cookie
 				child, cookie = self.GetNextChild(item, cookie)
 		return r
-
 wx.OrderedTreeCtrl = OrderedTreeCtrl
 
 ########################

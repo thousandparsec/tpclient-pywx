@@ -246,6 +246,7 @@ def main():
 
 				transStream = file('.translation', 'r')
 				outStream.write('def strings():\n')
+				outStream.write('\tpass')
 				outStream.write(transStream.read().replace('_(', '\t_('))
 
 				os.unlink('.translation')
