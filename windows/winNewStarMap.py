@@ -65,8 +65,6 @@ class panelStarMap(wx.Panel):
 		self.StarMap.ZoomToFit(None)
 		self.Canvas = self.StarMap.Canvas
 
-		self.Overlays = []
-
 		self.Bind(wx.EVT_SIZE, self.OnSize)
 		self.Bind(wx.EVT_ACTIVATE, self.OnShow)
 
@@ -90,9 +88,15 @@ class panelStarMap(wx.Panel):
 		"""\
 		Called when the cache has been updated.
 		"""
+		if hasattr(self, 'Overlay'):
+			self.Overlay.cleanup()
+
 		from overlays.Systems import Systems
-		self.Overlay = Systems(self.Canvas, self.application.cache)
+		self.Overlay = Systems(self, self.Canvas, self.application.cache)
 		self.Overlay.update()
+
+	def PostSelectObject(self, oid):
+		self.application.gui.Post(self.application.gui.SelectObjectEvent(oid))
 
 	def OnSelectObject(self, evt):
 		"""\

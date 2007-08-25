@@ -8,7 +8,8 @@ class Overlay(dict):
 	A layer which displays something.
 	"""	
 
-	def __init__(self, canvas, cache):
+	def __init__(self, parent, canvas, cache):
+		self.parent = parent
 		self.canvas = canvas
 		self.cache  = cache
 
@@ -16,7 +17,6 @@ class Overlay(dict):
 		"""\
 		Remove this overlay from the Canvas.
 		"""
-		# Remove any old values
 		for oid in self.keys():
 			# Remove the old object
 			del self[oid]
@@ -47,6 +47,9 @@ class Overlay(dict):
 		else:
 			self.canvas.RemoveObject(value)
 		dict.__delitem__(self, oid)
+
+	def __del__(self):
+		self.cleanup()
 
 	def update(self, oid=None):
 		"""\

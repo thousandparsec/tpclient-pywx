@@ -10,6 +10,7 @@ import numpy as N
 import wx
 from extra.wxFloatCanvas.FloatCanvas import Point, Group
 from extra.wxFloatCanvas.RelativePoint import RelativePoint, RelativePointSet
+from extra.wxFloatCanvas.PolygonStatic import PolygonArrow, PolygonShip
 
 from extra.wxFloatCanvas.FloatCanvas import EVT_FC_ENTER_OBJECT, EVT_FC_LEAVE_OBJECT
 from extra.wxFloatCanvas.FloatCanvas import EVT_FC_LEFT_UP, EVT_FC_RIGHT_UP
@@ -50,6 +51,17 @@ class GenericIcon(Group):
 	def ChildOffset(self, i, num):
 		angle = ((2.0*pi)/num)*(i-0.125)
 		return (int(cos(angle)*6), int(sin(angle)*6))
+
+class FleetIcon(GenericIcon):
+	def __init__(self, pos, type, children=[]):
+		if len(children) > 0:
+			raise TypeError("Fleet's can not have children!")
+
+		ObjectList = []
+
+		# The center Point
+		ObjectList.append(PolygonShip(pos, type))
+		Group.__init__(self, ObjectList, False)
 
 from Colorizer import *
 class Holder(list):
@@ -168,8 +180,7 @@ class Systems(Overlay):
 
 		Overlay.updateall(self)
 
-		from extra.wxFloatCanvas.Arrow import Arrow
-		self['arrow'] = Arrow((0,0), "Red", True)
+		self['arrow'] = PolygonArrow((0,0), "Red", True)
 
 	def updateone(self, oid):
 		"""\
@@ -189,7 +200,10 @@ class Systems(Overlay):
 		holder = Holder(self.cache, oid, FindChildren(self.cache, oid))
 		holder.SetColorizer(self.Colorizer)
 
-		self[oid] = GenericIcon(obj.pos[0:2], *holder.GetColors())
+		if isinstance(obj, Fleet):
+			self[oid] = FleetIcon(obj.pos[0:2], *holder.GetColors())
+		else:
+			self[oid] = GenericIcon(obj.pos[0:2], *holder.GetColors())
 		self[oid].holder = holder
 
 		# These pop-up the name of the object
@@ -207,7 +221,8 @@ class Systems(Overlay):
 
 		# Cycle throught the children on each click
 		i, rid = self.Selected.NextLoop()
-		
+	
+		print "Arrow", id(self['arrow'])	
 		self['arrow'].SetPoint(self.cache.objects[obj.holder[0]].pos[0:2])
 		self['arrow'].SetOffset((0,0))
 		if i > 0:
@@ -217,6 +232,8 @@ class Systems(Overlay):
 
 		self.SystemLeave(obj)
 		self.SystemEnter(obj)
+
+		self.parent.PostSelectObject(rid)
 
 	def SystemEnter(self, obj):
 		print "SystemEnter", obj
