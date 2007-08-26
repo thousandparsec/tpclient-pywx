@@ -41,7 +41,9 @@ class panelSystem(panelSystemBase):
 
 		# Setup to recieve game events
 		self.application = application
-		self.ignore = False
+
+		self.SelectIgnore     = False
+		self.SelectedPrevious = None
 
 		self.icons = {}
 		self.icons['Blank']      = wx.Image(os.path.join(graphicsdir, "blank-icon.png")).ConvertToBitmap()
@@ -61,6 +63,15 @@ class panelSystem(panelSystemBase):
 		self.Tree.SetFont(wx.local.normalFont)
 		self.Tree.Bind(wx.EVT_TREE_SEL_CHANGED, self.OnSelectItem)
 
+		self.Search.Bind(wx.EVT_TEXT, self.Rebuild)
+		self.Search.Bind(wx.EVT_TEXT_ENTER, self.Rebuild)
+		self.Search.Bind(wx.EVT_SEARCHCTRL_SEARCH_BTN, self.Rebuild)
+		self.Search.Bind(wx.EVT_SEARCHCTRL_CANCEL_BTN, self.OnSearchCancel)
+
+	def OnSearchCancel(self, evt):
+		self.Search.SetValue("")
+		self.Rebuild()
+
 	def GetPaneInfo(self):
 		info = wx.aui.AuiPaneInfo()
 
@@ -71,30 +82,6 @@ class panelSystem(panelSystemBase):
 		info.PinButton(True)
 		return info
 
-	def Rebuild(self):
-		"""\
-		Rebuilds the list of objects.
-		"""
-		try:
-			selected_id = self.Tree.GetPyData(self.Tree.GetSelection())
-		except:
-			selected_id = -1
-
-		if not selected_id:
-			selected_id = -1
-			
-		# Remove all the current items
-		self.Tree.DeleteAllItems()
-
-		universe = self.application.cache.objects[0]
-		selected = self.Add(None, universe, selected_id)
-	
-		self.Tree.SortChildren(self.Tree.GetRootItem())
-	
-		if selected:
-			self.Tree.SelectItem(selected)
-			self.Tree.EnsureVisible(selected)
-		
 	def ObjectTurnSummary(self, object):
 		"""\
 		Builds a brief string, identifying the number of turns remaining
@@ -114,63 +101,100 @@ class panelSystem(panelSystemBase):
 
 			return str(orders[0].turns) + ", " + str(turns)
 
-	def Add(self, root, object, selected_id=-1):
+	def Rebuild(self, evt=None):
 		"""\
-		Recursive method which builds the object list.
+		Rebuilds the list of objects.
 		"""
-		selected = None
-		new_root = None
-		orderable = object != None and hasattr(object, "order_types") and len(object.order_types) > 0
+		self.SelectIgnore = True
 
-		caption = object.name
-
-		if orderable:
-			caption += "  [" + self.ObjectTurnSummary(object) + "]"
-		
-		if root == None:
-			new_root = self.Tree.AddRoot(_("Known Universe"), self.icons['Root'])
+		selected = self.Tree.GetPyData(self.Tree.GetSelection())
+		if selected != None:
+			self.SelectedPrevious = selected
 		else:
-			if object != None:
-				if self.icons.has_key(object.__class__.__name__):
-					new_root = self.Tree.AppendItem(root, caption, self.icons[object.__class__.__name__])
-				else:
-					new_root = self.Tree.AppendItem(root, caption, self.icons['Unknown'])
-		
-		if object != None and hasattr(object, "owner") and object.owner != -1:
-			self.Tree.SetItemTextColour(new_root, object.owner == self.application.cache.players[0].id and 'DarkGreen' or 'DarkRed')
+			selected = self.SelectedPrevious
+
+		self.Tree.Freeze()
+
+		# Remove all the current items
+		self.Tree.DeleteAllItems()
+
+		self.Add(None, self.application.cache.objects[0], selected)
+
+		# Sort the tree
+		self.Tree.SortChildren(self.Tree.GetRootItem())
+	
+		if self.Filter != '*':
+			self.Tree.ExpandAll()
+
+		# Reselect the previously selected item..
+		selecteditem = self.Tree.GetSelection()
+		if self.Tree.GetPyData(selecteditem) != None:
+			self.Tree.EnsureVisible(selecteditem)
+
+		self.Tree.Thaw()
+
+		self.SelectIgnore = False
+
+	def Filter(self):
+		filter = self.Search.GetValue()
+		if len(filter) == 0:
+			return "*"
+		if filter[-1] != '*':
+			return filter.lower()+'*'
+	Filter = property(Filter)
+
+	def Add(self, parent, object, selected=None):
+		# Figure out the caption for this text...
+		caption = object.name
+		if object != None and hasattr(object, "order_types") and len(object.order_types) > 0:
+			caption += "  [" + self.ObjectTurnSummary(object) + "]"
+			
+		# Add the item
+		if parent is None:
+			if self.Filter == '*':
+				item = self.Tree.AddRoot(_("Known Universe"), self.icons['Root'])
+			else:
+				item = self.Tree.AddRoot(_("Finding %s") % self.Filter, self.icons['Root'])
+		else:
+			# Filter the list..
+			from fnmatch import fnmatch as match
+			if match(caption.lower(), self.Filter.lower()):
+				try:
+					icon = self.icons[object.__class__.__name__]
+				except KeyError:
+					icon = self.icons['Unknown']
+
+				item = self.Tree.AppendItem(parent, caption, icon)
+				self.Tree.SetPyData(item, object.id)
+
+				if selected == object.id:
+					self.Tree.SelectItem(item)
+			else:
+				item = parent
+
+		if selected != object.id:
+			self.Tree.UnselectItem(item)
 
 		if hasattr(object, "contains"):
 			for id in object.contains:
-				if not self.application.cache.objects.has_key(id):
-					continue
-				new = self.application.cache.objects[id]
-				temp = self.Add(new_root, new, selected_id)
-
-				if temp:
-					selected = temp
-		
-		if new_root:
-			self.Tree.SetPyData(new_root, object.id)
-
-			if object.id == selected_id:
-				return new_root
-			elif selected:
-				return selected
-		return
+				self.Add(item, self.application.cache.objects[id], selected)
 
 	def OnSelectItem(self, evt):
 		"""\
 		When somebody selects an item on the list.
 		"""
-		if self.ignore:
+		if self.SelectIgnore:
+			return
+
+		if not evt.GetItem().IsOk():
 			return
 
 		# Figure out which item it is
 		id = self.Tree.GetPyData(evt.GetItem())
-		
-		# Okay we need to post an event now
-		self.application.Post(self.application.gui.SelectObjectEvent(id))
-		
+		if id != None:
+			# Okay we need to post an event now
+			self.application.Post(self.application.gui.SelectObjectEvent(id))
+				
 		self.Refresh()
 
 	####################################################
@@ -189,7 +213,7 @@ class panelSystem(panelSystemBase):
 		
 		item = self.Tree.FindItemByData(evt.id)
 		if item:
-			self.ignore = True
+			self.SelectIgnore = True
 			
 			#self.Tree.CollapseAll()		# Collapse all the other stuff
 			self.Tree.SelectItem(item)		# Select Item
@@ -197,6 +221,6 @@ class panelSystem(panelSystemBase):
 				self.Tree.EnsureVisible(item)
 			self.Tree.Expand(item)			# Expand the Item
 
-			self.ignore = False
+			self.SelectIgnore = False
 	
 		self.Refresh()

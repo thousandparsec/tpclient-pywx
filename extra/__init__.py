@@ -227,7 +227,6 @@ class OrderedTreeCtrlXmlHandler(xrc.XmlResourceHandler):
 		return ctrl
 xrc.ExtraHandlers.append(OrderedTreeCtrlXmlHandler)
 
-
 wx.SEARCH_CANCEL_BTN = 2**30
 wx.SEARCH_SEARCH_BTN = 2**29
 wx.SEARCH_MENU       = 2**28
@@ -235,6 +234,7 @@ class SearchCtrlXmlHandler(xrc.XmlResourceHandler):
 	def __init__(self):
 		xrc.XmlResourceHandler.__init__(self)
 		# Specify the styles recognized by objects of this type
+		self.AddStyle("wxTE_PROCESS_ENTER",  wx.TE_PROCESS_ENTER)
 		self.AddStyle("wxSEARCH_CANCEL_BTN", wx.SEARCH_CANCEL_BTN)
 		self.AddStyle("wxSEARCH_SEARCH_BTN", wx.SEARCH_SEARCH_BTN)
 		self.AddStyle("wxSEARCH_MENU",       wx.SEARCH_MENU)
@@ -269,10 +269,6 @@ class SearchCtrlXmlHandler(xrc.XmlResourceHandler):
 
 		return ctrl
 xrc.ExtraHandlers.append(SearchCtrlXmlHandler)
-
-
-
-
 
 ########################
 # This fix allows me to have tooltips on individual items rather then just the whole control.
