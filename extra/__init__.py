@@ -600,7 +600,7 @@ class wxSimpleValidator(wx.PyValidator):
 		return True
 
 	def OnChar(self, event):
-		key = event.KeyCode()
+		key = event.KeyCode
 		if key < wx.WXK_SPACE or key == wx.WXK_DELETE or key > 255:
 			event.Skip()
 			return
