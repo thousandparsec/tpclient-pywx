@@ -62,7 +62,7 @@ except ImportError:
 	else:
 		notfound.append("NumPy or SciPy")
 
-wx_version = (2, 6, 0, 0)
+wx_version = (2, 8, 0, 0)
 wx_version_str = '.'.join([str(x) for x in wx_version[0:2]])
 try:
 	import wxversion
@@ -83,7 +83,7 @@ except (ImportError, KeyError), e:
 	print e
 
 	if system == "debian-based":
-		notfound.append("python-wxgtk2.6")
+		notfound.append("python-wxgtk2.8")
 	else:
 		notfound.append("wxPython > " + wx_version_str)
 
