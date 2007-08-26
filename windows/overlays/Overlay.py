@@ -68,7 +68,7 @@ class Holder(list):
 		Set the loop's position to a given object.
 		"""
 		if not v in self:
-			raise TypeError("That object %s doesn't exist in the Holder!" % v)
+			raise TypeError("That object %r doesn't exist in the Holder!" % v)
 		self.__current = self.index(v)
 		return self.__current
 
@@ -97,7 +97,11 @@ class Overlay(dict):
 		if self.has_key(key):
 			del self[key]
 
-		self.canvas.AddObject(value)
+		if type(value) in (list, tuple):
+			for v in value:
+				self.canvas.AddObject(v)
+		else:
+			self.canvas.AddObject(value)
 		dict.__setitem__(self, key, value)
 
 	def __delitem__(self, oid):
@@ -106,7 +110,11 @@ class Overlay(dict):
 		"""
 		value = self[oid]
 
-		self.canvas.RemoveObject(value)
+		if type(value) in (list, tuple):
+			for v in value:
+				self.canvas.RemoveObject(v)
+		else:
+			self.canvas.RemoveObject(value)
 		dict.__delitem__(self, oid)
 
 	def __del__(self):
