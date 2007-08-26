@@ -570,7 +570,7 @@ class panelOrder(panelOrderBase):
 			self.ArgumentsPanel.SetAutoLayout( True )
 			self.ArgumentsSizer = wx.FlexGridSizer( 0, 1, 0, 0)
 			self.ArgumentsPanel.SetSizer(self.ArgumentsSizer)
-			self.ArgumentsSizer.AddGrowableCol( 1 )
+			self.ArgumentsSizer.AddGrowableCol( 0 )
 
 			# Is this object dirty?
 			if hasattr(order, '_dirty'):
@@ -588,7 +588,7 @@ class panelOrder(panelOrderBase):
 				name_text.SetFont(wx.local.normalFont)
 
 				# Add the arguments bit
-				namepos = wx.TOP
+				namepos = wx.LEFT
 				if subtype == constants.ARG_ABS_COORD:
 					subpanel = argCoordPanel( self, self.ArgumentsPanel, getattr(order, name) )
 				elif subtype == constants.ARG_TIME:
@@ -596,9 +596,9 @@ class panelOrder(panelOrderBase):
 				elif subtype == constants.ARG_OBJECT:
 					subpanel = argObjectPanel( self, self.ArgumentsPanel, getattr(order, name), self.application.cache )
 				elif subtype == constants.ARG_LIST:
+					namepos = wx.TOP
 					subpanel = argListPanel( self, self.ArgumentsPanel, getattr(order, name) )
 				elif subtype == constants.ARG_STRING:
-					namepos = wx.LEFT
 					subpanel = argStringPanel( self, self.ArgumentsPanel, getattr(order, name) )
 				else:
 					subpanel = argNotImplimentedPanel( self, self.ArgumentsPanel, None )
@@ -609,25 +609,25 @@ class panelOrder(panelOrderBase):
 				
 				if namepos == wx.TOP:
 					self.ArgumentsSizer.Add( name_text, 0, wx.ALIGN_CENTER|wx.RIGHT, 4 )
-					self.ArgumentsSizer.Add( subpanel, 0,  wx.GROW|wx.ALIGN_CENTER)
+					self.ArgumentsSizer.Add( subpanel, 1,  wx.GROW|wx.EXPAND|wx.ALIGN_CENTER)
 		
 				elif namepos == wx.LEFT:
 					ArgumentSubSizer = wx.BoxSizer(wx.HORIZONTAL)
 					ArgumentSubSizer.Add( name_text, 0, wx.ALIGN_CENTER|wx.RIGHT, 4 )
-					ArgumentSubSizer.Add( subpanel,  0, wx.GROW|wx.ALIGN_CENTER)
+					ArgumentSubSizer.Add( subpanel,  1, wx.GROW|wx.EXPAND|wx.ALIGN_CENTER)
 
-					self.ArgumentsSizer.Add(ArgumentSubSizer)
+					self.ArgumentsSizer.Add(ArgumentSubSizer, 1, wx.GROW|wx.EXPAND|wx.ALIGN_CENTER)
 
 				else:
 					raise TypeError('WTF?')
 	
-			self.DetailsPanel.SetClientSize(self.ArgumentsPanel.GetBestSize())
-			self.DetailsSizer.Add( self.ArgumentsPanel, 0, wx.GROW|wx.ALIGN_CENTER|wx.ALL, 0 )
+#			self.DetailsPanel.SetClientSize(wx.Size(self.GetBestSize()[0], -1))
+			self.DetailsSizer.Add( self.ArgumentsPanel, 1, wx.GROW|wx.EXPAND|wx.ALIGN_CENTER|wx.ALL)
 
 			# Show the Save/Revert/Delete buttons
 			self.Save.Show()
 			self.Revert.Show()
-			self.Delete.Show()		
+			self.Delete.Show()
 	
 		elif isinstance(order, (unicode, str)):
 			self.Message.Show()
@@ -706,7 +706,7 @@ def argStringPanel(parent, parent_panel, args):
 
 	item1 = wx.TextCtrl( panel, -1, args[1], size=(wx.local.spinSize[0]*2, wx.local.spinSize[1]))
 	item1.SetFont(wx.local.tinyFont)
-	item0.Add( item1, 0, wx.ALIGN_CENTRE|wx.LEFT, 1 )
+	item0.Add( item1, 1, wx.ALIGN_CENTRE|wx.LEFT|wx.EXPAND, 1 )
 	
 	return panel
 	
@@ -736,7 +736,7 @@ def argObjectPanel(parent, parent_panel, args, cache):
 	item1.OnSelection(None)
 
 	item1.SetFont(wx.local.tinyFont)
-	item0.Add( item1, 0, wx.ALIGN_CENTRE|wx.LEFT, 1 )
+	item0.Add( item1, 1, wx.ALIGN_CENTRE|wx.LEFT|wx.EXPAND|wx.GROW, 1 )
 	
 	return panel
 
@@ -746,7 +746,10 @@ def argObjectGet(panel):
 	
 def argListPanel(parent, parent_panel, args):
 	panel = wx.Panel(parent_panel, -1)
-	base = wx.BoxSizer(wx.VERTICAL)
+
+	base = wx.FlexGridSizer(0, 1, 0, 0)
+	base.AddGrowableCol(0)
+	base.AddGrowableRow(0)
 
 	# Convert the first arg to a dictionary
 	types = {}
@@ -788,13 +791,13 @@ def argListPanel(parent, parent_panel, args):
 	delete.SetFont(wx.local.normalFont)
 
 	box_add = wx.BoxSizer(wx.HORIZONTAL)
-	box_add.Add( type_list, 0, wx.ALIGN_CENTRE|wx.LEFT, 1 )
-	box_add.Add( number, 0, wx.ALIGN_CENTRE|wx.LEFT, 1 )
+	box_add.Add( type_list, 2, wx.ALIGN_CENTRE|wx.LEFT|wx.EXPAND|wx.GROW, 1 )
+	box_add.Add( number, 0, wx.ALIGN_CENTRE|wx.LEFT|wx.EXPAND|wx.GROW, 1 )
 	box_add.Add( add, 0, wx.ALIGN_CENTRE|wx.LEFT, 1 )
 	box_add.Add( delete, 0, wx.ALIGN_CENTRE|wx.LEFT, 1 )
 
 	base.Add( selected, 1, wx.EXPAND|wx.ALIGN_CENTRE|wx.ALL, 1 )
-	base.Add( box_add, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
+	base.Add( box_add,  1, wx.EXPAND|wx.ALIGN_CENTRE|wx.ALL, 1 )
 
 	base.Fit(panel)
 
@@ -911,7 +914,7 @@ def argTimePanel(parent, parent_panel, args):
 	
 	item1 = wx.SpinCtrl( panel, -1, str(args[0]), min=min, max=max, size=(wx.local.spinSize[0]*2, wx.local.spinSize[1]) )
 	item1.SetFont(wx.local.tinyFont)
-	item0.Add( item1, 0, wx.ALIGN_CENTRE|wx.LEFT, 1 )
+	item0.Add( item1, 1, wx.ALIGN_CENTRE|wx.LEFT|wx.EXPAND, 1 )
 	
 	return panel
 	
