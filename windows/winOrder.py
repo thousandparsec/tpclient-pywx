@@ -625,13 +625,14 @@ class panelOrder(panelOrderBase):
 			self.DetailsSizer.Add( self.ArgumentsPanel, 1, wx.GROW|wx.EXPAND|wx.ALIGN_CENTER|wx.ALL)
 
 			# Show the Save/Revert/Delete buttons
+			self.Message.Show()
 			self.Save.Show()
 			self.Revert.Show()
 			self.Delete.Show()
 	
 		elif isinstance(order, (unicode, str)):
-			self.Message.Show()
 			self.Message.SetLabel(order)
+			self.Message.Show()
 
 			# Hide the Save/Revert buttons
 			self.Save.Hide()
@@ -936,7 +937,7 @@ def argCoordPanel(parent, parent_panel, args):
 
 	item2 = wx.TextCtrl( panel, -1, str(args[X]), size=wx.local.spinSize, validator=wx.SimpleValidator(wx.DIGIT_ONLY) )
 	item2.SetFont(wx.local.tinyFont)
-	item0.Add( item2, 0, wx.ALIGN_CENTRE|wx.LEFT, 1 )
+	item0.Add( item2, 1, wx.EXPAND|wx.ALIGN_CENTRE|wx.LEFT, 1 )
 
 	item3 = wx.StaticText( panel, -1, _("Y"))
 	item3.SetFont(wx.local.normalFont)
@@ -944,7 +945,7 @@ def argCoordPanel(parent, parent_panel, args):
 
 	item4 = wx.TextCtrl( panel, -1, str(args[Y]), size=wx.local.spinSize, validator=wx.SimpleValidator(wx.DIGIT_ONLY) )
 	item4.SetFont(wx.local.tinyFont)
-	item0.Add( item4, 0, wx.ALIGN_CENTRE|wx.LEFT, 1 )
+	item0.Add( item4, 1, wx.EXPAND|wx.ALIGN_CENTRE|wx.LEFT, 1 )
 
 	item5 = wx.StaticText( panel, -1, _("Z"))
 	item5.SetFont(wx.local.normalFont)
@@ -952,7 +953,7 @@ def argCoordPanel(parent, parent_panel, args):
 
 	item6 = wx.TextCtrl( panel, -1, str(args[Z]), size=wx.local.spinSize, validator=wx.SimpleValidator(wx.DIGIT_ONLY) )
 	item6.SetFont(wx.local.tinyFont)
-	item0.Add( item6, 0, wx.ALIGN_CENTRE|wx.LEFT, 1 )
+	item0.Add( item6, 1, wx.EXPAND|wx.ALIGN_CENTRE|wx.LEFT, 1 )
 
 	item7 = wx.Button( panel, -1, _("P"), size=wx.local.smallSize )
 	item7.SetFont(wx.local.normalFont)

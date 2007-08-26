@@ -89,7 +89,7 @@
               </object>
             </object>
             <object class="sizeritem">
-              <flag>wxALL|wxEXPAND|wxGROW</flag>
+              <flag>wxALL|wxEXPAND|wxGROW|wxALIGN_RIGHT</flag>
               <border>0</border>
               <object class="wxFlexGridSizer">
                 <cols>4</cols>
