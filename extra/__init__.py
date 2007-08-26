@@ -184,6 +184,8 @@ class OrderedTreeCtrlXmlHandler(xrc.XmlResourceHandler):
 	def __init__(self):
 		xrc.XmlResourceHandler.__init__(self)
 		# Specify the styles recognized by objects of this type
+		self.AddStyle("wxTR_DEFAULT_STYLE", wx.TR_DEFAULT_STYLE)
+		self.AddStyle("wxTR_HAS_VARIABLE_ROW_HEIGHT", wx.TR_HAS_VARIABLE_ROW_HEIGHT)
 		self.AddWindowStyles()
 
 	# This method and the next one are required for XmlResourceHandlers
@@ -224,6 +226,50 @@ class OrderedTreeCtrlXmlHandler(xrc.XmlResourceHandler):
 
 		return ctrl
 xrc.ExtraHandlers.append(OrderedTreeCtrlXmlHandler)
+
+
+wx.SEARCH_CANCEL_BTN = 2**30
+wx.SEARCH_SEARCH_BTN = 2**29
+wx.SEARCH_MENU       = 2**28
+class SearchCtrlXmlHandler(xrc.XmlResourceHandler):
+	def __init__(self):
+		xrc.XmlResourceHandler.__init__(self)
+		# Specify the styles recognized by objects of this type
+		self.AddStyle("wxSEARCH_CANCEL_BTN", wx.SEARCH_CANCEL_BTN)
+		self.AddStyle("wxSEARCH_SEARCH_BTN", wx.SEARCH_SEARCH_BTN)
+		self.AddStyle("wxSEARCH_MENU",       wx.SEARCH_MENU)
+		self.AddWindowStyles()
+
+	# This method and the next one are required for XmlResourceHandlers
+	def CanHandle(self, node):
+		return self.IsOfClass(node, "wxSearchCtrl") or self.IsOfClass(node, "SearchCtrl")
+
+	def DoCreateResource(self):
+		# The simple method assumes that there is no existing
+		# instance.  Be sure of that with an assert.
+		assert self.GetInstance() is None
+
+		#__init__(self, parent, id, value, pos, size, style, validator, name) 
+		ctrl = wx.SearchCtrl(self.GetParentAsWindow(),
+								self.GetID(),
+								"",
+								self.GetPosition(),
+								self.GetSize(),
+								self.GetStyle(),
+								name=self.GetName())
+
+		# These two things should be done in either case:
+		# Set standard window attributes
+		self.SetupWindow(ctrl)
+		# Create any child windows of this node
+		self.CreateChildren(ctrl)
+
+		ctrl.ShowSearchButton(self.GetStyle()&wx.SEARCH_SEARCH_BTN != 0)
+		ctrl.ShowCancelButton(self.GetStyle()&wx.SEARCH_CANCEL_BTN != 0)
+
+		return ctrl
+xrc.ExtraHandlers.append(SearchCtrlXmlHandler)
+
 
 
 

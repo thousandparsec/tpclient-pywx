@@ -9,11 +9,15 @@
       <hgap>0</hgap>
       <growablecols>0</growablecols>
       <object class="sizeritem">
-        <object class="wxOrderedTreeCtrl" name="Tree"/>
+        <object class="wxOrderedTreeCtrl" name="Tree">
+          <style>wxTR_DEFAULT_STYLE | wxTR_HAS_VARIABLE_ROW_HEIGHT</style>
+        </object>
         <flag>wxEXPAND|wxGROW</flag>
       </object>
       <object class="sizeritem">
-        <object class="wxTextCtrl" name="Search"/>
+        <object class="wxSearchCtrl" name="Search">
+          <style>wxSEARCH_CANCEL_BTN|wxSEARCH_SEARCH_BTN</style>
+        </object>
         <flag>wxEXPAND|wxGROW</flag>
       </object>
       <growablerows>0</growablerows>

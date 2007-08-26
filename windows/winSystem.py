@@ -43,8 +43,6 @@ class panelSystem(panelSystemBase):
 		self.application = application
 		self.ignore = False
 
-		self.Tree.SetWindowStyle(wx.TR_DEFAULT_STYLE | wx.TR_HAS_VARIABLE_ROW_HEIGHT)
-
 		self.icons = {}
 		self.icons['Blank']      = wx.Image(os.path.join(graphicsdir, "blank-icon.png")).ConvertToBitmap()
 		self.icons['Root']       = wx.Image(os.path.join(graphicsdir, "tp-icon.png")).ConvertToBitmap()
