@@ -88,12 +88,13 @@ class panelStarMap(wx.Panel):
 		"""\
 		Called when the cache has been updated.
 		"""
-		if hasattr(self, 'Overlay'):
-			self.Overlay.cleanup()
+		if evt.what == None:
+			if hasattr(self, 'Overlay'):
+				self.Overlay.cleanup()
 
-		from overlays.Systems import Systems
-		self.Overlay = Systems(self, self.Canvas, self.application.cache)
-		self.Overlay.update()
+			from overlays.Systems import Systems
+			self.Overlay = Systems(self, self.Canvas, self.application.cache)
+			self.Overlay.update()
 
 	def PostSelectObject(self, oid):
 		self.application.gui.Post(self.application.gui.SelectObjectEvent(oid))
