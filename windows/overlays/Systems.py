@@ -8,7 +8,7 @@ import numpy as N
 
 # wxPython imports
 import wx
-from extra.wxFloatCanvas.FloatCanvas   import Point, Group
+from extra.wxFloatCanvas.FloatCanvas   import Point, Group, Line
 from extra.wxFloatCanvas.RelativePoint import RelativePoint, RelativePointSet
 from extra.wxFloatCanvas.PolygonStatic import PolygonArrow, PolygonShip
 
@@ -58,6 +58,24 @@ def FindOwners(cache, obj):
 			continue
 		owners.add(child.owner)
 	return list(owners)
+
+def FindPath(cache, obj):
+	"""
+	Figure out the owners of this oidect (and it's children).
+	"""
+	if not isinstance(obj, Object):
+		raise TypeError("Object must be an object not %r" % obj)
+
+	locations = [obj.pos]
+	for order in cache.orders[obj.id]:
+		if order._name in ("Move", "Move To", "Intercept"):
+			if hasattr(order, "pos"):
+				locations.append(order.pos)
+			if hasattr(order, "to"):
+				locations.append(cache.objects[order.to].pos)
+	if len(locations) == 1:
+		return None
+	return locations
 
 class IconMixIn:
 	"""
@@ -112,7 +130,6 @@ class SystemIcon(Group, Holder, IconMixIn):
 		ObjectList = []
 
 		# The center point
-		print type, childtype
 		ObjectList.append(Point(system.pos[0:2], type, self.PrimarySize, False))
 
 		if len(self.children) > 0:
@@ -134,10 +151,10 @@ class FleetIcon(Group, Holder, IconMixIn):
 	"""
 
 	def __init__(self, cache, fleet, colorizer=None):
-		if not isinstance(system, Fleet):
+		if not isinstance(fleet, Fleet):
 			raise TypeError('FleetIcon must be given a Fleet, %r' % system)
 
-		if len(FindChildren(fleet)) > 0:
+		if len(FindChildren(cache, fleet)) > 0:
 			raise TypeError('The fleet has children! WTF?')
 
 		Holder.__init__(self, fleet, [])
@@ -150,7 +167,7 @@ class FleetIcon(Group, Holder, IconMixIn):
 		ObjectList = []
 
 		# The little ship icon
-		ObjectList.append(PolygonShip(pos, type))
+		ObjectList.append(PolygonShip(fleet.pos[0:2], type))
 
 		Group.__init__(self, ObjectList, False)
 
@@ -194,6 +211,11 @@ class Systems(Overlay):
 		self.Timer.Bind(wx.EVT_TIMER, self.OnHover)
 
 		self.PopupText = NamePopup(self.canvas, wx.SIMPLE_BORDER)
+
+	def cleanup(self):
+		if self.Hovering != None:
+			self.SystemLeave(self.Hovering)
+		Overlay.cleanup(self)
 
 	def updateall(self):
 		#self.Colorizer = ColorVerses(self.cache.players[0].id)
@@ -269,20 +291,21 @@ class Systems(Overlay):
 
 		self.parent.PostSelectObject(real.id)
 
-	def SystemEnter(self, obj):
-		print "SystemEnter", obj
-		screen = self.canvas.WorldToPixel(obj.XY)
+	def SystemEnter(self, holder):
+		print "SystemEnter", holder
+
+		screen = self.canvas.WorldToPixel(holder.XY)
 		pos	= self.canvas.ClientToScreen( screen )
 
 		# Build the string
 		s = "<font size='%s'>" % wx.local.normalFont.GetPointSize()
-		for i, cobj in enumerate(obj):
+		for i, cobj in enumerate(holder):
 			# Italics the currently selected object
 			style = 'normal'
-			if self.Selected.current == cobj:
+			if self.Selected != None and self.Selected.current == cobj:
 				style = 'italic'
 
-			color = obj.Colorizer(FindOwners(self.cache, cobj))
+			color = holder.Colorizer(FindOwners(self.cache, cobj))
 
 			s += "<font style='%s' color='%s'>%s" % (style, color, cobj.name)
 			if isinstance(cobj, Fleet):
@@ -296,17 +319,40 @@ class Systems(Overlay):
 		self.PopupText.Position(pos, (IconMixIn.PrimarySize, IconMixIn.PrimarySize))
 		self.PopupText.Show(True)
 
+		paths = []
+		for i, cobj in enumerate(holder):
+			# Draw the path of the object
+			path = FindPath(self.cache, cobj)
+			print repr(cobj), path
+			if path:
+				pr = path[0]
+				for p in path[1:]:
+					print p[0:2], pr[0:2]
+					paths.append(Line([pr[0:2], p[0:2]], LineColor='Blue', InForeground=True))
+					pr = p
+
+		print paths
+		if len(paths) > 0:
+			self['paths'] = paths
+		self.canvas.Draw()
+
 		# Start the "preview" mode
-		if obj != self.Selected:
-			self.Hovering = obj
+		if holder != self.Selected:
+			self.Hovering = holder
 			self.Hovering.ResetLoop()
 
 			self.Timer.Start(2000)
-
-	def SystemLeave(self, obj):
+		
+	def SystemLeave(self, holder):
+		print "SystemLeave", holder, self.Selected
 		self.PopupText.Hide()
 
+		# Hide any paths which are showing
+		if self.has_key('paths'):
+			del self['paths']
+
 		# Stop the "preview"
+		self.Hovering = None
 		self.Timer.Stop()
 		self['preview-arrow'].Hide()
 		self.canvas.Draw()
@@ -315,6 +361,8 @@ class Systems(Overlay):
 			self.parent.PostSelectObject(self.Selected.current.id)
 
 	def OnHover(self, evt):
+		self.Timer.Stop()
+
 		i, real = self.Hovering.NextLoop()
 		self.parent.PostPreviewObject(real.id)
 
