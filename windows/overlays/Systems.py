@@ -199,7 +199,7 @@ class Systems(Overlay):
 		obj = self.cache.objects[oid]
 
 		# Only draw top level objects
-		if isinstance(obj, Systems.toplevel):
+		if isinstance(obj, Systems.toplevel) or not hasattr(obj, 'parent'):
 			return
 
 		# Don't draw objects which parent's are not top level objects
@@ -271,7 +271,7 @@ class Systems(Overlay):
 			cobj = self.cache.objects[cid]
 
 			style = 'normal'
-			if [obj.holder[0], i] == self.Selected.holder:
+			if self.Selected != None and [obj.holder[0], i] == self.Selected.holder:
 				style = 'italic'
 
 			color = obj.holder.Colorizer(FindOwners(self.cache, cid))
