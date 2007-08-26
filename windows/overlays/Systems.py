@@ -302,8 +302,9 @@ class Systems(Overlay):
 		self.Timer.Stop()
 		self['preview-arrow'].Hide()
 		self.canvas.Draw()
-
-		self.parent.PostSelectObject(self.Selected.holder[self.Selected.holder.current])
+	
+		if self.Selected != None:
+			self.parent.PostSelectObject(self.Selected.holder[self.Selected.holder.current])
 
 	def OnHover(self, evt):
 		H = self.Hovering.holder
