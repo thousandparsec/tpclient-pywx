@@ -44,7 +44,6 @@ def configpath():
 			os.mkdir(rc)
 		return rc
 
-cache = {}
 def load_data(file):
 	"""\
 	Loads preference data from a file.

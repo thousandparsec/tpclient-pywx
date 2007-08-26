@@ -8,7 +8,7 @@ import numpy as N
 
 # wxPython imports
 import wx
-from extra.wxFloatCanvas.FloatCanvas import Point, Group
+from extra.wxFloatCanvas.FloatCanvas   import Point, Group
 from extra.wxFloatCanvas.RelativePoint import RelativePoint, RelativePointSet
 from extra.wxFloatCanvas.PolygonStatic import PolygonArrow, PolygonShip
 
@@ -16,80 +16,69 @@ from extra.wxFloatCanvas.FloatCanvas import EVT_FC_ENTER_OBJECT, EVT_FC_LEAVE_OB
 from extra.wxFloatCanvas.FloatCanvas import EVT_FC_LEFT_UP, EVT_FC_RIGHT_UP
 
 # tp imports
-from tp.netlib.objects.ObjectExtra.Galaxy import Galaxy
-from tp.netlib.objects.ObjectExtra.Universe import Universe
+from tp.netlib.objects                        import Object
+from tp.netlib.objects.ObjectExtra.Universe   import Universe
+from tp.netlib.objects.ObjectExtra.Galaxy     import Galaxy
 from tp.netlib.objects.ObjectExtra.StarSystem import StarSystem
-from tp.netlib.objects.ObjectExtra.Planet import Planet
-from tp.netlib.objects.ObjectExtra.Fleet import Fleet
+from tp.netlib.objects.ObjectExtra.Planet     import Planet
+from tp.netlib.objects.ObjectExtra.Fleet      import Fleet
 
-class GenericIcon(Group):
+from Overlay   import Overlay, Holder
+from Colorizer import *
+
+def FindChildren(cache, obj):
+	"""
+	Figure out all the children of this object.
+	"""
+	if not isinstance(obj, Object):
+		raise TypeError("Object must be an object not %r" % obj)
+
+	kids = set()
+	for cid in obj.contains:
+		child = cache.objects[cid]
+
+		kids.update(FindChildren(cache, child))
+		kids.add(child)
+
+	return list(kids)
+
+def FindOwners(cache, obj):
+	"""
+	Figure out the owners of this oidect (and it's children).
+	"""
+	if not isinstance(obj, Object):
+		raise TypeError("Object must be an object not %r" % obj)
+
+	owners = set()
+	for child in [obj]+FindChildren(cache, obj):
+		if not hasattr(child, 'owner'):
+			continue
+
+		if child.owner in (0, -1):
+			continue
+		owners.add(child.owner)
+	return list(owners)
+
+class IconMixIn:
+	"""
+	"""
 	PrimarySize = 3
 	ChildSize   = 3
 
-	def __init__(self, pos, type, children=[]):
-		ObjectList = []
+	def __init__(self, cache, colorizer):
+		self.cache = cache
+		self.SetColorizer(colorizer)
 
-		# The center Point
-		ObjectList.append(Point(pos, type, self.PrimarySize, False))
-
-		if len(children) > 0:
-			# The orbit bits
-			ObjectList.insert(0, Point(pos, "Black", 8))
-			ObjectList.insert(0, Point(pos, "Grey",  9, False))
-	
-			# The orbiting children
-			for i, childtype in enumerate(children):
-				ObjectList.append(RelativePoint(pos, childtype, self.ChildSize, False, 
-									self.ChildOffset(i, len(children))))
-
-		Group.__init__(self, ObjectList, False)
-
+	# FIXME: Should probably just monkey patch this onto Group?
 	def XY(self):
 		return self.ObjectList[0].XY
 	XY = property(XY)
 
-	def ChildOffset(self, i, num):
+	def ChildOffset(self, i):
+		num = len(self.children)
+
 		angle = ((2.0*pi)/num)*(i-0.125)
 		return (int(cos(angle)*6), int(sin(angle)*6))
-
-class FleetIcon(GenericIcon):
-	def __init__(self, pos, type, children=[]):
-		if len(children) > 0:
-			raise TypeError("Fleet's can not have children!")
-
-		ObjectList = []
-
-		# The center Point
-		ObjectList.append(PolygonShip(pos, type))
-		Group.__init__(self, ObjectList, False)
-
-from Colorizer import *
-class Holder(list):
-	def __init__(self, cache, parent, children=[]):
-		"""
-
-		"""
-		self.cache = cache
-
-		if not isinstance(parent, (int, long)):
-			raise TypeError("Parent must be an ID's not %r" % parent) 
-		for i, child in enumerate(children):
-			if not isinstance(child, (int, long)):
-				raise TypeError("Child %i must be an ID's not %r" % (i, child)) 
-
-		self.extend([parent] + children)
-		self.ResetLoop()
-
-	def ResetLoop(self):
-		self.current = -1
-
-	def NextLoop(self):
-		self.current = (self.current + 1) % len(self)
-		return self.current, self[self.current]
-
-	def SetLoop(self, v):
-		self.current = self.index(v)
-		return self.current
 
 	def SetColorizer(self, colorizer):
 		if not isinstance(colorizer, Colorizer):
@@ -97,50 +86,74 @@ class Holder(list):
 		self.Colorizer = colorizer
 
 	def GetColors(self):
-		parentcolor = self.Colorizer(FindOwners(self.cache, self[0]))
+		parentcolor = self.Colorizer(FindOwners(self.cache, self.primary))
 		
 		childrencolors = []
-		for child in self[1:]:
+		for child in self.children:
 			childrencolors.append(self.Colorizer(FindOwners(self.cache, child)))
 	
 		return parentcolor, childrencolors
 
-	def __eq__(self, value):
-		return [self[0], self.current] == value
-
-def FindChildren(cache, oid):
+class SystemIcon(Group, Holder, IconMixIn):
 	"""
-	Figure out all the children of this object.
+	Display a round dot with a dot for each child.
 	"""
-	if not isinstance(oid, (int, long)):
-		raise TypeError("oid must be a oid not %r" % oid)
+	def __init__(self, cache, system, colorizer=None):
+		if not isinstance(system, StarSystem):
+			raise TypeError('SystemIcon must be given a StarSystem, %r' % system)
 
-	kids = set()
-	for child in cache.objects[oid].contains:
-		kids.update(FindChildren(cache, child))
-		kids.add(child)
+		Holder.__init__(self, system, FindChildren(cache, system))
 
-	return list(kids)
+		# Get the colors of the object
+		IconMixIn.__init__(self, cache, colorizer)
+		type, childtype = self.GetColors()
 
-def FindOwners(cache, oid):
+		# Create a list of the objects
+		ObjectList = []
+
+		# The center point
+		print type, childtype
+		ObjectList.append(Point(system.pos[0:2], type, self.PrimarySize, False))
+
+		if len(self.children) > 0:
+			# The orbit bits
+			ObjectList.insert(0, Point(system.pos[0:2], "Black", 8))
+			ObjectList.insert(0, Point(system.pos[0:2], "Grey",  9, False))
+	
+			# The orbiting children
+			for i, childtype in enumerate(childtype):
+				ObjectList.append(
+					RelativePoint(system.pos[0:2], childtype, self.ChildSize, False, self.ChildOffset(i))
+				)
+
+		Group.__init__(self, ObjectList, False)
+
+class FleetIcon(Group, Holder, IconMixIn):
 	"""
-	Figure out the owners of this oidect (and it's children).
+	Display a little arrow shape thing.
 	"""
-	if not isinstance(oid, (int, long)):
-		raise TypeError("oid must be a oid not %r" % oid)
 
-	owners = set()
-	for child in [oid]+FindChildren(cache, oid):
-		if not hasattr(cache.objects[child], 'owner'):
-			continue
+	def __init__(self, cache, fleet, colorizer=None):
+		if not isinstance(system, Fleet):
+			raise TypeError('FleetIcon must be given a Fleet, %r' % system)
 
-		owner = cache.objects[child].owner
-		if owner in (0, -1):
-			continue
-		owners.add(owner)
-	return list(owners)
+		if len(FindChildren(fleet)) > 0:
+			raise TypeError('The fleet has children! WTF?')
 
-from Overlay import Overlay
+		Holder.__init__(self, fleet, [])
+
+		# Get the colors of the object
+		IconMixIn.__init__(self, cache, colorizer)
+		type, childtype = self.GetColors()
+
+		# Create a list of the objects
+		ObjectList = []
+
+		# The little ship icon
+		ObjectList.append(PolygonShip(pos, type))
+
+		Group.__init__(self, ObjectList, False)
+
 
 from wx.lib.fancytext import StaticFancyText
 class NamePopup(wx.PopupWindow):
@@ -207,14 +220,10 @@ class Systems(Overlay):
 		if not isinstance(parent, Systems.toplevel):
 			return
 
-		holder = Holder(self.cache, oid, FindChildren(self.cache, oid))
-		holder.SetColorizer(self.Colorizer)
-
 		if isinstance(obj, Fleet):
-			self[oid] = FleetIcon(obj.pos[0:2], *holder.GetColors())
+			self[oid] =  FleetIcon(self.cache, obj, self.Colorizer)
 		else:
-			self[oid] = GenericIcon(obj.pos[0:2], *holder.GetColors())
-		self[oid].holder = holder
+			self[oid] = SystemIcon(self.cache, obj, self.Colorizer)
 
 		# These pop-up the name of the object
 		self[oid].Bind(EVT_FC_ENTER_OBJECT, self.SystemEnter)
@@ -222,22 +231,22 @@ class Systems(Overlay):
 		self[oid].Bind(EVT_FC_LEFT_UP, self.SystemLeftClick)
 
 	def ArrowTo(self, arrow, obj, i):
-		arrow.SetPoint(self.cache.objects[obj.holder[0]].pos[0:2])
+		arrow.SetPoint(obj.primary.pos[0:2])
 		arrow.SetOffset((0,0))
 		if i > 0:
-			arrow.SetOffset(obj.ChildOffset(i-1, len(obj.holder)-1))
+			arrow.SetOffset(obj.ChildOffset(i-1))
 		self.canvas.Draw()
 
 	def SelectObject(self, oid):
-		pid = oid
-		while not self.has_key(pid):
+		parentid = oid
+		while not self.has_key(parentid):
 			try:
-				pid = self.cache.objects[pid].parent
+				parentid = self.cache.objects[parentid].parent
 			except AttributeError:
 				return
 
-		obj = self[pid]
-		i   = obj.holder.SetLoop(oid)
+		obj = self[parentid]
+		i   = obj.SetLoop(self.cache.objects[oid])
 
 		self.Selected = obj
 		self.ArrowTo(self['selected-arrow'], obj, i)
@@ -248,17 +257,17 @@ class Systems(Overlay):
 		# Are we clicking on the same object?
 		if self.Selected != obj:
 			self.Selected = obj
-			self.Selected.holder.ResetLoop()
+			self.Selected.ResetLoop()
 
 		# Cycle throught the children on each click
-		i, rid = self.Selected.holder.NextLoop()
+		i, real = self.Selected.NextLoop()
 		
 		self.ArrowTo(self['selected-arrow'], obj, i)
 
 		self.SystemLeave(obj)
 		self.SystemEnter(obj)
 
-		self.parent.PostSelectObject(rid)
+		self.parent.PostSelectObject(real.id)
 
 	def SystemEnter(self, obj):
 		print "SystemEnter", obj
@@ -267,14 +276,13 @@ class Systems(Overlay):
 
 		# Build the string
 		s = "<font size='%s'>" % wx.local.normalFont.GetPointSize()
-		for i, cid in enumerate(obj.holder):
-			cobj = self.cache.objects[cid]
-
+		for i, cobj in enumerate(obj):
+			# Italics the currently selected object
 			style = 'normal'
-			if self.Selected != None and [obj.holder[0], i] == self.Selected.holder:
+			if self.Selected.current == cobj:
 				style = 'italic'
 
-			color = obj.holder.Colorizer(FindOwners(self.cache, cid))
+			color = obj.Colorizer(FindOwners(self.cache, cobj))
 
 			s += "<font style='%s' color='%s'>%s" % (style, color, cobj.name)
 			if isinstance(cobj, Fleet):
@@ -285,13 +293,13 @@ class Systems(Overlay):
 		s = s[:-1]+"</font>"
 
 		self.PopupText.SetText(s)
-		self.PopupText.Position(pos, (GenericIcon.PrimarySize, GenericIcon.PrimarySize))
+		self.PopupText.Position(pos, (IconMixIn.PrimarySize, IconMixIn.PrimarySize))
 		self.PopupText.Show(True)
 
 		# Start the "preview" mode
 		if obj != self.Selected:
 			self.Hovering = obj
-			self.Hovering.holder.ResetLoop()
+			self.Hovering.ResetLoop()
 
 			self.Timer.Start(2000)
 
@@ -304,13 +312,11 @@ class Systems(Overlay):
 		self.canvas.Draw()
 	
 		if self.Selected != None:
-			self.parent.PostSelectObject(self.Selected.holder[self.Selected.holder.current])
+			self.parent.PostSelectObject(self.Selected.current.id)
 
 	def OnHover(self, evt):
-		H = self.Hovering.holder
-
-		i, rid = H.NextLoop()
-		self.parent.PostPreviewObject(rid)
+		i, real = self.Hovering.NextLoop()
+		self.parent.PostPreviewObject(real.id)
 
 		self['preview-arrow'].Show()
 		self.ArrowTo(self['preview-arrow'], self.Hovering, i)
