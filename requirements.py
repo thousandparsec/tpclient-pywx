@@ -262,6 +262,12 @@ if len(notfound) > 0:
 		print '    ', module
 	print
 
+import os, pprint
+try:
+	COLS = int(os.environ["COLUMNS"])
+except (KeyError, ValueError):
+	COLS = 80
+
 ALIGN = 25
 if len(recommended) > 0:
 	print "The following recommended modules where not found:"
@@ -272,7 +278,7 @@ if len(recommended) > 0:
 		lines[-1] += ' ' * (ALIGN-len(lines[-1]))
 
 		for word in reason.split(" "):
-			if len(lines[-1]) + len(word) > 80:
+			if (len(lines[-1]) + len(word) + 1) > COLS:
 				lines.append(' '*ALIGN)
 
 			lines[-1] += word + " "
