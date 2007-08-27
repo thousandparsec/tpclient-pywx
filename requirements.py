@@ -266,7 +266,11 @@ import os, pprint
 try:
 	COLS = int(os.environ["COLUMNS"])
 except (KeyError, ValueError):
-	COLS = 80
+	try:
+		import struct, fcntl, sys, termios
+		COLS = struct.unpack('hh', fcntl.ioctl(sys.stdout, termios.TIOCGWINSZ, '1234'))[1]
+	except:
+		COLS = 80
 
 ALIGN = 25
 if len(recommended) > 0:
