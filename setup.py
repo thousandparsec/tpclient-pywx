@@ -116,10 +116,17 @@ if sys.platform.startswith('linux') and "install" in sys.argv:
 	sys.exit()
 
 if not "py2app" in sys.argv and not "py2exe" in sys.argv:
-	print "This file is only provided to do the following,"
-	print "  py2exe executable bundles for windows"
-	print "  py2app dmg packages for Mac OS X"
-	print "  install on a unix system"
+	print "This file is only provided to do the following,   (python setup.py py2exe)"
+	print "  producing py2exe executable bundles for windows (python setup.py py2app)"
+	print "  producing py2app dmg packages for Mac OS X      (python setup.py install)"
+	print "  installing (a release) on a unix system"
+	if os.path.exists(".git"):
+		print
+		print "WARNING!!"
+		print " You seem to be running a git checkout (hence you don't want to be running this file)."
+		print " tpclient-pywx can be run straight from this directory by just typing:"
+		print "  ./tpclient-pywx"
+
 	sys.exit()
 
 if sys.platform == 'darwin':
