@@ -64,7 +64,7 @@ class panelOrder(panelOrderBase):
 
 	def GetPaneInfo(self):
 		info = wx.aui.AuiPaneInfo()
-		#info.MinSize(self.GetBestSize())
+		info.MinSize((self.GetBestSize()[0]*1.5,self.GetBestSize()[1]))
 		info.Left()
 		info.Layer(2)
 		return info
