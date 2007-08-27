@@ -47,12 +47,18 @@ def tostr(ver1):
 		s += "."+str(a)
 	return s[1:]
 
+print "My information:"
+print "---------------------------------------------------------------"
 import version
 try:
 	print "My version", version.version_str+'+'+version.version_target_str, "(git %s)" % version.version_git
 except AttributeError:
 	print "My version", version.version_str
+print "Running from ", os.path.dirname(os.path.join(os.path.abspath(__file__)))
+print
 
+print "Checking requirements:"
+print "---------------------------------------------------------------"
 try:
 	import numpy
 except ImportError:
@@ -78,7 +84,7 @@ try:
 	if not cmp(wx_version, wx.__version__.split('.')):
 		raise ImportError("wxPython was too old")
 
-	print "wxPython Version", wx.__version__
+	print "wxPython version is", wx.__version__
 except (ImportError, KeyError), e:
 	print e
 
@@ -118,6 +124,8 @@ try:
 	try:
 		import pyOpenSSL
 	except ImportError, e:
+		print e
+
 		# Maybe it's using a different name
 		import OpenSSL as pyOpenSSL
 except ImportError, e:
@@ -157,10 +165,11 @@ netlib_version = (0, 2, 1)
 try:
 	import tp.netlib
 
-	print "Thousand Parsec Protocol Library Version", tp.netlib.__version__, "(installed at %s)" % tp.netlib.__installpath__,
+	print "Thousand Parsec Protocol Library Version", tp.netlib.__version__ 
+	print "    (installed at %s)" % tp.netlib.__installpath__
 	try:
 		from tp.netlib.version import version_git
-		print "(git %s)" % version_git
+		print "    (git %s)" % version_git
 	except ImportError:
 		print
 
@@ -175,10 +184,11 @@ client_version = (0, 2, 99)
 try:
 	import tp.client
 
-	print "Thousand Parsec Client Library Version", tp.client.__version__, "(installed at %s)" % tp.client.__installpath__,
+	print "Thousand Parsec Client Library Version", tp.client.__version__
+	print "    (installed at %s)" % tp.client.__installpath__
 	try:
 		from tp.client.version import version_git
-		print "(git %s)" % version_git
+		print "    (git %s)" % version_git
 	except ImportError:
 		print
 
@@ -196,7 +206,7 @@ if len(notfound) == 0:
 		if not os.path.exists(location):
 			print "Hrm, unable to find tpclient-pywx are you running outside a tpclient-pywx tree?"
 		else:
-			print location
+			#print location
 			# Check the file is executable
 			try:
 				os.chmod(location, stat.S_IRUSR|stat.S_IWUSR|stat.S_IXUSR|stat.S_IRGRP|stat.S_IXGRP|stat.S_IROTH|stat.S_IXOTH)
@@ -219,6 +229,9 @@ if len(notfound) == 0:
 				else:
 					recommended.append(("Recent version of pyGTK.", reason))
 
+	print
+	print "Checking locations:"
+	print "---------------------------------------------------------------"
 	import os
 	try:
 		graphicsdir = os.environ["TPCLIENT_GRAPHICS"]
@@ -238,21 +251,34 @@ if len(notfound) == 0:
 		print "Can not find help documentation required by this client."
 		sys.exit()
 
-if len(notfound) > 0:
+if len(notfound) > 0 or len(recommended) > 0:
 	print
+	print "Possible problems found:"
+	print "---------------------------------------------------------------"
+
+if len(notfound) > 0:
 	print "The following requirements where not met:"
 	for module in notfound:
-		print '\t', module
-
-if len(recommended) > 0:
+		print '    ', module
 	print
+
+ALIGN = 25
+if len(recommended) > 0:
 	print "The following recommended modules where not found:"
 	for module, reason in recommended:
-		if len(module+',') > 16:
-			i = '\t'
-		else:
-			i = '\t\t'
-		print '\t', module + ',', i, reason
+		
+		lines = [""]
+		lines[-1] += '    %s,' % module
+		lines[-1] += ' ' * (ALIGN-len(lines[-1]))
+
+		for word in reason.split(" "):
+			if len(lines[-1]) + len(word) > 80:
+				lines.append(' '*ALIGN)
+
+			lines[-1] += word + " "
+
+		print
+		print "\n".join(lines)
 
 # Check for an apt-get based system,
 if system == "debian-based":
@@ -280,5 +306,5 @@ if len(notfound) > 0:
 	import sys
 	sys.exit(1)
 
-# FIXME: This is here to extra is imported very early on.
-import extra
+## FIXME: This is here to extra is imported very early on.
+#import extra
