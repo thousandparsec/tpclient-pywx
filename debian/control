@@ -8,8 +8,8 @@ Standards-Version: 3.7.2
 
 Package: tpclient-pywx
 Architecture: all
-Depends: ${python:Depends}, python-tp-netlib (>> 0.2), python-tp-client (>= 0.2.99), python-numpy, python-wxgtk2.6
-Recommends: python-psyco, python-pyopenssl, python-imaging, python-pygame, python-wxgtk2.8
+Depends: ${python:Depends}, python-tp-netlib (>> 0.2), python-tp-client (>= 0.2.99), python-numpy, python-wxgtk2.8
+Recommends: python-psyco, python-pyopenssl, python-imaging, python-pygame
 XB-Python-Version: ${python:Versions}
 Provides: ${python:Provides}
 Description: Thousand Parsec client written in Python
