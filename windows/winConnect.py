@@ -19,6 +19,9 @@ from utils import *
 
 from tp.netlib.client import url2bits
 
+# FIXME: The game really isn't part of the username, it's part of the server information
+# You could be playing multiple different games on the same server!
+
 class usernameMixIn:
 	def __init__(self):
 		self.Username.Bind(wx.EVT_CHAR, self.OnUsernameChar)
@@ -202,6 +205,7 @@ class winConnect(winConnectBase, winMainBaseXRC, usernameMixIn):
 		self.CenterOnScreen(wx.BOTH)
 
 		autoconnect = False
+
 		# If the server value is empty we should populate with a server item
 		if len(self.Server.GetValue()) == 0:
 			# Check that no other server is also set to autoconnect
@@ -234,22 +238,22 @@ class winConnect(winConnectBase, winMainBaseXRC, usernameMixIn):
 		if server in self.config['servers']:
 			# Check the values are the same
 			(oldusername, oldpassword, oldautoconnect) = self.config['details'][server]
+		else:
+			(oldusername, oldpassword, oldautoconnect) = (username, password, False)
 
-			if oldusername != username:
-				print "Username doesn't match.."
-			if oldpassword != password:
-				print "Password doesn't match.."
-				msg = _("""\
+		if oldpassword != password:
+			msg = _("""\
 It appears you are using a different password for 
 this account, would you like to update the saved 
 information with the new password?
 """)
-				dlg = wx.MessageDialog(self, msg, _("Update Password?"), wx.YES_NO|wx.YES_DEFAULT|wx.ICON_INFORMATION)
-				if dlg.ShowModal() == wx.ID_YES:
-					# Update the password
-					self.config['details'][server][PASSWORD] = password
-					# Save the config now
-					self.application.ConfigSave()
+
+			dlg = wx.MessageDialog(self, msg, _("Update Password?"), wx.YES_NO|wx.YES_DEFAULT|wx.ICON_INFORMATION)
+			if dlg.ShowModal() == wx.ID_YES:
+				# Update the password
+				self.config['details'][server][PASSWORD] = password
+				# Save the config now
+				self.application.ConfigSave()
 
 		else:
 			# Popup a dialog asking if we want to add the account
@@ -287,7 +291,7 @@ Would you like to save this account's details?
 		# password = <server>
 		server, username, game, password = url2bits(url)
 
-		if server is None:
+		if server is None or len(server) == 0:
 			return
 		self.Server.SetValue(server)
 
@@ -364,10 +368,10 @@ Would you like to save this account's details?
 		self.config = config
 		self.ConfigDefault(config)
 
-		self.Server.Clear()
-		self.Server.AppendItems(self.config['servers'])
+		#self.Server.Clear()
+		#self.Server.AppendItems(self.config['servers'])
+		#self.Server.SetValue(self.config['servers'][0])
 
-		self.Server.SetValue("")
 		self.ConfigDisplayUpdate(None)
 
 	def ConfigUpdate(self):
