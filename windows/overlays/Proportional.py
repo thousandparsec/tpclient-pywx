@@ -11,10 +11,10 @@ class Proportional(Overlay):
 	"""\
 	Draws proportional circles defined by amount.
 	"""
-	scale = 10000000000L
+	scale = 100L
 
-	def __init__(self, canvas, cache):
-		Overlay.__init__(self, canvas, cache)
+	def __init__(self, parent, canvas, cache):
+		Overlay.__init__(self, parent, canvas, cache)
 
 		self.max = 0
 		self.min = 0
@@ -39,7 +39,12 @@ class Proportional(Overlay):
 		# Calculate all the values so we can figure min/max.
 		values = {}
 		for oid in c.objects.keys():
+			print oid, self.amount(oid)
+
 			values[oid] = self.amount(oid)
+
+		import pprint
+		pprint.pprint(values)
 
 		# Get min/max values.
 		v = values.values()
@@ -68,4 +73,5 @@ class Proportional(Overlay):
 		proportional = value/(self.max-self.min)
 
 		# Create the new object.
-		self[oid] = FloatCanvas.Circle(c.objects[oid].pos[0:2], proportional*self.scale, FillColor="White")
+		self[oid] = FloatCanvas.Point(c.objects[oid].pos[0:2], 'White', proportional*self.scale)
+

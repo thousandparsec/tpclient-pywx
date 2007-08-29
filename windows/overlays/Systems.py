@@ -12,9 +12,6 @@ from extra.wxFloatCanvas.FloatCanvas   import Point, Group, Line
 from extra.wxFloatCanvas.RelativePoint import RelativePoint, RelativePointSet
 from extra.wxFloatCanvas.PolygonStatic import PolygonArrow, PolygonShip
 
-from extra.wxFloatCanvas.FloatCanvas import EVT_FC_ENTER_OBJECT, EVT_FC_LEAVE_OBJECT
-from extra.wxFloatCanvas.FloatCanvas import EVT_FC_LEFT_UP, EVT_FC_RIGHT_UP
-
 # tp imports
 from tp.netlib.objects                        import Object
 from tp.netlib.objects.ObjectExtra.Universe   import Universe
@@ -23,7 +20,7 @@ from tp.netlib.objects.ObjectExtra.StarSystem import StarSystem
 from tp.netlib.objects.ObjectExtra.Planet     import Planet
 from tp.netlib.objects.ObjectExtra.Fleet      import Fleet
 
-from Overlay   import Overlay, Holder
+from Overlay   import SystemLevelOverlay, Holder
 from Colorizer import *
 
 def FindChildren(cache, obj):
@@ -92,6 +89,9 @@ class IconMixIn:
 		return self.ObjectList[0].XY
 	XY = property(XY)
 
+	def GetSize(self):
+		return (self.PrimarySize*2, self.PrimarySize*2)
+
 	def ChildOffset(self, i):
 		num = len(self.children)
 
@@ -116,6 +116,10 @@ class SystemIcon(Group, Holder, IconMixIn):
 	"""
 	Display a round dot with a dot for each child.
 	"""
+	def copy(self):
+		# FIXME: Very expensive
+		return SystemIcon(self.cache, self.primary, self.Colorizer)
+
 	def __init__(self, cache, system, colorizer=None):
 		if not isinstance(system, StarSystem):
 			raise TypeError('SystemIcon must be given a StarSystem, %r' % system)
@@ -149,6 +153,9 @@ class FleetIcon(Group, Holder, IconMixIn):
 	"""
 	Display a little arrow shape thing.
 	"""
+	def copy(self):
+		# FIXME: Very expensive
+		return FleetIcon(self.cache, self.primary, self.Colorizer)
 
 	def __init__(self, cache, fleet, colorizer=None):
 		if not isinstance(fleet, Fleet):
@@ -171,157 +178,57 @@ class FleetIcon(Group, Holder, IconMixIn):
 
 		Group.__init__(self, ObjectList, False)
 
-
-from wx.lib.fancytext import StaticFancyText
-class NamePopup(wx.PopupWindow):
-	Padding = 2
-
-	def __init__(self, parent, style):
-		wx.PopupWindow.__init__(self, parent, style)
-
-		self.parent = parent
-
-		self.SetBackgroundColour("#202020")
-		self.Bind(wx.EVT_MOTION, parent.MotionEvent)
-
-	def SetText(self, text):
-		try:
-			self.st.Unbind(wx.EVT_MOTION)
-			self.st.Destroy()
-		except AttributeError:
-			pass
-
-		self.st = StaticFancyText(self.Window, -1, text, pos=(self.Padding, self.Padding))
-		sz = self.st.GetSize()
-		self.SetSize( (sz.width+2*self.Padding, sz.height+2*self.Padding) )
-
-		self.st.Bind(wx.EVT_MOTION, self.parent.MotionEvent)
-
-class Systems(Overlay):
+class Systems(SystemLevelOverlay):
 	toplevel = Galaxy, Universe
 
 	def __init__(self, *args, **kw):
-		Overlay.__init__(self, *args, **kw)
+		SystemLevelOverlay.__init__(self, *args, **kw)
 
 		self.canvas.SetCursor(wx.StockCursor(wx.CURSOR_RIGHT_ARROW))
 
-		self.Selected = None
-		self.Hovering = None
-		self.Timer = wx.Timer()
-		self.Timer.Bind(wx.EVT_TIMER, self.OnHover)
-
-		self.PopupText = NamePopup(self.canvas, wx.SIMPLE_BORDER)
-
-	def cleanup(self):
-		if self.Hovering != None:
-			self.SystemLeave(self.Hovering)
-		Overlay.cleanup(self)
-
-	def updateall(self):
+	def UpdateAll(self):
 		#self.Colorizer = ColorVerses(self.cache.players[0].id)
 		self.Colorizer = ColorEach()
 
-		Overlay.updateall(self)
+		SystemLevelOverlay.UpdateAll(self)
 
-		self['selected-arrow'] = PolygonArrow((0,0), "Red", True)
-		self['preview-arrow']  = PolygonArrow((0,0), "#555555", True)
+		self['preview-arrow'] = PolygonArrow((0,0), "#555555", True)
 		self['preview-arrow'].Hide()
+		self['selected-arrow'] = PolygonArrow((0,0), "Red", True)
 
-	def updateone(self, oid):
-		"""\
-
-		"""
-		obj = self.cache.objects[oid]
-
-		# Only draw top level objects
-		if isinstance(obj, Systems.toplevel) or not hasattr(obj, 'parent'):
-			return
-
-		# Don't draw objects which parent's are not top level objects
-		parent = self.cache.objects[obj.parent]
-		if not isinstance(parent, Systems.toplevel):
-			return
-
+	def Icon(self, obj):
 		if isinstance(obj, Fleet):
-			self[oid] =  FleetIcon(self.cache, obj, self.Colorizer)
+			return FleetIcon(self.cache, obj, self.Colorizer)
 		else:
-			self[oid] = SystemIcon(self.cache, obj, self.Colorizer)
+			return SystemIcon(self.cache, obj, self.Colorizer)
 
-		# These pop-up the name of the object
-		self[oid].Bind(EVT_FC_ENTER_OBJECT, self.SystemEnter)
-		self[oid].Bind(EVT_FC_LEAVE_OBJECT, self.SystemLeave)
-		self[oid].Bind(EVT_FC_LEFT_UP, self.SystemLeftClick)
-
-	def ArrowTo(self, arrow, obj, i):
-		arrow.SetPoint(obj.primary.pos[0:2])
+	def ArrowTo(self, arrow, icon, object):
+		arrow.SetPoint(icon.primary.pos[0:2])
 		arrow.SetOffset((0,0))
+
+		i = icon.index(object)
+		print icon, i, repr(object)
 		if i > 0:
-			arrow.SetOffset(obj.ChildOffset(i-1))
+			arrow.SetOffset(icon.ChildOffset(i-1))
+
+	def ObjectLeftClick(self, icon, obj):
+		"""
+		Move the red arrow to the current object.
+		"""
+		self.ArrowTo(self['selected-arrow'], icon, obj)
 		self.canvas.Draw()
+		return True
 
-	def SelectObject(self, oid):
-		parentid = oid
-		while not self.has_key(parentid):
-			try:
-				parentid = self.cache.objects[parentid].parent
-			except AttributeError:
-				return
+	def ObjectHoverEnter(self, icon, pos):
+		"""
+		The pop-up contains details about what is in the system.
+		Also draws the path of each object in the system.
+		"""
+		SystemLevelOverlay.ObjectHoverEnter(self, icon, pos)
 
-		obj = self[parentid]
-		i   = obj.SetLoop(self.cache.objects[oid])
-
-		self.Selected = obj
-		self.ArrowTo(self['selected-arrow'], obj, i)
-
-	def SystemLeftClick(self, obj):
-		print "SystemClick", obj
-
-		# Are we clicking on the same object?
-		if self.Selected != obj:
-			self.Selected = obj
-			self.Selected.ResetLoop()
-
-		# Cycle throught the children on each click
-		i, real = self.Selected.NextLoop()
-		
-		self.ArrowTo(self['selected-arrow'], obj, i)
-
-		self.SystemLeave(obj)
-		self.SystemEnter(obj)
-
-		self.parent.PostSelectObject(real.id)
-
-	def SystemEnter(self, holder):
-		print "SystemEnter", holder
-
-		screen = self.canvas.WorldToPixel(holder.XY)
-		pos	= self.canvas.ClientToScreen( screen )
-
-		# Build the string
-		s = "<font size='%s'>" % wx.local.normalFont.GetPointSize()
-		for i, cobj in enumerate(holder):
-			# Italics the currently selected object
-			style = 'normal'
-			if self.Selected != None and self.Selected.current == cobj:
-				style = 'italic'
-
-			color = holder.Colorizer(FindOwners(self.cache, cobj))
-
-			s += "<font style='%s' color='%s'>%s" % (style, color, cobj.name)
-			if isinstance(cobj, Fleet):
-				for shipid, amount in cobj.ships:
-					s+= "\n  %s %ss" % (amount, self.cache.designs[shipid].name)
-			s += "</font>\n"
-
-		s = s[:-1]+"</font>"
-
-		self.PopupText.SetText(s)
-		self.PopupText.Position(pos, (IconMixIn.PrimarySize, IconMixIn.PrimarySize))
-		self.PopupText.Show(True)
-
+		# Draw the path of the object
 		paths = []
-		for i, cobj in enumerate(holder):
-			# Draw the path of the object
+		for i, cobj in enumerate(icon):
 			path = FindPath(self.cache, cobj)
 			print repr(cobj), path
 			if path:
@@ -331,42 +238,46 @@ class Systems(Overlay):
 					paths.append(Line([pr[0:2], p[0:2]], LineColor='Blue', InForeground=True))
 					pr = p
 
-		print paths
 		if len(paths) > 0:
 			self['paths'] = paths
+			self.canvas.Draw()
+
+	def ObjectHovering(self, icon, object):
+		SystemLevelOverlay.ObjectHovering(self, icon, object)
+
+		self['preview-arrow'].Show()
+		self.ArrowTo(self['preview-arrow'], icon, object)
 		self.canvas.Draw()
 
-		# Start the "preview" mode
-		if holder != self.Selected:
-			self.Hovering = holder
-			self.Hovering.ResetLoop()
+		return True
 
-			self.Timer.Start(2000)
-		
-	def SystemLeave(self, holder):
-		print "SystemLeave", holder, self.Selected
-		self.PopupText.Hide()
+	def ObjectHoverLeave(self, icon):
+		SystemLevelOverlay.ObjectHoverLeave(self, icon)
 
 		# Hide any paths which are showing
 		if self.has_key('paths'):
 			del self['paths']
-
-		# Stop the "preview"
-		self.Hovering = None
-		self.Timer.Stop()
 		self['preview-arrow'].Hide()
 		self.canvas.Draw()
-	
-		if self.Selected != None:
-			self.parent.PostSelectObject(self.Selected.current.id)
 
-	def OnHover(self, evt):
-		self.Timer.Stop()
+	def ObjectPopupText(self, icon):
+		# Build the string
+		s = "<font size='%s'>" % wx.local.normalFont.GetPointSize()
+		for i, cobj in enumerate(icon):
+			# Italics the currently selected object
+			style = 'normal'
+			if self.Selected != None and self.Selected.current == cobj:
+				style = 'italic'
 
-		i, real = self.Hovering.NextLoop()
-		self.parent.PostPreviewObject(real.id)
+			color = icon.Colorizer(FindOwners(self.cache, cobj))
 
-		self['preview-arrow'].Show()
-		self.ArrowTo(self['preview-arrow'], self.Hovering, i)
-		self.Timer.Start(2000)
-		
+			s += "<font style='%s' color='%s'>%s" % (style, color, cobj.name)
+			if isinstance(cobj, Fleet):
+				for shipid, amount in cobj.ships:
+					s+= "\n  %s %ss" % (amount, self.cache.designs[shipid].name)
+			s += "</font>\n"
+
+		s = s[:-1]+"</font>"
+
+		return s
+

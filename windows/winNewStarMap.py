@@ -22,6 +22,8 @@ from utils import *
 # FIXME: Float canvas has problems with the large sizes (when zoomed into planet level)
 # We should fix this by doing some prescaling...
  
+from overlays.Resource import Resource
+from overlays.Systems  import Systems
 
 if False:
 	"""
@@ -90,11 +92,11 @@ class panelStarMap(wx.Panel):
 		"""
 		if evt.what == None:
 			if hasattr(self, 'Overlay'):
-				self.Overlay.cleanup()
+				self.Overlay.CleanUp()
 
-			from overlays.Systems import Systems
 			self.Overlay = Systems(self, self.Canvas, self.application.cache)
-			self.Overlay.update()
+#			self.Overlay = Resource(self, self.Canvas, self.application.cache)
+			self.Overlay.Update()
 
 	def PostSelectObject(self, oid):
 		self.application.gui.Post(self.application.gui.SelectObjectEvent(oid))

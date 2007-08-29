@@ -39,3 +39,4 @@ class Value(Overlay):
 			return
 
 		self[oid] = FloatCanvas.Circle(self.cache.objects[oid].pos[0:2], self.value(oid)*self.scale, FillColor="White", LineColor="Red")
+
