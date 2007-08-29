@@ -73,20 +73,18 @@ class usernameMixIn:
 		return
 
 	def GetUsername(self):
-		game = self.Game.GetValue()
 		username = self.Username.GetValue()
-		if len(game) > 0:
+		game     = self.Game.GetValue().strip()
+		if self.GameShow.GetValue() and len(game) > 0:
 			return "%s@%s" % (username, game)
 		else:
 			return username
 
 	def GetUsernameGame(self):
-		game = self.Game.GetValue()
 		username = self.Username.GetValue()
-		if len(game) > 0:
-			return (username, game)
-		else:
-			return (username, "")
+		game     = self.Game.GetValue().strip()
+	
+		return (username, game)
 
 	def SetUsername(self, value):
 		# Split the part after the @ into the game box
