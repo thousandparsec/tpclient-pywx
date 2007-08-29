@@ -241,21 +241,7 @@ class winConnect(winConnectBase, winMainBaseXRC, usernameMixIn):
 		else:
 			(oldusername, oldpassword, oldautoconnect) = (username, password, False)
 
-		if oldpassword != password:
-			msg = _("""\
-It appears you are using a different password for 
-this account, would you like to update the saved 
-information with the new password?
-""")
-
-			dlg = wx.MessageDialog(self, msg, _("Update Password?"), wx.YES_NO|wx.YES_DEFAULT|wx.ICON_INFORMATION)
-			if dlg.ShowModal() == wx.ID_YES:
-				# Update the password
-				self.config['details'][server][PASSWORD] = password
-				# Save the config now
-				self.application.ConfigSave()
-
-		else:
+		if server not in self.config['servers'] or username != username:
 			# Popup a dialog asking if we want to add the account
 			msg = _("""\
 It appears you havn't access this account before.
@@ -266,9 +252,24 @@ Would you like to save this account's details?
 
 			if dlg.ShowModal() == wx.ID_YES:
 				# Add the account.
-				self.ConfigPanel.Servers.SetStrings([server,] + self.ConfigPanel.Servers.GetStrings())
-				self.config['details'][server] = (username, password, False)
+				if not server in self.ConfigPanel.Servers.GetStrings():
+					self.ConfigPanel.Servers.SetStrings([server,] + self.ConfigPanel.Servers.GetStrings())
+				self.config['details'][server] = [username, password, False]
 
+				# Save the config now
+				self.application.ConfigSave()
+
+		elif password != oldpassword:
+			msg = _("""\
+It appears you are using a different password for 
+this account, would you like to update the saved 
+information with the new password?
+""")
+
+			dlg = wx.MessageDialog(self, msg, _("Update Password?"), wx.YES_NO|wx.YES_DEFAULT|wx.ICON_INFORMATION)
+			if dlg.ShowModal() == wx.ID_YES:
+				# Update the password
+				self.config['details'][server][PASSWORD] = password
 				# Save the config now
 				self.application.ConfigSave()
 
@@ -338,7 +339,6 @@ Would you like to save this account's details?
 					del config[server]
 
 		except (ValueError, KeyError), e:
-			print e
 			config['details'] = {}
 		for server in config['servers']:
 			if server not in config['details']:
