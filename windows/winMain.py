@@ -39,62 +39,19 @@ def tos(n):
 		return "%.1fK" % (float(n)/Kb)
 	return "%sb" % n
 
-class MediaProgress(wx.PopupCtrl):
-	def __init__(self, parent, application, *args, **kw):
-		wx.PopupCtrl.__init__(self, parent, *args, **kw)
-		self.application = application
-
-		self.SetPopupCtrl(wx.Gauge(self))
-
-		self.win  = wx.Window(self,-1,pos = (0,0),style = 0)
-		self.list = wx.ListBox(self.win)
-
-		self.SetPopupContent(self.win)
-
-		self.win.Bind(wx.EVT_LISTBOX, self.OnSelect, self.list)
-		self.win.Bind(wx.EVT_LISTBOX_DCLICK, self.OnSelect, self.list)
-
-		self.listitems = []
-
-	def OnSelect(self, evt):
-		self.PopDown()
-
-	def OnButton(self,evt):
-		if len(self.listitems) > 1: 
-			self.PopUp()
-
-	def FormatContent(self):
-		self.list.Set(self.listitems)
-
-		s = self.list.GetBestSize()
-		s += (0, 10)
-		self.list.SetSize(s)
-		self.win.SetClientSize(s)
-
 class StatusBar(wx.StatusBar):
-	WIDGET_PROGRESS = 0
-	WIDGET_PROGRESS_CANCEL = 1
-	WIDGET_TEXT = 3
-	TEXT_PROGRESS = 2
-	TEXT_TIMER = 3
+	TEXT_TIMER = 1
 
 	def __init__(self, application, parent):
 		wx.StatusBar.__init__(self, parent, -1)
 
 		self.application = application
 
-		self.SetFieldsCount(4)
-		self.SetStatusWidths([-3, 20, -3, -2])
-
-		self.Progress = MediaProgress(self, application, -1)
-		self.ProgressCancel = wx.Button(self, -1, "X")
-		self.ProgressCancel.Enable(False)
+		self.SetFieldsCount(2)
+		self.SetStatusWidths([-10, -2])
 
 		self.StatusTextCtrl = wx.TextCtrl(self, -1, "")
 		self.StatusTextCtrl.SetEditable(False)
-
-		self.SetStatusText("", StatusBar.TEXT_TIMER)
-		self.SetStatusText("", StatusBar.TEXT_PROGRESS)
 
 		self.endtime = 0
 		self.parent = parent
@@ -106,7 +63,6 @@ class StatusBar(wx.StatusBar):
 		self.Reposition()
 		self.Bind(wx.EVT_SIZE, self.OnSize)
 		self.Bind(wx.EVT_IDLE, self.OnIdle)
-		self.Bind(wx.EVT_BUTTON, self.OnButtonCancel, self.ProgressCancel)
 
 	def Notify(self):
 		sih = 60*60
@@ -134,15 +90,7 @@ class StatusBar(wx.StatusBar):
 		self.endtime = endtime
 
 	def Reposition(self):
-		rect = self.GetFieldRect(StatusBar.WIDGET_PROGRESS)
-		self.Progress.SetPosition((rect.x+4, rect.y+2))
-		self.Progress.SetSize((rect.width-6, rect.height-4))
-
-		rect = self.GetFieldRect(StatusBar.WIDGET_PROGRESS_CANCEL)
-		self.ProgressCancel.SetPosition((rect.x, rect.y))
-		self.ProgressCancel.SetSize((rect.width, rect.height))
-
-		rect = self.GetFieldRect(StatusBar.WIDGET_TEXT)
+		rect = self.GetFieldRect(StatusBar.TEXT_TIMER)
 		self.StatusTextCtrl.SetPosition((rect.x, rect.y))
 		self.StatusTextCtrl.SetSize((rect.width, rect.height))
 		
@@ -168,36 +116,6 @@ class StatusBar(wx.StatusBar):
 	def OnIdle(self, evt):
 		if self.sizeChanged:
 			self.Reposition()
-
-	def OnMediaDownloadStart(self, evt):
-		self.progress = evt.file
-
-		self.Progress.SetRange(evt.size)
-		files = []
-		for file in self.application.media.todownload.keys():
-			if file != evt.file:
-				files.append(file)
-		self.Progress.listitems = files
-		self.ProgressCancel.Enable(True)
-
-		self.SetStatusText("Dw: %s" % os.path.basename(evt.file), StatusBar.TEXT_PROGRESS)
-
-	def OnMediaDownloadProgress(self, evt):
-		self.Progress.SetRange(evt.size)
-		self.Progress.SetValue(evt.progress)
-		
-		tt = wx.ToolTip("%s of %s" % (tos(evt.progress), tos(evt.size)))
-		tt.Enable(True)
-		self.SetToolTip(tt)
-
-	def OnMediaDownloadDone(self, evt):
-		self.Clear()
-
-	def OnMediaDownloadAbort(self, evt):
-		self.Clear()
-
-	def OnButtonCancel(self, evt):
-		self.parent.application.media.StopFile(self.progress)
 
 
 class winMain(winMDIBase):
@@ -234,15 +152,6 @@ class winMain(winMDIBase):
 		self.mgr.Update()
 
 		self.updatepending = False
-
-	def OnMediaDownloadStart(self, evt):
-		self.statusbar.OnMediaDownloadStart(evt)
-	def OnMediaDownloadProgress(self, evt):
-		self.statusbar.OnMediaDownloadProgress(evt)
-	def OnMediaDownloadDone(self, evt):
-		self.statusbar.OnMediaDownloadDone(evt)		
-	def OnMediaDownloadAbort(self, evt):
-		self.statusbar.OnMediaDownloadAbort(evt)		
 
 	def Show(self, show=True):
 		# Show this window and it's children - also fixes menus for MacOS
