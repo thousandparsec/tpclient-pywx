@@ -9,12 +9,7 @@ import copy
 # wxPython Imports
 import wx
 
-# Local Imports
-from winBase import *
-from utils import *
-
 # Protocol Imports
-from tp.netlib import failed
 from tp.netlib import objects
 from tp.netlib.objects import constants
 
@@ -23,6 +18,7 @@ ORDERS_COL = 1
 
 buttonSize = (wx.local.buttonSize[0], wx.local.buttonSize[1]+2)
 
+# FIXME: This is quite annoying..
 defaults = {
 	constants.ARG_ABS_COORD: [0,0,0],
 	constants.ARG_TIME: [0, 0],
@@ -33,10 +29,9 @@ defaults = {
 	constants.ARG_RANGE: [-1, -1, -1, -1],
 }
 
-from xrc.panelOrder import panelOrderBase
+from windows.xrc.panelOrder import panelOrderBase
 class panelOrder(panelOrderBase):
 	title = _("Orders")
-	from defaults import winOrderDefaultSize as DefaultSize
 
 	def __init__(self, application, parent):
 		panelOrderBase.__init__(self, parent)

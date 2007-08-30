@@ -12,8 +12,7 @@ import wx
 import wx.gizmos
 
 # Local imports
-from winBase import *
-from utils import *
+from windows.winBase import winReport, ShiftMixIn
 
 from tp.client.parser import DesignCalculator
 from tp.netlib.objects import Design, Component, Category
@@ -39,16 +38,12 @@ def comparebyid(a, b):
 
 
 # Show the universe
-class winDesign(winReportBase, winShiftMixIn):
+class winDesign(winReport, ShiftMixIn):
 	title = _("Design")
 	
-	from defaults import winDesignDefaultPosition as DefaultPosition
-	from defaults import winDesignDefaultSize as DefaultSize
-	from defaults import winDesignDefaultShow as DefaultShow
-
 	def __init__(self, application, parent):
-		winReportBase.__init__(self, application, parent)
-		winShiftMixIn.__init__(self)
+		winReport.__init__(self, application, parent)
+		ShiftMixIn.__init__(self)
 		
 		self.selected = None	# Currently selected design
 		self.updating = []		# Designs which are been saved to the server

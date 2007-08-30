@@ -25,37 +25,9 @@ from tp.netlib.objects.ObjectExtra.StarSystem import StarSystem
 from tp.netlib.objects.ObjectExtra.Planet import Planet
 from tp.netlib.objects.ObjectExtra.Fleet import Fleet
 
-# Local imports
-from winBase import *
-from utils import *
-
-def splitall(start):
-	bits = []
-
-	while True:
-		start, end = os.path.split(start)
-		if end is '':
-			break
-		bits.append(end)
-	bits.reverse()
-	return bits
-
-class winInfo(winBase):
-	def __init__(self, application, parent):
-		winBase.__init__(self, application, parent)
-
-		self.Panel = panelInformation(application, self)
-
-	def __getattr__(self, key):
-		try:
-			return winBase.__getattr__(self, key)
-		except AttributeError:
-			return getattr(self.Panel, key)
-
-from xrc.panelInformation import panelInformationBase
+from windows.xrc.panelInformation import panelInformationBase
 class panelInformation(panelInformationBase):
 	title = _("Information")
-	from defaults import winInfoDefaultSize as DefaultSize
 
 	def __init__(self, application, parent):
 		panelInformationBase.__init__(self, parent)

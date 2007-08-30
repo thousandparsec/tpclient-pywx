@@ -9,7 +9,6 @@ import os
 
 # wxPython Imports
 import wx
-import wx.gizmos
 
 from requirements import graphicsdir
 
@@ -21,19 +20,19 @@ except ImportError:
 from tp.netlib import constants as features
 
 # Local Imports
-from winBase import winMainBaseXRC
+from winBase import winBaseXRC
 from winConnect import usernameMixIn
 from xrc.winAccount import winAccountBase
 
 throbber = os.path.join(graphicsdir, "downloading.gif")
 okay = os.path.join(graphicsdir, "finished.gif")
 
-class winAccount(winAccountBase, winMainBaseXRC, usernameMixIn):
+class winAccount(winAccountBase, winBaseXRC, usernameMixIn):
 	title = _("Account")
 
 	def __init__(self, application):
 		winAccountBase.__init__(self, None)
-		winMainBaseXRC.__init__(self, application)	
+		winBaseXRC.__init__(self, application)	
 		usernameMixIn.__init__(self)
 
 	def Show(self, show=True):
@@ -52,7 +51,7 @@ class winAccount(winAccountBase, winMainBaseXRC, usernameMixIn):
 
 		self.State("start")
 
-		winMainBaseXRC.Show(self, show)
+		winBaseXRC.Show(self, show)
 
 	def State(self, mode):
 		if mode == "start":

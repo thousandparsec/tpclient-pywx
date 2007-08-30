@@ -12,7 +12,7 @@ import wx
 import wx.gizmos
 
 # Local Imports
-from winBase import winMainBaseXRC
+from winBase import winBaseXRC
 from xrc.winConnect import winConnectBase
 from xrc.configConnect import configConnectBase
 from utils import *
@@ -158,7 +158,7 @@ AUTOCONNECT=2
 
 # FIXME: The config should use proper URLs, currently you can't have more then one login to a server (and a server could have multiple games).
 
-class winConnect(winConnectBase, winMainBaseXRC, usernameMixIn):
+class winConnect(winConnectBase, winBaseXRC, usernameMixIn):
 	title = _("Connect")
 
 	def Post(*args):
@@ -166,7 +166,7 @@ class winConnect(winConnectBase, winMainBaseXRC, usernameMixIn):
 
 	def __init__(self, application):
 		winConnectBase.__init__(self, None)
-		winMainBaseXRC.__init__(self, application)	
+		winBaseXRC.__init__(self, application)	
 		usernameMixIn.__init__(self)
 
 		self.attemps = 0
@@ -224,7 +224,7 @@ class winConnect(winConnectBase, winMainBaseXRC, usernameMixIn):
 			wx.CallAfter(self.OnOkay, None)
 		self.attemps += 1
 
-		return winMainBaseXRC.Show(self)
+		return winBaseXRC.Show(self)
 
 	def OnOkay(self, evt):
 		server = self.Server.GetValue()

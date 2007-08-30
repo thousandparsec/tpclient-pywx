@@ -7,14 +7,14 @@ import wx
 import wx.lib.anchors
 
 # Local Imports
-from winBase import *
+from winBase import winBase
 
 # Shows messages from the game system to the player.
-class winConfig(winMainBase):
+class winConfig(winBase):
 	title = _("Config")
 	
 	def __init__(self, application, windows):
-		winMainBase.__init__(self, application)
+		winBase.__init__(self, application)
 
 		self.application = application
 

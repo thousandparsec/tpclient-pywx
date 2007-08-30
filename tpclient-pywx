@@ -154,10 +154,7 @@ class GUI(wx.App):
 			from windows.winUpdate import winUpdate
 			self.update = winUpdate(application)
 
-			from windows.winDebug import winDebug
-			self.debug = winDebug(application)
-		
-			self.windows = (self.main, self.connectto, self.update, self.debug)
+			self.windows = (self.main, self.connectto, self.update)
 		
 			from windows.winConfig import winConfig
 			self.config = winConfig(application, self.windows)

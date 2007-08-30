@@ -61,6 +61,7 @@ def save_data(file, data):
 	"""
 	f = open(os.path.join(configpath(), file), "w")
 	pickle.dump(data, f)
+	f.close()
 
 __all__ = [
 	'Blank', 'save_data', 'load_data', 'configpath', # Config functions

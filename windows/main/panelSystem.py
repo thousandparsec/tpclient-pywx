@@ -13,26 +13,11 @@ import wx.gizmos
 
 # Local imports
 from requirements import graphicsdir
-import defaults
-from winBase import *
-from utils import *
 
 NAME = 0
 DESC = 1
 
-##class winSystem(winBase):
-##	def __init__(self, application, parent):
-##		winBase.__init__(self, application, parent)
-##
-##		self.Panel = panelSystem(application, self)
-##
-##	def __getattr__(self, key):
-##		try:
-##			return winBase.__getattr__(self, key)
-##		except AttributeError:
-##			return getattr(self.Panel, key)
-
-from xrc.panelSystem import panelSystemBase
+from windows.xrc.panelSystem import panelSystemBase
 class panelSystem(panelSystemBase):
 	title = _("System")
 

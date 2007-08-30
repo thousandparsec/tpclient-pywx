@@ -11,32 +11,30 @@ from sets import Set
 # wxPython Imports
 import wx
 import wx.html
-import wx.lib.anchors
 
-# Local Imports
-from winBase import *
-
-# Protocol Imports
-from tp.netlib import failed, GenericRS
-
+# Config information
 from requirements import graphicsdir
 
-from xrc.panelMessage import panelMessageBase
-class panelMessage(panelMessageBase, winShiftMixIn):
+# Local Imports
+from windows.winBase import ShiftMixIn
+
+# Protocol Imports
+from tp.netlib import GenericRS
+
+from windows.xrc.panelMessage import panelMessageBase
+class panelMessage(panelMessageBase, ShiftMixIn):
 	title = _("Messages")
-	from defaults import winMessageDefaultSize as DefaultSize
 
 	def __init__(self, application, parent):
 		panelMessageBase.__init__(self, parent)
-		winShiftMixIn.__init__(self)
+		ShiftMixIn.__init__(self)
 
 		self.application = application
 
 		if wx.Platform != "__WXMAC__":
-#			pass
 			self.Message.SetFonts("Swiss", "Courier", [10, 12, 14, 16, 20, 24])
-#		else:
-#			self.Message.SetFonts("Swiss", "Courier", [4, 6, 8, 10, 12, 14, 16])
+		else:
+			self.Message.SetFonts("Swiss", "Courier", [4, 6, 8, 10, 12, 14, 16])
 		self.Message.Bind(wx.html.EVT_HTML_LINK_CLICKED, self.OnLinkEvent)
 
 		# The current message slot

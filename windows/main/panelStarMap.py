@@ -15,13 +15,6 @@ from extra.wxFloatCanvas.RelativePoint import RelativePoint
 
 from extra.wxFloatCanvas.NavCanvas import NavCanvas
 
-# Local imports
-from winBase import *
-from utils import *
-
-# FIXME: Float canvas has problems with the large sizes (when zoomed into planet level)
-# We should fix this by doing some prescaling...
- 
 from overlays.Resource import Resource
 from overlays.Systems  import Systems
 

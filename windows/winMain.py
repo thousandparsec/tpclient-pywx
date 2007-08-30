@@ -1,27 +1,23 @@
-"""\
-This module contains the main menu window.
+"""
+This is the primary window for interacting with the game.
 """
 
 # Python imports
-import copy
 import time
 import math
 import os.path
 
 # wxPython imports
 import wx
-import wx.lib.popupctl as pop
 
 # Local imports
 from requirements import docdir
-from winBase import *
+from winBase import winBase
 from utils import *
 
 ID_MENU = 10042
 ID_OPEN = 10043
 ID_UNIV = 10044
-ID_REVERT = 10046
-ID_CONFIG = 10047
 ID_EXIT = 10049
 ID_FILE = 10050
 
@@ -29,15 +25,6 @@ ID_WIN_TIPS	 = 11006
 ID_WIN_HELP = 1105
 
 ID_HELP = 10057
-
-Mb = 1024*1024
-Kb = 1024
-def tos(n):
-	if n > Mb:
-		return "%.1fM" % (float(n)/Mb)
-	if n > Kb:
-		return "%.1fK" % (float(n)/Kb)
-	return "%sb" % n
 
 class StatusBar(wx.StatusBar):
 	TEXT_TIMER = 1
@@ -117,39 +104,58 @@ class StatusBar(wx.StatusBar):
 		if self.sizeChanged:
 			self.Reposition()
 
-
-class winMain(winMDIBase):
+class winMain(winBase):
 	title = _("Thousand Parsec")
 
-	def __init__(self, application):
-		winMDIBase.__init__(self, application)
+	def children_get(self):
+		r = {}
+		r.update(self.windows)
+		r.update(self.panels)
+		return r
+	def children_set(self, value):
+		return
+	children = property(children_get, children_set)
 
+	def __init__(self, application):
+		winBase.__init__(self, application)
+
+		# Setup the status bar
 		self.statusbar = StatusBar(application, self)
 		self.SetStatusBar(self.statusbar)
-		self.SetMenuBar(self.Menu(self))
 
-		from windows.winDesign import winDesign
-		winDesign(application, self)
+		# Actual windows
+		from windows.main.winDesign import winDesign
 
+		self.windows = {}
+		for window in [winDesign]:
+			title = window.title
+			self.windows[title] = window(application, self)
+
+		# Setup the AUI interface
 		self.mgr = wx.aui.AuiManager()
 		self.mgr.SetManagedWindow(self)
 
-		from windows.winInfo    import panelInformation
-		from windows.winPicture import panelPicture
-		from windows.winOrder   import panelOrder
-		from windows.winMessage import panelMessage
-		from windows.winNewStarMap import panelStarMap
-		from windows.winSystem  import panelSystem
+		# Panel in the AUI interface...
+		from windows.main.panelInfo    import panelInformation
+		from windows.main.panelPicture import panelPicture
+		from windows.main.panelOrder   import panelOrder
+		from windows.main.panelMessage import panelMessage
+		from windows.main.panelStarMap import panelStarMap
+		from windows.main.panelSystem  import panelSystem
 
-		for window in [panelStarMap, panelSystem, panelMessage, panelInformation, panelPicture, panelOrder]:
-			title = window.title
+		self.panels = {}
+		for panel in [panelStarMap, panelSystem, panelMessage, panelInformation, panelPicture, panelOrder]:
+			title = panel.title
 
-			instance = window(application, self)
+			instance = panel(application, self)
 
 			self.mgr.AddPane(instance, instance.GetPaneInfo().Caption(title)) 
-			self.children[title] = instance
+			self.panels[title] = instance
 
 		self.mgr.Update()
+
+		# Setup the Menu
+		self.SetMenuBar(self.Menu(self))
 
 		self.updatepending = False
 
@@ -165,7 +171,7 @@ class winMain(winMDIBase):
 			except Exception, e:
 				print e
 
-		winMDIBase.Show(self)
+		winBase.Show(self)
 
 		# FIXME: Hack until perspective loading is done..
 		self.Maximize()
@@ -236,10 +242,10 @@ class winMain(winMDIBase):
 
 		# File Menu
 		file = wx.Menu()
-		file.Append( ID_OPEN, _("Connect to Game\tCtrl-O"), _("Connect to a diffrent Game") )
-		file.Append( ID_UNIV, _("Download the Universe\tCtrl-U"), _("Download the Universe") )
+		file.Append( ID_OPEN, _("C&onnect to Game\tCtrl-O"), _("Connect to a diffrent Game") )
+		file.Append( ID_UNIV, _("Download the &Universe\tCtrl-U"), _("Download the Universe") )
 		file.AppendSeparator()
-		file.Append( wx.ID_PREFERENCES, _("Preferences"), _("Configure the Client") )
+		file.Append( wx.ID_PREFERENCES, _("&Preferences"), _("Configure the Client") )
 		file.AppendSeparator()
 		file.Append( ID_EXIT, _("Exit"), _("Exit") )
 
@@ -259,7 +265,7 @@ class winMain(winMDIBase):
 		source.OnMenuWindowUpdate = OnMenuWindowUpdate
 
 		source.menu_ids = {}
-		for title in self.children.keys():
+		for title in self.windows.keys():
 			id = wx.NewId()
 			source.menu_ids[id] = title
 

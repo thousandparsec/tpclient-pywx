@@ -26,11 +26,8 @@ from tp.netlib.objects.ObjectExtra.StarSystem import StarSystem
 from tp.netlib.objects.ObjectExtra.Planet import Planet
 from tp.netlib.objects.ObjectExtra.Fleet import Fleet
 
-# Local imports
+# Config imports
 from requirements import graphicsdir
-
-from winBase import *
-from utils import *
 
 def splitall(start):
 	bits = []
@@ -44,23 +41,10 @@ def splitall(start):
 	return bits
 
 WAITING = os.path.join(graphicsdir, "loading.gif")
-class winPicture(winBase):
-	
-	def __init__(self, application, parent):
-		winBase.__init__(self, application, parent)
 
-		self.Panel = panelPicture(application, self)
-
-	def __getattr__(self, key):
-		try:
-			return winBase.__getattr__(self, key)
-		except AttributeError:
-			return getattr(self.Panel, key)
-
-from xrc.panelPicture import panelPictureBase
+from windows.xrc.panelPicture import panelPictureBase
 class panelPicture(panelPictureBase):
 	title = _("Picture")
-	from defaults import winInfoDefaultSize as DefaultSize
 
 	def __init__(self, application, parent):
 		panelPictureBase.__init__(self, parent)

@@ -8,7 +8,7 @@ import time
 import wx
 
 # Local Imports
-from winBase import winMainBaseXRC
+from winBase import winBaseXRC
 from xrc.winServerBrowser import winServerBrowserBase
 
 from requirements import graphicsdir
@@ -17,7 +17,7 @@ throbber = os.path.join(graphicsdir, "downloading.gif")
 okay = os.path.join(graphicsdir, "finished.gif")
 notokay = os.path.join(graphicsdir, "waiting.gif")
 
-class winServerBrowser(winServerBrowserBase, winMainBaseXRC):
+class winServerBrowser(winServerBrowserBase, winBaseXRC):
 	title = _("Updating")
 	
 	ServersColumns = [_("Name"), _("Playing"), _("Server"), _("P"), _("C"), _("O"), _("Other")]
@@ -31,7 +31,7 @@ class winServerBrowser(winServerBrowserBase, winMainBaseXRC):
 
 	def __init__(self, application):
 		winServerBrowserBase.__init__(self, None)
-		winMainBaseXRC.__init__(self, application)
+		winBaseXRC.__init__(self, application)
 		
 		self.Servers.Bind(wx.EVT_LIST_ITEM_SELECTED, self.OnServerSelect)
 		self.Locations.Bind(wx.EVT_LIST_ITEM_SELECTED, self.OnLocationSelect)
@@ -206,7 +206,7 @@ class winServerBrowser(winServerBrowserBase, winMainBaseXRC):
 		self.OnToggleLocation(False)
 
 		self.CenterOnScreen(wx.BOTH)
-		return winMainBaseXRC.Show(self)
+		return winBaseXRC.Show(self)
 
 	def OnCancel(self, evt):
 		self.application.gui.Show(self.application.gui.connectto)	

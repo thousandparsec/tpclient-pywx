@@ -1,27 +1,28 @@
 
 # Python imports
-import string
 import os, os.path
 import time
 
 # wxPython Imports
 import wx
 
-# Local Imports
+# Config imports
 from requirements import graphicsdir
-from winBase import winMainBaseXRC
+
+# Local Imports
+from winBase import winBaseXRC
 from xrc.winUpdate import winUpdateBase
 
 throbber = os.path.join(graphicsdir, "downloading.gif")
-okay = os.path.join(graphicsdir, "finished.png")
-waiting = os.path.join(graphicsdir, "waiting.png")
+okay     = os.path.join(graphicsdir, "finished.png")
+waiting  = os.path.join(graphicsdir, "waiting.png")
 
-class winUpdate(winUpdateBase, winMainBaseXRC):
+class winUpdate(winUpdateBase, winBaseXRC):
 	title = _("Updating")
 	
 	def __init__(self, application):
 		winUpdateBase.__init__(self, None)
-		winMainBaseXRC.__init__(self, application)
+		winBaseXRC.__init__(self, application)
 
 		self.Message.Bind(wx.EVT_UPDATE_UI, self.MessageDown)
 		self.GoDown = False
@@ -143,7 +144,7 @@ class winUpdate(winUpdateBase, winMainBaseXRC):
 		self.Clear()
 
 		self.CenterOnScreen(wx.BOTH)
-		return winMainBaseXRC.Show(self)
+		return winBaseXRC.Show(self)
 
 	def Update(self, mode, state, message="", todownload=None, total=None, amount=None):
 		# We do a little bit different for this mode
