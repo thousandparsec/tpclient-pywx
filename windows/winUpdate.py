@@ -61,6 +61,7 @@ class winUpdate(winUpdateBase, winBaseXRC):
 
 	def OnOkay(self, evt):
 		self.application.gui.Show(self.application.gui.main)
+		self.application.gui.Show(self.application.gui.idlefinder)
 		self.application.Post(self.application.cache.CacheUpdateEvent(None))
 
 	def MessageDown(self, evt):
