@@ -269,7 +269,7 @@ class Network(NetworkThread):
 		"""
 		# FIXME: This should be sending events really
 		gui = self.application.gui
-		up = make(self, gui, gui.update.Update)
+		up = make(self, gui, gui.update.Callback)
 
 		# Show the Update window
 		gui.Call(gui.Show, gui.update)
@@ -283,7 +283,7 @@ class Network(NetworkThread):
 
 	def CacheUpdate(self):
 		gui = self.application.gui
-		up = make(self, gui, gui.update.Update)
+		up = make(self, gui, gui.update.Callback)
 
 		# Show the update window
 		gui.Call(gui.Show, gui.update)

@@ -43,6 +43,7 @@ class winUpdate(winUpdateBase, winBaseXRC):
 			self.Panel.GetSizer().GetItem(2).GetSizer().RemoveGrowableCol(1)
 
 		self.Panel.Layout()
+		self.Panel.Update()
 
 	def OnCancel(self, evt):
 		self.application.network.Reset()
@@ -146,7 +147,7 @@ class winUpdate(winUpdateBase, winBaseXRC):
 		self.CenterOnScreen(wx.BOTH)
 		return winBaseXRC.Show(self)
 
-	def Update(self, mode, state, message="", todownload=None, total=None, amount=None):
+	def Callback(self, mode, state, message="", todownload=None, total=None, amount=None):
 		# We do a little bit different for this mode
 		if mode == "connecting":
 			animation = getattr(self, "%sAnim" % mode.title())
@@ -252,6 +253,7 @@ class winUpdate(winUpdateBase, winBaseXRC):
 		if len(message) > 0:
 			self.Message.AppendText(message+"\n")
 		self.Panel.Layout()
+		self.Panel.Update()
 		self.GoDown = True
 
 		if state == "failure":
