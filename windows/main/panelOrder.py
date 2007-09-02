@@ -324,6 +324,7 @@ class panelOrder(panelOrderBase):
 		else:
 			self.Master.Show()
 			self.Master.Layout()
+			self.Master.Update()
 
 		# We now point to this object
 		self.oid = evt.id 
@@ -646,6 +647,7 @@ class panelOrder(panelOrderBase):
 		self.DetailsPanel.Layout()
 		self.Master.Layout()
 		self.Layout()
+		self.Update()
 
 	def FromPanel(self, order):
 		orderdesc = objects.OrderDescs()[order.subtype]

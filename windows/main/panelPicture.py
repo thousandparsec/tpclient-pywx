@@ -64,7 +64,9 @@ class panelPicture(panelPictureBase):
 		self.Download.Hide()
 		self.Static.Show()
 		self.Animation.Hide()
+
 		self.Layout()
+		self.Update()
 
 	def GetPaneInfo(self):
 		info = wx.aui.AuiPaneInfo()
@@ -101,7 +103,9 @@ class panelPicture(panelPictureBase):
 	
 	def OnMediaDownloadProgress(self, evt):
 		self.Download.Show()
+
 		self.Layout()
+		self.Update()
 
 		print "winPicture.MediaDownloadProgress", evt.file
 
@@ -139,6 +143,7 @@ class panelPicture(panelPictureBase):
 			self.ETA.SetLabel("%is" % eta)
 
 		self.Download.Layout()
+		self.Download.Update()
 
 	def OnMediaDownloadDone(self, evt):
 		self.Progress.SetRange(0)
@@ -147,7 +152,9 @@ class panelPicture(panelPictureBase):
 		self.ETA.SetLabel('')
 
 		self.Download.Hide()
+
 		self.Layout()
+		self.Update()
 
 		if evt is None:
 			return
@@ -182,7 +189,9 @@ class panelPicture(panelPictureBase):
 			else:
 				bitmap = wx.BitmapFromImage(wx.EmptyImage(128, 128))
 			self.Static.SetBitmap(bitmap)
+
 		self.Layout()
+		self.Update()
 
 	def OnSelectObject(self, evt):
 		print "winInfo SelectObject", evt
