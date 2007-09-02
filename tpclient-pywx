@@ -158,9 +158,6 @@ class GUI(wx.App):
 		
 			from windows.winConfig import winConfig
 			self.config = winConfig(application, self.windows)
-									
-			from windows.winIdleFinder import winIdleFinder
-			self.idlefinder = winIdleFinder(application)
 
 		except:
 			utils.do_traceback()

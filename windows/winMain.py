@@ -125,12 +125,13 @@ class winMain(winBase):
 
 		# Actual windows
 		from windows.main.winDesign import winDesign
+		from windows.main.winIdleFinder import winIdleFinder
 
 		self.windows = {}
-		for window in [winDesign]:
+		for window in [winDesign, winIdleFinder]:
 			title = window.title
 			self.windows[title] = window(application, self)
-
+			
 		# Setup the AUI interface
 		self.mgr = wx.aui.AuiManager()
 		self.mgr.SetManagedWindow(self)

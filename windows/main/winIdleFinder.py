@@ -2,20 +2,21 @@
 This module contains the idle objects finder display.
 """
 
-# wxPython Imports
+# wxPython imports
 import wx
+import wx.gizmos
 from wx import *
 import wx.lib.anchors
 
-# Local Imports
-from winBase import *
+# Local imports
+from windows.winBase import winReport, ShiftMixIn
 
 # Shows messages from the game system to the player.
-class winIdleFinder(winMainBase):
+class winIdleFinder(winReport):
 	title = _("Objects Without Orders")
 	
-	def __init__(self, application):
-		winMainBase.__init__(self, application)
+	def __init__(self, application, parent):
+		winReport.__init__(self, application, parent)	
 
 		self.application = application
 

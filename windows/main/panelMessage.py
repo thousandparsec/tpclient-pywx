@@ -34,7 +34,8 @@ class panelMessage(panelMessageBase, ShiftMixIn):
 		if wx.Platform != "__WXMAC__":
 			self.Message.SetFonts("Swiss", "Courier", [10, 12, 14, 16, 20, 24])
 		else:
-			self.Message.SetFonts("Swiss", "Courier", [4, 6, 8, 10, 12, 14, 16])
+			pass
+			#self.Message.SetFonts("Swiss", "Courier", [4, 6, 8, 10, 12, 14, 16])
 		self.Message.Bind(wx.html.EVT_HTML_LINK_CLICKED, self.OnLinkEvent)
 
 		# The current message slot
