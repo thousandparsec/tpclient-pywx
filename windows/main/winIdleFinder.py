@@ -9,35 +9,22 @@ from wx import *
 import wx.lib.anchors
 
 # Local imports
-from windows.winBase import winReport, ShiftMixIn
-
+from windows.winBase import winReportXRC, ShiftMixIn
+from windows.xrc.winIdleFinder import IdleFinderBase
 # Shows messages from the game system to the player.
-class winIdleFinder(winReport):
+class winIdleFinder(winReportXRC, IdleFinderBase):
 	title = _("Objects Without Orders")
 	
 	def __init__(self, application, parent):
-		winReport.__init__(self, application, parent)	
-
+		IdleFinderBase.__init__(self, parent)
+		winReportXRC.__init__(self, application, parent)
+		
 		self.application = application
 
 		# Create a panel for the current window.
-		main = wx.Panel(self, -1)
-		
-		base = wx.BoxSizer(wx.VERTICAL)
-		
-		self.idlelist = wx.ListCtrl(self, -1, style = wx.LC_REPORT, size = (400, 400))
 		self.idlelist.InsertColumn(0, "Item ID", width = 100)
 		self.idlelist.InsertColumn(1, "Item Name", width = 200)
 		self.idlelist.InsertColumn(2, "Item Type", width = 100)
-		base.Add(self.idlelist)
-
-		horiz = wx.BoxSizer(wx.HORIZONTAL)
-		base.Add(horiz, 0, wx.ALIGN_RIGHT)
-	
-		main.SetAutoLayout(True)
-		main.SetSizer(base)
-		
-		base.SetSizeHints(self)
 
 		self.Bind(wx.EVT_SHOW, self.OnShow)
 		self.Bind(wx.EVT_ACTIVATE, self.OnShow)
