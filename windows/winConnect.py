@@ -369,7 +369,7 @@ information with the new password?
 		self.ConfigDefault(config)
 
 		#self.Server.Clear()
-		#self.Server.AppendItems(self.config['servers'])
+		self.Server.AppendItems(self.config['servers'])
 		#self.Server.SetValue(self.config['servers'][0])
 
 		self.ConfigDisplayUpdate(None)
