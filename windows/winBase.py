@@ -42,18 +42,18 @@ else:
 class ShiftMixIn(object):
 	def __init__(self):
 		# Bits for doing the button changing on shift
-		self.timer = wx.Timer(self)
+		self.shiftimer = wx.Timer(self)
 		self.shift = False
 
 	def ShiftStart(self):
-		self.timer.Start(50)
-		self.Bind(wx.EVT_TIMER, self.OnTimer, self.timer)
+		self.shiftimer.Start(50)
+		self.Bind(wx.EVT_TIMER, self.OnShiftTimer, self.shiftimer)
 
 	def ShiftStop(self):
-		if self.timer.Stop():
-			self.Unbind(wx.EVT_TIMER, self.timer)
+		if self.shiftimer.Stop():
+			self.Unbind(wx.EVT_TIMER, self.shiftimer)
 		
-	def OnTimer(self, evt):
+	def OnShiftTimer(self, evt):
 		shift = wx.GetKeyState(wx.WXK_SHIFT)
 		if self.shift == shift:
 			return
@@ -153,6 +153,8 @@ class winBaseMixIn(winMixIn):
 				break
 
 			bases += list(c.__bases__)
+
+		self.Update()
 
 		# Post an event to this window and it's children
 		for window in self.children.values():

@@ -167,10 +167,12 @@ class winMain(winBase):
 
 		for window in self.children.values():
 			try:
-				if window.config.has_key('show') and window.config['show']:
-					window.Show()
+				if hasattr(window, 'config'):
+					if not window.config.has_key('show') or not window.config['show']:
+						continue
+				window.Show()
 			except Exception, e:
-				print e
+				print "Showing children error", window, e
 
 		winBase.Show(self)
 
@@ -329,7 +331,7 @@ class winMain(winBase):
 
 		if config[0] or override != None:
 			tp = wx.CreateFileTipProvider(os.path.join(docdir, "tips.txt"), config[1])
-			config[0] = wx.ShowTip(None, tp)
+			config[0] = wx.ShowTip(self, tp)
 			config[1] = tp.GetCurrentTip()
 
 			save_data("pywx_tips", config)
