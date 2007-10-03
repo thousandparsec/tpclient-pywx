@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="mac-roman"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <resource>
   <object class="wxFrame" name="winDesign">
     <title>Design</title>
@@ -101,12 +101,16 @@
                                                 <size>200, 400</size>
                                                 <object class="wxPanel" name="prop_sizerpanel">
                                                   
+                                                  
                                                   <object class="wxFlexGridSizer">
+                                                    
                                                     
                                                     <cols>2</cols>
                                                     
+                                                    
                                                     <rows>0</rows>
                                                   </object>
+                                                  
                                                   
                                                   <size>200, 400</size>
                                                 </object>
