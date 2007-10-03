@@ -12,7 +12,8 @@ import wx
 import wx.gizmos
 
 # Local imports
-from windows.winBase import winReport, ShiftMixIn
+from windows.winBase import winReportXRC, ShiftMixIn
+from windows.xrc.winDesign import winDesignBase
 
 from tp.client.parser import DesignCalculator
 from tp.netlib.objects import Design, Component, Category
@@ -38,75 +39,76 @@ def comparebyid(a, b):
 
 
 # Show the universe
-class winDesign(winReport, ShiftMixIn):
+class winDesign(winDesignBase, winReportXRC, ShiftMixIn):
 	title = _("Design")
 	
 	def __init__(self, application, parent):
-		winReport.__init__(self, application, parent)
+		winDesignBase.__init__(self, parent)
+		winReportXRC.__init__(self, application, parent)
 		ShiftMixIn.__init__(self)
 		
 		self.selected = None	# Currently selected design
 		self.updating = []		# Designs which are been saved to the server
 
-		panel = wx.Panel(self, -1)
+		#panel = wx.Panel(self, -1)
 		
 		self.icons = wx.ImageList(*wx.ArtSize)
 		self.icons.Add(Art(wx.ART_FOLDER, wx.ART_OTHER, wx.ArtSize))
 		self.icons.Add(Art(wx.ART_FILE_OPEN, wx.ART_OTHER, wx.ArtSize))
 		self.icons.Add(Art(wx.ART_NORMAL_FILE, wx.ART_OTHER, wx.ArtSize))
 
-		self.grid = wx.FlexGridSizer(2, 3, 0, 0)
-		self.grid.AddGrowableCol(0, 15)		# Middle Column is growable
-		self.grid.AddGrowableCol(1, 50)		# Middle Column is growable
-		self.grid.AddGrowableCol(2, 15)		# Middle Column is growable
-		self.grid.AddGrowableRow(1)			# Bottom row is growable
+		self.grid = self.gridpanel.GetSizer()
+		#self.grid.AddGrowableCol(0, 15)		# Middle Column is growable
+		#self.grid.AddGrowableCol(1, 50)		# Middle Column is growable
+		#self.grid.AddGrowableCol(2, 15)		# Middle Column is growable
+		#self.grid.AddGrowableRow(1)			# Bottom row is growable
 
-		self.designs = wx.OrderedTreeCtrl( panel, -1, style=wx.TR_DEFAULT_STYLE | wx.TR_HAS_VARIABLE_ROW_HEIGHT)
+		#self.designs = wx.OrderedTreeCtrl( panel, -1, style=wx.TR_DEFAULT_STYLE | wx.TR_HAS_VARIABLE_ROW_HEIGHT)
 		self.designs.SetFont(wx.local.normalFont)
 		self.designs.SetImageList(self.icons)
 
 		# The labels
 		################################################################
-		self.top = wx.BoxSizer( wx.HORIZONTAL )
+		self.top = self.toppanel.GetSizer()
 		
 		# The title (editable version)
-		self.titleedit = wx.TextCtrl( panel, -1, _("Title"), size=(-1,wx.local.buttonSize[1]), style=wx.TE_CENTRE)
+		#self.titleedit = wx.TextCtrl( panel, -1, _("Title"), size=(-1,wx.local.buttonSize[1]), style=wx.TE_CENTRE)
 		self.titleedit.SetFont(wx.local.normalFont)
-		self.top.Add( self.titleedit, 1, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
+		#self.top.Add( self.titleedit, 1, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
 		
 		# The title (noneditable version)
-		self.titletext = wx.StaticText( panel, -1, _("Title"), size=(-1,wx.local.buttonSize[1]), style=wx.ALIGN_CENTRE|wx.ST_NO_AUTORESIZE)
+		#self.titletext = wx.StaticText( panel, -1, _("Title"), size=(-1,wx.local.buttonSize[1]), style=wx.ALIGN_CENTRE|wx.ST_NO_AUTORESIZE)
 		self.titletext.SetFont(wx.local.normalFont)
-		self.top.Add( self.titletext, 1, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1)
+		#self.top.Add( self.titletext, 1, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1)
 
 		# The number of times the design is in use
-		self.used = wx.StaticText( panel, -1, "0000", size=(-1,wx.local.buttonSize[1]), style=wx.ALIGN_RIGHT|wx.ST_NO_AUTORESIZE)
+		#self.used = wx.StaticText( panel, -1, "0000", size=(-1,wx.local.buttonSize[1]), style=wx.ALIGN_RIGHT|wx.ST_NO_AUTORESIZE)
 		self.used.SetFont(wx.local.normalFont)
-		self.top.Add( self.used, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
+		#self.top.Add( self.used, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
 
-		self.middle = wx.BoxSizer( wx.VERTICAL )
+		self.middle = self.middlepanel.GetSizer()
 		
 		# The categories this design is in
-		self.categories = wx.StaticText( panel, -1, "", size=(-1,wx.local.buttonSize[1]), style=wx.ALIGN_CENTRE|wx.ST_NO_AUTORESIZE)
+		#self.categories = wx.StaticText( panel, -1, "", size=(-1,wx.local.buttonSize[1]), style=wx.ALIGN_CENTRE|wx.ST_NO_AUTORESIZE)
 		self.categories.SetFont(wx.local.normalFont)
-		self.middle.Add( self.categories, 0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 0 )
+		#self.middle.Add( self.categories, 0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 0 )
 		
 		# The currently selected design
-		self.designsizer = wx.BoxSizer( wx.HORIZONTAL )
-		self.middle.Add(self.designsizer, 2, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
+		self.designsizer = self.designsizerpanel.GetSizer()
+		#self.middle.Add(self.designsizer, 2, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
 
 		# The components in the design
-		self.parts = wx.ListCtrl(panel, -1, wx.DefaultPosition, wx.DefaultSize, wx.LC_REPORT|wx.SUNKEN_BORDER|wx.LC_EDIT_LABELS )
+		#self.parts = wx.ListCtrl(panel, -1, wx.DefaultPosition, wx.DefaultSize, wx.LC_REPORT|wx.SUNKEN_BORDER|wx.LC_EDIT_LABELS )
 		self.parts.InsertColumn(0, "#", format=wx.LIST_FORMAT_RIGHT, width=20)
 		self.parts.InsertColumn(1, _("Component"))
 		self.parts.SetFont(wx.local.normalFont)
-		self.designsizer.Add(self.parts, 2, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
+		#self.designsizer.Add(self.parts, 2, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
 
 		# The properties of the design
-		self.design_ps = wx.BoxSizer(wx.HORIZONTAL)
-		self.design_pp = wx.Panel(panel, -1)
-		self.design_pp.SetSizer(self.design_ps)
-		self.designsizer.Add(self.design_pp, 2, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
+		self.design_ps = self.design_pspanel.GetSizer()
+		#self.design_pp = wx.Panel(panel, -1)
+		#self.design_pp.SetSizer(self.design_ps)
+		#self.designsizer.Add(self.design_pp, 2, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
 
 		# The description of the current design
 		#self.desc = wx.TextCtrl( panel, -1, " ", style=wx.TE_RIGHT|wx.TE_MULTILINE|wx.TE_PROCESS_ENTER)
@@ -117,69 +119,69 @@ class winDesign(winReport, ShiftMixIn):
 		#self.middle.Add( self.desc, 1, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
 
 		# The buttons
-		buttons = wx.BoxSizer( wx.HORIZONTAL )
-		self.middle.Add(buttons, 0, wx.ALIGN_RIGHT|wx.ALL, 1 )
+		buttons = self.buttonspanel.GetSizer()
+		#self.middle.Add(buttons, 0, wx.ALIGN_RIGHT|wx.ALL, 1 )
 
 		# The edit button
-		self.edit = wx.Button( panel, -1, _("Edit"), size=wx.local.buttonSize)
+		#self.edit = wx.Button( panel, -1, _("Edit"), size=wx.local.buttonSize)
 		self.edit.SetFont(wx.local.normalFont)
-		buttons.Add( self.edit, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
+		#buttons.Add( self.edit, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
 		
 		# The duplicate button
-		self.duplicate = wx.Button( panel, -1, _("Duplicate"), size=wx.local.buttonSize)
+		#self.duplicate = wx.Button( panel, -1, _("Duplicate"), size=wx.local.buttonSize)
 		self.duplicate.SetFont(wx.local.normalFont)
-		buttons.Add( self.duplicate, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
+		#buttons.Add( self.duplicate, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
 		
 		# The delete button
-		self.delete = wx.Button( panel, -1, _("Delete"), size=wx.local.buttonSize)
+		#self.delete = wx.Button( panel, -1, _("Delete"), size=wx.local.buttonSize)
 		self.delete.SetFont(wx.local.normalFont)
-		buttons.Add( self.delete, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
+		#buttons.Add( self.delete, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
 
 		# The revert button
-		self.revert = wx.Button( panel, -1, _("Revert"), size=wx.local.buttonSize)
+		#self.revert = wx.Button( panel, -1, _("Revert"), size=wx.local.buttonSize)
 		self.revert.SetFont(wx.local.normalFont)
-		buttons.Add( self.revert, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
+		#buttons.Add( self.revert, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
 
 		# The save button
-		self.save = wx.Button( panel, -1, _("Save"), size=wx.local.buttonSize)
+		#self.save = wx.Button( panel, -1, _("Save"), size=wx.local.buttonSize)
 		self.save.SetFont(wx.local.normalFont)
-		buttons.Add( self.save, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
+		#buttons.Add( self.save, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
 		
 		# The components
 		
-		self.compssizer = wx.BoxSizer( wx.VERTICAL )
+		self.compssizer = self.compssizerpanel.GetSizer()
 		
-		self.comps = wx.OrderedTreeCtrl( panel, -1, style=wx.TR_DEFAULT_STYLE | wx.TR_HAS_VARIABLE_ROW_HEIGHT | wx.TR_MULTIPLE)
+		#self.comps = wx.OrderedTreeCtrl( panel, -1, style=wx.TR_DEFAULT_STYLE | wx.TR_HAS_VARIABLE_ROW_HEIGHT | wx.TR_MULTIPLE)
 		self.comps.SetFont(wx.local.normalFont)
 		self.comps.SetImageList(self.icons)
-		self.compssizer.Add(self.comps, 1, wx.GROW|wx.ALIGN_RIGHT|wx.ALL, 1 )
+		#self.compssizer.Add(self.comps, 1, wx.GROW|wx.ALIGN_RIGHT|wx.ALL, 1 )
 
-		self.addsizer = wx.BoxSizer( wx.HORIZONTAL )
-		self.compssizer.Add(self.addsizer, 0, wx.ALIGN_RIGHT|wx.ALL, 0)
+		self.addsizer = self.addsizerpanel.GetSizer()
+		#self.compssizer.Add(self.addsizer, 0, wx.ALIGN_RIGHT|wx.ALL, 0)
 
-		self.add = wx.Button( panel, -1, _("Add"), size=wx.local.buttonSize)
+		#self.add = wx.Button( panel, -1, _("Add"), size=wx.local.buttonSize)
 		self.add.SetFont(wx.local.normalFont)
-		self.addsizer.Add(self.add, 0, wx.ALIGN_RIGHT|wx.ALL, 1 )
+		#self.addsizer.Add(self.add, 0, wx.ALIGN_RIGHT|wx.ALL, 1 )
 
-		self.addmany = wx.Button( panel, -1, _("Add Many"), size=wx.local.buttonSize)
+		#self.addmany = wx.Button( panel, -1, _("Add Many"), size=wx.local.buttonSize)
 		self.addmany.SetFont(wx.local.normalFont)
-		self.addsizer.Add(self.addmany, 0, wx.ALIGN_RIGHT|wx.ALL, 1 )
+		#self.addsizer.Add(self.addmany, 0, wx.ALIGN_RIGHT|wx.ALL, 1 )
 		
 		
-		blank = wx.Panel( panel, -1 )
-		self.grid.Add(blank,    0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
-		self.grid.Add(self.top,         0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
-		blank = wx.Panel( panel, -1 )
-		self.grid.Add(blank,    0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
-		self.grid.Add(self.designs,     0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
-		self.grid.Add(self.middle,      0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
-		self.grid.Add(self.compssizer,  0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
+		#blank = wx.Panel( panel, -1 )
+		#self.grid.Add(blank,    0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
+		#self.grid.Add(self.top,         0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
+		#blank = wx.Panel( panel, -1 )
+		#self.grid.Add(blank,    0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
+		#self.grid.Add(self.designs,     0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
+		#self.grid.Add(self.middle,      0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
+		#self.grid.Add(self.compssizer,  0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
 
-		panel.SetAutoLayout( True )
-		panel.SetSizer( self.grid )
+		self.panel.SetAutoLayout( True )
+		#self.panel.SetSizer( self.grid )
 
-		self.grid.Fit( panel )
-		self.grid.SetSizeHints( self )
+		#self.grid.Fit( panel )
+		#self.grid.SetSizeHints( self )
 
 		self.Bind(wx.EVT_BUTTON, self.OnEdit, self.edit)
 		self.Bind(wx.EVT_BUTTON, self.OnSelect, self.revert)
@@ -190,7 +192,7 @@ class winDesign(winReport, ShiftMixIn):
 
 		self.Bind(wx.EVT_TREE_SEL_CHANGED, self.OnSelectObject, self.designs)
 
-		self.panel = panel
+		#self.panel = panel
 		self.OnSelect()
 
 	# Functions to manipulate the Tree controls....
@@ -311,14 +313,15 @@ class winDesign(winReport, ShiftMixIn):
 		# Remove the previous panel and stuff
 		if hasattr(self, 'properties'):
 			self.properties.Hide()
-			self.design_ps.Remove(self.properties)
-			self.properties.Destroy()
-			del self.properties
+			#self.design_ps.Remove(self.properties)
+			#self.properties.Destroy()
+			#del self.properties
 
 		# Create a new panel
-		panel = wx.Panel(self.design_pp, -1)
-		sizer = wx.BoxSizer(wx.VERTICAL) 
-		panel.SetSizer(sizer)
+		#panel = wx.Panel(self.design_pp, -1)
+		#sizer = wx.BoxSizer(wx.VERTICAL) 
+		sizer = self.sizerpanel.GetSizer()
+		#panel.SetSizer(sizer)
 
 		# Sort the properties into category groups
 		properties = {}
@@ -334,30 +337,90 @@ class winDesign(winReport, ShiftMixIn):
 			category = cache.categories[cid]
 
 			# The box around the properties in the category
-			box = wx.StaticBox(panel, -1, category.name)
-			box.SetFont(wx.local.normalFont)
-			box_sizer = wx.StaticBoxSizer(box, wx.VERTICAL)
-			sizer.Add(box_sizer, 1, SIZER_FLAGS, 5)
+			#box = wx.StaticBox(panel, -1, category.name)
+			self.box.SetFont(wx.local.normalFont)
+			#box_sizer = wx.StaticBoxSizer(box, wx.VERTICAL)
+			box_sizer = self.box_sizerpanel.GetSizer()
+			#sizer.Add(box_sizer, 1, SIZER_FLAGS, 5)
 
 			# The properties
-			prop_sizer = wx.FlexGridSizer( 0, 2, 0, 0 )
-			box_sizer.Add(prop_sizer, 1, SIZER_FLAGS, 5)
+			#prop_sizer = wx.FlexGridSizer( 0, 2, 0, 0 )
+			prop_sizer = self.prop_sizerpanel.GetSizer()
+			#box_sizer.Add(prop_sizer, 1, SIZER_FLAGS, 5)
 
 			for property, pstring in properties[cid]:
+				
 				# Property name
-				name = wx.StaticText(panel, -1, property.display_name)
+				name = wx.StaticText(self.properties, -1, property.display_name)
 				name.SetFont(wx.local.normalFont)
 				prop_sizer.Add(name, 0, SIZER_FLAGS|wx.ALIGN_RIGHT, 5)
 
 				# Property value
-				value = wx.StaticText(panel, -1, pstring)
+				value = wx.StaticText(self.properties, -1, pstring)
 				value.SetFont(wx.local.normalFont)
 				prop_sizer.Add(value, 1, SIZER_FLAGS|wx.ALIGN_RIGHT, 5)
 
-		self.design_ps.Add( panel, 1, SIZER_FLAGS, 5 )
+		#self.design_ps.Add( panel, 1, SIZER_FLAGS, 5 )
 		self.design_ps.Layout()
-
-		self.properties = panel
+		#self.prop_sizerpanel.Layout()
+		self.properties.Show()
+		#self.properties = panel
+		
+#	def BuildPropertiesPanel(self, design):
+#		SIZER_FLAGS = wx.GROW|wx.ALIGN_CENTER_VERTICAL|wx.ALL
+#		cache = self.application.cache
+#
+#		# Remove the previous panel and stuff
+#		if hasattr(self, 'properties'):
+#			self.properties.Hide()
+#			self.design_ps.Remove(self.properties)
+#			self.properties.Destroy()
+#			del self.properties
+#
+#		# Create a new panel
+#		panel = wx.Panel(self.design_pp, -1)
+#		sizer = wx.BoxSizer(wx.VERTICAL) 
+#		panel.SetSizer(sizer)
+#
+#		# Sort the properties into category groups
+#		properties = {}
+#		for pid, pstring in design.properties:
+#			property = cache.properties[pid]
+#			
+#			for cid in property.categories:
+#				if not properties.has_key(cid):
+#					properties[cid] = []
+#				properties[cid].append((property, pstring))
+#				
+#		for cid in properties.keys():
+#			category = cache.categories[cid]
+#
+#			# The box around the properties in the category
+#			box = wx.StaticBox(panel, -1, category.name)
+#			box.SetFont(wx.local.normalFont)
+#			box_sizer = wx.StaticBoxSizer(box, wx.VERTICAL)
+#			sizer.Add(box_sizer, 1, SIZER_FLAGS, 5)
+#
+#			# The properties
+#			prop_sizer = wx.FlexGridSizer( 0, 2, 0, 0 )
+#			box_sizer.Add(prop_sizer, 1, SIZER_FLAGS, 5)
+#
+#			for property, pstring in properties[cid]:
+#				# Property name
+#				name = wx.StaticText(panel, -1, property.display_name)
+#				name.SetFont(wx.local.normalFont)
+#				prop_sizer.Add(name, 0, SIZER_FLAGS|wx.ALIGN_RIGHT, 5)
+#
+#				# Property value
+#				value = wx.StaticText(panel, -1, pstring)
+#				value.SetFont(wx.local.normalFont)
+#				prop_sizer.Add(value, 1, SIZER_FLAGS|wx.ALIGN_RIGHT, 5)
+#
+#		self.design_ps.Add( panel, 1, SIZER_FLAGS, 5 )
+#		self.design_ps.Show(panel)
+#		self.design_ps.Layout()
+#
+#		self.properties = panel
 
 	def BuildPartsPanel(self, design):
 		# Populate the parts list
@@ -415,7 +478,7 @@ class winDesign(winReport, ShiftMixIn):
 		self.designs.Disable()
 
 		# Show the component bar
-		self.grid.Show(self.compssizer)
+		self.grid.Show(self.compssizerpanel)
 		
 		# Make the title and description editable
 		self.top.Show(self.titleedit)
@@ -477,7 +540,7 @@ class winDesign(winReport, ShiftMixIn):
 		self.designs.Enable()
 
 		# Hide the component bar
-		self.grid.Hide(self.compssizer)
+		self.grid.Hide(self.compssizerpanel)
 
 		# Make the title and description uneditable
 		self.top.Hide(self.titleedit)
@@ -508,7 +571,7 @@ class winDesign(winReport, ShiftMixIn):
 			self.titletext.SetLabel("")
 
 			# Hide the design
-			self.middle.Hide(self.designsizer)
+			self.middle.Hide(self.designsizerpanel)
 			self.middle.Layout()
 			
 			# Disable the buttons
@@ -525,7 +588,8 @@ class winDesign(winReport, ShiftMixIn):
 		self.BuildHeaderPanel(self.selected)
 
 		# Show the parts list
-		self.middle.Show(self.designsizer)
+		self.middle.Show(self.designsizerpanel)
+		self.middle.Layout()
 
 		# Populate the parts list
 		self.BuildPartsPanel(self.selected)
