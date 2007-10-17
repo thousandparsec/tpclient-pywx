@@ -105,7 +105,8 @@ class winDesign(winDesignBase, winReportXRC, ShiftMixIn):
 		#self.designsizer.Add(self.parts, 2, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
 
 		# The properties of the design
-		self.design_ps = self.design_pspanel.GetSizer()
+		#self.design_ps = self.design_pspanel.GetSizer()
+		self.design_ps = wx.BoxSizer(wx.HORIZONTAL)
 		#self.design_pp = wx.Panel(panel, -1)
 		#self.design_pp.SetSizer(self.design_ps)
 		#self.designsizer.Add(self.design_pp, 2, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
@@ -305,23 +306,28 @@ class winDesign(winDesignBase, winReportXRC, ShiftMixIn):
 			c += self.application.cache.categories[cid].name + ", "
 		c = c[:-2]
 		self.categories.SetLabel(c)
-
+		
 	def BuildPropertiesPanel(self, design):
 		SIZER_FLAGS = wx.GROW|wx.ALIGN_CENTER_VERTICAL|wx.ALL
 		cache = self.application.cache
-
+		
 		# Remove the previous panel and stuff
 		if hasattr(self, 'properties'):
 			self.properties.Hide()
-			#self.design_ps.Remove(self.properties)
-			#self.properties.Destroy()
-			#del self.properties
+			self.design_ps.Remove(self.properties)
+			self.properties.Destroy()
+			del self.properties
+		if hasattr(self, 'design_pspanel'):
+			self.design_pspanel.Hide()
+			self.designsizer.Remove(self.design_pspanel)
+			self.design_pspanel.Destroy()
+			del self.design_pspanel
 
 		# Create a new panel
-		#panel = wx.Panel(self.design_pp, -1)
-		#sizer = wx.BoxSizer(wx.VERTICAL) 
-		sizer = self.sizerpanel.GetSizer()
-		#panel.SetSizer(sizer)
+		panel = wx.Panel(self.design_pp, -1)
+		sizer = wx.BoxSizer(wx.VERTICAL) 
+		panel.SetSizer(sizer)
+		panel.SetSize((250, 390))
 
 		# Sort the properties into category groups
 		properties = {}
@@ -337,90 +343,32 @@ class winDesign(winDesignBase, winReportXRC, ShiftMixIn):
 			category = cache.categories[cid]
 
 			# The box around the properties in the category
-			#box = wx.StaticBox(panel, -1, category.name)
-			self.box.SetFont(wx.local.normalFont)
-			#box_sizer = wx.StaticBoxSizer(box, wx.VERTICAL)
-			box_sizer = self.box_sizerpanel.GetSizer()
-			#sizer.Add(box_sizer, 1, SIZER_FLAGS, 5)
+			box = wx.StaticBox(panel, -1, category.name)
+			box.SetFont(wx.local.normalFont)
+			box_sizer = wx.StaticBoxSizer(box, wx.VERTICAL)
+			sizer.Add(box_sizer, 1, SIZER_FLAGS, 5)
 
 			# The properties
-			#prop_sizer = wx.FlexGridSizer( 0, 2, 0, 0 )
-			prop_sizer = self.prop_sizerpanel.GetSizer()
-			#box_sizer.Add(prop_sizer, 1, SIZER_FLAGS, 5)
+			prop_sizer = wx.FlexGridSizer( 0, 2, 0, 0 )
+			box_sizer.Add(prop_sizer, 1, SIZER_FLAGS, 5)
 
 			for property, pstring in properties[cid]:
-				
 				# Property name
-				name = wx.StaticText(self.properties, -1, property.display_name)
+				name = wx.StaticText(panel, -1, property.display_name)
 				name.SetFont(wx.local.normalFont)
 				prop_sizer.Add(name, 0, SIZER_FLAGS|wx.ALIGN_RIGHT, 5)
 
 				# Property value
-				value = wx.StaticText(self.properties, -1, pstring)
+				value = wx.StaticText(panel, -1, pstring)
 				value.SetFont(wx.local.normalFont)
 				prop_sizer.Add(value, 1, SIZER_FLAGS|wx.ALIGN_RIGHT, 5)
+				
+				self.design_ps.Layout()
+				panel.Layout()
 
-		#self.design_ps.Add( panel, 1, SIZER_FLAGS, 5 )
-		self.design_ps.Layout()
-		#self.prop_sizerpanel.Layout()
-		self.properties.Show()
-		#self.properties = panel
-		
-#	def BuildPropertiesPanel(self, design):
-#		SIZER_FLAGS = wx.GROW|wx.ALIGN_CENTER_VERTICAL|wx.ALL
-#		cache = self.application.cache
-#
-#		# Remove the previous panel and stuff
-#		if hasattr(self, 'properties'):
-#			self.properties.Hide()
-#			self.design_ps.Remove(self.properties)
-#			self.properties.Destroy()
-#			del self.properties
-#
-#		# Create a new panel
-#		panel = wx.Panel(self.design_pp, -1)
-#		sizer = wx.BoxSizer(wx.VERTICAL) 
-#		panel.SetSizer(sizer)
-#
-#		# Sort the properties into category groups
-#		properties = {}
-#		for pid, pstring in design.properties:
-#			property = cache.properties[pid]
-#			
-#			for cid in property.categories:
-#				if not properties.has_key(cid):
-#					properties[cid] = []
-#				properties[cid].append((property, pstring))
-#				
-#		for cid in properties.keys():
-#			category = cache.categories[cid]
-#
-#			# The box around the properties in the category
-#			box = wx.StaticBox(panel, -1, category.name)
-#			box.SetFont(wx.local.normalFont)
-#			box_sizer = wx.StaticBoxSizer(box, wx.VERTICAL)
-#			sizer.Add(box_sizer, 1, SIZER_FLAGS, 5)
-#
-#			# The properties
-#			prop_sizer = wx.FlexGridSizer( 0, 2, 0, 0 )
-#			box_sizer.Add(prop_sizer, 1, SIZER_FLAGS, 5)
-#
-#			for property, pstring in properties[cid]:
-#				# Property name
-#				name = wx.StaticText(panel, -1, property.display_name)
-#				name.SetFont(wx.local.normalFont)
-#				prop_sizer.Add(name, 0, SIZER_FLAGS|wx.ALIGN_RIGHT, 5)
-#
-#				# Property value
-#				value = wx.StaticText(panel, -1, pstring)
-#				value.SetFont(wx.local.normalFont)
-#				prop_sizer.Add(value, 1, SIZER_FLAGS|wx.ALIGN_RIGHT, 5)
-#
-#		self.design_ps.Add( panel, 1, SIZER_FLAGS, 5 )
-#		self.design_ps.Show(panel)
-#		self.design_ps.Layout()
-#
-#		self.properties = panel
+		self.design_ps.Show(panel)
+
+		self.properties = panel
 
 	def BuildPartsPanel(self, design):
 		# Populate the parts list

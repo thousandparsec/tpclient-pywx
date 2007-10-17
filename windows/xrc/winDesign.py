@@ -58,7 +58,6 @@ class winDesignBase:
 		self.properties = XRCCTRL(self, "properties")
 		self.sizerpanel = XRCCTRL(self, "sizerpanel")
 		self.box_sizerpanel = XRCCTRL(self, "box_sizerpanel")
-		self.box = XRCCTRL(self, "box")
 		self.prop_sizerpanel = XRCCTRL(self, "prop_sizerpanel")
 		self.buttonspanel = XRCCTRL(self, "buttonspanel")
 		self.edit = XRCCTRL(self, "edit")
