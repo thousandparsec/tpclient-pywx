@@ -110,6 +110,14 @@ Template_ToggleButton = """\
 			self.Bind(wx.EVT_TOGGLEBUTTON, self.On%(controlName)s, self.%(controlName)s)
 """
 Template_BitmapButton = Template_Button
+Template_ComboBox = """\
+		self.%(controlName)s = XRCCTRL(self, "%(controlID)s")
+		if hasattr(self, "On%(controlName)s"):
+			self.Bind(wx.EVT_COMBOBOX, self.On%(controlName)s, self.%(controlName)s)
+			self.Bind(wx.EVT_TEXT_ENTER, self.On%(controlName)s, self.%(controlName)s)
+		if hasattr(self, "OnDirty%(controlName)s"):
+			self.Bind(wx.EVT_TEXT, self.On%(controlName)s, self.%(controlName)s)
+"""
 
 def Generate_wxFrame(xrcFile, topWindow, outFile):
 	fileName = os.path.basename(xrcFile.name)
