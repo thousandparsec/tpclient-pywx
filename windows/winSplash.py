@@ -9,6 +9,7 @@ try:
 
 	import time
 
+	os.environ['SDL_VIDEO_CENTERED'] = '1'
 	os.environ['SDL_VIDEO_WINDOW_POS'] = "center"
 	import pygame
 
