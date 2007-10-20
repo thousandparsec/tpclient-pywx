@@ -88,6 +88,13 @@ class Overlay(dict):
 		"""
 		pass
 
+	def Focus(self):
+		"""\
+		Returns the coordinates that the current overlay is focused at.
+		Probably the selected object. 
+		"""
+		pass
+
 class Holder(list):
 	"""
 	A holder is an entity which contains a "primary" object and a bunch of
@@ -214,6 +221,17 @@ class SystemLevelOverlay(Overlay):
 		icon.Bind(EVT_FC_ENTER_OBJECT, self.SystemEnter)
 		icon.Bind(EVT_FC_LEAVE_OBJECT, self.SystemLeave)
 		icon.Bind(EVT_FC_LEFT_UP, self.SystemLeftClick)
+
+	def Focus(self):
+		"""\
+		Returns the coordinates of the currently selected object or the center
+		of the universe.
+		"""
+		try:
+			return self.Selected.XY
+		except Exception, e:
+			return (0,0)
+			
 
 	def SelectObject(self, oid):
 		"""

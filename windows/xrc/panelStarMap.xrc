@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource version="2.3.0.1" xmlns="http://www.wxwidgets.org/wxxrc">
+  <object class="wxPanel" name="panelStarMap" subclass="Dialog">
+    <object class="wxFlexGridSizer">
+      <cols>1</cols>
+      <rows>2</rows>
+      <vgap>1</vgap>
+      <hgap>1</hgap>
+      <object class="sizeritem">
+        <object class="wxBoxSizer">
+          <orient>wxHORIZONTAL</orient>
+          <object class="sizeritem">
+            <object class="wxBitmapButton" name="MouseMode">
+              <bitmap stock_id="wxART_MISSING_IMAGE"></bitmap>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <object class="wxComboBox" name="ZoomLevel">
+              <content>
+                <item>Fit</item>
+                <item>80%</item>
+                <item>50%</item>
+                <item>10%</item>
+                <item>Box</item>
+              </content>
+              <style>wxCB_DROPDOWN</style>
+            </object>
+            <flag>wxEXPAND</flag>
+          </object>
+          <object class="sizeritem">
+            <object class="wxStaticLine">
+              <size>8</size>
+              <style>wxLI_VERTICAL</style>
+            </object>
+            <flag>wxTOP|wxBOTTOM|wxEXPAND</flag>
+            <border>4</border>
+          </object>
+          <object class="sizeritem">
+            <object class="wxBitmapButton" name="Home">
+              <bitmap stock_id="wxART_GO_HOME"></bitmap>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <object class="wxBitmapButton" name="Find">
+              <bitmap stock_id="wxART_FIND"></bitmap>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <object class="wxStaticLine">
+              <size>8</size>
+              <style>wxLI_VERTICAL</style>
+            </object>
+            <flag>wxTOP|wxBOTTOM|wxEXPAND</flag>
+            <border>4</border>
+          </object>
+          <object class="sizeritem">
+            <object class="wxChoice" name="DisplayMode">
+              <content>
+                <item>System</item>
+                <item>Resources</item>
+              </content>
+            </object>
+            <flag>wxEXPAND</flag>
+          </object>
+          <object class="sizeritem">
+            <object class="wxPanel" name="DisplayModeExtra"/>
+          </object>
+        </object>
+        <border>0</border>
+      </object>
+      <object class="sizeritem">
+        <object class="wxPanel" name="FloatCanvas">
+          <bg>#1A1A1A</bg>
+        </object>
+        <flag>wxEXPAND</flag>
+      </object>
+      <growablerows>1</growablerows>
+      <growablecols>0</growablecols>
+    </object>
+  </object>
+</resource>

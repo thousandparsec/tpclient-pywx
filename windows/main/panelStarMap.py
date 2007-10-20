@@ -11,57 +11,29 @@ import numpy as N
 # wxPython imports
 import wx
 from extra.wxFloatCanvas import FloatCanvas
-from extra.wxFloatCanvas.RelativePoint import RelativePoint
-
-from extra.wxFloatCanvas.NavCanvas import NavCanvas
 
 from overlays.Resource import Resource
 from overlays.Systems  import Systems
 
-if False:
-	"""
-	When a mouse hovers over an object,
-		- Display the "paths" of each child
-		- Display a quick box with details about the object
-	"""
-
-class StarMapCanvas(NavCanvas):
-	def BuildToolbar(self):
-		tb = wx.ToolBar(self)
-		self.ToolBar = tb
-
-		tb.SetToolBitmapSize((24,24))
-
-		from extra.wxFloatCanvas import Resources
-		self.ZoomButton = tb.AddRadioTool(wx.ID_ANY, bitmap=Resources.getMagPlusBitmap(), shortHelp = "Change Zoom Level.")
-		self.Bind(wx.EVT_TOOL, self.OnZoomTool, self.ZoomButton)
-
-		tb.AddSeparator()
-		tb.Realize()
-		return tb
-
-	def OnZoomTool(self, evt):
-		# Popup a menu
-		menu = wx.Menu()
-		menu.Append(100, "Testing")	
-		self.PopupMenu(menu)
-
-# Shows the main map of the universe.
-class panelStarMap(wx.Panel):
+from windows.xrc.panelStarMap import panelStarMapBase
+class panelStarMap(panelStarMapBase):
 	title = _("StarMap")
 
 	def __init__(self, application, parent):
-		wx.Panel.__init__(self, parent)
+		panelStarMapBase.__init__(self, parent)
 
 		self.application = application
 
-#		self.StarMap = StarMapCanvas(self, Debug = 1, BackgroundColor="black")
-		self.StarMap = NavCanvas(self, Debug = 1, BackgroundColor="black")
-		self.StarMap.ZoomToFit(None)
-		self.Canvas = self.StarMap.Canvas
+		self.Canvas = FloatCanvas.FloatCanvas(self.FloatCanvas, Debug=1, BackgroundColor="black")
+
+		import extra.wxFloatCanvas.GUIMode as GUIMode
+		self.GUIZoomIn  =  GUIMode.GUIZoomIn(self.Canvas)
+		self.GUIZoomOut =  GUIMode.GUIZoomOut(self.Canvas)
+		self.GUIMove    =  GUIMode.GUIMove(self.Canvas)
+		self.GUIMouse   =  GUIMode.GUIMouse(self.Canvas)
+		self.Canvas.SetMode(self.GUIMouse)
 
 		self.Bind(wx.EVT_SIZE, self.OnSize)
-		self.Bind(wx.EVT_ACTIVATE, self.OnShow)
 
 	def GetPaneInfo(self):
 		info = wx.aui.AuiPaneInfo()
@@ -70,14 +42,37 @@ class panelStarMap(wx.Panel):
 		info.MaximizeButton(True)
 		return info
 
-	def OnShow(self, evt):
-		self.Canvas.Draw()
-
 	def OnSize(self, evt):
-#		self.Canvas.SetSize(self.GetClientSize())
-		self.StarMap.SetSize(self.GetClientSize())
-#		self.Canvas.OnSize(evt)
-		self.Canvas.ZoomToBB()
+		self.Layout()
+		self.FloatCanvas.Layout()
+		self.Canvas.SetSize(self.FloatCanvas.GetClientSize())
+
+	def OnZoomLevel(self, evt):
+		if isinstance(evt, wx.Event):
+			to = evt.GetString().lower()
+		else:
+			to = str(evt).lower()
+
+		if self.Canvas.GUIMode == self.GUIZoomIn:
+			self.Canvas.SetMode(self.GUIMouse)
+
+		if to == 'fit':
+			self.Canvas.ZoomToBB()
+			self.ScaleMax = self.Canvas.Scale
+		elif to == 'box':
+			self.Canvas.SetMode(self.GUIZoomIn)
+		else:
+			if to[-1] == '%':
+				to = to[:-1]
+
+			try:
+				to = float(to)
+
+				self.Canvas.Scale = self.ScaleMax*(100/to)
+				self.Canvas.Zoom(1, self.Overlay.Focus(), 'world')
+			except ValueError:
+				# FIXME: This should pop-up some type of error.
+				print "Can not zoom to that level"
 
 	def OnCacheUpdate(self, evt):
 		"""\
@@ -90,6 +85,9 @@ class panelStarMap(wx.Panel):
 			self.Overlay = Systems(self, self.Canvas, self.application.cache)
 #			self.Overlay = Resource(self, self.Canvas, self.application.cache)
 			self.Overlay.Update()
+
+		self.OnZoomLevel('fit')
+		self.Canvas.Draw()
 
 	def PostSelectObject(self, oid):
 		self.application.gui.Post(self.application.gui.SelectObjectEvent(oid))
