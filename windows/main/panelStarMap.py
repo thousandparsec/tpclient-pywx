@@ -32,14 +32,56 @@ class panelStarMap(panelStarMapBase):
 		self.GUIZoomOut =  GUIMode.GUIZoomOut(self.Canvas)
 		self.GUIMove    =  GUIMode.GUIMove(self.Canvas)
 		self.GUIMouse   =  GUIMode.GUIMouse(self.Canvas)
-		self.Canvas.SetMode(self.GUIMouse)
+		self.SetMode(self.GUIMouse)
+
+		# Create the mouse-mode popup
+		self.MouseModePopup = wx.PopupWindow(self)
+		p = wx.Panel(self.MouseModePopup)
+		s = wx.BoxSizer(wx.VERTICAL)
+
+		for button in [ wx.Button(p, -1, 'Mouse'),
+						wx.Button(p, -1, 'Move'),
+						wx.Button(p, -1, 'Zoom In'),
+						wx.Button(p, -1, 'Zoom Out'),
+						wx.Button(p, -1, 'Waypoint')]:
+			button.Bind(wx.EVT_BUTTON, self.OnMouseModeButton)
+			s.Add(button, 	proportion=1, flag=wx.EXPAND)
+
+		p.SetSizer(s)
+		p.Layout()
+		p.SetSize(p.GetBestSize())
+		self.MouseModePopup.SetSize(p.GetBestSize())
 
 		self.Bind(wx.EVT_SIZE, self.OnSize)
 
+		# Populate the overlay chooser
 		self.Overlay = None
 		for overlay in self.Overlays:
 			self.DisplayMode.Append(overlay.name, overlay)
 		self.DisplayMode.SetSelection(0)
+
+	def OnMouseMode(self, evt):
+		if self.MouseModePopup.IsShown():
+			self.MouseModePopup.Hide()
+		else:
+			size = (0, self.MouseMode.GetSize()[1])
+			self.MouseModePopup.Position(self.MouseMode.GetScreenPosition(), size)
+			self.MouseModePopup.Show()
+	
+	def OnMouseModeButton(self, evt):
+		self.MouseModePopup.Hide()
+
+		mode = evt.GetEventObject().GetLabel()
+		mode = mode.replace(' ', '')
+		
+		GUIMode = getattr(self, 'GUI%s' % mode)
+		self.SetMode(GUIMode)
+
+	def SetMode(self, mode):
+		self.Canvas.SetMode(mode)
+
+		if mode == self.GUIMouse:
+			self.Canvas.SetCursor(wx.StockCursor(wx.CURSOR_RIGHT_ARROW))
 
 	def OnDisplayMode(self, evt):
 		cls = self.DisplayMode.GetClientData(self.DisplayMode.GetSelection())
@@ -102,13 +144,13 @@ class panelStarMap(panelStarMapBase):
 			to = str(evt).lower()
 
 		if self.Canvas.GUIMode == self.GUIZoomIn:
-			self.Canvas.SetMode(self.GUIMouse)
+			self.SetMode(self.GUIMouse)
 
 		if to == 'fit':
 			self.Canvas.ZoomToBB()
 			self.ScaleMax = self.Canvas.Scale
 		elif to == 'box':
-			self.Canvas.SetMode(self.GUIZoomIn)
+			self.SetMode(self.GUIZoomIn)
 		else:
 			if to[-1] == '%':
 				to = to[:-1]
