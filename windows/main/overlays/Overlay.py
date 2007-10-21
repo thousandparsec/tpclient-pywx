@@ -285,8 +285,9 @@ class SystemLevelOverlay(Overlay):
 		system = self.cache.objects[parentid]
 		real   = self.cache.objects[oid]
 
-		icon = self[system.id]
+		icon = self[system.id].copy()
 		icon.SetLoop(real)
+		self.Selected = icon
 
 		self.ObjectLeftClick(icon, real)
 
