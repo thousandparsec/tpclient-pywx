@@ -20,13 +20,15 @@ class Resource(Proportional):
 	"""\
 	Draws proportional circles for the relative number of resources.
 	"""
+	name = "Resources"
+
 	TOTAL        = -1
 	SURFACE	     =  1
 	MINABLE	     =  2
 	INACCESSABLE =  3	
 
-	def __init__(self, parent, canvas, cache, resource=None, type=-1):
-		Proportional.__init__(self, parent, canvas, cache)
+	def __init__(self, parent, canvas, panel, cache, resource=None, type=-1):
+		Proportional.__init__(self, parent, canvas, panel, cache)
 
 		self.resource = resource
 		self.type     = type

@@ -19,6 +19,7 @@ from windows.xrc.panelStarMap import panelStarMapBase
 class panelStarMap(panelStarMapBase):
 	title = _("StarMap")
 
+	Overlays = [Systems, Resource]
 	def __init__(self, application, parent):
 		panelStarMapBase.__init__(self, parent)
 
@@ -34,6 +35,53 @@ class panelStarMap(panelStarMapBase):
 		self.Canvas.SetMode(self.GUIMouse)
 
 		self.Bind(wx.EVT_SIZE, self.OnSize)
+
+		self.Overlay = None
+		for overlay in self.Overlays:
+			self.DisplayMode.Append(overlay.name, overlay)
+		self.DisplayMode.SetSelection(0)
+
+	def OnDisplayMode(self, evt):
+		cls = self.DisplayMode.GetClientData(self.DisplayMode.GetSelection())
+
+		oid = -1
+
+		# Clear any overlay which is currently around
+		if self.Overlay != None:
+			oid = self.Overlay.Focus()[0]
+
+			self.Overlay.CleanUp()
+			self.Overlay = None
+
+			# Remove the panel from the sizer
+			self.DisplayModeExtra.GetSizer().Remove(self.DisplayModePanel)
+
+			# Destroy the panel and all it's children
+			self.DisplayModePanel.Destroy()
+
+			# Destory our reference to the panel
+			del self.DisplayModePanel
+
+		# Create a new panel
+		self.DisplayModePanel = wx.Panel(self.DisplayModeExtra)
+		#self.DisplayModePanel.SetBackgroundColour(wx.BLUE) # Only needed for debugging where the panel is covering
+		# Add the panel to the sizer
+		self.DisplayModeExtra.GetSizer().Add(self.DisplayModePanel, proportion=1, flag=wx.EXPAND)
+
+		# Create the new overlay
+		self.Overlay = cls(self, self.Canvas, self.DisplayModePanel, self.application.cache)
+		self.Overlay.UpdateAll()
+
+		if oid != -1:
+			try:
+				self.Overlay.SelectObject(oid)
+			except NotImplementedError:
+				pass
+
+		# Force the panel to layout
+		self.DisplayModeExtra.Layout()
+
+		self.Canvas.Draw()
 
 	def GetPaneInfo(self):
 		info = wx.aui.AuiPaneInfo()
@@ -69,7 +117,7 @@ class panelStarMap(panelStarMapBase):
 				to = float(to)
 
 				self.Canvas.Scale = self.ScaleMax*(100/to)
-				self.Canvas.Zoom(1, self.Overlay.Focus(), 'world')
+				self.Canvas.Zoom(1, self.Overlay.Focus()[1], 'world')
 			except ValueError:
 				# FIXME: This should pop-up some type of error.
 				print "Can not zoom to that level"
@@ -79,15 +127,14 @@ class panelStarMap(panelStarMapBase):
 		Called when the cache has been updated.
 		"""
 		if evt.what == None:
-			if hasattr(self, 'Overlay'):
-				self.Overlay.CleanUp()
+			# FIXME: These shouldn't really be here
+			if self.Overlay is not None:
+				self.Overlay.UpdateAll()
+			else:
+				self.OnDisplayMode(None)		
 
-			self.Overlay = Systems(self, self.Canvas, self.application.cache)
-#			self.Overlay = Resource(self, self.Canvas, self.application.cache)
-			self.Overlay.Update()
-
-		self.OnZoomLevel('fit')
-		self.Canvas.Draw()
+			self.OnZoomLevel('fit')
+			self.Canvas.Draw()
 
 	def PostSelectObject(self, oid):
 		self.application.gui.Post(self.application.gui.SelectObjectEvent(oid))

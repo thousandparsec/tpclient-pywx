@@ -10,10 +10,18 @@ class Overlay(dict):
 	A layer which displays something on the StarMap.
 	"""	
 	def name():
-		raise NotImplimented("This overlay has not specified a name! - This is bad!")
+		raise NotImplementedError("This overlay has not specified a name! - This is bad!")
 	name = property(staticmethod(name))
 
-	def __init__(self, parent, canvas, cache):
+	def __init__(self, parent, canvas, panel, cache):
+		"""
+		Create a new Overlay object.
+
+		parent is the application which can be used to post events.
+		canvas is the wx.FloatCanvas to draw onto.
+		panel  is the toolbar panel which the overlay can add it's own icons/widgets too.
+		cache  is the libtpclient-py cache containing the universe data.
+		"""
 		self.parent = parent
 		if canvas is None:
 			raise TypeError("Canvas can not be none!")
@@ -21,6 +29,8 @@ class Overlay(dict):
 		if cache is None:
 			raise TypeError("Cache can not be none!")
 		self.cache  = cache
+
+		self.panel  = panel
 
 	def CleanUp(self):
 		"""\
@@ -101,10 +111,21 @@ class Overlay(dict):
 
 	def Focus(self):
 		"""\
-		Returns the coordinates that the current overlay is focused at.
-		Probably the selected object. 
+		Returns a tuple of,
+			Selected object id (-1 for no object)
+			The coordinates that the current overlay is focused at.
+
+		This should probably be the selected object (but something else could be focused on other overlays). 
 		"""
-		pass
+		return -1, (0,0)
+
+	def SelectObject(self, oid):
+		"""
+		Select an object using an external event.
+
+		Simulates this as a mouse click.
+		"""
+		raise NotImplementedError("Select Object method has not been implimented!")
 
 class Holder(list):
 	"""
@@ -240,9 +261,9 @@ class SystemLevelOverlay(Overlay):
 		of the universe.
 		"""
 		try:
-			return self.Selected.XY
+			return self.Selected.primary.id, self.Selected.XY
 		except Exception, e:
-			return (0,0)
+			return 0, (0,0)
 			
 
 	def SelectObject(self, oid):

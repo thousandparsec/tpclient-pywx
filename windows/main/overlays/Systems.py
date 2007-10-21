@@ -179,17 +179,46 @@ class FleetIcon(Group, Holder, IconMixIn):
 		Group.__init__(self, ObjectList, False)
 
 class Systems(SystemLevelOverlay):
+	name     = "Systems"
 	toplevel = Galaxy, Universe
 
-	def __init__(self, *args, **kw):
-		SystemLevelOverlay.__init__(self, *args, **kw)
+	Colorizers = [ColorVerses, ColorEach]
+
+	def __init__(self, parent, canvas, panel, cache, *args, **kw):
+		SystemLevelOverlay.__init__(self, parent, canvas, panel, cache, *args, **kw)
 
 		self.canvas.SetCursor(wx.StockCursor(wx.CURSOR_RIGHT_ARROW))
 
-	def UpdateAll(self):
-		#self.Colorizer = ColorVerses(self.cache.players[0].id)
-		self.Colorizer = ColorEach()
+		# Create a drop-down on the panel for colorizer
+		self.ColorizeMode = wx.Choice(panel)
+		self.ColorizeMode.Bind(wx.EVT_CHOICE, self.OnColorizeMode)
 
+		# Populate the colorizer dropdown with information
+		for colorizer in self.Colorizers:
+			self.ColorizeMode.Append(colorizer.name, colorizer)
+		self.ColorizeMode.SetSelection(0)
+
+		self.Colorizer = None
+		self.OnColorizeMode(None)
+
+		sizer = wx.FlexGridSizer(10)
+		sizer.AddGrowableRow(0)
+		sizer.Add(self.ColorizeMode, proportion=1, flag=wx.EXPAND)
+		panel.SetSizer(sizer)
+
+	def OnColorizeMode(self, evt):
+		cls = self.ColorizeMode.GetClientData(self.ColorizeMode.GetSelection())
+
+		if not isinstance(self.Colorizer, cls):
+			# Change the colorizer
+			self.Colorizer = cls(self.cache.players[0].id)
+
+			if not evt is None:
+				self.CleanUp()
+				self.UpdateAll()
+				self.canvas.Draw()
+
+	def UpdateAll(self):
 		SystemLevelOverlay.UpdateAll(self)
 
 		self['preview-arrow'] = PolygonArrow((0,0), "#555555", True)

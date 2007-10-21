@@ -50,6 +50,9 @@ class panelStarMapBase(wx.Panel):
 			self.Bind(wx.EVT_BUTTON, self.OnFind, self.Find)
 
 		self.DisplayMode = XRCCTRL(self, "DisplayMode")
+		if hasattr(self, "OnDisplayMode"):
+			self.DisplayMode.Bind(wx.EVT_CHOICE, self.OnDisplayMode)
+
 		self.DisplayModeExtra = XRCCTRL(self, "DisplayModeExtra")
 		self.FloatCanvas = XRCCTRL(self, "FloatCanvas")
 
@@ -60,5 +63,6 @@ def strings():
 	_("80%");
 	_("50%");
 	_("10%");
+	_("Box");
 	_("System");
 	_("Resources");
