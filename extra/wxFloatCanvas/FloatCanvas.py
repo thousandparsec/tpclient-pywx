@@ -256,10 +256,10 @@ class DrawObject:
     def UnBindAll(self):
         ## fixme: this only removes one from each list, there could be more.
         if self._Canvas.HitDict:
-            for List in self._Canvas.HitDict.itervalues():
+            for Event in self._Canvas.HitDict.itervalues():
                 try:
-                   List.remove(self)
-                except ValueError:
+                   del Event[self.HitColor]
+                except KeyError:
                     pass
         self.HitAble = False
 
