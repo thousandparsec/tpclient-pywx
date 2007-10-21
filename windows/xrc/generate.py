@@ -118,6 +118,11 @@ Template_ComboBox = """\
 		if hasattr(self, "OnDirty%(controlName)s"):
 			self.Bind(wx.EVT_TEXT, self.On%(controlName)s, self.%(controlName)s)
 """
+Template_Choice = """\
+		self.%(controlName)s = XRCCTRL(self, "%(controlID)s")
+		if hasattr(self, "On%(controlName)s"):
+			self.%(controlName)s.Bind(wx.EVT_CHOICE, self.On%(controlName)s)
+"""
 
 def Generate_wxFrame(xrcFile, topWindow, outFile):
 	fileName = os.path.basename(xrcFile.name)
