@@ -9,10 +9,17 @@ class Overlay(dict):
 	"""\
 	A layer which displays something on the StarMap.
 	"""	
+	def name():
+		raise NotImplimented("This overlay has not specified a name! - This is bad!")
+	name = property(staticmethod(name))
 
 	def __init__(self, parent, canvas, cache):
 		self.parent = parent
+		if canvas is None:
+			raise TypeError("Canvas can not be none!")
 		self.canvas = canvas
+		if cache is None:
+			raise TypeError("Cache can not be none!")
 		self.cache  = cache
 
 	def CleanUp(self):
@@ -45,8 +52,12 @@ class Overlay(dict):
 
 		if type(value) in (list, tuple):
 			for v in value:
+				v.UnBindAll()
+
 				self.canvas.RemoveObject(v)
 		else:
+			value.UnBindAll()
+
 			self.canvas.RemoveObject(value)
 		dict.__delitem__(self, oid)
 
@@ -217,6 +228,7 @@ class SystemLevelOverlay(Overlay):
 
 		from extra.wxFloatCanvas.FloatCanvas import EVT_FC_ENTER_OBJECT, EVT_FC_LEAVE_OBJECT
 		from extra.wxFloatCanvas.FloatCanvas import EVT_FC_LEFT_UP, EVT_FC_RIGHT_UP
+
 		# These pop-up the name of the object
 		icon.Bind(EVT_FC_ENTER_OBJECT, self.SystemEnter)
 		icon.Bind(EVT_FC_LEAVE_OBJECT, self.SystemLeave)
@@ -289,7 +301,6 @@ class SystemLevelOverlay(Overlay):
 		self.SystemEnter(self.Selected)
 
 	def SystemEnter(self, icon):
-
 		print "SystemEnter", icon, self.Selected
 
 		pos	= self.canvas.ClientToScreen(self.canvas.WorldToPixel(icon.XY))
