@@ -1,0 +1,6 @@
+#! /usr/bin/python
+
+import extra 
+
+from wx.tools.XRCed.xrced import main
+main()

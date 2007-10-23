@@ -16,17 +16,33 @@ xrc.ExtraHandlers = []
 def XmlResourceWithHandlers(*args, **kw):
 	if len(args)+len(kw) > 1:
 		raise RuntimeError("Don't know what to do with all the arguments!")
+	f = None
 	if len(args) > 0:
 		f = args[0]
-	else:
+	elif len(kw) > 0:
 		f = kw['file']
 
 	res = EmptyXmlResourceOrig()
 	for handler in xrc.ExtraHandlers:
 		res.InsertHandler(handler())
-	res.Load(f)
+	if f != None:
+		res.Load(f)
 	return res
 xrc.XmlResourceWithHandlers = XmlResourceWithHandlers
+
+OrigXmlResource = xrc.XmlResource
+class MyXmlResource(OrigXmlResource):
+	def __init__(self, *args, **kw):
+		print '__init__', self
+		OrigXmlResource.__init__(self, *args, **kw)
+
+	def InitAllHandlers(self, *args, **kw):
+		print "InitAllHandlers!"
+		r = OrigXmlResource.InitAllHandlers(self, *args, **kw)
+		for handler in xrc.ExtraHandlers:
+			self.InsertHandler(handler())
+		return r
+xrc.XmlResource = MyXmlResource
 
 def EmptyXmlResourceWithHandlers(*args, **kwargs):
 	res = EmptyXmlResourceOrig(*args, **kwargs)
