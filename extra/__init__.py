@@ -624,9 +624,9 @@ class wxSimpleValidator(wx.PyValidator):
 ########################
 wx.PopupWindowOrig = wx.PopupWindow
 
-if wx.Platform == '__WXMAC__':
+if wx.Platform == '__WXMAC__' and not hasattr(wx, 'PopupWindow'):
 	class FakePopupWindow(wx.Frame):
-		def __init__(self, parent, style):
+		def __init__(self, parent, style=None):
 			wx.Frame.__init__(self, parent, style = wx.NO_BORDER | wx.FRAME_NO_TASKBAR | wx.STAY_ON_TOP)
 			self.Panel = wx.Panel(self)
 
