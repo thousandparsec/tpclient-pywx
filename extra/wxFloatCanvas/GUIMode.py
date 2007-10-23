@@ -252,6 +252,9 @@ class GUIMouseAndMove(GUIMouse, GUIMove):
         GUIMouse.__init__(self, parent)
         GUIMove.__init__(self, parent)
 
+    def OnKeyUp(self, event):
+        print 'OnKeyEvent', self, event
+
     def OnLeftDown(self, event):
         EventType = FloatCanvas.EVT_FC_LEFT_DOWN
         if not self.parent.HitTest(event, EventType):

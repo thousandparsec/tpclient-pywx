@@ -2209,6 +2209,8 @@ class FloatCanvas(wx.Panel):
         wx.EVT_RIGHT_DCLICK(self, self.RightDoubleCLickEvent)
         wx.EVT_MOTION(self, self.MotionEvent)
         wx.EVT_MOUSEWHEEL(self, self.WheelEvent)
+        wx.EVT_KEY_DOWN(self, self.KeyDownEvent)
+        wx.EVT_KEY_UP(self, self.KeyUpEvent)
 
         ## CHB: I'm leaving these out for now.
         #wx.EVT_ENTER_WINDOW(self, self. )
@@ -2473,6 +2475,16 @@ class FloatCanvas(wx.Panel):
     def RightUpEvent(self, event):
         if self.GUIMode:
             self.GUIMode.OnRightUp(event)
+        event.Skip()
+
+    def KeyDownEvent(self, event):
+        if self.GUIMode and hasattr(self.GUIMode, 'OnKeyDown'):
+            self.GUIMode.OnKeyDown(event)
+        event.Skip()
+
+    def KeyUpEvent(self, event):
+        if self.GUIMode and hasattr(self.GUIMode, 'OnKeyUp'):
+            self.GUIMode.OnKeyUp(event)
         event.Skip()
 
     def MakeNewBuffers(self):
