@@ -7,7 +7,7 @@
         <cols>3</cols>
         <rows>2</rows>
         <object class="spacer">
-          <size>0,0</size>
+          <option>1</option>
           <flag>wxALL|wxEXPAND|wxGROW</flag>
         </object>
         <object class="sizeritem">
@@ -20,7 +20,7 @@
                   <style>wxTE_CENTRE</style>
                 </object>
                 <option>1</option>
-                <flag>wxALL|wxALIGN_CENTRE</flag>
+                <flag>wxALL|wxEXPAND|wxGROW|wxALIGN_CENTRE</flag>
                 <border>1</border>
               </object>
               <object class="sizeritem">
@@ -29,7 +29,7 @@
                   <style>wxALIGN_CENTRE|wxST_NO_AUTORESIZE</style>
                 </object>
                 <option>1</option>
-                <flag>wxALL|wxALIGN_CENTRE</flag>
+                <flag>wxALL|wxEXPAND|wxGROW|wxALIGN_CENTRE</flag>
                 <border>1</border>
               </object>
               <object class="sizeritem">
@@ -37,23 +37,35 @@
                   <label>0000</label>
                   <style>wxALIGN_RIGHT|wxST_NO_AUTORESIZE</style>
                 </object>
-                <option>0</option>
-                <flag>wxALL|wxALIGN_CENTRE</flag>
+                <option>1</option>
+                <flag>wxALL|wxEXPAND|wxGROW|wxALIGN_CENTRE</flag>
                 <border>1</border>
               </object>
             </object>
           </object>
-          <flag>wxALL|wxALIGN_CENTRE</flag>
+          <option>1</option>
+          <flag>wxALL|wxEXPAND|wxGROW|wxALIGN_CENTRE</flag>
           <border>1</border>
         </object>
         <object class="spacer">
-          <size>0,0</size>
+          <option>1</option>
           <flag>wxALL|wxEXPAND|wxGROW</flag>
         </object>
         <object class="sizeritem">
-          <object class="wxOrderedTreeCtrl" name="designs">
-            <style>wxTR_DEFAULT_STYLE | wxTR_HAS_VARIABLE_ROW_HEIGHT</style>
+          <object class="wxPanel" name="designspanel">
+            <object class="wxBoxSizer">
+              <orient>wxVERTICAL</orient>
+              <object class="sizeritem">
+                <object class="wxOrderedTreeCtrl" name="designs">
+                  <style>wxTR_DEFAULT_STYLE | wxTR_HAS_VARIABLE_ROW_HEIGHT</style>
+                </object>
+                <option>1</option>
+                <flag>wxALL|wxEXPAND|wxGROW|wxALIGN_CENTRE</flag>
+                <border>1</border>
+              </object>
+            </object>
           </object>
+          <option>1</option>
           <flag>wxALL|wxEXPAND|wxGROW|wxALIGN_CENTRE</flag>
           <border>1</border>
         </object>
@@ -76,9 +88,9 @@
                     <orient>wxHORIZONTAL</orient>
                     <object class="sizeritem">
                       <object class="wxListCtrl" name="parts">
-                        <size>200, 400</size>
                         <style>wxLC_REPORT|wxLC_EDIT_LABELS|wxSUNKEN_BORDER</style>
                       </object>
+                      <option>1</option>
                       <flag>wxALL|wxEXPAND|wxGROW</flag>
                     </object>
                     <object class="sizeritem">
@@ -121,6 +133,7 @@
                                             </object>
                                           </object>
                                         </object>
+                                        <option>1</option>
                                         <flag>wxALL|wxEXPAND|wxGROW</flag>
                                       </object>
                                     </object>
@@ -132,18 +145,19 @@
                               </object>
                               <style></style>
                             </object>
+                            <option>1</option>
                             <flag>wxALL|wxEXPAND|wxGROW</flag>
                           </object>
                         </object>
                       </object>
-                      <option>2</option>
+                      <option>1</option>
                       <flag>wxALL|wxGROW|wxALIGN_CENTRE</flag>
                       <border>1</border>
                     </object>
                   </object>
-                  <size>400, 400</size>
                 </object>
-                <flag>wxALL|wxEXPAND|wxGROW</flag>
+                <option>1</option>
+                <flag>wxALL|wxEXPAND|wxGROW|wxALIGN_CENTRE</flag>
               </object>
               <object class="sizeritem">
                 <object class="wxPanel" name="buttonspanel">
@@ -153,45 +167,48 @@
                       <object class="wxButton" name="edit">
                         <label>Edit</label>
                       </object>
-                      <flag>wxALL|wxALIGN_CENTRE</flag>
+                      <flag>wxALL|wxEXPAND|wxGROW|wxALIGN_CENTRE</flag>
                       <border>1</border>
                     </object>
                     <object class="sizeritem">
                       <object class="wxButton" name="duplicate">
                         <label>Duplicate</label>
                       </object>
-                      <flag>wxALL|wxALIGN_CENTRE</flag>
+                      <flag>wxALL|wxEXPAND|wxGROW|wxALIGN_CENTRE</flag>
                       <border>1</border>
                     </object>
                     <object class="sizeritem">
                       <object class="wxButton" name="delete">
                         <label>Delete</label>
                       </object>
-                      <flag>wxALL|wxALIGN_CENTRE</flag>
+                      <flag>wxALL|wxEXPAND|wxGROW|wxALIGN_CENTRE</flag>
                       <border>1</border>
                     </object>
                     <object class="sizeritem">
                       <object class="wxButton" name="revert">
                         <label>Revert</label>
                       </object>
-                      <flag>wxALL|wxALIGN_CENTRE</flag>
+                      <flag>wxALL|wxEXPAND|wxGROW|wxALIGN_CENTRE</flag>
                       <border>1</border>
                     </object>
                     <object class="sizeritem">
                       <object class="wxButton" name="save">
                         <label>Save</label>
                       </object>
-                      <flag>wxALL|wxALIGN_CENTRE</flag>
+                      <flag>wxALL|wxEXPAND|wxGROW|wxALIGN_CENTRE</flag>
                       <border>1</border>
                     </object>
                   </object>
                 </object>
+                <option>0</option>
                 <flag>wxALL|wxEXPAND|wxGROW</flag>
               </object>
             </object>
           </object>
+          <option>1</option>
           <flag>wxALL|wxEXPAND|wxGROW|wxALIGN_LEFT</flag>
           <border>1</border>
+          <minsize>0, 400</minsize>
         </object>
         <object class="sizeritem">
           <object class="wxPanel" name="compssizerpanel">
@@ -214,7 +231,7 @@
                         <label>Add</label>
                       </object>
                       <option>0</option>
-                      <flag>wxALIGN_RIGHT</flag>
+                      <flag>wxALL|wxEXPAND|wxGROW|wxALIGN_RIGHT</flag>
                       <border>1</border>
                     </object>
                     <object class="sizeritem">
@@ -222,25 +239,26 @@
                         <label>Add Many</label>
                       </object>
                       <option>0</option>
-                      <flag>wxALL|wxALIGN_RIGHT</flag>
+                      <flag>wxALL|wxEXPAND|wxGROW|wxALIGN_RIGHT</flag>
                       <border>1</border>
                     </object>
                   </object>
                 </object>
+                <option>0</option>
                 <flag>wxALL|wxEXPAND|wxGROW</flag>
               </object>
             </object>
           </object>
+          <option>1</option>
           <flag>wxALL|wxEXPAND|wxGROW|wxALIGN_CENTRE</flag>
         </object>
+        <growablerows>1</growablerows>
         <growablecols>0</growablecols>
         <growablecols>1</growablecols>
         <growablecols>2</growablecols>
-        <growablecols>3</growablecols>
-        <growablerows>1</growablerows>
       </object>
       <style></style>
     </object>
-    <size>600, 500</size>
+    <size>800, 500</size>
   </object>
 </resource>
