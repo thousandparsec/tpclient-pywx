@@ -2,104 +2,117 @@
 <resource>
   <object class="wxFrame" name="winDesign">
     <title>Design</title>
-    <object class="wxPanel" name="panel">
-      <object class="wxPanel" name="gridpanel">
-        <object class="wxFlexGridSizer">
-          <cols>3</cols>
-          <rows>2</rows>
-          <object class="spacer">
-            <size>0,0</size>
-          </object>
-          <object class="sizeritem">
-            <object class="wxPanel" name="toppanel">
-              <object class="wxBoxSizer">
-                <orient>wxHORIZONTAL</orient>
-                <object class="sizeritem">
-                  <object class="wxTextCtrl" name="titleedit">
-                    <value>Title</value>
-                    <style>wxTE_CENTRE</style>
-                  </object>
-                  <option>1</option>
-                  <flag>wxALL|wxGROW|wxALIGN_CENTRE</flag>
-                  <border>1</border>
+    <object class="wxPanel" name="gridpanel">
+      <object class="wxFlexGridSizer">
+        <cols>3</cols>
+        <rows>2</rows>
+        <object class="spacer">
+          <size>0,0</size>
+          <flag>wxALL|wxEXPAND|wxGROW</flag>
+        </object>
+        <object class="sizeritem">
+          <object class="wxPanel" name="toppanel">
+            <object class="wxBoxSizer">
+              <orient>wxHORIZONTAL</orient>
+              <object class="sizeritem">
+                <object class="wxTextCtrl" name="titleedit">
+                  <value>Title</value>
+                  <style>wxTE_CENTRE</style>
                 </object>
-                <object class="sizeritem">
-                  <object class="wxStaticText" name="titletext">
-                    <label>Title</label>
-                    <style>wxALIGN_CENTRE|wxST_NO_AUTORESIZE</style>
-                  </object>
-                  <option>1</option>
-                  <flag>wxALL|wxGROW|wxALIGN_CENTRE</flag>
-                  <border>1</border>
+                <option>1</option>
+                <flag>wxALL|wxALIGN_CENTRE</flag>
+                <border>1</border>
+              </object>
+              <object class="sizeritem">
+                <object class="wxStaticText" name="titletext">
+                  <label>Title</label>
+                  <style>wxALIGN_CENTRE|wxST_NO_AUTORESIZE</style>
                 </object>
-                <object class="sizeritem">
-                  <object class="wxStaticText" name="used">
-                    <label>0000</label>
-                    <style>wxALIGN_RIGHT|wxST_NO_AUTORESIZE</style>
-                  </object>
-                  <option>0</option>
-                  <flag>wxALL|wxALIGN_CENTRE</flag>
-                  <border>1</border>
+                <option>1</option>
+                <flag>wxALL|wxALIGN_CENTRE</flag>
+                <border>1</border>
+              </object>
+              <object class="sizeritem">
+                <object class="wxStaticText" name="used">
+                  <label>0000</label>
+                  <style>wxALIGN_RIGHT|wxST_NO_AUTORESIZE</style>
                 </object>
+                <option>0</option>
+                <flag>wxALL|wxALIGN_CENTRE</flag>
+                <border>1</border>
               </object>
             </object>
-            <flag>wxALL|wxALIGN_CENTRE</flag>
-            <border>1</border>
           </object>
-          <object class="spacer">
-            <size>0,0</size>
+          <flag>wxALL|wxALIGN_CENTRE</flag>
+          <border>1</border>
+        </object>
+        <object class="spacer">
+          <size>0,0</size>
+          <flag>wxALL|wxEXPAND|wxGROW</flag>
+        </object>
+        <object class="sizeritem">
+          <object class="wxOrderedTreeCtrl" name="designs">
+            <style>wxTR_DEFAULT_STYLE | wxTR_HAS_VARIABLE_ROW_HEIGHT</style>
           </object>
-          <object class="sizeritem">
-            <object class="wxOrderedTreeCtrl" name="designs">
-              <size>200, 400</size>
-              <style>wxTR_DEFAULT_STYLE | wxTR_HAS_VARIABLE_ROW_HEIGHT</style>
-            </object>
-            <flag>wxALL|wxALIGN_CENTRE</flag>
-            <border>1</border>
-          </object>
-          <object class="sizeritem">
-            <object class="wxPanel" name="middlepanel">
-              <object class="wxBoxSizer">
-                <orient>wxVERTICAL</orient>
-                <object class="sizeritem">
-                  <object class="wxStaticText" name="categories">
-                    <label></label>
-                    <style>wxALIGN_CENTRE|wxST_NO_AUTORESIZE</style>
-                  </object>
-                  <option>0</option>
-                  <flag>wxALL|wxALIGN_CENTRE</flag>
-                  <border>0</border>
+          <flag>wxALL|wxEXPAND|wxGROW|wxALIGN_CENTRE</flag>
+          <border>1</border>
+        </object>
+        <object class="sizeritem">
+          <object class="wxPanel" name="middlepanel">
+            <object class="wxBoxSizer">
+              <orient>wxVERTICAL</orient>
+              <object class="sizeritem">
+                <object class="wxStaticText" name="categories">
+                  <label></label>
+                  <style>wxALIGN_CENTRE|wxST_NO_AUTORESIZE</style>
                 </object>
-                <object class="sizeritem">
-                  <object class="wxPanel" name="designsizerpanel">
-                    <object class="wxBoxSizer">
-                      <orient>wxHORIZONTAL</orient>
-                      <object class="sizeritem">
-                        <object class="wxListCtrl" name="parts">
-                          <size>150, 400</size>
-                          <style>wxLC_REPORT|wxLC_EDIT_LABELS|wxSUNKEN_BORDER</style>
-                        </object>
+                <option>0</option>
+                <flag>wxALL|wxEXPAND|wxGROW|wxALIGN_CENTRE</flag>
+                <border>0</border>
+              </object>
+              <object class="sizeritem">
+                <object class="wxPanel" name="designsizerpanel">
+                  <object class="wxBoxSizer">
+                    <orient>wxHORIZONTAL</orient>
+                    <object class="sizeritem">
+                      <object class="wxListCtrl" name="parts">
+                        <size>200, 400</size>
+                        <style>wxLC_REPORT|wxLC_EDIT_LABELS|wxSUNKEN_BORDER</style>
                       </object>
-                      <object class="sizeritem">
-                        <object class="wxPanel" name="design_pp">
-                          <object class="wxPanel" name="design_pspanel">
-                            <object class="wxBoxSizer">
-                              <orient>wxHORIZONTAL</orient>
-                              <object class="sizeritem">
-                                <object class="wxPanel" name="properties">
-                                  <object class="wxPanel" name="sizerpanel">
+                      <flag>wxALL|wxEXPAND|wxGROW</flag>
+                    </object>
+                    <object class="sizeritem">
+                      <object class="wxPanel" name="design_pp">
+                        <object class="wxBoxSizer">
+                          <orient>wxVERTICAL</orient>
+                          <object class="sizeritem">
+                            <object class="wxPanel" name="design_pspanel">
+                              <object class="wxBoxSizer">
+                                <orient>wxHORIZONTAL</orient>
+                                <object class="sizeritem">
+                                  <object class="wxPanel" name="properties">
                                     <object class="wxBoxSizer">
                                       <orient>wxVERTICAL</orient>
                                       <object class="sizeritem">
-                                        <object class="wxPanel" name="box_sizerpanel">
-                                          <object class="wxStaticBoxSizer">
-                                            <label></label>
+                                        <object class="wxPanel" name="sizerpanel">
+                                          <object class="wxBoxSizer">
                                             <orient>wxVERTICAL</orient>
                                             <object class="sizeritem">
-                                              <object class="wxPanel" name="prop_sizerpanel">
-                                                <object class="wxFlexGridSizer">
-                                                  <cols>2</cols>
-                                                  <rows>0</rows>
+                                              <object class="wxPanel" name="box_sizerpanel">
+                                                <object class="wxStaticBoxSizer">
+                                                  <label></label>
+                                                  <orient>wxVERTICAL</orient>
+                                                  <object class="sizeritem">
+                                                    <object class="wxPanel" name="prop_sizerpanel">
+                                                      <object class="wxFlexGridSizer">
+                                                        <cols>2</cols>
+                                                        <rows>0</rows>
+                                                      </object>
+                                                    </object>
+                                                    <option>1</option>
+                                                    <flag>wxALL|wxGROW|wxALIGN_CENTRE_VERTICAL</flag>
+                                                    <border>5</border>
+                                                  </object>
                                                 </object>
                                               </object>
                                               <option>1</option>
@@ -108,123 +121,126 @@
                                             </object>
                                           </object>
                                         </object>
-                                        <option>1</option>
-                                        <flag>wxALL|wxGROW|wxALIGN_CENTRE_VERTICAL</flag>
-                                        <border>5</border>
+                                        <flag>wxALL|wxEXPAND|wxGROW</flag>
                                       </object>
                                     </object>
-                                    <size>250, 400</size>
                                   </object>
-                                  <size>250, 400</size>
+                                  <option>1</option>
+                                  <flag>wxALL|wxGROW|wxALIGN_CENTRE_VERTICAL</flag>
+                                  <border>5</border>
                                 </object>
-                                <option>1</option>
-                                <flag>wxALL|wxGROW|wxALIGN_CENTRE_VERTICAL</flag>
-                                <border>5</border>
                               </object>
+                              <style></style>
                             </object>
-                            <size>250, 400</size>
+                            <flag>wxALL|wxEXPAND|wxGROW</flag>
                           </object>
-                          <size>250, 400</size>
                         </object>
-                        <option>2</option>
-                        <flag>wxALL|wxGROW|wxALIGN_CENTRE</flag>
-                        <border>1</border>
                       </object>
-                    </object>
-                    <size>200, 400</size>
-                  </object>
-                </object>
-                <object class="sizeritem">
-                  <object class="wxPanel" name="buttonspanel">
-                    <object class="wxBoxSizer">
-                      <orient>wxHORIZONTAL</orient>
-                      <object class="sizeritem">
-                        <object class="wxButton" name="edit">
-                          <label>Edit</label>
-                        </object>
-                        <flag>wxALL|wxALIGN_CENTRE</flag>
-                        <border>1</border>
-                      </object>
-                      <object class="sizeritem">
-                        <object class="wxButton" name="duplicate">
-                          <label>Duplicate</label>
-                        </object>
-                        <flag>wxALL|wxALIGN_CENTRE</flag>
-                        <border>1</border>
-                      </object>
-                      <object class="sizeritem">
-                        <object class="wxButton" name="delete">
-                          <label>Delete</label>
-                        </object>
-                        <flag>wxALL|wxALIGN_CENTRE</flag>
-                        <border>1</border>
-                      </object>
-                      <object class="sizeritem">
-                        <object class="wxButton" name="revert">
-                          <label>Revert</label>
-                        </object>
-                        <flag>wxALL|wxALIGN_CENTRE</flag>
-                        <border>1</border>
-                      </object>
-                      <object class="sizeritem">
-                        <object class="wxButton" name="save">
-                          <label>Save</label>
-                        </object>
-                        <flag>wxALL|wxALIGN_CENTRE</flag>
-                        <border>1</border>
-                      </object>
+                      <option>2</option>
+                      <flag>wxALL|wxGROW|wxALIGN_CENTRE</flag>
+                      <border>1</border>
                     </object>
                   </object>
+                  <size>400, 400</size>
                 </object>
+                <flag>wxALL|wxEXPAND|wxGROW</flag>
+              </object>
+              <object class="sizeritem">
+                <object class="wxPanel" name="buttonspanel">
+                  <object class="wxBoxSizer">
+                    <orient>wxHORIZONTAL</orient>
+                    <object class="sizeritem">
+                      <object class="wxButton" name="edit">
+                        <label>Edit</label>
+                      </object>
+                      <flag>wxALL|wxALIGN_CENTRE</flag>
+                      <border>1</border>
+                    </object>
+                    <object class="sizeritem">
+                      <object class="wxButton" name="duplicate">
+                        <label>Duplicate</label>
+                      </object>
+                      <flag>wxALL|wxALIGN_CENTRE</flag>
+                      <border>1</border>
+                    </object>
+                    <object class="sizeritem">
+                      <object class="wxButton" name="delete">
+                        <label>Delete</label>
+                      </object>
+                      <flag>wxALL|wxALIGN_CENTRE</flag>
+                      <border>1</border>
+                    </object>
+                    <object class="sizeritem">
+                      <object class="wxButton" name="revert">
+                        <label>Revert</label>
+                      </object>
+                      <flag>wxALL|wxALIGN_CENTRE</flag>
+                      <border>1</border>
+                    </object>
+                    <object class="sizeritem">
+                      <object class="wxButton" name="save">
+                        <label>Save</label>
+                      </object>
+                      <flag>wxALL|wxALIGN_CENTRE</flag>
+                      <border>1</border>
+                    </object>
+                  </object>
+                </object>
+                <flag>wxALL|wxEXPAND|wxGROW</flag>
               </object>
             </object>
-            <flag>wxALL|wxALIGN_LEFT</flag>
-            <border>1</border>
           </object>
-          <object class="sizeritem">
-            <object class="wxPanel" name="compssizerpanel">
-              <object class="wxBoxSizer">
-                <orient>wxVERTICAL</orient>
-                <object class="sizeritem">
-                  <object class="wxOrderedTreeCtrl" name="comps">
-                    <style>wxTR_DEFAULT_STYLE|wxTR_HAS_VARIABLE_ROW_HEIGHT</style>
-                  </object>
-                  <option>1</option>
-                  <flag>wxALL|wxGROW|wxALIGN_RIGHT</flag>
-                  <border>1</border>
-                </object>
-                <object class="sizeritem">
-                  <object class="wxPanel" name="addsizerpanel">
-                    <object class="wxBoxSizer">
-                      <orient>wxHORIZONTAL</orient>
-                      <object class="sizeritem">
-                        <object class="wxButton" name="add">
-                          <label>Add</label>
-                        </object>
-                        <option>0</option>
-                        <flag>wxALIGN_RIGHT</flag>
-                        <border>1</border>
-                      </object>
-                      <object class="sizeritem">
-                        <object class="wxButton" name="addmany">
-                          <label>Add Many</label>
-                        </object>
-                        <option>0</option>
-                        <flag>wxALL|wxALIGN_RIGHT</flag>
-                        <border>1</border>
-                      </object>
-                    </object>
-                  </object>
-                </object>
-              </object>
-            </object>
-            <flag>wxALL|wxGROW|wxALIGN_CENTRE</flag>
-          </object>
+          <flag>wxALL|wxEXPAND|wxGROW|wxALIGN_LEFT</flag>
+          <border>1</border>
         </object>
-        <style></style>
+        <object class="sizeritem">
+          <object class="wxPanel" name="compssizerpanel">
+            <object class="wxBoxSizer">
+              <orient>wxVERTICAL</orient>
+              <object class="sizeritem">
+                <object class="wxOrderedTreeCtrl" name="comps">
+                  <style>wxTR_DEFAULT_STYLE|wxTR_HAS_VARIABLE_ROW_HEIGHT</style>
+                </object>
+                <option>1</option>
+                <flag>wxALL|wxGROW|wxALIGN_RIGHT</flag>
+                <border>1</border>
+              </object>
+              <object class="sizeritem">
+                <object class="wxPanel" name="addsizerpanel">
+                  <object class="wxBoxSizer">
+                    <orient>wxHORIZONTAL</orient>
+                    <object class="sizeritem">
+                      <object class="wxButton" name="add">
+                        <label>Add</label>
+                      </object>
+                      <option>0</option>
+                      <flag>wxALIGN_RIGHT</flag>
+                      <border>1</border>
+                    </object>
+                    <object class="sizeritem">
+                      <object class="wxButton" name="addmany">
+                        <label>Add Many</label>
+                      </object>
+                      <option>0</option>
+                      <flag>wxALL|wxALIGN_RIGHT</flag>
+                      <border>1</border>
+                    </object>
+                  </object>
+                </object>
+                <flag>wxALL|wxEXPAND|wxGROW</flag>
+              </object>
+            </object>
+          </object>
+          <flag>wxALL|wxEXPAND|wxGROW|wxALIGN_CENTRE</flag>
+        </object>
+        <growablecols>0</growablecols>
+        <growablecols>1</growablecols>
+        <growablecols>2</growablecols>
+        <growablecols>3</growablecols>
+        <growablerows>1</growablerows>
       </object>
       <style></style>
     </object>
-    <size>800, 500</size>
+    <size>600, 500</size>
   </object>
 </resource>

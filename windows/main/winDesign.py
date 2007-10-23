@@ -178,7 +178,7 @@ class winDesign(winDesignBase, winReportXRC, ShiftMixIn):
 		#self.grid.Add(self.middle,      0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
 		#self.grid.Add(self.compssizer,  0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
 
-		self.panel.SetAutoLayout( True )
+		self.gridpanel.SetAutoLayout( True )
 		#self.panel.SetSizer( self.grid )
 
 		#self.grid.Fit( panel )
