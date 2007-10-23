@@ -236,7 +236,6 @@ class Systems(SystemLevelOverlay):
 		arrow.SetOffset((0,0))
 
 		i = icon.index(object)
-		print icon, i, repr(object)
 		if i > 0:
 			arrow.SetOffset(icon.ChildOffset(i-1))
 
@@ -259,11 +258,9 @@ class Systems(SystemLevelOverlay):
 		paths = []
 		for i, cobj in enumerate(icon):
 			path = FindPath(self.cache, cobj)
-			print repr(cobj), path
 			if path:
 				pr = path[0]
 				for p in path[1:]:
-					print p[0:2], pr[0:2]
 					paths.append(Line([pr[0:2], p[0:2]], LineColor='Blue', InForeground=True))
 					pr = p
 

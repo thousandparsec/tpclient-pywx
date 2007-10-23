@@ -272,8 +272,6 @@ class SystemLevelOverlay(Overlay):
 
 		Simulates this as a mouse click.
 		"""
-		print "SelectObject", oid
-
 		# Figure out which Icon this object is under
 		parentid = oid
 		while not self.has_key(parentid):
@@ -292,8 +290,6 @@ class SystemLevelOverlay(Overlay):
 		self.ObjectLeftClick(icon, real)
 
 	def SystemLeftClick(self, icon):
-		print "SystemLeftClick", icon, self.Selected
-
 		# Leave the currently hovered system
 		HoveredOn = self.SystemLeave(self.Hovering)
 
@@ -304,12 +300,10 @@ class SystemLevelOverlay(Overlay):
 
 		# Select the same icon we are previewing
 		elif HoveredOn == icon:
-			print "Selecting hovered object", HoveredOn
 			self.Selected = HoveredOn
 
 		# Clicking on a new object
 		else:
-			print "Selecting new object", icon
 			self.Selected = icon.copy()
 			self.Selected.ResetLoop()
 
@@ -323,8 +317,6 @@ class SystemLevelOverlay(Overlay):
 		self.SystemEnter(self.Selected)
 
 	def SystemEnter(self, icon):
-		print "SystemEnter", icon, self.Selected
-
 		pos	= self.canvas.ClientToScreen(self.canvas.WorldToPixel(icon.XY))
 
 		# Did someone forget to unhover?
@@ -343,8 +335,6 @@ class SystemLevelOverlay(Overlay):
 			self.Timer.Start(self.HoverTimeOutFirst)
 
 	def SystemHovering(self, event):
-		print "SystemHover", self.Hovering
-
 		# Reset the timer
 		self.Timer.Stop()
 		self.Timer.Start(self.HoverTimeOut)
@@ -356,7 +346,6 @@ class SystemLevelOverlay(Overlay):
 			self.parent.PostPreviewObject(object.id)
 
 	def SystemLeave(self, icon):
-		print "SystemLeave", icon, self.Selected
 		if icon == None:
 			return
 
