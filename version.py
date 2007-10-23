@@ -14,6 +14,7 @@ if os.path.exists(os.path.join(installpath, '.git')):
 	ref = h.readline().strip().split(': ', 1)[1]
 	# This file has the SHA1
 	p = open(os.path.join(installpath, '.git', ref))
+	del ref
 
 	version_git = p.read().strip()
 
@@ -29,7 +30,28 @@ if os.path.exists(os.path.join(installpath, '.git')):
 version_str = "%i.%i.%i" % version[:3]
 
 if __name__ == "__main__":
+	import sys
+	if len(sys.argv) > 1 and sys.argv[1] == '--fix':
+		print """
+import os, os.path
+__path__ = os.path.realpath(os.path.dirname(__file__))
+installpath = os.path.split(os.path.split(__path__)[0])[0]
+"""
+		for value in dir():
+			if value.startswith('__') or value in ('installpath',):
+				continue
+			if isinstance(eval(value), (tuple, str, unicode)):
+				exec("print '%s =', repr(%s)" % (value, value))
+
+		print """
+try:
+	print version_str+'+'+version_target_str, "(git %s)" % version_git, "(installed at %s)" % installpath
+except ValueError:
+	print version_str, "(installed at %s)" % installpath
+"""
+		sys.exit(0)
+
 	if os.path.exists(os.path.join(installpath, '.git')):
-		print version_str+'+'+version_target_str, "(git %s)" % version_git
+		print version_str+'+'+version_target_str, "(git %s)" % version_git, "(installed at %s)" % installpath
 	else:
-		print version_str
+		print version_str, "(installed at %s)" % installpath

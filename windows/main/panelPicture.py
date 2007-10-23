@@ -107,7 +107,7 @@ class panelPicture(panelPictureBase):
 		self.Layout()
 		self.Update()
 
-		print "winPicture.MediaDownloadProgress", evt.file
+		#print "winPicture.MediaDownloadProgress", evt.file
 
 		self.progress.append((time.time(), evt.amount))
 		# Trim off the oldest samples

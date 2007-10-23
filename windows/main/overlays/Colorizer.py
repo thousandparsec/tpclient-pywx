@@ -3,16 +3,28 @@ class Colorizer(object):
 	"""
 	These classes deal with figuring out the color of an object.
 	"""
+	def name(self):
+		raise NotImplementedError("The name attribute has not been implemented.")
+	name = property(staticmethod(name))
+
+	def __init__(self, playerid):
+		"""
+		Create a new colorizer, takes a player id.
+		"""
+		pass
+
 	def __call__(self, owners):
 		"""
 		This function takes a list of the owners of this object.
 		"""
-		raise NotImplimented("This function has not been implimented!")
+		raise NotImplementedError("This function has not been implimented!")
 
 class ColorVerses(Colorizer):
 	"""
 	This colorizer shows you in green and all the enemies in red.
 	"""
+	name = "Verses"
+
 	Friendly  = "Green"
 	Enemy     = "Red"
 	Unowned   = "White"
@@ -33,7 +45,9 @@ class ColorEach(Colorizer):
 
 	Alot of the code is based on stuff at http://mg.pov.lt/irclog2html/svn/irclog2html.py
 	"""
-	def __init__(self, rgbmin=240, rgbmax=125, rgb=None, a=0.95, b=0.5):
+	name = "Individual"
+
+	def __init__(self, pid, rgbmin=240, rgbmax=125, rgb=None, a=0.95, b=0.5):
 		"""Define a range of colors available for choosing.
 
 		`rgbmin` and `rgbmax` define the outmost range of color depth (note

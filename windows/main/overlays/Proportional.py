@@ -13,8 +13,8 @@ class Proportional(Overlay):
 	"""
 	scale = 100L
 
-	def __init__(self, parent, canvas, cache):
-		Overlay.__init__(self, parent, canvas, cache)
+	def __init__(self, *args, **kw):
+		Overlay.__init__(self, *args, **kw)
 
 		self.max = 0
 		self.min = 0

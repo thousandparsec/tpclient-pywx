@@ -9,11 +9,28 @@ class Overlay(dict):
 	"""\
 	A layer which displays something on the StarMap.
 	"""	
+	def name():
+		raise NotImplementedError("This overlay has not specified a name! - This is bad!")
+	name = property(staticmethod(name))
 
-	def __init__(self, parent, canvas, cache):
+	def __init__(self, parent, canvas, panel, cache):
+		"""
+		Create a new Overlay object.
+
+		parent is the application which can be used to post events.
+		canvas is the wx.FloatCanvas to draw onto.
+		panel  is the toolbar panel which the overlay can add it's own icons/widgets too.
+		cache  is the libtpclient-py cache containing the universe data.
+		"""
 		self.parent = parent
+		if canvas is None:
+			raise TypeError("Canvas can not be none!")
 		self.canvas = canvas
+		if cache is None:
+			raise TypeError("Cache can not be none!")
 		self.cache  = cache
+
+		self.panel  = panel
 
 	def CleanUp(self):
 		"""\
@@ -45,8 +62,12 @@ class Overlay(dict):
 
 		if type(value) in (list, tuple):
 			for v in value:
+				v.UnBindAll()
+
 				self.canvas.RemoveObject(v)
 		else:
+			value.UnBindAll()
+
 			self.canvas.RemoveObject(value)
 		dict.__delitem__(self, oid)
 
@@ -87,6 +108,24 @@ class Overlay(dict):
 		Updates an object on the Canvas.
 		"""
 		pass
+
+	def Focus(self):
+		"""\
+		Returns a tuple of,
+			Selected object id (-1 for no object)
+			The coordinates that the current overlay is focused at.
+
+		This should probably be the selected object (but something else could be focused on other overlays). 
+		"""
+		return -1, (0,0)
+
+	def SelectObject(self, oid):
+		"""
+		Select an object using an external event.
+
+		Simulates this as a mouse click.
+		"""
+		raise NotImplementedError("Select Object method has not been implimented!")
 
 class Holder(list):
 	"""
@@ -210,10 +249,22 @@ class SystemLevelOverlay(Overlay):
 
 		from extra.wxFloatCanvas.FloatCanvas import EVT_FC_ENTER_OBJECT, EVT_FC_LEAVE_OBJECT
 		from extra.wxFloatCanvas.FloatCanvas import EVT_FC_LEFT_UP, EVT_FC_RIGHT_UP
+
 		# These pop-up the name of the object
 		icon.Bind(EVT_FC_ENTER_OBJECT, self.SystemEnter)
 		icon.Bind(EVT_FC_LEAVE_OBJECT, self.SystemLeave)
 		icon.Bind(EVT_FC_LEFT_UP, self.SystemLeftClick)
+
+	def Focus(self):
+		"""\
+		Returns the coordinates of the currently selected object or the center
+		of the universe.
+		"""
+		try:
+			return self.Selected.primary.id, self.Selected.XY
+		except Exception, e:
+			return 0, (0,0)
+			
 
 	def SelectObject(self, oid):
 		"""
@@ -234,8 +285,9 @@ class SystemLevelOverlay(Overlay):
 		system = self.cache.objects[parentid]
 		real   = self.cache.objects[oid]
 
-		icon = self[system.id]
+		icon = self[system.id].copy()
 		icon.SetLoop(real)
+		self.Selected = icon
 
 		self.ObjectLeftClick(icon, real)
 
@@ -271,7 +323,6 @@ class SystemLevelOverlay(Overlay):
 		self.SystemEnter(self.Selected)
 
 	def SystemEnter(self, icon):
-
 		print "SystemEnter", icon, self.Selected
 
 		pos	= self.canvas.ClientToScreen(self.canvas.WorldToPixel(icon.XY))
