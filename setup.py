@@ -51,7 +51,8 @@ if sys.platform.startswith('linux') and "install" in sys.argv:
 		return
 
 	prefix = "/usr/local"
-	temp = "debian/tpclient-pywx/usr"
+	temp   = None
+
 	if "--prefix" in sys.argv:
 		prefix = sys.argv[sys.argv.index('--prefix')+1]
 	if "--temp" in sys.argv:
@@ -61,6 +62,12 @@ if sys.platform.startswith('linux') and "install" in sys.argv:
 			trash, prefix = arg.split('=')
 		elif arg.startswith('--temp='):
 			trash, temp = arg.split('=')
+
+	include_support = "--include-support" in sys.argv
+
+	# If temp was not set, it should just be the prefix
+	if temp is None:
+		temp = prefix
 
 	print "Installing to...", temp
 	print "Target is...", prefix
@@ -104,7 +111,8 @@ if sys.platform.startswith('linux') and "install" in sys.argv:
 		if os.path.isdir(file):
 			shutil.copytree(file, os.path.join(privatepath, file))
 
-	#os.symlink(os.path.join(os.path.abspath(os.curdir), 'tp'), os.path.join(privatepath, 'tp'))
+	# Fix the version path
+	os.system('python version.py --fix > %s' % os.path.join(privatepath, 'version.py'))
 
 	# Cleanup some files which shouldn't have been copied...
 	cleanupfiles = ['windows/xrc/generate.sh', 'windows/xrc/tp.pjd', 'windows/xrc/tp.xrc']
