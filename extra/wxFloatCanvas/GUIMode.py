@@ -154,7 +154,6 @@ class GUIMouse(GUIBase):
         self.parent.MouseOverTest(event)
         self.parent._RaiseMouseEvent(event,FloatCanvas.EVT_FC_MOTION)
 
-
 class GUIMove(GUIBase):
 
     Cursor = HandCursor
@@ -247,6 +246,28 @@ class GUIMove(GUIBase):
             self.parent.Zoom(0.9)
         else:
             self.parent.Zoom(1.1)
+
+class GUIMouseAndMove(GUIMouse, GUIMove):
+    def __init__(self, parent):
+        GUIMouse.__init__(self, parent)
+        GUIMove.__init__(self, parent)
+
+    def OnLeftDown(self, event):
+        EventType = FloatCanvas.EVT_FC_LEFT_DOWN
+        if not self.parent.HitTest(event, EventType):
+            GUIMove.OnLeftDown(self, event) 
+
+    def OnLeftUp(self, event):
+        if self.StartMove is None:
+            GUIMouse.OnLeftUp(self, event)
+        else:
+            GUIMove.OnLeftUp(self, event)
+
+    def OnMove(self, event):
+        if self.StartMove is None:
+            GUIMouse.OnMove(self, event)
+        else:
+            GUIMove.OnMove(self, event)
 
 class GUIZoomIn(GUIBase):
  

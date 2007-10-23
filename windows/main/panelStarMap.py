@@ -16,6 +16,7 @@ from overlays.Resource import Resource
 from overlays.Systems  import Systems
 
 from windows.xrc.panelStarMap import panelStarMapBase
+
 class panelStarMap(panelStarMapBase):
 	title = _("StarMap")
 
@@ -31,7 +32,7 @@ class panelStarMap(panelStarMapBase):
 		self.GUIZoomIn  =  GUIMode.GUIZoomIn(self.Canvas)
 		self.GUIZoomOut =  GUIMode.GUIZoomOut(self.Canvas)
 		self.GUIMove    =  GUIMode.GUIMove(self.Canvas)
-		self.GUIMouse   =  GUIMode.GUIMouse(self.Canvas)
+		self.GUIMouse   =  GUIMode.GUIMouseAndMove(self.Canvas)
 		self.SetMode(self.GUIMouse)
 
 		# Create the mouse-mode popup

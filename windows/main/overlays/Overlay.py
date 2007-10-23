@@ -249,10 +249,13 @@ class SystemLevelOverlay(Overlay):
 
 		from extra.wxFloatCanvas.FloatCanvas import EVT_FC_ENTER_OBJECT, EVT_FC_LEAVE_OBJECT
 		from extra.wxFloatCanvas.FloatCanvas import EVT_FC_LEFT_UP, EVT_FC_RIGHT_UP
+		from extra.wxFloatCanvas.FloatCanvas import EVT_FC_LEFT_DOWN, EVT_FC_RIGHT_DOWN
 
 		# These pop-up the name of the object
 		icon.Bind(EVT_FC_ENTER_OBJECT, self.SystemEnter)
 		icon.Bind(EVT_FC_LEAVE_OBJECT, self.SystemLeave)
+		# This is needed to the hit test doesn't fall through
+		icon.Bind(EVT_FC_LEFT_DOWN, lambda x: True) 
 		icon.Bind(EVT_FC_LEFT_UP, self.SystemLeftClick)
 
 	def Focus(self):
