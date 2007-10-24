@@ -17,6 +17,8 @@ from overlays.Systems  import Systems
 
 from windows.xrc.panelStarMap import panelStarMapBase
 
+from tp.netlib.objects import OrderDescs
+
 class panelStarMap(panelStarMapBase):
 	title = _("StarMap")
 
@@ -43,10 +45,13 @@ class panelStarMap(panelStarMapBase):
 		for button in [ wx.Button(p, -1, 'Mouse'),
 						wx.Button(p, -1, 'Move'),
 						wx.Button(p, -1, 'Zoom In'),
-						wx.Button(p, -1, 'Zoom Out'),
-						wx.Button(p, -1, 'Waypoint')]:
+						wx.Button(p, -1, 'Zoom Out')]:
 			button.Bind(wx.EVT_BUTTON, self.OnMouseModeButton)
 			s.Add(button, proportion=1, flag=wx.EXPAND)
+
+		self.WaypointButton = wx.Button(p, -1, 'Waypoint')
+		self.WaypointButton.Bind(wx.EVT_BUTTON, self.OnMouseModeButton)
+		s.Add(self.WaypointButton, proportion=1, flag=wx.EXPAND)
 
 		p.SetSizer(s)
 		p.Layout()
@@ -87,7 +92,7 @@ class panelStarMap(panelStarMapBase):
 		mode = evt.GetEventObject().GetLabel()
 		mode = mode.replace(' ', '')
 		
-		GUIMode = getattr(self, 'GUI%s' % mode)
+		GUIMode = getattr(self, 'GUI%s' % mode, self.GUIMouse)
 		self.SetMode(GUIMode)
 
 	def SetMode(self, mode):
@@ -203,6 +208,22 @@ class panelStarMap(panelStarMapBase):
 		"""
 		if isinstance(evt, self.application.gui.PreviewObjectEvent):
 			return
+
+		# Check if this object can move so we can enable waypoint mode
+		canmove = False
+		for orderid in self.application.cache.objects[evt.id].order_types:
+			order = OrderDescs()[orderid]
+
+			# FIXME: Needs to be a better way to do this...
+			if order._name in ("Move", "Move To", "Intercept"):
+				canmove = True
+				break
+
+		if canmove:
+			self.WaypointButton.Enable()
+		else:
+			self.WaypointButton.Disable()
+
 		self.Overlay.SelectObject(evt.id)
 
 	def OnUpdateOrder(self, evt):

@@ -65,6 +65,7 @@ def FindPath(cache, obj):
 
 	locations = [obj.pos]
 	for order in cache.orders[obj.id]:
+		# FIXME: Needs to be a better way to do this...
 		if order._name in ("Move", "Move To", "Intercept"):
 			if hasattr(order, "pos"):
 				locations.append(order.pos)
