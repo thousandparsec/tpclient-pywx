@@ -42,54 +42,53 @@ class winDesignBase:
 		self.PostCreate(pre)
 
 		# Define variables for the controls
-		self.panel = XRCCTRL(self, "panel")
-		self.gridpanel = XRCCTRL(self, "gridpanel")
-		self.toppanel = XRCCTRL(self, "toppanel")
-		self.titleedit = XRCCTRL(self, "titleedit")
-		self.titletext = XRCCTRL(self, "titletext")
-		self.used = XRCCTRL(self, "used")
-		self.designs = XRCCTRL(self, "designs")
-		self.middlepanel = XRCCTRL(self, "middlepanel")
-		self.categories = XRCCTRL(self, "categories")
-		self.designsizerpanel = XRCCTRL(self, "designsizerpanel")
-		self.parts = XRCCTRL(self, "parts")
-		self.design_pp = XRCCTRL(self, "design_pp")
-		self.design_pspanel = XRCCTRL(self, "design_pspanel")
-		self.properties = XRCCTRL(self, "properties")
-		self.sizerpanel = XRCCTRL(self, "sizerpanel")
-		self.box_sizerpanel = XRCCTRL(self, "box_sizerpanel")
-		self.prop_sizerpanel = XRCCTRL(self, "prop_sizerpanel")
-		self.buttonspanel = XRCCTRL(self, "buttonspanel")
-		self.edit = XRCCTRL(self, "edit")
-		if hasattr(self, "Onedit"):
-			self.Bind(wx.EVT_BUTTON, self.Onedit, self.edit)
+		self.Panel = XRCCTRL(self, "Panel")
+		self.DesignsSearch = XRCCTRL(self, "DesignsSearch")
+		self.TitlePanel = XRCCTRL(self, "TitlePanel")
+		self.TitleEditable = XRCCTRL(self, "TitleEditable")
+		self.TitleStatic = XRCCTRL(self, "TitleStatic")
+		self.Used = XRCCTRL(self, "Used")
+		self.ComponentsSearch = XRCCTRL(self, "ComponentsSearch")
+		self.DesignsPanel = XRCCTRL(self, "DesignsPanel")
+		self.DesignsTree = XRCCTRL(self, "DesignsTree")
+		self.DesignPanel = XRCCTRL(self, "DesignPanel")
+		self.Categories = XRCCTRL(self, "Categories")
+		self.DesignInfoPanel = XRCCTRL(self, "DesignInfoPanel")
+		self.PartsList = XRCCTRL(self, "PartsList")
+		self.DesignProperties = XRCCTRL(self, "DesignProperties")
+		self.DesignPropertyGroup1 = XRCCTRL(self, "DesignPropertyGroup1")
+		self.DesignPropertyGroup2 = XRCCTRL(self, "DesignPropertyGroup2")
+		self.DesignButtonsPanel = XRCCTRL(self, "DesignButtonsPanel")
+		self.Edit = XRCCTRL(self, "Edit")
+		if hasattr(self, "OnEdit"):
+			self.Bind(wx.EVT_BUTTON, self.OnEdit, self.Edit)
 
-		self.duplicate = XRCCTRL(self, "duplicate")
-		if hasattr(self, "Onduplicate"):
-			self.Bind(wx.EVT_BUTTON, self.Onduplicate, self.duplicate)
+		self.Duplicate = XRCCTRL(self, "Duplicate")
+		if hasattr(self, "OnDuplicate"):
+			self.Bind(wx.EVT_BUTTON, self.OnDuplicate, self.Duplicate)
 
-		self.delete = XRCCTRL(self, "delete")
-		if hasattr(self, "Ondelete"):
-			self.Bind(wx.EVT_BUTTON, self.Ondelete, self.delete)
+		self.Delete = XRCCTRL(self, "Delete")
+		if hasattr(self, "OnDelete"):
+			self.Bind(wx.EVT_BUTTON, self.OnDelete, self.Delete)
 
-		self.revert = XRCCTRL(self, "revert")
-		if hasattr(self, "Onrevert"):
-			self.Bind(wx.EVT_BUTTON, self.Onrevert, self.revert)
+		self.Revert = XRCCTRL(self, "Revert")
+		if hasattr(self, "OnRevert"):
+			self.Bind(wx.EVT_BUTTON, self.OnRevert, self.Revert)
 
-		self.save = XRCCTRL(self, "save")
-		if hasattr(self, "Onsave"):
-			self.Bind(wx.EVT_BUTTON, self.Onsave, self.save)
+		self.Save = XRCCTRL(self, "Save")
+		if hasattr(self, "OnSave"):
+			self.Bind(wx.EVT_BUTTON, self.OnSave, self.Save)
 
-		self.compssizerpanel = XRCCTRL(self, "compssizerpanel")
-		self.comps = XRCCTRL(self, "comps")
-		self.addsizerpanel = XRCCTRL(self, "addsizerpanel")
-		self.add = XRCCTRL(self, "add")
-		if hasattr(self, "Onadd"):
-			self.Bind(wx.EVT_BUTTON, self.Onadd, self.add)
+		self.ComponentsPanel = XRCCTRL(self, "ComponentsPanel")
+		self.ComponentsTree = XRCCTRL(self, "ComponentsTree")
+		self.ComponentsButtonPanel = XRCCTRL(self, "ComponentsButtonPanel")
+		self.ComponentsAdd = XRCCTRL(self, "ComponentsAdd")
+		if hasattr(self, "OnComponentsAdd"):
+			self.Bind(wx.EVT_BUTTON, self.OnComponentsAdd, self.ComponentsAdd)
 
-		self.addmany = XRCCTRL(self, "addmany")
-		if hasattr(self, "Onaddmany"):
-			self.Bind(wx.EVT_BUTTON, self.Onaddmany, self.addmany)
+		self.ComponentsAddMany = XRCCTRL(self, "ComponentsAddMany")
+		if hasattr(self, "OnComponentsAddMany"):
+			self.Bind(wx.EVT_BUTTON, self.OnComponentsAddMany, self.ComponentsAddMany)
 
 
 
@@ -98,6 +97,15 @@ def strings():
 	_("Title");
 	_("Title");
 	_("0000");
+	_("Some Categories, Will Go, Here");
+	_("Property 1:");
+	_("The value of property 1");
+	_("Property 2:");
+	_("The value of property 2");
+	_("Property 1:");
+	_("The value of property 1");
+	_("Property 2:");
+	_("The value of property 2");
 	_("Edit");
 	_("Duplicate");
 	_("Delete");

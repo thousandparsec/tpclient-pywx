@@ -79,6 +79,7 @@
           <option>1</option>
           <flag>wxALL|wxEXPAND|wxGROW|wxALIGN_CENTRE</flag>
           <border>1</border>
+          <minsize>200, 0</minsize>
         </object>
         <object class="sizeritem">
           <object class="wxPanel" name="DesignPanel">
@@ -148,57 +149,18 @@
                             <option>1</option>
                             <flag>wxALL|wxEXPAND|wxGROW</flag>
                           </object>
-                          <object class="sizeritem">
-                            <object class="wxPanel" name="DesignPropertyGroup2">
-                              <style></style>
-                              <object class="wxStaticBoxSizer">
-                                <label></label>
-                                <orient>wxVERTICAL</orient>
-                                <object class="sizeritem">
-                                  <object class="wxPanel">
-                                    <object class="wxFlexGridSizer">
-                                      <cols>2</cols>
-                                      <rows>2</rows>
-                                      <object class="sizeritem">
-                                        <object class="wxStaticText">
-                                          <label>Property 1:</label>
-                                        </object>
-                                      </object>
-                                      <object class="sizeritem">
-                                        <object class="wxStaticText">
-                                          <label>The value of property 1</label>
-                                        </object>
-                                      </object>
-                                      <object class="sizeritem">
-                                        <object class="wxStaticText">
-                                          <label>Property 2:</label>
-                                        </object>
-                                      </object>
-                                      <object class="sizeritem">
-                                        <object class="wxStaticText">
-                                          <label>The value of property 2</label>
-                                        </object>
-                                      </object>
-                                      <hgap>5</hgap>
-                                      <growablecols>1</growablecols>
-                                    </object>
-                                  </object>
-                                </object>
-                              </object>
-                            </object>
-                            <option>1</option>
-                            <flag>wxALL|wxEXPAND|wxGROW</flag>
-                          </object>
                         </object>
                       </object>
                       <option>1</option>
                       <flag>wxALL|wxGROW|wxALIGN_CENTRE</flag>
                       <border>1</border>
+                      <minsize></minsize>
                     </object>
                   </object>
                 </object>
                 <option>1</option>
                 <flag>wxALL|wxEXPAND|wxGROW|wxALIGN_CENTRE</flag>
+                <minsize></minsize>
               </object>
               <object class="sizeritem">
                 <object class="wxPanel" name="DesignButtonsPanel">
@@ -257,7 +219,7 @@
           <option>1</option>
           <flag>wxALL|wxEXPAND|wxGROW|wxALIGN_LEFT</flag>
           <border>1</border>
-          <minsize>0, 400</minsize>
+          <minsize>500, 0</minsize>
         </object>
         <object class="sizeritem">
           <object class="wxPanel" name="ComponentsPanel">
@@ -310,6 +272,6 @@
       </object>
       <style></style>
     </object>
-    <size>800, 500</size>
+    <size>900, 500</size>
   </object>
 </resource>
