@@ -16,6 +16,7 @@ from overlays.Resource import Resource
 from overlays.Systems  import Systems
 
 from windows.xrc.panelStarMap import panelStarMapBase
+
 class panelStarMap(panelStarMapBase):
 	title = _("StarMap")
 
@@ -31,7 +32,7 @@ class panelStarMap(panelStarMapBase):
 		self.GUIZoomIn  =  GUIMode.GUIZoomIn(self.Canvas)
 		self.GUIZoomOut =  GUIMode.GUIZoomOut(self.Canvas)
 		self.GUIMove    =  GUIMode.GUIMove(self.Canvas)
-		self.GUIMouse   =  GUIMode.GUIMouse(self.Canvas)
+		self.GUIMouse   =  GUIMode.GUIMouseAndMove(self.Canvas)
 		self.SetMode(self.GUIMouse)
 
 		# Create the mouse-mode popup
@@ -45,7 +46,7 @@ class panelStarMap(panelStarMapBase):
 						wx.Button(p, -1, 'Zoom Out'),
 						wx.Button(p, -1, 'Waypoint')]:
 			button.Bind(wx.EVT_BUTTON, self.OnMouseModeButton)
-			s.Add(button, 	proportion=1, flag=wx.EXPAND)
+			s.Add(button, proportion=1, flag=wx.EXPAND)
 
 		p.SetSizer(s)
 		p.Layout()
@@ -59,6 +60,18 @@ class panelStarMap(panelStarMapBase):
 		for overlay in self.Overlays:
 			self.DisplayMode.Append(overlay.name, overlay)
 		self.DisplayMode.SetSelection(0)
+
+		self.Bind(wx.EVT_ENTER_WINDOW, self.OnMouseEnter)
+		self.Bind(wx.EVT_LEAVE_WINDOW, self.OnMouseLeave)
+
+	def OnMouseEnter(self, evt):
+		print "OnMouseEnter!", evt
+		# FIXME: Should make sure we gain the keyboard focus
+		self.Canvas.SetFocus()
+
+	def OnMouseLeave(self, evt):
+		print "OnMouseLeave!", evt
+		# FIXME: Put the keyboard focus back where it was
 
 	def OnMouseMode(self, evt):
 		if self.MouseModePopup.IsShown():

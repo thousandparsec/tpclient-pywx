@@ -154,7 +154,6 @@ class GUIMouse(GUIBase):
         self.parent.MouseOverTest(event)
         self.parent._RaiseMouseEvent(event,FloatCanvas.EVT_FC_MOTION)
 
-
 class GUIMove(GUIBase):
 
     Cursor = HandCursor
@@ -247,6 +246,56 @@ class GUIMove(GUIBase):
             self.parent.Zoom(0.9)
         else:
             self.parent.Zoom(1.1)
+
+class GUIMouseAndMove(GUIMouse, GUIMove):
+    def __init__(self, parent):
+        GUIMouse.__init__(self, parent)
+        GUIMove.__init__(self, parent)
+
+    def OnKeyUp(self, event):
+        # FIXME: Check these on non-qwerty keyboards
+        ZoomOut = (61, 388)
+        ZoomIn  = (45, 306, 390)
+        if event.UnicodeKey in ZoomIn:
+            self.parent.Zoom(0.90, event.GetPosition(), 'pixel') 
+        elif event.UnicodeKey in ZoomOut:
+            self.parent.Zoom(1.10, event.GetPosition(), 'pixel')
+
+        Up    = (315, 87, 332)
+        Left  = (314, 328, 65)
+        Down  = (317, 326, 83)
+        Right = (316, 330, 68)
+        if event.UnicodeKey in Left:
+            self.parent.MoveImage((-40, 0), 'Pixel')
+        elif event.UnicodeKey in Right:
+            self.parent.MoveImage((40, 0), 'Pixel')
+        elif event.UnicodeKey in Up:
+            self.parent.MoveImage((0, -40), 'Pixel')
+        elif event.UnicodeKey in Down:
+            self.parent.MoveImage((0, 40), 'Pixel')
+
+    def OnLeftDown(self, event):
+        EventType = FloatCanvas.EVT_FC_LEFT_DOWN
+        if not self.parent.HitTest(event, EventType):
+            GUIMove.OnLeftDown(self, event) 
+
+    def OnLeftUp(self, event):
+        if self.StartMove is None:
+            GUIMouse.OnLeftUp(self, event)
+        else:
+            GUIMove.OnLeftUp(self, event)
+
+    def OnLeftDouble(self, event):
+        EventType = FloatCanvas.EVT_FC_LEFT_DCLICK
+        if not self.parent.HitTest(event, EventType):
+            self.parent.Zoom(1.0,event.GetPosition(),"pixel")
+#            self.parent._RaiseMouseEvent(event, EventType)
+
+    def OnMove(self, event):
+        if self.StartMove is None:
+            GUIMouse.OnMove(self, event)
+        else:
+            GUIMove.OnMove(self, event)
 
 class GUIZoomIn(GUIBase):
  
