@@ -14,6 +14,7 @@ from extra.wxFloatCanvas import FloatCanvas
 
 from overlays.Resource import Resource
 from overlays.Systems  import Systems
+from overlays.Path     import Paths
 
 from windows.xrc.panelStarMap import panelStarMapBase
 
@@ -22,7 +23,7 @@ from tp.netlib.objects import OrderDescs
 class panelStarMap(panelStarMapBase):
 	title = _("StarMap")
 
-	Overlays = [Systems, Resource]
+	Overlays = [Paths, Systems, Resource]
 	def __init__(self, application, parent):
 		panelStarMapBase.__init__(self, parent)
 
@@ -77,8 +78,14 @@ class panelStarMap(panelStarMapBase):
 	def OnMouseLeave(self, evt):
 		print "OnMouseLeave!", evt
 		# FIXME: Put the keyboard focus back where it was
+		pass
 
 	def OnMouseMode(self, evt):
+		"""
+		Occurs when a person clicks on the MouseMode button.
+
+		Pops-up a menu which lets them select which MouseMode to change too.
+		"""
 		if self.MouseModePopup.IsShown():
 			self.MouseModePopup.Hide()
 		else:
@@ -87,6 +94,11 @@ class panelStarMap(panelStarMapBase):
 			self.MouseModePopup.Show()
 	
 	def OnMouseModeButton(self, evt):
+		"""
+		Occurs when a person clicks on an option on the MouseMode popup.
+
+		Changes the current GUIMode to the selected option.
+		"""
 		self.MouseModePopup.Hide()
 
 		mode = evt.GetEventObject().GetLabel()
@@ -96,12 +108,20 @@ class panelStarMap(panelStarMapBase):
 		self.SetMode(GUIMode)
 
 	def SetMode(self, mode):
+		"""
+		Set the current mode of the canvas to a given type.
+		"""
 		self.Canvas.SetMode(mode)
 
 		if mode == self.GUIMouse:
 			self.Canvas.SetCursor(wx.StockCursor(wx.CURSOR_RIGHT_ARROW))
 
 	def OnDisplayMode(self, evt):
+		"""
+		Called when the DisplayMode choice box is changed.
+
+		Causes the overlay being displayed on the starmap to be changed.
+		"""
 		cls = self.DisplayMode.GetClientData(self.DisplayMode.GetSelection())
 
 		oid = -1
@@ -144,6 +164,9 @@ class panelStarMap(panelStarMapBase):
 		self.Canvas.Draw()
 
 	def GetPaneInfo(self):
+		"""
+		wx.aui method for getting the initial position and settings of this panel.
+		"""
 		info = wx.aui.AuiPaneInfo()
 		info.Center()
 		info.PinButton(True)
@@ -156,6 +179,11 @@ class panelStarMap(panelStarMapBase):
 		self.Canvas.SetSize(self.FloatCanvas.GetClientSize())
 
 	def OnZoomLevel(self, evt):
+		"""
+		Called when the ZoomLevel box is changed.
+		"""
+		# FIXME: When the ZoomLevel is changed in any there way, we should get called too...
+
 		if isinstance(evt, wx.Event):
 			to = evt.GetString().lower()
 		else:
@@ -196,12 +224,6 @@ class panelStarMap(panelStarMapBase):
 			self.OnZoomLevel('fit')
 			self.Canvas.Draw()
 
-	def PostSelectObject(self, oid):
-		self.application.gui.Post(self.application.gui.SelectObjectEvent(oid))
-
-	def PostPreviewObject(self, oid):
-		self.application.gui.Post(self.application.gui.PreviewObjectEvent(oid))
-
 	def OnSelectObject(self, evt):
 		"""\
 		Called when an object is selected.
@@ -238,5 +260,40 @@ class panelStarMap(panelStarMapBase):
 		"""
 		pass
 
+	##########################################################################
+	# These methods are called by the overlays to post information about user
+	# interactions with them.
+	##########################################################################
 
+	def OnOverlayObjectSelected(self, oid):
+		"""
+		Called when an object is selected on the starmap. Given the object id.
+		"""
+		self.application.gui.Post(self.application.gui.SelectObjectEvent(oid))
 
+	def OnOverlayObjectPreview(self, oid):
+		"""
+		Called when an object is previewed on the starmap. Given the object id.
+		"""
+		self.application.gui.Post(self.application.gui.PreviewObjectEvent(oid))
+
+	def OnOverlayOrderSelected(self, oid, slot):
+		"""
+		Called when an order (on an object) is selected on the starmap). Given
+		the object id and the slot.
+		"""
+		self.application.gui.Post(self.application.gui.SelectOrderEvent(oid, slot))
+
+	def OnOverlaySpaceSelected(self, coords):
+		"""
+		Called when empty space is selected on the starmap. Given the
+		coordinates.  
+		"""
+		pass
+
+	def OnOverlaySpacePreview(self, coords):
+		"""
+		Called when empty space is previewed on the starmap. Given the
+		coordinates.  
+		"""
+		pass

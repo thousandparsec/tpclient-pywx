@@ -56,25 +56,6 @@ def FindOwners(cache, obj):
 		owners.add(child.owner)
 	return list(owners)
 
-def FindPath(cache, obj):
-	"""
-	Figure out the owners of this oidect (and it's children).
-	"""
-	if not isinstance(obj, Object):
-		raise TypeError("Object must be an object not %r" % obj)
-
-	locations = [obj.pos]
-	for order in cache.orders[obj.id]:
-		# FIXME: Needs to be a better way to do this...
-		if order._name in ("Move", "Move To", "Intercept"):
-			if hasattr(order, "pos"):
-				locations.append(order.pos)
-			if hasattr(order, "to"):
-				locations.append(cache.objects[order.to].pos)
-	if len(locations) == 1:
-		return None
-	return locations
-
 class IconMixIn:
 	"""
 	"""
@@ -257,13 +238,13 @@ class Systems(SystemLevelOverlay):
 
 		# Draw the path of the object
 		paths = []
-		for i, cobj in enumerate(icon):
-			path = FindPath(self.cache, cobj)
-			if path:
-				pr = path[0]
-				for p in path[1:]:
-					paths.append(Line([pr[0:2], p[0:2]], LineColor='Blue', InForeground=True))
-					pr = p
+##		for i, cobj in enumerate(icon):
+##			path = FindPath(self.cache, cobj)
+##			if path:
+##				pr = path[0]
+##				for p in path[1:]:
+##					paths.append(Line([pr[0:2], p[0:2]], LineColor='Blue', InForeground=True))
+##					pr = p
 
 		if len(paths) > 0:
 			self['paths'] = paths
