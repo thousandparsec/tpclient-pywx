@@ -256,10 +256,20 @@ class GUIMouseAndMove(GUIMouse, GUIMove):
         # FIXME: Check these on non-qwerty keyboards
         ZoomOut = (61, 388)
         ZoomIn  = (45, 390)
+
+        pos = event.GetPosition()
+        size = self.parent.GetSize()
+        center = size[0]/2, size[1]/2
+
+        move = center[0]-pos[0], center[1]-pos[1]
         if event.UnicodeKey in ZoomIn:
-            self.parent.Zoom(0.90, event.GetPosition(), 'pixel') 
+            self.parent.Zoom(0.90, event.GetPosition(), 'Pixel', False) 
+            self.parent.MoveImage(move, 'Pixel')
+            return True
         elif event.UnicodeKey in ZoomOut:
-            self.parent.Zoom(1.10, event.GetPosition(), 'pixel')
+            self.parent.Zoom(1.10, event.GetPosition(), 'Pixel', False)
+            self.parent.MoveImage(move, 'Pixel')
+            return True
 
         Up    = (315, 87, 332)
         Left  = (314, 328, 65)
@@ -273,6 +283,7 @@ class GUIMouseAndMove(GUIMouse, GUIMove):
             self.parent.MoveImage((0, -40), 'Pixel')
         elif event.UnicodeKey in Down:
             self.parent.MoveImage((0, 40), 'Pixel')
+        return True
 
     def OnLeftDown(self, event):
         EventType = FloatCanvas.EVT_FC_LEFT_DOWN

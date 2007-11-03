@@ -2709,7 +2709,7 @@ class FloatCanvas(wx.Panel):
         self._BackgroundDirty = True
         self.Draw()
 
-    def Zoom(self, factor, center = None, centerCoords="world"):
+    def Zoom(self, factor, center = None, centerCoords="World", DrawFlag=True):
 
         """
         Zoom(factor, center) changes the amount of zoom of the image by factor.
@@ -2720,17 +2720,19 @@ class FloatCanvas(wx.Panel):
         If center is not given, the center will stay the same.
 
         centerCoords is a flag indicating whether the center given is in pixel or world 
-        coords. Options are: "world" or "pixel"
+        coords. Options are: "World" or "Pixel"
         
         """
         self.Scale = self.Scale*factor
         if not center is None:
-            if centerCoords == "pixel":
+            if centerCoords == "Pixel":
                 center = self.PixelToWorld( center )
-            else:
+            elif centerCoords == "World":
                 center = N.array(center,N.float)
+            else:
+                raise FloatCanvasError('centerCoords must be either "Pixel", or "World"')
             self.ViewPortCenter = center
-        self.SetToNewScale()
+        self.SetToNewScale(DrawFlag)
 
     def ZoomToBB(self, NewBB=None, DrawFlag=True):
 
