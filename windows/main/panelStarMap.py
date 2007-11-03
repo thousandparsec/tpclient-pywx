@@ -156,10 +156,11 @@ class panelStarMap(panelStarMapBase):
 			self.Overlay[-1].UpdateAll()
 
 		if oid != -1:
-			try:
-				self.Overlay[-1].SelectObject(oid)
-			except NotImplementedError:
-				pass
+			for Overlay in self.Overlay:
+				try:
+					Overlay.SelectObject(oid)
+				except NotImplementedError:
+					pass
 
 		# Force the panel to layout
 		self.DisplayModeExtra.Layout()
@@ -208,7 +209,7 @@ class panelStarMap(panelStarMapBase):
 				to = float(to)
 
 				self.Canvas.Scale = self.ScaleMax*(100/to)
-				self.Canvas.Zoom(1, self.Overlay[-1].Focus()[1], 'world')
+				self.Canvas.Zoom(1, self.Overlay[-1].Focus()[1], 'World')
 			except ValueError:
 				# FIXME: This should pop-up some type of error.
 				print "Can not zoom to that level"

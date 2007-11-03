@@ -17,7 +17,7 @@ from tp.netlib.objects.ObjectExtra.Universe   import Universe
 from tp.netlib.objects.ObjectExtra.Galaxy     import Galaxy
 
 
-from Overlay   import SystemLevelOverlay, Holder
+from Overlay   import Overlay
 
 def FindPath(cache, obj):
 	"""
@@ -49,15 +49,28 @@ class PathSegment(Group):
 	It has a "previous segment" reference which can be an object or another path segment.
 	It has a endingat destination
 	"""
-	Background = None
+	BackgroundColor = None
 	# The color of paths when just shown
-	Normal = "Grey"
+	InactiveColor = "Grey"
 	# The color of path of the currently selected object
-	Active = "Blue"
+	ActiveColor = "Blue"
 	# The color of the currently active segment of the path
-	Selected = wx.Color(255,0,0)
+	SelectedColor = "Red"
 	# The color of the "split" handles
-	SplitHandle = "Yellow"	
+	SplitHandleColor = "Yellow"	
+
+	class States:
+		Inactive = "Inactive"
+		Active   = "Active"
+		Selected = "Selected"
+
+		transisions = [
+			(Inactive, Active),
+			(Active, Selected),
+			(Selected, Active),
+			(Active, Inactive),
+			(Selected, Inactive),
+		]
 
 	def XY(self):
 		return self.ObjectList[0].XY
@@ -70,6 +83,8 @@ class PathSegment(Group):
 
 		# Check the ending at parameter
 		# Must be a set of corrdinates or an object
+
+		self.State = self.States.Inactive
 
 		self.what     = what
 		self.endat    = endingat
@@ -91,9 +106,9 @@ class PathSegment(Group):
 		ObjectList = []
 		# Draw the line
 		# A wider version of the path to make it easier to click on the line
-		ObjectList.append(Line([start[0:2], end[0:2]], LineColor=self.Background, LineWidth = 10))
+		ObjectList.append(Line([start[0:2], end[0:2]], LineColor=self.BackgroundColor, LineWidth = 10))
 		# The visible version of the path 
-		ObjectList.append(Line([start[0:2], end[0:2]], LineColor=self.Active))
+		ObjectList.append(Line([start[0:2], end[0:2]], LineColor=self.InactiveColor))
 
 		# Draw the "ticks" which indicate how far the object will reach each turn
 
@@ -119,13 +134,32 @@ class PathSegment(Group):
 
 			self.next = segment
 
+	def SetState(self, state):
+		if self.State == state:
+			return 
+
+		if not (self.State, state) in self.States.transisions:
+			raise TypeError("Can not change from %s to %s" % (self.State, state))
+
+		self.State = state
+
+		# Change the color of this segment
+		color = getattr(self, str(state) + 'Color')
+		self.ObjectList[-1].SetColor(color)
+
 	def Select(self, yes):
 		if yes:
-			self.ObjectList[-1].SetColor(self.Selected)
+			self.SetState(self.States.Selected)
 		else:
-			self.ObjectList[-1].SetColor(self.Active)
+			self.SetState(self.States.Active)
 
-class Paths(SystemLevelOverlay):
+	def Active(self, yes):
+		if yes:
+			self.SetState(self.States.Active)
+		else:
+			self.SetState(self.States.Inactive)
+
+class Paths(Overlay):
 	"""\
 	Draws a path of ships and similar objects.
 	"""
@@ -134,8 +168,9 @@ class Paths(SystemLevelOverlay):
 
 
 	def __init__(self, parent, canvas, panel, cache, *args, **kw):
-		SystemLevelOverlay.__init__(self, parent, canvas, panel, cache, *args, **kw)
+		Overlay.__init__(self, parent, canvas, panel, cache, *args, **kw)
 
+		self.oid = None
 		self.active = None
 
 	def UpdateOne(self, oid, overrides={}):
@@ -160,6 +195,24 @@ class Paths(SystemLevelOverlay):
 				segment.Bind(EVT_FC_LEFT_UP, self.OnClickSegment)
 
 				previous = segment
+
+	def SelectObject(self, oid):
+		"""
+		Select an object using an external event.
+
+		Simulates this as a mouse click.
+		"""
+		if self.oid == oid:
+			return
+		else:
+			self.oid = oid
+
+		# FIXME: This is kind of suckily slow!
+		for nid, slot in self.keys():
+			if oid == nid:
+				self[(nid, slot)].Active(True)
+			else:
+				self[(nid, slot)].Active(False)
 
 	def OnClickSegment(self, evt):
 		self.parent.OnOverlayObjectSelected(evt.what.id)
