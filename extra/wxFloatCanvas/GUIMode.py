@@ -255,7 +255,7 @@ class GUIMouseAndMove(GUIMouse, GUIMove):
     def OnKeyUp(self, event):
         # FIXME: Check these on non-qwerty keyboards
         ZoomOut = (61, 388)
-        ZoomIn  = (45, 306, 390)
+        ZoomIn  = (45, 390)
         if event.UnicodeKey in ZoomIn:
             self.parent.Zoom(0.90, event.GetPosition(), 'pixel') 
         elif event.UnicodeKey in ZoomOut:
