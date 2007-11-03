@@ -49,7 +49,7 @@ class PathSegment(Group):
 	It has a "previous segment" reference which can be an object or another path segment.
 	It has a endingat destination
 	"""
-	Background = "Black"
+	Background = None
 	# The color of paths when just shown
 	Normal = "Grey"
 	# The color of path of the currently selected object
@@ -91,13 +91,13 @@ class PathSegment(Group):
 		ObjectList = []
 		# Draw the line
 		# A wider version of the path to make it easier to click on the line
-		ObjectList.append(Line([start[0:2], end[0:2]], LineColor=self.Background, InForeground=False, LineWidth = 10))
+		ObjectList.append(Line([start[0:2], end[0:2]], LineColor=self.Background, LineWidth = 10))
 		# The visible version of the path 
-		ObjectList.append(Line([start[0:2], end[0:2]], LineColor=self.Active,     InForeground=True))
+		ObjectList.append(Line([start[0:2], end[0:2]], LineColor=self.Active))
 
 		# Draw the "ticks" which indicate how far the object will reach each turn
 
-		Group.__init__(self, ObjectList, False)
+		Group.__init__(self, ObjectList, True)
 
 	def SetNext(self, segment):
 		"""
@@ -170,7 +170,7 @@ class Paths(SystemLevelOverlay):
 		self.active = evt
 		self.active.Select(True)	
 
-		self.canvas.Draw(Force=True)
+		self.canvas.Draw()
 
 	def Empty(self, evt):
 		pass

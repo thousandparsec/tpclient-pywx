@@ -23,7 +23,7 @@ from tp.netlib.objects import OrderDescs
 class panelStarMap(panelStarMapBase):
 	title = _("StarMap")
 
-	Overlays = [Paths, Systems, Resource]
+	Overlays = [(Paths, Systems), (Paths, Resource)]
 	def __init__(self, application, parent):
 		panelStarMapBase.__init__(self, parent)
 
@@ -64,7 +64,7 @@ class panelStarMap(panelStarMapBase):
 		# Populate the overlay chooser
 		self.Overlay = None
 		for overlay in self.Overlays:
-			self.DisplayMode.Append(overlay.name, overlay)
+			self.DisplayMode.Append(overlay[-1].name, overlay)
 		self.DisplayMode.SetSelection(0)
 
 		self.Bind(wx.EVT_ENTER_WINDOW, self.OnMouseEnter)
@@ -128,10 +128,11 @@ class panelStarMap(panelStarMapBase):
 
 		# Clear any overlay which is currently around
 		if self.Overlay != None:
-			oid = self.Overlay.Focus()[0]
+			oid = self.Overlay[-1].Focus()[0]
 
-			self.Overlay.CleanUp()
-			self.Overlay = None
+			for Overlay in self.Overlay:
+				Overlay.CleanUp()
+				Overlay = None
 
 			# Remove the panel from the sizer
 			self.DisplayModeExtra.GetSizer().Remove(self.DisplayModePanel)
@@ -149,12 +150,14 @@ class panelStarMap(panelStarMapBase):
 		self.DisplayModeExtra.GetSizer().Add(self.DisplayModePanel, proportion=1, flag=wx.EXPAND)
 
 		# Create the new overlay
-		self.Overlay = cls(self, self.Canvas, self.DisplayModePanel, self.application.cache)
-		self.Overlay.UpdateAll()
+		self.Overlay = []
+		for Overlay in cls:
+			self.Overlay.append(Overlay(self, self.Canvas, self.DisplayModePanel, self.application.cache))
+			self.Overlay[-1].UpdateAll()
 
 		if oid != -1:
 			try:
-				self.Overlay.SelectObject(oid)
+				self.Overlay[-1].SelectObject(oid)
 			except NotImplementedError:
 				pass
 
@@ -205,7 +208,7 @@ class panelStarMap(panelStarMapBase):
 				to = float(to)
 
 				self.Canvas.Scale = self.ScaleMax*(100/to)
-				self.Canvas.Zoom(1, self.Overlay.Focus()[1], 'world')
+				self.Canvas.Zoom(1, self.Overlay[-1].Focus()[1], 'world')
 			except ValueError:
 				# FIXME: This should pop-up some type of error.
 				print "Can not zoom to that level"
@@ -217,7 +220,8 @@ class panelStarMap(panelStarMapBase):
 		if evt.what == None:
 			# FIXME: These shouldn't really be here
 			if self.Overlay is not None:
-				self.Overlay.UpdateAll()
+				for Overlay in self.Overlay:
+					Overlay.UpdateAll()
 			else:
 				self.OnDisplayMode(None)		
 
@@ -246,7 +250,8 @@ class panelStarMap(panelStarMapBase):
 		else:
 			self.WaypointButton.Disable()
 
-		self.Overlay.SelectObject(evt.id)
+		for Overlay in self.Overlay:
+			Overlay.SelectObject(evt.id)
 
 	def OnUpdateOrder(self, evt):
 		"""\

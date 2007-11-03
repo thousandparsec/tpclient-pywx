@@ -129,7 +129,7 @@ class SystemIcon(Group, Holder, IconMixIn):
 					RelativePoint(system.pos[0:2], childtype, self.ChildSize, False, self.ChildOffset(i))
 				)
 
-		Group.__init__(self, ObjectList, False)
+		Group.__init__(self, ObjectList, True)
 
 class FleetIcon(Group, Holder, IconMixIn):
 	"""
