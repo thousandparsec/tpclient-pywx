@@ -194,7 +194,6 @@ class panelPicture(panelPictureBase):
 		self.Update()
 
 	def OnSelectObject(self, evt):
-		print "winInfo SelectObject", evt
 		if evt.id == self.current:
 			return
 		self.current = evt.id

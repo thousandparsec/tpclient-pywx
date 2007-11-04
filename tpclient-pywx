@@ -75,6 +75,12 @@ class GUI(wx.App):
 		"""
 		def __init__(self, id, slots):
 			self.id = id
+			
+			try:
+				slots[0]
+			except:
+				slots = [slots]
+
 			self.slots = slots
 		
 		def __str__(self):

@@ -53,7 +53,7 @@ class panelOrder(panelOrderBase):
 
 		self.DetailsSizer = self.DetailsPanel.GetSizer()
 
-		self.Orders.Bind(wx.EVT_LIST_ITEM_SELECTED, self.OnOrderSelect)
+		self.Orders.Bind(wx.EVT_LIST_ITEM_SELECTED,   self.OnOrderSelect)
 		self.Orders.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.OnOrderSelect)
 		self.Orders.Bind(wx.EVT_RIGHT_UP, self.OnRightClick)
 
@@ -363,6 +363,22 @@ class panelOrder(panelOrderBase):
 		# Select no orders
 		self.OnOrderSelect(None, True)
 
+	def OnSelectOrder(self, evt):
+		print "OnSelectOrder", evt
+
+		# Don't do anything if it is the wrong object
+		if evt and self.oid != evt.id:
+			print "Not the correct object!", self.oid, evt.id
+			return
+		
+		# Don't do anything if the slots are already the same
+		if self.slots == evt.slots:
+			print "Ignoring as this order is already selected."
+			return
+
+		self.Orders.SetSelected(evt.slots)
+		self.OnOrderSelect(None)
+
 	def OnCacheUpdate(self, evt):
 		"""\
 		Called when the cache is updated.
@@ -402,9 +418,12 @@ class panelOrder(panelOrderBase):
 		"""\
 		Called when somebody selects an order.
 		"""
+		print "OnOrderSelect", evt, force
 		slots = self.Orders.GetSelected()
 		if self.slots == slots and not force:
 			return
+
+		print "OnOrderSelect", slots
 
 		try:
 			object = self.application.cache.objects[self.oid]
@@ -430,8 +449,8 @@ class panelOrder(panelOrderBase):
 			self.Orders.EnsureVisible(slots[-1])
 		
 		# FIXME: This should be done better
-		if not hasattr(order, '_dirty'):
-			self.application.Post(self.application.gui.SelectOrderEvent(self.oid, slots))
+#		if not hasattr(order, '_dirty'):
+#			self.application.Post(self.application.gui.SelectOrderEvent(self.oid, slots))
 
 	def OnOrderNew(self, evt, after=True):
 		"""\
@@ -469,7 +488,7 @@ class panelOrder(panelOrderBase):
 		
 		# Select the newly created order
 		self.Orders.SetSelected([slot])
-		self.OnOrderSelect(None)
+		#self.OnOrderSelect(None)
 
 	def OnOrderDelete(self, evt):
 		"""\
