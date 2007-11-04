@@ -192,6 +192,16 @@ class winDesign(winDesignBase, winReportXRC, ShiftMixIn):
 		self.Bind(wx.EVT_BUTTON, self.OnAddMany, self.ComponentsAddMany)
 
 		self.Bind(wx.EVT_TREE_SEL_CHANGED, self.OnSelectObject, self.DesignsTree)
+		
+		self.DesignsSearch.Bind(wx.EVT_TEXT, self.BuildDesignList)
+		self.DesignsSearch.Bind(wx.EVT_TEXT_ENTER, self.BuildDesignList)
+		self.DesignsSearch.Bind(wx.EVT_SEARCHCTRL_SEARCH_BTN, self.BuildDesignList)
+		self.DesignsSearch.Bind(wx.EVT_SEARCHCTRL_CANCEL_BTN, self.OnDesignsSearchCancel)
+		
+		self.ComponentsSearch.Bind(wx.EVT_TEXT, self.BuildCompList)
+		self.ComponentsSearch.Bind(wx.EVT_TEXT_ENTER, self.BuildCompList)
+		self.ComponentsSearch.Bind(wx.EVT_SEARCHCTRL_SEARCH_BTN, self.BuildCompList)
+		self.ComponentsSearch.Bind(wx.EVT_SEARCHCTRL_CANCEL_BTN, self.OnComponentsSearchCancel)
 
 		#self.Panel = Panel
 		self.OnSelect()
@@ -229,6 +239,14 @@ class winDesign(winDesignBase, winReportXRC, ShiftMixIn):
 
 	# Functions to build PartsList of the interface
 	#################################################################################
+	def DesignsFilter(self):
+		filter = self.DesignsSearch.GetValue()
+		if len(filter) == 0:
+			return "*"
+		if filter[-1] != '*':
+			return '*'+filter.lower()+'*'
+	DesignsFilter = property(DesignsFilter)
+	
 	def BuildDesignList(self, evt=None):
 		self.DesignsTree.DeleteAllItems()
 
@@ -248,13 +266,24 @@ class winDesign(winDesignBase, winReportXRC, ShiftMixIn):
 
 			for design in cache.designs.values():
 				if category.id in design.categories:
-					self.TreeAddItem(self.DesignsTree, categoryitem, design)
+					# Filter the list..
+					from fnmatch import fnmatch as match
+					if match(design.name.lower(), self.DesignsFilter.lower()):
+						self.TreeAddItem(self.DesignsTree, categoryitem, design)
 
 			if not self.DesignsTree.ItemHasChildren(categoryitem):
 				self.DesignsTree.Delete(categoryitem)
 
 		self.DesignsTree.SortChildren(self.DesignsTree.GetRootItem())
-		self.DesignsTree.Expand(root)
+		self.DesignsTree.ExpandAll()
+
+	def ComponentsFilter(self):
+		filter = self.ComponentsSearch.GetValue()
+		if len(filter) == 0:
+			return "*"
+		if filter[-1] != '*':
+			return '*'+filter.lower()+'*'
+	ComponentsFilter = property(ComponentsFilter)
 
 	def BuildCompList(self, evt=None):
 		#FIXME: This is broken as it does not take into account the change of position of items
@@ -273,13 +302,16 @@ class winDesign(winDesignBase, winReportXRC, ShiftMixIn):
 
 			for component in cache.components.values():
 				if category.id in component.categories:
-					self.TreeAddItem(self.ComponentsTree, categoryitem, component)
+					# Filter the list..
+					from fnmatch import fnmatch as match
+					if match(component.name.lower(), self.ComponentsFilter.lower()):
+						self.TreeAddItem(self.ComponentsTree, categoryitem, component)
 
 			if not self.ComponentsTree.ItemHasChildren(categoryitem):
 				self.ComponentsTree.Delete(categoryitem)
 
 		self.ComponentsTree.SortChildren(self.ComponentsTree.GetRootItem())
-		self.ComponentsTree.Expand(root)
+		self.ComponentsTree.ExpandAll()
 	
 		# FIXME: This is broken as it does not take into account the change of position of items
 #		if selected:
@@ -427,10 +459,12 @@ class winDesign(winDesignBase, winReportXRC, ShiftMixIn):
 
 		# Show the component bar
 		self.grid.Show(self.ComponentsPanel)
+		self.grid.Show(self.ComponentsSearch)
 		
 		# Make the title and description editable
 		self.top.Show(self.TitleEditable)
-		self.top.Hide(self.TitleStatic)
+		#self.top.Hide(self.TitleStatic)
+		self.top.Layout()
 
 		# Disable Edit, Duplicate, Delete
 		self.Edit.Disable()
@@ -489,6 +523,7 @@ class winDesign(winDesignBase, winReportXRC, ShiftMixIn):
 
 		# Hide the component bar
 		self.grid.Hide(self.ComponentsPanel)
+		self.grid.Hide(self.ComponentsSearch)
 
 		# Make the title and description uneditable
 		self.top.Hide(self.TitleEditable)
@@ -595,3 +630,10 @@ class winDesign(winDesignBase, winReportXRC, ShiftMixIn):
 
 			self.DesignsTree.SortChildren(self.DesignsTree.GetRootItem())
 	
+	def OnDesignsSearchCancel(self, evt):
+		self.DesignsSearch.SetValue("")
+		self.BuildDesignList()
+		
+	def OnComponentsSearchCancel(self, evt):
+		self.ComponentsSearch.SetValue("")
+		self.BuildCompList()

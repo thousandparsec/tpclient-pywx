@@ -15,7 +15,16 @@
         </object>
         <object class="sizeritem">
           <object class="wxPanel" name="TitlePanel">
-            <object class="wxFlexGridSizer">
+            <object class="wxBoxSizer">
+              <object class="sizeritem">
+                <object class="wxStaticText" name="TitleStatic">
+                  <label>Title</label>
+                  <style>wxALIGN_RIGHT|wxST_NO_AUTORESIZE</style>
+                </object>
+                <option>1</option>
+                <flag>wxALL|wxEXPAND|wxGROW|wxALIGN_RIGHT</flag>
+                <border>1</border>
+              </object>
               <object class="sizeritem">
                 <object class="wxTextCtrl" name="TitleEditable">
                   <value>Title</value>
@@ -26,26 +35,15 @@
                 <border>1</border>
               </object>
               <object class="sizeritem">
-                <object class="wxStaticText" name="TitleStatic">
-                  <label>Title</label>
-                  <style>wxALIGN_CENTRE|wxST_NO_AUTORESIZE</style>
-                </object>
-                <option>1</option>
-                <flag>wxALL|wxEXPAND|wxGROW|wxALIGN_CENTRE</flag>
-                <border>1</border>
-              </object>
-              <object class="sizeritem">
                 <object class="wxStaticText" name="Used">
                   <label>0000</label>
-                  <style>wxALIGN_RIGHT|wxST_NO_AUTORESIZE</style>
+                  <style>wxALIGN_LEFT|wxST_NO_AUTORESIZE</style>
                 </object>
                 <option>1</option>
-                <flag>wxALL|wxEXPAND|wxGROW|wxALIGN_CENTRE</flag>
+                <flag>wxALL|wxEXPAND|wxGROW|wxALIGN_LEFT</flag>
                 <border>1</border>
               </object>
-              <cols>3</cols>
-              <rows>1</rows>
-              <growablecols>0</growablecols>
+              <orient>wxHORIZONTAL</orient>
             </object>
           </object>
           <option>1</option>
@@ -205,7 +203,6 @@
                     </object>
                     <cols>6</cols>
                     <rows>1</rows>
-                    <growablecols>0</growablecols>
                   </object>
                 </object>
                 <option>0</option>
