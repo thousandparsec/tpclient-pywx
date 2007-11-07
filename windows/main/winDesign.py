@@ -460,10 +460,13 @@ class winDesign(winDesignBase, winReportXRC, ShiftMixIn):
 		# Show the component bar
 		self.grid.Show(self.ComponentsPanel)
 		self.grid.Show(self.ComponentsSearch)
+		self.ComponentsPanel.SetSize((0, 0))
+		self.ComponentsSearch.SetSize((0, 0))
+		self.ComponentsPanel.Layout()
 		
 		# Make the title and description editable
 		self.top.Show(self.TitleEditable)
-		#self.top.Hide(self.TitleStatic)
+		self.top.Hide(self.TitleStatic)
 		self.top.Layout()
 
 		# Disable Edit, Duplicate, Delete
@@ -524,6 +527,9 @@ class winDesign(winDesignBase, winReportXRC, ShiftMixIn):
 		# Hide the component bar
 		self.grid.Hide(self.ComponentsPanel)
 		self.grid.Hide(self.ComponentsSearch)
+		self.ComponentsPanel.SetSize((0,0))
+		self.ComponentsSearch.SetSize((0,0))
+		self.ComponentsPanel.Layout()
 
 		# Make the title and description uneditable
 		self.top.Hide(self.TitleEditable)
@@ -554,8 +560,8 @@ class winDesign(winDesignBase, winReportXRC, ShiftMixIn):
 			self.TitleStatic.SetLabel("")
 
 			# Hide the design
-			self.middle.Hide(self.DesignInfoPanel)
-			self.middle.Layout()
+			self.grid.Hide(self.DesignPanel)
+			self.grid.Layout()
 			
 			# Disable the buttons
 			self.Edit.Disable()
@@ -571,8 +577,8 @@ class winDesign(winDesignBase, winReportXRC, ShiftMixIn):
 		self.BuildHeaderPanel(self.selected)
 
 		# Show the PartsList list
-		self.middle.Show(self.DesignInfoPanel)
-		self.middle.Layout()
+		self.grid.Show(self.DesignPanel)
+		self.grid.Layout()
 
 		# Populate the PartsList list
 		self.BuildPartsPanel(self.selected)

@@ -19,10 +19,10 @@
               <object class="sizeritem">
                 <object class="wxStaticText" name="TitleStatic">
                   <label>Title</label>
-                  <style>wxALIGN_RIGHT|wxST_NO_AUTORESIZE</style>
+                  <style>wxALIGN_CENTRE|wxST_NO_AUTORESIZE</style>
                 </object>
                 <option>1</option>
-                <flag>wxALL|wxEXPAND|wxGROW|wxALIGN_RIGHT</flag>
+                <flag>wxALL|wxEXPAND|wxGROW|wxALIGN_CENTRE</flag>
                 <border>1</border>
               </object>
               <object class="sizeritem">
@@ -37,10 +37,10 @@
               <object class="sizeritem">
                 <object class="wxStaticText" name="Used">
                   <label>0000</label>
-                  <style>wxALIGN_LEFT|wxST_NO_AUTORESIZE</style>
+                  <style>wxALIGN_RIGHT|wxST_NO_AUTORESIZE</style>
                 </object>
-                <option>1</option>
-                <flag>wxALL|wxEXPAND|wxGROW|wxALIGN_LEFT</flag>
+                <option>0</option>
+                <flag>wxALL|wxEXPAND|wxGROW|wxALIGN_RIGHT</flag>
                 <border>1</border>
               </object>
               <orient>wxHORIZONTAL</orient>
@@ -93,8 +93,7 @@
               </object>
               <object class="sizeritem">
                 <object class="wxPanel" name="DesignInfoPanel">
-                  <object class="wxBoxSizer">
-                    <orient>wxHORIZONTAL</orient>
+                  <object class="wxFlexGridSizer">
                     <object class="sizeritem">
                       <object class="wxListCtrl" name="PartsList">
                         <style>wxLC_REPORT|wxLC_EDIT_LABELS|wxSUNKEN_BORDER</style>
@@ -152,8 +151,13 @@
                       <option>1</option>
                       <flag>wxALL|wxGROW|wxALIGN_CENTRE</flag>
                       <border>1</border>
-                      <minsize></minsize>
+                      <minsize>250, 300</minsize>
                     </object>
+                    <cols>2</cols>
+                    <rows>1</rows>
+                    <growablerows>0</growablerows>
+                    <growablecols>0</growablecols>
+                    <growablecols>1</growablecols>
                   </object>
                 </object>
                 <option>1</option>
@@ -228,6 +232,7 @@
                 <option>1</option>
                 <flag>wxALL|wxGROW|wxALIGN_RIGHT</flag>
                 <border>1</border>
+                <minsize>200, 400</minsize>
               </object>
               <object class="sizeritem">
                 <object class="wxPanel" name="ComponentsButtonPanel">
