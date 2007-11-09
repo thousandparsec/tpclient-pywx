@@ -11,7 +11,7 @@ import os
 result = os.system('apt-get --version > /dev/null 2>&1') 
 if result == 0:
 	system = "debian-based"
-elif result == 32512:
+else:
 	system = "unknown"
 
 from types import StringTypes
