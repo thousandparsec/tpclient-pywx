@@ -254,6 +254,16 @@ class panelStarMap(panelStarMapBase):
 		for Overlay in self.Overlay:
 			Overlay.SelectObject(evt.id)
 
+	def OnSelectOrder(self, evt):
+		"""
+		Called when an order is selected.
+		"""
+		for Overlay in self.Overlay:
+			try:
+				Overlay.SelectOrder(evt.id, evt.slots)
+			except AttributeError, e:
+				print e
+
 	def OnUpdateOrder(self, evt):
 		"""\
 		Called when an order is updated.

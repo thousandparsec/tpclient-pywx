@@ -299,35 +299,35 @@ class panelOrder(panelOrderBase):
 		"""\
 		Called when an object is selected.
 		"""
+		print "OnSelectObject", evt, force, self.oid, evt.id
+
 		# Don't do anything if the object hasn't actually changed!
-		if evt and self.oid == evt.id and not force:
+		if self.oid == evt.id and not force:
 			return
-	
+
+		self.oid = evt.id 
+
+		# Ignore none events.
+		if evt.id is None:
+			self.Master.Hide()
+			return
+		
 		# Check the object exists
-		try:
-			object = self.application.cache.objects[evt.id]
-		except KeyError:
-			print _("Warning: Object %s does not exist!" % (evt.id))
-			evt = None
-	
+		object = self.application.cache.objects[evt.id]
+		print repr(object)
+
 		# Do the clean up first
 		self.Orders.DeleteAllItems()
 		self.Possible.Clear()
-		
-		if evt == None:
-			self.oid = None
-			self.OnOrderSelect(None)
-			return
-	
+
 		if object.order_number == 0 and len(object.order_types) == 0:
+			print "No orders and no possible orders on this object!"
 			self.Master.Hide()
 		else:
 			self.Master.Show()
 			self.Master.Layout()
 			self.Master.Update()
 
-		# We now point to this object
-		self.oid = evt.id 
 		self.Orders.SetToolTipDefault(_("Current orders on %s.") % object.name)
 		
 		# Add all the orders to the list
@@ -360,8 +360,9 @@ class panelOrder(panelOrderBase):
 		if len(object.order_types) > 0:
 			self.Possible.SetSelection(0)
 
-		# Select no orders
+		# Select no orders		
 		self.OnOrderSelect(None, True)
+
 
 	def OnSelectOrder(self, evt):
 		print "OnSelectOrder", evt
@@ -420,10 +421,14 @@ class panelOrder(panelOrderBase):
 		"""
 		print "OnOrderSelect", evt, force
 		slots = self.Orders.GetSelected()
-		if self.slots == slots and not force:
-			return
 
-		print "OnOrderSelect", slots
+		print "OnOrderSelect", self.slots, slots,
+		if self.slots == slots and not force:
+			print "Slots equal, ignoring"
+			return
+		else:
+			print "Slots not equal, processing"
+			self.slots = slots
 
 		try:
 			object = self.application.cache.objects[self.oid]
@@ -440,8 +445,6 @@ class panelOrder(panelOrderBase):
 			order = _("No object selected.")
 
 		print 'Order!', repr(order)
-
-		self.slots = slots
 		self.BuildPanel(order)
 
 		# Ensure we can see the items
@@ -449,8 +452,9 @@ class panelOrder(panelOrderBase):
 			self.Orders.EnsureVisible(slots[-1])
 		
 		# FIXME: This should be done better
-#		if not hasattr(order, '_dirty'):
-#			self.application.Post(self.application.gui.SelectOrderEvent(self.oid, slots))
+		if not hasattr(order, '_dirty'):
+			print self, slots
+			self.application.Post(self.application.gui.SelectOrderEvent(self.oid, slots))
 
 	def OnOrderNew(self, evt, after=True):
 		"""\
