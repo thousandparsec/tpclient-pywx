@@ -639,6 +639,11 @@ class panelOrder(panelOrderBase):
 
 				else:
 					raise TypeError('WTF?')
+
+			if len(orderdesc.names) == 0:
+				name_text = wx.StaticText( self.ArgumentsPanel, -1, "No arguments" )
+				name_text.SetFont(wx.local.normalFont)
+				self.ArgumentsSizer.Add( name_text, 0, wx.ALIGN_CENTER|wx.CENTER, 4 )
 	
 #			self.DetailsPanel.SetClientSize(wx.Size(self.GetBestSize()[0], -1))
 			self.DetailsSizer.Add( self.ArgumentsPanel, 1, wx.GROW|wx.EXPAND|wx.ALIGN_CENTER|wx.ALL)
