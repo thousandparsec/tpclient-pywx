@@ -24,6 +24,9 @@ import traceback
 import utils
 from version import version
 from tp.netlib import failed
+from tp.client.threads import NotImportantEvent, Event
+
+pyid = id
 
 class ThreadExited(Exception):
 	pass
@@ -36,19 +39,26 @@ def make(me, thread, method):
 		thread.Call(method, *args, **kw)
 	return t
 
+class wxPyEvent(wx.PyEvent, Event):
+	def __init__(self):
+		wx.PyEvent.__init__(self)
+		Event.__init__(self)
+
 class GUI(wx.App):
 	## These are window events
-	class ShowWindowEvent(wx.PyEvent):
+	class ShowWindowEvent(wxPyEvent):
 		"""\
 		Raised when the the windows are showed.
 		"""
 		pass
 
-	class SelectObjectEvent(wx.PyEvent):
+	class SelectObjectEvent(wxPyEvent):
 		"""\
 		Raised when an object is selected.
 		"""
 		def __init__(self, id):
+			wxPyEvent.__init__(self)
+
 			self.id = id
 	
 		def __str__(self):
@@ -58,40 +68,42 @@ class GUI(wx.App):
 	class PreviewObjectEvent(SelectObjectEvent):
 		pass
 
-	class SelectPositionEvent(wx.PyEvent):
+	class SelectPositionEvent(wxPyEvent):
 		"""\
 		Raised when a position is selected.
 		"""
 		def __init__(self, pos):
+			wxPyEvent.__init__(self)
+
 			self.x, self.y, self.z = pos
 		
 		def __str__(self):
 			return "<SelectPositionEvent (%s, %s %s)>" % (self.x, self.y, self.z)
 		__repr__ = __str__
 	
-	class SelectOrderEvent(wx.PyEvent):
+	class SelectOrderEvent(wxPyEvent):
 		"""\
 		Raised when an order is selected.
 		"""
 		def __init__(self, id, slots):
-			self.id = id
-			
-			try:
-				slots[0]
-			except:
-				slots = [slots]
+			wxPyEvent.__init__(self)
 
+			self.id = id
+			if not hasattr(slots, '__getitem__'):
+				slots = [slots]
 			self.slots = slots
 		
 		def __str__(self):
-			return "<SelectOrderEvent id=%s slots=%s>" % (self.id, self.slots)
+			return "<SelectOrderEvent(%x) id=%s slots=%s>" % (pyid(self), self.id, self.slots)
 		__repr__ = __str__
 
-	class DirtyOrderEvent(wx.PyEvent):
+	class DirtyOrderEvent(wxPyEvent):
 		"""\
 		Raised when an order value changes but hasn't been saved yet.
 		"""
 		def __init__(self, order):
+			wxPyEvent.__init__(self)
+
 			self.id = order.id
 			self.slot = order.slot
 			self.order = order
@@ -107,6 +119,9 @@ class GUI(wx.App):
 			wx.App.__init__(self, redirect=False)
 		else:
 			wx.App.__init__(self)
+
+		# FIXME:
+		self.LastEvent = {}
 
 		############
 		# Setup the translation stuff...
@@ -170,7 +185,7 @@ class GUI(wx.App):
 		self.Call(self.Show, self.connectto)
 
 	def __str__(self):
-		return "<GUIThread(wxThread, %s)>" % hex(id(self))
+		return "<GUIThread(wxThread, %s)>" % hex(pyid(self))
 
 	def Cleanup(self):
 		for window in self.windows:
@@ -213,7 +228,21 @@ class GUI(wx.App):
 		"""
 		Post an Event the current window.
 		"""
-		func = 'On' + event.__class__.__name__[:-5]
+		#################################################################
+		# This code is to ensure the correct ordering of the events.
+		# FIXME: Must be a much better way to do this
+		#################################################################
+		try:
+			if self.LastEvent[event.type] > event.time:
+				print "Ignoring Event as it is too old..", event
+				return
+		except KeyError:
+			pass
+		#################################################################
+
+		self.LastEvent[event.type] = event.time
+
+		func = 'On' + event.type
 		if hasattr(self, func):
 			try:
 				getattr(self, func)(event)
@@ -223,8 +252,7 @@ class GUI(wx.App):
 		self.current.Post(event)
 
 		# If it's not a GUI event also post to all the other windows...
-		from tp.client.threads import NotImportantEvent
-		if not isinstance(event, (wx.PyEvent, NotImportantEvent)):
+		if not isinstance(event, (wxPyEvent, NotImportantEvent)):
 			for window in self.windows:
 				if window is self.current:
 					continue
