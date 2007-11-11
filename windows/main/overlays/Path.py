@@ -233,8 +233,8 @@ class Paths(Overlay):
 		self.canvas.Draw()
 
 	def OnClickSegment(self, evt):
-		self.parent.OnOverlayObjectSelected(evt.what.id)
-		self.parent.OnOverlayOrderSelected(evt.what.id, evt.what.slot)
+		self.parent.OnOverlayObjectSelected(self, evt.what.id)
+		self.parent.OnOverlayOrderSelected(self, evt.what.id, evt.what.slot)
 
 	def Empty(self, evt):
 		pass

@@ -57,6 +57,10 @@ class panelOrder(panelOrderBase):
 		self.Orders.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.OnOrderSelect)
 		self.Orders.Bind(wx.EVT_RIGHT_UP, self.OnRightClick)
 
+		self.application.gui.Binder(self.application.CacheClass.CacheUpdateEvent, self.OnCacheUpdate)
+		self.application.gui.Binder(self.application.gui.SelectObjectEvent, self.OnSelectObject)
+		self.application.gui.Binder(self.application.gui.SelectOrderEvent,  self.OnSelectOrder)
+
 	def GetPaneInfo(self):
 		info = wx.aui.AuiPaneInfo()
 		info.MinSize((self.GetBestSize()[0]*1.5,self.GetBestSize()[1]))
@@ -114,7 +118,7 @@ class panelOrder(panelOrderBase):
 		# Tell everyone else about the change
 		if slot > self.Orders.GetItemCount():
 			slot = -1
-		self.application.Post(self.application.cache.CacheDirtyEvent("orders", "create", self.oid, slot, order))
+		self.application.Post(self.application.cache.CacheDirtyEvent("orders", "create", self.oid, slot, order), source=self)
 
 	def DeleteOrder(self, slot, order):
 		"""\
@@ -128,7 +132,7 @@ class panelOrder(panelOrderBase):
 		self.UpdateListItem(slot, order)
 
 		# Tell everyone about the change
-		self.application.Post(self.application.cache.CacheDirtyEvent("orders", "remove", self.oid, slot, order))
+		self.application.Post(self.application.cache.CacheDirtyEvent("orders", "remove", self.oid, slot, order), source=self)
 	
 	def UpdateOrder(self, slot, order):
 		"""\
@@ -142,7 +146,7 @@ class panelOrder(panelOrderBase):
 		self.UpdateListItem(slot, order)
 		
 		# Tell everyone about the change
-		self.application.Post(self.application.cache.CacheDirtyEvent("orders", "change", self.oid, slot, order))
+		self.application.Post(self.application.cache.CacheDirtyEvent("orders", "change", self.oid, slot, order), source=self)
 
 	def BuildMenu(self, menu):
 		"""\
@@ -363,9 +367,12 @@ class panelOrder(panelOrderBase):
 		# Select no orders		
 		self.OnOrderSelect(None, True)
 
-
 	def OnSelectOrder(self, evt):
 		print "OnSelectOrder", evt
+
+		if hasattr(evt, "source") and evt.source == self:
+			print "Ignoring as I posted this event!"
+			return
 
 		# Don't do anything if it is the wrong object
 		if evt and self.oid != evt.id:
@@ -376,7 +383,7 @@ class panelOrder(panelOrderBase):
 		if self.slots == evt.slots:
 			print "Ignoring as this order is already selected."
 			return
-
+	
 		self.Orders.SetSelected(evt.slots)
 		self.OnOrderSelect(None)
 
@@ -403,18 +410,19 @@ class panelOrder(panelOrderBase):
 			self.UpdateListItem(evt.slot, evt.change)
 			
 			# Rebuild the panel
-			if evt.slot in self.Orders.GetSelected():
+			if evt.slot in self.Orders.slots:
 				self.OnOrderSelect(None, force=True)
+
 		elif evt.action == "remove":
 			self.RemoveListItem(evt.slot)
 
-			slots = self.Orders.GetSelected()
-			if evt.slot in slots or len(slots) == 0:
+			if evt.slot in self.slots or len(self.slots) == 0:
 				self.OnOrderSelect(None)
 
 	####################################################
 	# Local Event Handlers
 	####################################################
+
 	def OnOrderSelect(self, evt, force=False):
 		"""\
 		Called when somebody selects an order.
@@ -453,8 +461,7 @@ class panelOrder(panelOrderBase):
 		
 		# FIXME: This should be done better
 		if not hasattr(order, '_dirty'):
-			print self, slots
-			self.application.Post(self.application.gui.SelectOrderEvent(self.oid, slots))
+			self.application.Post(self.application.gui.SelectOrderEvent(self.oid, slots), source=self)
 
 	def OnOrderNew(self, evt, after=True):
 		"""\
@@ -544,7 +551,7 @@ class panelOrder(panelOrderBase):
 		"""
 		# Ignore programatic changes
 		if self.ignore:
-			pass
+			return 
 		
 		# Figure out which slot to use
 		slots = self.Orders.GetSelected()
@@ -560,7 +567,7 @@ class panelOrder(panelOrderBase):
 		order = self.FromPanel(order)
 
 		# Tell the gui about the change
-		self.application.gui.Post(self.application.gui.DirtyOrderEvent(order))
+		self.application.Post(self.application.gui.DirtyOrderEvent(order), source=self)
 		
 	####################################################
 	# Panel Functions

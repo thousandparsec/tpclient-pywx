@@ -44,6 +44,67 @@ class wxPyEvent(wx.PyEvent, Event):
 		wx.PyEvent.__init__(self)
 		Event.__init__(self)
 
+class EventBinder(dict):
+	def __init__(self, *args, **kw):
+		self.LastEvent = {}
+		dict.__init__(self, *args, **kw)
+
+	def Bind(self, event, function):
+		if not issubclass(event, Event):
+			raise TypeError("First argument must be an event object.")
+		if not callable(function):
+			raise TypeError("Second argument must be a callable.")
+
+		name = event.__name__
+
+		if not self.has_key(name):
+			self[name] = []
+		self[name].append(function)
+
+	__call__ = Bind
+
+	def Unbind(self, event, function):
+		if not issubclass(event, Event):
+			raise TypeError("First argument must be an event object.")
+		if not callable(function):
+			raise TypeError("Argument must be a callable.")
+
+		name = event.__name__
+
+		if not self.has_key(name) or not function in self[name]:
+			raise KeyError("That function is not bound to that argument!")
+
+		self[name].remove(function)
+
+		if len(self[name]) == 0:
+			del self[name]
+
+	def Post(self, event):
+		name = event.__class__.__name__
+
+		if not self.has_key(name):
+			return
+
+		try:
+			if self.LastEvent[event.type] > event.time:
+				return
+		except KeyError:
+			pass
+
+		for function in self[name]:
+			# Don't post back to the original producer
+			# Source is the function
+			if function == event.source:
+				continue
+
+			# Don't post back to the original producer
+			# Source is an instance method
+			if type(function) is type(EventBinder.Post):
+				if hasattr(event.source, function.__name__) and getattr(event.source, function.__name__) == function:
+					continue
+
+			function(event)
+
 class GUI(wx.App):
 	## These are window events
 	class ShowWindowEvent(wxPyEvent):
@@ -120,8 +181,7 @@ class GUI(wx.App):
 		else:
 			wx.App.__init__(self)
 
-		# FIXME:
-		self.LastEvent = {}
+		self.Binder = EventBinder()
 
 		############
 		# Setup the translation stuff...
@@ -151,14 +211,17 @@ class GUI(wx.App):
 
 		self.current = None
 
+		# Show the splash screen
+		from windows.winSplash import winSplash
+		self.splash = winSplash(application)
+		self.Show(self.splash)
+
+	def Create(self):
+		application = self.application
+
 		try:
 			wx.InitAllImageHandlers()
 			
-			# Show the splash screen
-			from windows.winSplash import winSplash
-			self.splash = winSplash(application)
-			self.Show(self.splash)
-
 			# Load the other main windows
 			from windows.winMain import winMain
 			self.main = winMain(application)
@@ -228,20 +291,6 @@ class GUI(wx.App):
 		"""
 		Post an Event the current window.
 		"""
-		#################################################################
-		# This code is to ensure the correct ordering of the events.
-		# FIXME: Must be a much better way to do this
-		#################################################################
-		try:
-			if self.LastEvent[event.type] > event.time:
-				print "Ignoring Event as it is too old..", event
-				return
-		except KeyError:
-			pass
-		#################################################################
-
-		self.LastEvent[event.type] = event.time
-
 		func = 'On' + event.type
 		if hasattr(self, func):
 			try:
@@ -249,14 +298,7 @@ class GUI(wx.App):
 			except Exception, e:
 				utils.do_traceback()
 
-		self.current.Post(event)
-
-		# If it's not a GUI event also post to all the other windows...
-		if not isinstance(event, (wxPyEvent, NotImportantEvent)):
-			for window in self.windows:
-				if window is self.current:
-					continue
-				window.Post(event)
+		self.Binder.Post(event)
 
 	def Show(self, window):
 		"""

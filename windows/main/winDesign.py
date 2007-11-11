@@ -203,6 +203,9 @@ class winDesign(winDesignBase, winReportXRC, ShiftMixIn):
 		self.ComponentsSearch.Bind(wx.EVT_SEARCHCTRL_SEARCH_BTN, self.BuildCompList)
 		self.ComponentsSearch.Bind(wx.EVT_SEARCHCTRL_CANCEL_BTN, self.OnComponentsSearchCancel)
 
+		self.application.gui.Binder(self.application.CacheClass.CacheUpdateEvent, self.OnCacheUpdate)
+		self.application.gui.Binder(self.application.gui.SelectObjectEvent, self.OnSelectObject)
+
 		#self.Panel = Panel
 		self.OnSelect()
 

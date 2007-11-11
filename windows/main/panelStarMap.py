@@ -70,6 +70,10 @@ class panelStarMap(panelStarMapBase):
 		self.Bind(wx.EVT_ENTER_WINDOW, self.OnMouseEnter)
 		self.Bind(wx.EVT_LEAVE_WINDOW, self.OnMouseLeave)
 
+		self.application.gui.Binder(self.application.CacheClass.CacheUpdateEvent, self.OnCacheUpdate)
+		self.application.gui.Binder(self.application.gui.SelectObjectEvent, self.OnSelectObject)
+		self.application.gui.Binder(self.application.gui.SelectOrderEvent,  self.OnSelectOrder)
+
 	def OnMouseEnter(self, evt):
 		print "OnMouseEnter!", evt
 		# FIXME: Should make sure we gain the keyboard focus
@@ -252,6 +256,8 @@ class panelStarMap(panelStarMapBase):
 			self.WaypointButton.Disable()
 
 		for Overlay in self.Overlay:
+			if evt.source == Overlay:
+				continue
 			Overlay.SelectObject(evt.id)
 
 	def OnSelectOrder(self, evt):
@@ -281,33 +287,33 @@ class panelStarMap(panelStarMapBase):
 	# interactions with them.
 	##########################################################################
 
-	def OnOverlayObjectSelected(self, oid):
+	def OnOverlayObjectSelected(self, overlay, oid):
 		"""
 		Called when an object is selected on the starmap. Given the object id.
 		"""
-		self.application.gui.Post(self.application.gui.SelectObjectEvent(oid))
+		self.application.Post(self.application.gui.SelectObjectEvent(oid), source=overlay)
 
-	def OnOverlayObjectPreview(self, oid):
+	def OnOverlayObjectPreview(self, overlay, oid):
 		"""
 		Called when an object is previewed on the starmap. Given the object id.
 		"""
-		self.application.gui.Post(self.application.gui.PreviewObjectEvent(oid))
+		self.application.Post(self.application.gui.PreviewObjectEvent(oid), source=overlay)
 
-	def OnOverlayOrderSelected(self, oid, slot):
+	def OnOverlayOrderSelected(self, overlay, oid, slot):
 		"""
 		Called when an order (on an object) is selected on the starmap). Given
 		the object id and the slot.
 		"""
-		self.application.gui.Post(self.application.gui.SelectOrderEvent(oid, slot))
+		self.application.Post(self.application.gui.SelectOrderEvent(oid, slot), source=overlay)
 
-	def OnOverlaySpaceSelected(self, coords):
+	def OnOverlaySpaceSelected(self, overlay, coords):
 		"""
 		Called when empty space is selected on the starmap. Given the
 		coordinates.  
 		"""
 		pass
 
-	def OnOverlaySpacePreview(self, coords):
+	def OnOverlaySpacePreview(self, overlay, coords):
 		"""
 		Called when empty space is previewed on the starmap. Given the
 		coordinates.  
