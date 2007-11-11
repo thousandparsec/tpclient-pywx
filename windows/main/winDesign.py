@@ -58,137 +58,31 @@ class winDesign(winDesignBase, winReportXRC, ShiftMixIn):
 		self.icons.Add(Art(wx.ART_NORMAL_FILE, wx.ART_OTHER, wx.ArtSize))
 
 		self.grid = self.Panel.GetSizer()
-		#self.grid.AddGrowableCol(0, 15)		# Middle Column is growable
-		#self.grid.AddGrowableCol(1, 50)		# Middle Column is growable
-		#self.grid.AddGrowableCol(2, 15)		# Middle Column is growable
-		#self.grid.AddGrowableRow(1)			# Bottom row is growable
 
-		#self.DesignsTree = wx.OrderedTreeCtrl( Panel, -1, style=wx.TR_DEFAULT_STYLE | wx.TR_HAS_VARIABLE_ROW_HEIGHT)
-		self.DesignsTree.SetFont(wx.local.normalFont)
 		self.DesignsTree.SetImageList(self.icons)
 
 		# The labels
 		################################################################
-		self.top = self.TitlePanel.GetSizer()
-		
-		# The title (editable version)
-		#self.TitleEditable = wx.TextCtrl( Panel, -1, _("Title"), size=(-1,wx.local.buttonSize[1]), style=wx.TE_CENTRE)
-		self.TitleEditable.SetFont(wx.local.normalFont)
-		#self.top.Add( self.TitleEditable, 1, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
-		
-		# The title (noneditable version)
-		#self.TitleStatic = wx.StaticText( Panel, -1, _("Title"), size=(-1,wx.local.buttonSize[1]), style=wx.ALIGN_CENTRE|wx.ST_NO_AUTORESIZE)
-		self.TitleStatic.SetFont(wx.local.normalFont)
-		#self.top.Add( self.TitleStatic, 1, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1)
+		self.top			= self.TitlePanel.GetSizer()
+		self.middle			= self.DesignPanel.GetSizer()
+		self.designsizer	= self.DesignInfoPanel.GetSizer()
+		self.compssizer		= self.ComponentsPanel.GetSizer()
+		self.addsizer		= self.ComponentsButtonPanel.GetSizer()
 
-		# The number of times the design is in use
-		#self.Used = wx.StaticText( Panel, -1, "0000", size=(-1,wx.local.buttonSize[1]), style=wx.ALIGN_RIGHT|wx.ST_NO_AUTORESIZE)
-		self.Used.SetFont(wx.local.normalFont)
-		#self.top.Add( self.Used, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
+		self.design_ps		= wx.BoxSizer(wx.HORIZONTAL)
 
-		self.middle = self.DesignPanel.GetSizer()
-		
-		# The Categories this design is in
-		#self.Categories = wx.StaticText( Panel, -1, "", size=(-1,wx.local.buttonSize[1]), style=wx.ALIGN_CENTRE|wx.ST_NO_AUTORESIZE)
-		self.Categories.SetFont(wx.local.normalFont)
-		#self.middle.Add( self.Categories, 0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 0 )
-		
-		# The currently selected design
-		self.designsizer = self.DesignInfoPanel.GetSizer()
-		#self.middle.Add(self.designsizer, 2, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
-
-		# The components in the design
-		#self.PartsList = wx.ListCtrl(Panel, -1, wx.DefaultPosition, wx.DefaultSize, wx.LC_REPORT|wx.SUNKEN_BORDER|wx.LC_EDIT_LABELS )
 		self.PartsList.InsertColumn(0, "#", format=wx.LIST_FORMAT_RIGHT, width=20)
 		self.PartsList.InsertColumn(1, _("Component"))
-		self.PartsList.SetFont(wx.local.normalFont)
-		#self.designsizer.Add(self.PartsList, 2, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
 
-		# The properties of the design
-		#self.design_ps = self.DesignProperties.GetSizer()
-		self.design_ps = wx.BoxSizer(wx.HORIZONTAL)
-		#self.DesignPropertyGroup1 = wx.Panel(Panel, -1)
-		#self.DesignPropertyGroup1.SetSizer(self.design_ps)
-		#self.designsizer.Add(self.DesignPropertyGroup1, 2, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
-
-		# The description of the current design
-		#self.desc = wx.TextCtrl( Panel, -1, " ", style=wx.TE_RIGHT|wx.TE_MULTILINE|wx.TE_PROCESS_ENTER)
-		#self.desc.SetFont(wx.local.normalFont)
-		#self.middle.Add( self.desc, 1, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
-		
-		# The "component description Panel"
-		#self.middle.Add( self.desc, 1, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
-
-		# The buttons
-		buttons = self.DesignButtonsPanel.GetSizer()
-		#self.middle.Add(buttons, 0, wx.ALIGN_RIGHT|wx.ALL, 1 )
-
-		# The Edit button
-		#self.Edit = wx.Button( Panel, -1, _("Edit"), size=wx.local.buttonSize)
-		self.Edit.SetFont(wx.local.normalFont)
-		#buttons.Add( self.Edit, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
-		
-		# The Duplicate button
-		#self.Duplicate = wx.Button( Panel, -1, _("Duplicate"), size=wx.local.buttonSize)
-		self.Duplicate.SetFont(wx.local.normalFont)
-		#buttons.Add( self.Duplicate, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
-		
-		# The Delete button
-		#self.Delete = wx.Button( Panel, -1, _("Delete"), size=wx.local.buttonSize)
-		self.Delete.SetFont(wx.local.normalFont)
-		#buttons.Add( self.Delete, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
-
-		# The Revert button
-		#self.Revert = wx.Button( Panel, -1, _("Revert"), size=wx.local.buttonSize)
-		self.Revert.SetFont(wx.local.normalFont)
-		#buttons.Add( self.Revert, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
-
-		# The Save button
-		#self.Save = wx.Button( Panel, -1, _("Save"), size=wx.local.buttonSize)
-		self.Save.SetFont(wx.local.normalFont)
-		#buttons.Add( self.Save, 0, wx.ALIGN_CENTRE|wx.ALL, 1 )
-		
-		# The components
-		
-		self.compssizer = self.ComponentsPanel.GetSizer()
-		
-		#self.ComponentsTree = wx.OrderedTreeCtrl( Panel, -1, style=wx.TR_DEFAULT_STYLE | wx.TR_HAS_VARIABLE_ROW_HEIGHT | wx.TR_MULTIPLE)
-		self.ComponentsTree.SetFont(wx.local.normalFont)
 		self.ComponentsTree.SetImageList(self.icons)
-		#self.compssizer.Add(self.ComponentsTree, 1, wx.GROW|wx.ALIGN_RIGHT|wx.ALL, 1 )
-
-		self.addsizer = self.ComponentsButtonPanel.GetSizer()
-		#self.compssizer.Add(self.addsizer, 0, wx.ALIGN_RIGHT|wx.ALL, 0)
-
-		#self.ComponentsAdd = wx.Button( Panel, -1, _("Add"), size=wx.local.buttonSize)
-		self.ComponentsAdd.SetFont(wx.local.normalFont)
-		#self.addsizer.Add(self.ComponentsAdd, 0, wx.ALIGN_RIGHT|wx.ALL, 1 )
-
-		#self.ComponentsAddMany = wx.Button( Panel, -1, _("Add Many"), size=wx.local.buttonSize)
-		self.ComponentsAddMany.SetFont(wx.local.normalFont)
-		#self.addsizer.Add(self.ComponentsAddMany, 0, wx.ALIGN_RIGHT|wx.ALL, 1 )
-		
-		
-		#blank = wx.Panel( Panel, -1 )
-		#self.grid.Add(blank,    0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
-		#self.grid.Add(self.top,         0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
-		#blank = wx.Panel( Panel, -1 )
-		#self.grid.Add(blank,    0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
-		#self.grid.Add(self.DesignsTree,     0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
-		#self.grid.Add(self.middle,      0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
-		#self.grid.Add(self.compssizer,  0, wx.GROW|wx.ALIGN_CENTRE|wx.ALL, 1 )
 
 		self.Panel.SetAutoLayout( True )
-		#self.Panel.SetSizer( self.grid )
 
-		#self.grid.Fit( Panel )
-		#self.grid.SetSizeHints( self )
-
-		self.Bind(wx.EVT_BUTTON, self.OnEdit, self.Edit)
+		self.Bind(wx.EVT_BUTTON, self.OnEdit,   self.Edit)
 		self.Bind(wx.EVT_BUTTON, self.OnSelect, self.Revert)
-		self.Bind(wx.EVT_BUTTON, self.OnSave, self.Save)
+		self.Bind(wx.EVT_BUTTON, self.OnSave,   self.Save)
 
-		self.Bind(wx.EVT_BUTTON, self.OnAdd, self.ComponentsAdd)
+		self.Bind(wx.EVT_BUTTON, self.OnAdd,     self.ComponentsAdd)
 		self.Bind(wx.EVT_BUTTON, self.OnAddMany, self.ComponentsAddMany)
 
 		self.Bind(wx.EVT_TREE_SEL_CHANGED, self.OnSelectObject, self.DesignsTree)
@@ -493,7 +387,7 @@ class winDesign(winDesignBase, winReportXRC, ShiftMixIn):
 
 		# Is this a new design?
 		if design.id == -1:
-			self.application.Post(self.application.cache.CacheDirtyEvent("DesignsTree", "create", -1, design))
+			self.application.Post(self.application.cache.CacheDirtyEvent("DesignsTree", "create", -1, design), source=self)
 			self.selected = None
 		else:
 			# Add the design to ones which are being updated
@@ -504,7 +398,7 @@ class winDesign(winDesignBase, winReportXRC, ShiftMixIn):
 				self.TreeColourItem(self.DesignsTree, item, "updating")
 	
 			# Tell the world about the change
-			self.application.Post(self.application.cache.CacheDirtyEvent("DesignsTree", "change", design.id, design))
+			self.application.Post(self.application.cache.CacheDirtyEvent("DesignsTree", "change", design.id, design), source=self)
 
 		self.OnSelect(None)
 
@@ -518,7 +412,7 @@ class winDesign(winDesignBase, winReportXRC, ShiftMixIn):
 		for item in self.DesignsTree.FindAllByData(design, comparebyid):
 			self.TreeColourItem(self.DesignsTree, item, "removing")
 			
-		self.application.Post(self.application.cache.CacheDirtyEvent("DesignsTree", "remove", design.id, design))
+		self.application.Post(self.application.cache.CacheDirtyEvent("DesignsTree", "remove", design.id, design), source=self)
 
 	def OnSelect(self, evt=None):
 		# Stop any running Shift timers
