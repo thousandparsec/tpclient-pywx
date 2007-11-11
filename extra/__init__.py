@@ -494,12 +494,16 @@ class wxListCtrl(wx.ListCtrlOrig, mlc.ListCtrlAutoWidthMixin, mlc.ColumnSorterMi
 		return slots
 
 	def SetSelected(self, slots):
+		self.Freeze()
+
 		# Unselect the currently selected items
 		for slot in self.GetSelected():
 			self.SetItemState(slot, 0, wx.LIST_STATE_SELECTED)
 
 		for slot in slots:
 			self.SetItemState(slot, wx.LIST_STATE_SELECTED, wx.LIST_STATE_SELECTED)
+
+		self.Thaw()
 		
 	def AddSelected(self, slot):
 		self.SetItemState(slot, wx.LIST_STATE_SELECTED, wx.LIST_STATE_SELECTED)
