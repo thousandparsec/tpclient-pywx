@@ -40,6 +40,8 @@ class panelMessage(panelMessageBase, ShiftMixIn):
 		# Contains the message types to be filtered
 		self.filtered = Set()
 
+		self.application.gui.Binder(self.application.CacheClass.CacheUpdateEvent, self.OnCacheUpdate)
+
 	def OnLinkEvent(self, evt):
 		link = evt.GetLinkInfo().GetHref()
 		print link
@@ -313,7 +315,7 @@ class panelMessage(panelMessageBase, ShiftMixIn):
 			return
 
 		# Tell everyone about the change
-		self.application.Post(self.application.cache.CacheDirtyEvent("messages", "remove", self.bid, slot, None))
+		self.application.Post(self.application.cache.CacheDirtyEvent("messages", "remove", self.bid, slot, None), source=self)
 
 	def OnGoto(self, slot):
 		# Select the object this message references
@@ -339,14 +341,14 @@ class panelMessage(panelMessageBase, ShiftMixIn):
 			self.PopupMenu(menu, (x,y+self.Goto.GetSize()[1]))
 
 		elif len(ids) == 1:
-			self.application.Post(self.application.gui.SelectObjectEvent(ids[0]))
+			self.application.Post(self.application.gui.SelectObjectEvent(ids[0]), source=self)
 
 	def MessageGotoMenu(self, evt):
 		menu = evt.GetEventObject()
 		item = menu.FindItemById(evt.GetId())
 
 		id = int(item.GetLabel().split('(')[-1][:-1])
-		self.application.Post(self.application.gui.SelectObjectEvent(id))
+		self.application.Post(self.application.gui.SelectObjectEvent(id), source=self)
 
 	def MessageNew(self, evt=None):
 		pass

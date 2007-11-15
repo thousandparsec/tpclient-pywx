@@ -68,6 +68,11 @@ class panelPicture(panelPictureBase):
 		self.Layout()
 		self.Update()
 
+		self.application.gui.Binder(self.application.MediaClass.MediaUpdateEvent,			self.OnMediaUpdate)
+		self.application.gui.Binder(self.application.MediaClass.MediaDownloadProgressEvent, self.OnMediaDownloadProgress)
+		self.application.gui.Binder(self.application.MediaClass.MediaDownloadDoneEvent,		self.OnMediaDownloadDone)
+		self.application.gui.Binder(self.application.gui.SelectObjectEvent, self.OnSelectObject)
+
 	def GetPaneInfo(self):
 		info = wx.aui.AuiPaneInfo()
 		info.MinSize(wx.Size(128,150))

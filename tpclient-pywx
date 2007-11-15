@@ -24,6 +24,9 @@ import traceback
 import utils
 from version import version
 from tp.netlib import failed
+from tp.client.threads import NotImportantEvent, Event
+
+pyid = id
 
 class ThreadExited(Exception):
 	pass
@@ -36,19 +39,87 @@ def make(me, thread, method):
 		thread.Call(method, *args, **kw)
 	return t
 
+class wxPyEvent(wx.PyEvent, Event):
+	def __init__(self):
+		wx.PyEvent.__init__(self)
+		Event.__init__(self)
+
+class EventBinder(dict):
+	def __init__(self, *args, **kw):
+		self.LastEvent = {}
+		dict.__init__(self, *args, **kw)
+
+	def Bind(self, event, function):
+		if not issubclass(event, Event):
+			raise TypeError("First argument must be an event object.")
+		if not callable(function):
+			raise TypeError("Second argument must be a callable.")
+
+		name = event.__name__
+
+		if not self.has_key(name):
+			self[name] = []
+		self[name].append(function)
+
+	__call__ = Bind
+
+	def Unbind(self, event, function):
+		if not issubclass(event, Event):
+			raise TypeError("First argument must be an event object.")
+		if not callable(function):
+			raise TypeError("Argument must be a callable.")
+
+		name = event.__name__
+
+		if not self.has_key(name) or not function in self[name]:
+			raise KeyError("That function is not bound to that argument!")
+
+		self[name].remove(function)
+
+		if len(self[name]) == 0:
+			del self[name]
+
+	def Post(self, event):
+		name = event.__class__.__name__
+
+		if not self.has_key(name):
+			return
+
+		try:
+			if self.LastEvent[event.type] > event.time:
+				return
+		except KeyError:
+			pass
+
+		for function in self[name]:
+			# Don't post back to the original producer
+			# Source is the function
+			if function == event.source:
+				continue
+
+			# Don't post back to the original producer
+			# Source is an instance method
+			if type(function) is type(EventBinder.Post):
+				if hasattr(event.source, function.__name__) and getattr(event.source, function.__name__) == function:
+					continue
+
+			function(event)
+
 class GUI(wx.App):
 	## These are window events
-	class ShowWindowEvent(wx.PyEvent):
+	class ShowWindowEvent(wxPyEvent):
 		"""\
 		Raised when the the windows are showed.
 		"""
 		pass
 
-	class SelectObjectEvent(wx.PyEvent):
+	class SelectObjectEvent(wxPyEvent):
 		"""\
 		Raised when an object is selected.
 		"""
 		def __init__(self, id):
+			wxPyEvent.__init__(self)
+
 			self.id = id
 	
 		def __str__(self):
@@ -58,40 +129,42 @@ class GUI(wx.App):
 	class PreviewObjectEvent(SelectObjectEvent):
 		pass
 
-	class SelectPositionEvent(wx.PyEvent):
+	class SelectPositionEvent(wxPyEvent):
 		"""\
 		Raised when a position is selected.
 		"""
 		def __init__(self, pos):
+			wxPyEvent.__init__(self)
+
 			self.x, self.y, self.z = pos
 		
 		def __str__(self):
 			return "<SelectPositionEvent (%s, %s %s)>" % (self.x, self.y, self.z)
 		__repr__ = __str__
 	
-	class SelectOrderEvent(wx.PyEvent):
+	class SelectOrderEvent(wxPyEvent):
 		"""\
 		Raised when an order is selected.
 		"""
 		def __init__(self, id, slots):
-			self.id = id
-			
-			try:
-				slots[0]
-			except:
-				slots = [slots]
+			wxPyEvent.__init__(self)
 
+			self.id = id
+			if not hasattr(slots, '__getitem__'):
+				slots = [slots]
 			self.slots = slots
 		
 		def __str__(self):
-			return "<SelectOrderEvent id=%s slots=%s>" % (self.id, self.slots)
+			return "<SelectOrderEvent(%x) id=%s slots=%s>" % (pyid(self), self.id, self.slots)
 		__repr__ = __str__
 
-	class DirtyOrderEvent(wx.PyEvent):
+	class DirtyOrderEvent(wxPyEvent):
 		"""\
 		Raised when an order value changes but hasn't been saved yet.
 		"""
 		def __init__(self, order):
+			wxPyEvent.__init__(self)
+
 			self.id = order.id
 			self.slot = order.slot
 			self.order = order
@@ -107,6 +180,8 @@ class GUI(wx.App):
 			wx.App.__init__(self, redirect=False)
 		else:
 			wx.App.__init__(self)
+
+		self.Binder = EventBinder()
 
 		############
 		# Setup the translation stuff...
@@ -136,14 +211,17 @@ class GUI(wx.App):
 
 		self.current = None
 
+		# Show the splash screen
+		from windows.winSplash import winSplash
+		self.splash = winSplash(application)
+		self.Show(self.splash)
+
+	def Create(self):
+		application = self.application
+
 		try:
 			wx.InitAllImageHandlers()
 			
-			# Show the splash screen
-			from windows.winSplash import winSplash
-			self.splash = winSplash(application)
-			self.Show(self.splash)
-
 			# Load the other main windows
 			from windows.winMain import winMain
 			self.main = winMain(application)
@@ -170,7 +248,7 @@ class GUI(wx.App):
 		self.Call(self.Show, self.connectto)
 
 	def __str__(self):
-		return "<GUIThread(wxThread, %s)>" % hex(id(self))
+		return "<GUIThread(wxThread, %s)>" % hex(pyid(self))
 
 	def Cleanup(self):
 		for window in self.windows:
@@ -213,22 +291,14 @@ class GUI(wx.App):
 		"""
 		Post an Event the current window.
 		"""
-		func = 'On' + event.__class__.__name__[:-5]
+		func = 'On' + event.type
 		if hasattr(self, func):
 			try:
 				getattr(self, func)(event)
 			except Exception, e:
 				utils.do_traceback()
 
-		self.current.Post(event)
-
-		# If it's not a GUI event also post to all the other windows...
-		from tp.client.threads import NotImportantEvent
-		if not isinstance(event, (wx.PyEvent, NotImportantEvent)):
-			for window in self.windows:
-				if window is self.current:
-					continue
-				window.Post(event)
+		self.Binder.Post(event)
 
 	def Show(self, window):
 		"""

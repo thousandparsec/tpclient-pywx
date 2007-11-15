@@ -35,6 +35,8 @@ class panelInformation(panelInformationBase):
 		self.application = application
 		self.current = -1
 
+		self.application.gui.Binder(self.application.gui.SelectObjectEvent, self.OnSelectObject)
+
 	def GetPaneInfo(self):
 		info = wx.aui.AuiPaneInfo()
 		info.MinSize(self.GetBestSize())

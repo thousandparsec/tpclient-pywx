@@ -53,6 +53,9 @@ class panelSystem(panelSystemBase):
 		self.Search.Bind(wx.EVT_SEARCHCTRL_SEARCH_BTN, self.Rebuild)
 		self.Search.Bind(wx.EVT_SEARCHCTRL_CANCEL_BTN, self.OnSearchCancel)
 
+		self.application.gui.Binder(self.application.CacheClass.CacheUpdateEvent, self.OnCacheUpdate)
+		self.application.gui.Binder(self.application.gui.SelectObjectEvent, self.OnSelectObject)
+
 	def OnSearchCancel(self, evt):
 		self.Search.SetValue("")
 		self.Rebuild()
@@ -178,7 +181,7 @@ class panelSystem(panelSystemBase):
 		id = self.Tree.GetPyData(evt.GetItem())
 		if id != None:
 			# Okay we need to post an event now
-			self.application.Post(self.application.gui.SelectObjectEvent(id))
+			self.application.Post(self.application.gui.SelectObjectEvent(id), source=self)
 				
 		self.Refresh()
 

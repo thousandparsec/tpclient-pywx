@@ -120,13 +120,13 @@ class SystemIcon(Group, Holder, IconMixIn):
 
 		if len(self.children) > 0:
 			# The orbit bits
-			ObjectList.insert(0, Point(system.pos[0:2], "Black", 8))
-			ObjectList.insert(0, Point(system.pos[0:2], "Grey",  9, False))
+			ObjectList.insert(0, Point(system.pos[0:2], "Black", 8, InForeground=True))
+			ObjectList.insert(0, Point(system.pos[0:2], "Grey",  9, InForeground=True))
 	
 			# The orbiting children
 			for i, childtype in enumerate(childtype):
 				ObjectList.append(
-					RelativePoint(system.pos[0:2], childtype, self.ChildSize, False, self.ChildOffset(i))
+					RelativePoint(system.pos[0:2], childtype, self.ChildSize, True, self.ChildOffset(i))
 				)
 
 		Group.__init__(self, ObjectList, True)
@@ -156,9 +156,10 @@ class FleetIcon(Group, Holder, IconMixIn):
 		ObjectList = []
 
 		# The little ship icon
+		ObjectList.append(Point(fleet.pos[0:2], None, 12))
 		ObjectList.append(PolygonShip(fleet.pos[0:2], type))
 
-		Group.__init__(self, ObjectList, False)
+		Group.__init__(self, ObjectList, True)
 
 class Systems(SystemLevelOverlay):
 	name     = "Systems"

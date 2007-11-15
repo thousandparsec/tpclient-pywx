@@ -315,7 +315,7 @@ class SystemLevelOverlay(Overlay):
 
 		if self.ObjectLeftClick(self.Selected, self.Selected.current):
 			# Post a selected event
-			self.parent.OnOverlayObjectSelected(self.Selected.current.id)
+			self.parent.OnOverlayObjectSelected(self, self.Selected.current.id)
 
 		self.SystemEnter(self.Selected)
 
@@ -346,7 +346,7 @@ class SystemLevelOverlay(Overlay):
 		i, object = self.Hovering.NextLoop()
 		if self.ObjectHovering(self.Hovering, object):
 			# Post a preview event
-			self.parent.OnOverlayObjectPreview(object.id)
+			self.parent.OnOverlayObjectPreview(self, object.id)
 
 	def SystemLeave(self, icon):
 		if icon == None:
@@ -359,7 +359,7 @@ class SystemLevelOverlay(Overlay):
 
 		# Return back the originally selected object	
 		if self.Hovering != None and self.Selected != None:
-			self.parent.OnOverlayObjectSelected(self.Selected.current.id)
+			self.parent.OnOverlayObjectSelected(self, self.Selected.current.id)
 
 		t = self.Hovering
 		# Clear the currently hovering object

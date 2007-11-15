@@ -171,7 +171,7 @@ class Paths(Overlay):
 		Overlay.__init__(self, parent, canvas, panel, cache, *args, **kw)
 
 		self.oid = None
-		self.active = None
+		self.active = []
 
 	def UpdateOne(self, oid, overrides={}):
 
@@ -214,16 +214,27 @@ class Paths(Overlay):
 			else:
 				self[(nid, slot)].Active(False)
 
-	def OnClickSegment(self, evt):
-		self.parent.OnOverlayObjectSelected(evt.what.id)
-		self.parent.OnOverlayOrderSelected(evt.what.id, evt.what.slot)
+		self.canvas.Draw()
 
-		if not self.active is None:
-			self.active.Select(False)
-		self.active = evt
-		self.active.Select(True)	
+	def SelectOrder(self, id, slots):
+		for active in self.active:
+			active.Select(False)
+
+		self.active = []
+		for slot in slots:
+			try:
+				self.active.append(self[(id, slot)])
+			except KeyError:
+				pass
+
+		for active in self.active:
+			active.Select(True)	
 
 		self.canvas.Draw()
+
+	def OnClickSegment(self, evt):
+		self.parent.OnOverlayObjectSelected(self, evt.what.id)
+		self.parent.OnOverlayOrderSelected(self, evt.what.id, evt.what.slot)
 
 	def Empty(self, evt):
 		pass
