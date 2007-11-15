@@ -32,8 +32,14 @@ class Resource(Proportional):
 
 		self.resource = resource
 		self.type     = type
+		
+		self.UpdateAll()
+		self.canvas.Draw()
+		
+	def UpdateAll(self):
+		Proportional.UpdateAll(self)
 	
-	def amount(self, oid):
+	def Amount(self, oid):
 		"""\
 		The amount of this resource on this object.
 		"""
@@ -43,7 +49,7 @@ class Resource(Proportional):
 		amount = 0
 		if hasattr(o, "contains"):
 			for child in o.contains:
-				amount += self.amount(child)
+				amount += self.Amount(child)
 
 		if hasattr(o, "resources"):
 			for resource in o.resources:
@@ -51,5 +57,5 @@ class Resource(Proportional):
 					amount += reduce(int.__add__, resource[1:])
 				else:
 					amount += resource[self.type]
-
+		
 		return amount

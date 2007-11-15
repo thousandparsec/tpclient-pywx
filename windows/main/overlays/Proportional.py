@@ -11,7 +11,7 @@ class Proportional(Overlay):
 	"""\
 	Draws proportional circles defined by amount.
 	"""
-	scale = 100L
+	scale = 50L
 
 	def __init__(self, *args, **kw):
 		Overlay.__init__(self, *args, **kw)
@@ -21,30 +21,31 @@ class Proportional(Overlay):
 
 		self.fco = {}
 
-	def amount(self, oid):
+	def Amount(self, oid):
 		"""\
 		The absolute size of this object (non-proportional).
 		"""
 		return 1
 
-	def updateall(self):
+	def UpdateAll(self):
 		"""\
 				
-		"""
+		""" 
 		c = self.cache
 
 		# Remove all the objects.
-		self.cleanup()
+		self.CleanUp()
 
 		# Calculate all the values so we can figure min/max.
 		values = {}
 		for oid in c.objects.keys():
-			print oid, self.amount(oid)
-
-			values[oid] = self.amount(oid)
+			#print oid, self.Amount(oid)
+			# Disregard the Universe and the Galaxy
+			if (c.objects[oid].subtype > 1):
+				values[oid] = self.Amount(oid)
 
 		import pprint
-		pprint.pprint(values)
+		#pprint.pprint(values)
 
 		# Get min/max values.
 		v = values.values()
@@ -52,26 +53,33 @@ class Proportional(Overlay):
 		self.max = max(v)
 
 		for oid, value in values.items():
-			self.updateone(oid, value)
+			self.UpdateOne(oid, value)
 
-	def updateone(self, oid, value=None):
+	def UpdateOne(self, oid, value=None):
 		"""\
 
 		"""
+			
 		c = self.cache
-
-		if value is None:
-			# Get the new value.
-			value = self.amount(oid)
-
-			# If the min/max value has changed we need to redraw everything.
-			if value < self.min or value > self.max:
-				self.updateall()
-				return
-
-		# New proportional value.
-		proportional = value/(self.max-self.min)
-
-		# Create the new object.
-		self[oid] = FloatCanvas.Point(c.objects[oid].pos[0:2], 'White', proportional*self.scale)
-
+		
+		# Disregard the Universe and the Galaxy
+		if (c.objects[oid].subtype > 1):
+	
+			if value is None:
+				# Get the new value.
+				value = self.Amount(oid)
+	
+				# If the min/max value has changed we need to redraw everything.
+				if value < self.min or value > self.max:
+					self.UpdateAll()
+					return
+	
+			# New proportional value.
+			if not (self.max-self.min) is 0:
+				proportional = value/float(self.max-self.min)
+			else :
+				proportional = .1
+	
+			# Create the new object.
+			#print proportional
+			self[oid] = FloatCanvas.Point(c.objects[oid].pos[0:2], 'White', proportional*self.scale)
