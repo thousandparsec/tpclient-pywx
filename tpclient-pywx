@@ -103,7 +103,11 @@ class EventBinder(dict):
 				if hasattr(event.source, function.__name__) and getattr(event.source, function.__name__) == function:
 					continue
 
-			function(event)
+			try:
+				function(event)
+			except Exception, e:
+				utils.do_traceback()
+				
 
 class GUI(wx.App):
 	## These are window events
