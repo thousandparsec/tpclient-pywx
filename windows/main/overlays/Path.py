@@ -112,7 +112,7 @@ class PathSegment(Group):
 
 		# Draw the "ticks" which indicate how far the object will reach each turn
 
-		Group.__init__(self, ObjectList, True)
+		Group.__init__(self, ObjectList, False)
 
 	def SetNext(self, segment):
 		"""
@@ -159,6 +159,7 @@ class PathSegment(Group):
 		else:
 			self.SetState(self.States.Inactive)
 
+# FIXME: The hitpath and the actual path should be seperated for speed reasons..
 class Paths(Overlay):
 	"""\
 	Draws a path of ships and similar objects.
@@ -214,7 +215,7 @@ class Paths(Overlay):
 			else:
 				self[(nid, slot)].Active(False)
 
-		self.canvas.Draw()
+		self.canvas.Draw(True)
 
 	def SelectOrder(self, id, slots):
 		for active in self.active:
@@ -230,7 +231,7 @@ class Paths(Overlay):
 		for active in self.active:
 			active.Select(True)	
 
-		self.canvas.Draw()
+		self.canvas.Draw(True)
 
 	def OnClickSegment(self, evt):
 		self.parent.OnOverlayObjectSelected(self, evt.what.id)
