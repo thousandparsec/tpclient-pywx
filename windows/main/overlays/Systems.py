@@ -129,7 +129,7 @@ class SystemIcon(Group, Holder, IconMixIn):
 					RelativePoint(system.pos[0:2], childtype, self.ChildSize, True, self.ChildOffset(i))
 				)
 
-		Group.__init__(self, ObjectList, True)
+		Group.__init__(self, ObjectList, False)
 
 class FleetIcon(Group, Holder, IconMixIn):
 	"""
@@ -159,7 +159,7 @@ class FleetIcon(Group, Holder, IconMixIn):
 		ObjectList.append(Point(fleet.pos[0:2], None, 12))
 		ObjectList.append(PolygonShip(fleet.pos[0:2], type))
 
-		Group.__init__(self, ObjectList, True)
+		Group.__init__(self, ObjectList, False)
 
 class Systems(SystemLevelOverlay):
 	name     = "Systems"
