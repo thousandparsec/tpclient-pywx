@@ -5,13 +5,14 @@ This overlay is the base for overlays which use proportional circles.
 """
 # wxPython imports
 from extra.wxFloatCanvas import FloatCanvas
+from extra.wxFloatCanvas import PieChart
 
 from Overlay import Overlay
 class Proportional(Overlay):
 	"""\
 	Draws proportional circles defined by amount.
 	"""
-	scale = 50L
+	scale = 150L
 
 	def __init__(self, *args, **kw):
 		Overlay.__init__(self, *args, **kw)
@@ -83,3 +84,7 @@ class Proportional(Overlay):
 			# Create the new object.
 			#print proportional
 			self[oid] = FloatCanvas.Point(c.objects[oid].pos[0:2], 'White', proportional*self.scale)
+			#'LineColor':'Red', 'FillColor':'Red'
+			# 'LineColor':'White', 'FillColor':'White'
+			
+			return proportional
