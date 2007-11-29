@@ -410,7 +410,7 @@ class panelOrder(panelOrderBase):
 			self.UpdateListItem(evt.slot, evt.change)
 			
 			# Rebuild the panel
-			if evt.slot in self.Orders.slots:
+			if evt.slot in self.slots:
 				self.OnOrderSelect(None, force=True)
 
 		elif evt.action == "remove":
