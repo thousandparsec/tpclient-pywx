@@ -12,7 +12,8 @@ class Proportional(Overlay):
 	"""\
 	Draws proportional circles defined by amount.
 	"""
-	scale = 150L
+	scale = 60L
+	#scale = 150L
 
 	def __init__(self, *args, **kw):
 		Overlay.__init__(self, *args, **kw)
@@ -79,7 +80,13 @@ class Proportional(Overlay):
 			if not (self.max-self.min) is 0:
 				proportional = value/float(self.max-self.min)
 			else :
-				proportional = .1
+				proportional = .01
+				
+			if (proportional*self.scale) < 10 and proportional > 0:
+				proportional = 10.0 / self.scale
+			
+			#if (proportional*self.scale) > 30:
+				#proportional = 30.0 / self.scale
 	
 			# Create the new object.
 			#print proportional
