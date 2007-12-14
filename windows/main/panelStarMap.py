@@ -298,6 +298,7 @@ class panelStarMap(panelStarMapBase):
 		Called when an object is previewed on the starmap. Given the object id.
 		"""
 		self.application.Post(self.application.gui.PreviewObjectEvent(oid), source=overlay)
+		print "Previewed", oid
 
 	def OnOverlayOrderSelected(self, overlay, oid, slot):
 		"""

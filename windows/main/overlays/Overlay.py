@@ -125,7 +125,7 @@ class Overlay(dict):
 
 		Simulates this as a mouse click.
 		"""
-		raise NotImplementedError("Select Object method has not been implimented!")
+		raise NotImplementedError("Select Object method has not been implemented!")
 
 class Holder(list):
 	"""

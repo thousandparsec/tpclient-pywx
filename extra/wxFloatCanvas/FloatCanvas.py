@@ -2327,7 +2327,7 @@ class FloatCanvas(wx.Panel):
         evt = _MouseEvent(EventType, Event, self.GetId(), pt)
         self.GetEventHandler().ProcessEvent(evt)
 
-    if wx.__version__ >= "2.8" and False:
+    if wx.__version__ >= "2.8" and wx.Platform == "__WXMAC__":
         HitTestBitmapDepth = 32
         #print "Using hit test code for 2.8"
         def GetHitTestColor(self, xy):
