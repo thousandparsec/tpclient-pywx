@@ -41,6 +41,7 @@ def make(me, thread, method):
 
 class wxPyEvent(wx.PyEvent, Event):
 	def __init__(self):
+		self.source = None
 		wx.PyEvent.__init__(self)
 		Event.__init__(self)
 
@@ -80,34 +81,48 @@ class EventBinder(dict):
 			del self[name]
 
 	def Post(self, event):
-		name = event.__class__.__name__
-
-		if not self.has_key(name):
-			return
-
+		# Make sure that this event has not already passed
 		try:
 			if self.LastEvent[event.type] > event.time:
 				return
 		except KeyError:
 			pass
 
-		for function in self[name]:
-			# Don't post back to the original producer
-			# Source is the function
-			if function == event.source:
+		self.LastEvent[event.type] = event.time
+
+		# The people we have already sent the even too
+		sentto = [event.source]
+
+		# FIXME: This set does not guarentee the order!
+		bases = set([event.__class__])
+		while len(bases) > 0:
+			# Get the next base class
+			cls = bases.pop()
+			# Add this class bases to be checked
+			bases.update(cls.__bases__)
+
+			name = cls.__name__
+			# See if we have anyone who wants to be called for this type.
+			if not self.has_key(name):
 				continue
 
-			# Don't post back to the original producer
-			# Source is an instance method
-			if type(function) is type(EventBinder.Post):
-				if hasattr(event.source, function.__name__) and getattr(event.source, function.__name__) == function:
+			for function in self[name]:
+				# Source is a function
+				if function in sentto:
 					continue
 
-			try:
-				function(event)
-			except Exception, e:
-				utils.do_traceback()
+				# If source is an class, get the function off the class so we can check
+				if hasattr(event.source, function.__name__) and getattr(event.source, function.__name__) in sentto:
+					continue
+
+				try:
+					function(event)
+				except Exception, e:
+					utils.do_traceback()
 				
+				sentto.append(function)
+
+		print "I sent the following event %r to %r" % (event, sentto)
 
 class GUI(wx.App):
 	## These are window events
