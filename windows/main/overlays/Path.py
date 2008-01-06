@@ -16,7 +16,6 @@ from tp.netlib.objects                        import Order
 from tp.netlib.objects.ObjectExtra.Universe   import Universe
 from tp.netlib.objects.ObjectExtra.Galaxy     import Galaxy
 
-
 from Overlay   import Overlay
 
 def FindPath(cache, obj):
@@ -175,7 +174,6 @@ class Paths(Overlay):
 		self.active = []
 
 	def UpdateOne(self, oid, overrides={}):
-
 		path = FindPath(self.cache, self.cache.objects[oid])
 		if not path is None:
 			previous = self.cache.objects[oid]
@@ -197,13 +195,14 @@ class Paths(Overlay):
 
 				previous = segment
 
-	def SelectObject(self, oid):
+
+	def SelectObject(self, oid, force=False):
 		"""
 		Select an object using an external event.
 
 		Simulates this as a mouse click.
 		"""
-		if self.oid == oid:
+		if self.oid == oid and not force:
 			return
 		else:
 			self.oid = oid

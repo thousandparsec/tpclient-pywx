@@ -13,7 +13,7 @@ from extra.wxFloatCanvas.RelativePoint import RelativePoint, RelativePointSet
 from extra.wxFloatCanvas.PolygonStatic import PolygonArrow, PolygonShip
 
 # tp imports
-from tp.netlib.objects                        import Object
+from tp.netlib.objects                        import Object, OrderDescs
 from tp.netlib.objects.ObjectExtra.Universe   import Universe
 from tp.netlib.objects.ObjectExtra.Galaxy     import Galaxy
 from tp.netlib.objects.ObjectExtra.StarSystem import StarSystem
@@ -238,6 +238,32 @@ class Systems(SystemLevelOverlay):
 		"""
 		self.menumap = {}
 
+		# MoveTo quick add
+		# FIXME: Horrible hack!
+		moveorder = None
+		if not self.Selected is None:
+			for id in self.Selected.current.order_types:
+				orderdesc = OrderDescs()[id]
+
+				print orderdesc, orderdesc._name
+
+				if orderdesc._name in ("Move",) and moveorder is None:
+					def s(to, what=self.Selected.current, how=orderdesc, type=id):
+						print "move order what: %r to: %r how: %r" % (what, to, how)
+
+						neworder = how(0, what.id, -1, type, 0, [], to.pos)
+						neworder._dirty = True
+						self.parent.application.Post(self.parent.application.cache.CacheDirtyEvent("orders", "create", what.id, -1, neworder), source=self)
+
+					moveorder = s
+
+				if orderdesc._name in ("Move To", "Intercept"):
+					def s(to, what=self.Selected.current, how=orderdesc):
+						print "move order what: %r to: %r how: %r" % (what, to, how)
+					moveorder = s
+
+		print moveorder
+
 		menu = wx.Menu()
 		for obj in icon:
 			id = wx.NewId()
@@ -253,7 +279,21 @@ class Systems(SystemLevelOverlay):
 			else:
 				menu.Append(id, obj.name)
 
-		self.parent.Bind(wx.EVT_MENU, self.OnContextMenu)
+		if not moveorder is None:
+			submenu = wx.Menu()
+			for obj in icon:
+				id = wx.NewId()
+
+				def s(evt, obj=obj, moveorder=moveorder):
+					moveorder(obj)
+
+				self.menumap[id] = s
+				submenu.Append(id, "to %s" % obj.name)
+
+			menu.AppendSeparator()
+			menu.AppendMenu(wx.NewId(), "Move %s" % self.Selected.current.name, submenu)	
+
+		self.parent.Bind(wx.EVT_MENU, 		self.OnContextMenu)
 		self.parent.Bind(wx.EVT_MENU_CLOSE, self.OnContextMenuClose)
 
 		#pos	= self.canvas.WorldToPixel(icon.XY)

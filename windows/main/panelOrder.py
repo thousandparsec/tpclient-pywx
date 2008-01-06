@@ -79,6 +79,12 @@ class panelOrder(panelOrderBase):
 		"""\
 		Updates an order at a certain position in the list.
 		"""
+		print "UpdateListItem", slot, self.Orders.GetItemCount()
+		print self.Orders.objects, len(self.Orders.objects)
+
+		while slot >= self.Orders.GetItemCount():
+			self.Orders.InsertStringItem(slot, "") 
+
 		self.Orders.SetStringItem(slot, TURNS_COL, str(order.turns))
 		self.Orders.SetStringItem(slot, ORDERS_COL, order._name)
 		#self.Orders.SetToolTipItem(slot, _("Tip %s") % slot)
@@ -391,6 +397,10 @@ class panelOrder(panelOrderBase):
 		"""\
 		Called when the cache is updated.
 		"""
+		print evt
+		if isinstance(evt, self.application.cache.CacheDirtyEvent):
+			return
+
 		# If an object or the cache has updated - do a full update
 		if evt.what in ("objects", None):
 			self.OnSelectObject(self.application.gui.SelectObjectEvent(self.oid), force=True)
