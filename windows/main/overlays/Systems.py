@@ -189,6 +189,8 @@ class Systems(SystemLevelOverlay):
 		sizer.Add(self.ColorizeMode, proportion=1, flag=wx.EXPAND)
 		panel.SetSizer(sizer)
 
+		self.menu = None
+
 	def OnColorizeMode(self, evt):
 		cls = self.ColorizeMode.GetClientData(self.ColorizeMode.GetSelection())
 
@@ -230,6 +232,34 @@ class Systems(SystemLevelOverlay):
 		self.canvas.Draw()
 		return True
 
+	def ObjectRightClick(self, icon, hover):
+		"""
+		Popup a selection menu.
+		"""
+		self.menu = wx.Menu()
+		for obj in icon:
+			if obj == hover:
+				self.menu.AppendCheckItem(obj.id, obj.name)
+				self.menu.Check(obj.id, True)
+			else:
+				self.menu.Append(obj.id, obj.name)
+
+		self.parent.Bind(wx.EVT_MENU, self.OnContextMenu)
+		self.parent.Bind(wx.EVT_MENU_CLOSE, self.OnContextMenuClose)
+
+		pos	= self.canvas.WorldToPixel(icon.XY)
+		self.parent.PopupMenu(self.menu)
+
+	def OnContextMenu(self, evt):
+		menu = evt.GetEventObject()
+		item = menu.FindItemById(evt.GetId())
+
+		self.SelectObject(evt.GetId(), True)
+		self.parent.OnOverlayObjectSelected(self, evt.GetId())
+		
+	def OnContextMenuClose(self, evt):
+		self.menu = None
+
 	def ObjectHoverEnter(self, icon, pos):
 		"""
 		The pop-up contains details about what is in the system.
@@ -252,6 +282,9 @@ class Systems(SystemLevelOverlay):
 			self.canvas.Draw()
 
 	def ObjectHovering(self, icon, object):
+		if not self.menu is None:
+			return False
+
 		SystemLevelOverlay.ObjectHovering(self, icon, object)
 
 		self['preview-arrow'].Show()
