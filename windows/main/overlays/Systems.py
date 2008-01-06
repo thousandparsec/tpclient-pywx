@@ -189,7 +189,7 @@ class Systems(SystemLevelOverlay):
 		sizer.Add(self.ColorizeMode, proportion=1, flag=wx.EXPAND)
 		panel.SetSizer(sizer)
 
-		self.menu = None
+		self.menumap = None
 
 	def OnColorizeMode(self, evt):
 		cls = self.ColorizeMode.GetClientData(self.ColorizeMode.GetSelection())
@@ -236,29 +236,34 @@ class Systems(SystemLevelOverlay):
 		"""
 		Popup a selection menu.
 		"""
-		self.menu = wx.Menu()
+		self.menumap = {}
+
+		menu = wx.Menu()
 		for obj in icon:
+			id = wx.NewId()
+
+			def s(evt, obj=obj):
+				self.SelectObject(obj.id, True)
+				self.parent.OnOverlayObjectSelected(self, obj.id)
+			self.menumap[id] = s
+
 			if obj == hover:
-				self.menu.AppendCheckItem(obj.id, obj.name)
-				self.menu.Check(obj.id, True)
+				menu.AppendCheckItem(id, obj.name)
+				menu.Check(id, True)
 			else:
-				self.menu.Append(obj.id, obj.name)
+				menu.Append(id, obj.name)
 
 		self.parent.Bind(wx.EVT_MENU, self.OnContextMenu)
 		self.parent.Bind(wx.EVT_MENU_CLOSE, self.OnContextMenuClose)
 
-		pos	= self.canvas.WorldToPixel(icon.XY)
-		self.parent.PopupMenu(self.menu)
+		#pos	= self.canvas.WorldToPixel(icon.XY)
+		self.parent.PopupMenu(menu)
 
 	def OnContextMenu(self, evt):
-		menu = evt.GetEventObject()
-		item = menu.FindItemById(evt.GetId())
-
-		self.SelectObject(evt.GetId(), True)
-		self.parent.OnOverlayObjectSelected(self, evt.GetId())
+		self.menumap[evt.GetId()](evt)
 		
 	def OnContextMenuClose(self, evt):
-		self.menu = None
+		self.menumap = None
 
 	def ObjectHoverEnter(self, icon, pos):
 		"""
@@ -282,7 +287,7 @@ class Systems(SystemLevelOverlay):
 			self.canvas.Draw()
 
 	def ObjectHovering(self, icon, object):
-		if not self.menu is None:
+		if not self.menumap is None:
 			return False
 
 		SystemLevelOverlay.ObjectHovering(self, icon, object)
