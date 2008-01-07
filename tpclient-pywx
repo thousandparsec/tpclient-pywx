@@ -122,7 +122,7 @@ class EventBinder(dict):
 				
 				sentto.append(function)
 
-		print "I sent the following event %r to %r" % (event, sentto)
+		print "I sent the following event (from %r) %r to %r" % (event.source, event, sentto)
 
 class GUI(wx.App):
 	## These are window events
