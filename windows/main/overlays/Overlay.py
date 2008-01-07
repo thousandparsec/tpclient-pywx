@@ -74,6 +74,10 @@ class Overlay(dict):
 	def __del__(self):
 		self.CleanUp()
 
+	def __str__(self):
+		return "<Overlay-%s %s>" % (self.__class__.__name__, hex(id(self)))
+	__repr__ = __str__
+
 	def Update(self, oid=None):
 		"""\
 		Update the FloatCanvas objects for this oid.
