@@ -265,6 +265,7 @@ class panelStarMap(panelStarMapBase):
 		for Overlay in self.Overlay:
 			if evt.source == Overlay:
 				continue
+
 			if update:
 				Overlay.UpdateOne(evt.id)
 
@@ -275,6 +276,9 @@ class panelStarMap(panelStarMapBase):
 		Called when an order is selected.
 		"""
 		for Overlay in self.Overlay:
+			if evt.source == Overlay:
+				continue
+
 			try:
 				Overlay.SelectOrder(evt.id, evt.slots)
 			except AttributeError, e:
@@ -308,7 +312,6 @@ class panelStarMap(panelStarMapBase):
 		Called when an object is previewed on the starmap. Given the object id.
 		"""
 		self.application.Post(self.application.gui.PreviewObjectEvent(oid), source=overlay)
-		print "Previewed", oid
 
 	def OnOverlayOrderSelected(self, overlay, oid, slot):
 		"""
