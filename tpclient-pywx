@@ -112,7 +112,7 @@ class EventBinder(dict):
 					continue
 
 				# If source is an class, get the function off the class so we can check
-				if hasattr(event.source, function.__name__) and getattr(event.source, function.__name__) in sentto:
+				if hasattr(event.source, function.__name__) and getattr(event.source, function.__name__) == function:
 					continue
 
 				try:
