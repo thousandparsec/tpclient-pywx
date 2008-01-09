@@ -7,25 +7,103 @@
 
 #class StateTracker(object):
 class TrackerObject(object):
-	pass
+	"""
+	Tracks the state of the selected object. 
 
-class TrackerObjectOrder(object):
-	REFRESH_DIRTY    = 1
-	REFRESH_COMMITED = 2
+	Also provides a functionality to select an object.
+	"""
 
 	def __init__(self):
 		self.oid   = None
-		self.slots = []
 
 		self.application.gui.Binder(self.application.CacheClass.CacheUpdateEvent, self.OnCacheUpdate)
 		self.application.gui.Binder(self.application.gui.SelectObjectEvent,       self.OnSelectObject)
+
+	##########################################################################
+	# Callbacks for various events
+	##########################################################################
+	def OnCacheUpdate(self, evt):
+		"""
+		Called when something changes in the cache.
+		"""
+		assert self != evt.source, "Got event %s which I was the source of." % evt
+
+		# If there was a whole cache update
+		if evt.what is None:
+			# Refresh the currently selected object
+			if not self.oid is None:
+				self.ObjectRefresh(oid)
+			else:
+				self.ObjectSelect(None)
+
+	def OnSelectObject(self, evt):
+		"""
+		Called when something else selects an object.
+		"""
+		assert self != evt.source, "Got event %s which I was the source of." % evt
+
+		# Check that if object is not already selected
+		if self.oid == evt.id:
+			return
+
+		self.ObjectSelect(evt.id)
+
+	##########################################################################
+	# Methods called when state changes with an object
+	##########################################################################
+	def ObjectSelect(self, id):
+		"""
+		Called when an object is selected.
+	
+		(By default updates the currently selected oid.)
+		"""
+		self.oid = id
+	
+	def ObjectRefresh(self, id, object=None):
+		"""
+		Refresh the selected object.
+
+		If object is given then it should be used as the source of information,
+		otherwise the cache should be used.
+	
+		(By default calls SelectObject.)
+		"""
+		if object is None:
+			self.ObjectSelect(id)
+
+	##########################################################################
+	# Methods to change the state
+	##########################################################################
+	def SelectObject(self, id):
+		"""
+		Called to select an object.
+		"""
+		if self.oid == id:
+			return
+
+		self.ObjectSelect(id)
+		self.application.Post(self.application.gui.SelectObjectEvent(id), source=self)
+
+
+class TrackerObjectOrder(TrackerObject):
+	"""
+	Tracks the currently selected object and order.
+
+	Also provides a functionality to select an object and orders.
+	"""
+
+	def __init__(self):
+		TrackerObject.__init__(self)
+
+		self.slots = []
+
 		self.application.gui.Binder(self.application.gui.SelectOrderEvent,        self.OnSelectOrder)
 
 	##########################################################################
 	# Callbacks for various events
 	##########################################################################
 	def OnCacheUpdate(self, evt):
-		print evt
+		assert self != evt.source, "Got event %s which I was the source of." % evt
 
 		# If there was a whole cache update
 		if evt.what is None:
@@ -43,9 +121,10 @@ class TrackerObjectOrder(object):
 			return
 	
 		# Only interested in an CacheUpdates which are for the selected object
-		if evt.id != self.id:
+		if evt.id != self.oid:
 			return 
 
+		CacheDirtyEvent, CacheUpdateEvent = self.application.cache.CacheDirtyEvent, self.application.cache.CacheUpdateEvent
 		if evt.what == "objects":
 			if isinstance(evt, CacheDirtyEvent):
 				self.ObjectRefresh(evt.id, "---")
@@ -73,16 +152,13 @@ class TrackerObjectOrder(object):
 				if evt.action == "change":
 					self.OrderRefresh(evt.slot)
 
-				if evt.remove == "remove":
+				if evt.action == "remove":
 					self.OrderRemove(evt.slot)
 
 				return
 
 	def OnSelectObject(self, evt):
-		"""
-		Called when 
-		"""
-		print self, "OnSelectObject", evt
+		assert self != evt.source, "Got event %s which I was the source of." % evt
 
 		# Check that if object is not already selected
 		if self.oid == evt.id:
@@ -94,7 +170,10 @@ class TrackerObjectOrder(object):
 		self.ObjectSelect(evt.id)
 
 	def OnSelectOrder(self, evt):
-		print self, "OnSelectOrder", evt
+		"""
+		Called when something else selects an order.
+		"""
+		assert self != evt.source, "Got event %s which I was the source of." % evt
 
 		# Check this order is for the currently selected object
 		if self.oid != evt.id:
@@ -107,37 +186,17 @@ class TrackerObjectOrder(object):
 		self.OrdersSelect(evt.slots)
 
 	##########################################################################
-	# Methods called when state changes with an object
-	##########################################################################
-	def ObjectSelect(self, id):
-		"""
-		Called when an object is selected.
-		"""
-		self.oid = id
-	
-	def ObjectRefresh(self, id, object=None):
-		"""
-		Refresh the selected object.
-
-		If object is given then it should be used as the source of information,
-		otherwise the cache should be used.
-	
-		(By default calls SelectObject)
-		"""
-		if object is None:
-			self.ObjectSelect(id)
-
-	##########################################################################
 	# Methods called when state changes with the order
 	##########################################################################
 	def OrdersSelect(self, slots):
 		"""
-		Select an order (using slots)
+		Select an order (using slots).
 		"""
 		self.slots = slots
 
 	def OrderInsert(self, slot, override=None):
 		"""
+		Called when a new order is inserted.
 		"""
 		pass
 
@@ -155,22 +214,13 @@ class TrackerObjectOrder(object):
 
 	def OrderRemove(self, slot, override=None):
 		"""
+		Called when an order is removed.
 		"""
 		pass
 
 	##########################################################################
-	# Methods to change the state
+	# Methods to change the state (orders)
 	##########################################################################
-	def SelectObject(self, id):
-		"""
-		Called to select an object.
-		"""
-		if self.oid == id:
-			return
-
-		self.ObjectSelect(id)
-		self.application.Post(self.application.gui.SelectObjectEvent(id), source=self)
-
 	def SelectOrders(self, slots):
 		"""
 		Called to select orders on the current object.

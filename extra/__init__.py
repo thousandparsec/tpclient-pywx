@@ -354,6 +354,7 @@ class wxListCtrl(wx.ListCtrlOrig, mlc.ListCtrlAutoWidthMixin, mlc.ColumnSorterMi
 		ToolTipItemMixIn.__init__(self)
 
 		self.objects = []
+		self.ignore  = 0
 		self.Bind(wx.EVT_MOTION, self.OnMouseMotion)
 
 	#############################################################################
@@ -498,9 +499,11 @@ class wxListCtrl(wx.ListCtrlOrig, mlc.ListCtrlAutoWidthMixin, mlc.ColumnSorterMi
 
 		# Unselect the currently selected items
 		for slot in self.GetSelected():
+			self.ignore += 1
 			self.SetItemState(slot, 0, wx.LIST_STATE_SELECTED)
 
 		for slot in slots:
+			self.ignore += 1
 			self.SetItemState(slot, wx.LIST_STATE_SELECTED, wx.LIST_STATE_SELECTED)
 
 		self.Thaw()

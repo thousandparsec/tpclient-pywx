@@ -174,6 +174,7 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 		
 		# Set the order types to the first selection
 		if len(object.order_types) > 0:
+			self.Possible.Enable()
 			self.Possible.SetSelection(0)
 		else:
 			self.Possible.Disable()
@@ -186,9 +187,7 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 		del slots
 
 		# FIXME: This is not going to work
-		self.ignore = True
 		self.Orders.SetSelected(self.slots)
-		self.ignore = False
 
 		try:
 			object = self.application.cache.objects[self.oid]
@@ -216,7 +215,7 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 		Inserts the order into a slot.
 		"""
 		if override is None:
-			order = self.application.cache.orders[slot]
+			order = self.application.cache.orders[self.oid][slot]
 		else:
 			order = override
 
@@ -230,7 +229,7 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 		"""\
 		"""
 		if override is None:
-			order = self.application.cache.orders[slot]
+			order = self.application.cache.orders[self.oid][slot]
 		else:
 			order = override
 
@@ -258,9 +257,8 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 		"""\
 		Called when somebody selects an order.
 		"""
-		print "OnOrderSelect", evt
-
-		if self.ignore:
+		if self.Orders.ignore > 0:
+			self.Orders.ignore -= 1
 			return
 
 		slots = self.Orders.GetSelected()
@@ -333,8 +331,8 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 	OnDelete = OnOrderDelete
 
 	def OnRevert(self, evt):
-		pass
 #		self.OnOrderSelect(evt, force=True)
+		pass
 
 	def OnOrderDirty(self, evt):
 		"""\
