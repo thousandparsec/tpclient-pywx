@@ -95,7 +95,7 @@ class PieChart(XYObjectMixin, LineOnlyMixin, DrawObject):
     def CalculatePoints(self):
         # add the zero point to start
         Values = N.vstack( ( (0,), self.Values) )
-        self.Angles = 360. * Values.cumsum()/Values.sum()
+        self.Angles = 270 - 360. * Values.cumsum()/Values.sum()
         self.CalcBoundingBox()
         
     def SetBrushes(self):
@@ -123,13 +123,18 @@ class PieChart(XYObjectMixin, LineOnlyMixin, DrawObject):
         else:
             Diameter = self.Diameter
         dc.SetPen(self.Pen)
+        PreviousEndXY = (0,0)
         for i, brush in enumerate(self.Brushes):
             dc.SetBrush( brush )
             Radius = Diameter/2
-            FromAngle = self.toRAD(self.Angles[i+1])
-            ToAngle = self.toRAD(self.Angles[i])
-            StartXY = CenterXY + (Radius * cos(FromAngle), Radius * sin(FromAngle))
+            ToAngle = self.toRAD(self.Angles[i+1])
+            FromAngle = self.toRAD(self.Angles[i])
             EndXY = CenterXY + (Radius * cos(ToAngle), Radius * sin(ToAngle))
+            if not (PreviousEndXY[0] == 0 and PreviousEndXY[1] == 0):
+                StartXY = PreviousEndXY
+            else:
+                StartXY = CenterXY + (Radius * cos(FromAngle), Radius * sin(FromAngle))
+            PreviousEndXY = EndXY
             dc.DrawArc(StartXY[0], StartXY[1], EndXY[0], EndXY[1], CenterXY[0], CenterXY[1])
         if HTdc and self.HitAble:
             if self.Scaled:

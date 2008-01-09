@@ -230,6 +230,7 @@ class panelStarMap(panelStarMapBase):
 			else:
 				self.OnDisplayMode(None)		
 
+			self.ZoomLevel.SetValue("Fit")
 			self.OnZoomLevel('fit')
 			self.Canvas.Draw()
 
