@@ -161,7 +161,8 @@ class FleetIcon(Group, Holder, IconMixIn):
 
 		Group.__init__(self, ObjectList, False)
 
-class Systems(SystemLevelOverlay):
+from extra.StateTracker import TrackerObjectOrder
+class Systems(SystemLevelOverlay, TrackerObjectOrder):
 	name     = "Systems"
 	toplevel = Galaxy, Universe
 
@@ -190,6 +191,8 @@ class Systems(SystemLevelOverlay):
 		panel.SetSizer(sizer)
 
 		self.menumap = None
+
+		TrackerObjectOrder.__init__(self)
 
 	def OnColorizeMode(self, evt):
 		cls = self.ColorizeMode.GetClientData(self.ColorizeMode.GetSelection())
@@ -249,11 +252,12 @@ class Systems(SystemLevelOverlay):
 
 				if orderdesc._name in ("Move",) and moveorder is None:
 					def s(to, what=self.Selected.current, how=orderdesc, type=id):
-						print "move order what: %r to: %r how: %r" % (what, to, how)
+						print "move order what: %r to: %r (%r) how: %r" % (what, to, to.pos, how)
 
 						neworder = how(0, what.id, -1, type, 0, [], to.pos)
 						neworder._dirty = True
-						self.parent.application.Post(self.parent.application.cache.CacheDirtyEvent("orders", "create", what.id, -1, neworder), source=self)
+
+						self.AppendOrder(neworder)
 
 					moveorder = s
 
@@ -269,8 +273,7 @@ class Systems(SystemLevelOverlay):
 			id = wx.NewId()
 
 			def s(evt, obj=obj):
-				self.SelectObject(obj.id, True)
-				self.parent.OnOverlayObjectSelected(self, obj.id)
+				self.SelectObject(obj.id)
 			self.menumap[id] = s
 
 			if obj == hover:
