@@ -75,12 +75,13 @@ class panelStarMap(panelStarMapBase, TrackerObject):
 		TrackerObject.__init__(self)
 
 	def OnMouseEnter(self, evt):
-		print "OnMouseEnter!", evt
+#		print "OnMouseEnter!", evt
 		# FIXME: Should make sure we gain the keyboard focus
-		self.Canvas.SetFocus()
+#		self.Canvas.SetFocus()
+		pass
 
 	def OnMouseLeave(self, evt):
-		print "OnMouseLeave!", evt
+#		print "OnMouseLeave!", evt
 		# FIXME: Put the keyboard focus back where it was
 		pass
 
