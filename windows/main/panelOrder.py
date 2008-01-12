@@ -105,7 +105,7 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 		self.ColourListItem(slot, wx.BLACK)
 		self.Orders.SetItemPyData(slot, order)
 		
-	def RemoveListItem(self, slot, order=None):
+	def RemoveListItem(self, slot):
 		"""\
 		Removes an order from a position in the list.
 		"""
@@ -119,8 +119,6 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 		"""\
 		Called when an object is selected.
 		"""
-		TrackerObjectOrder.ObjectSelect(self, id)
-
 		# Hide the order panel when no object is selected
 		if id is None:
 			self.Master.Hide()
@@ -183,9 +181,6 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 	# Methods called when state changes with the order
 	##########################################################################
 	def OrdersSelect(self, slots):
-		TrackerObjectOrder.OrdersSelect(self, slots)
-		del slots
-
 		# FIXME: This is not going to work
 		self.Orders.SetSelected(self.slots)
 
@@ -219,6 +214,8 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 		else:
 			order = override
 
+		print "OrderInsert", repr(order)
+
 		# Update the list box
 		self.InsertListItem(slot, order)
 
@@ -239,14 +236,16 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 		if not override is None:
 			self.ColourListItem(slot, wx.BLUE)
 
-	def OrderRemove(self, slot, override=None):
+	def OrdersRemove(self, slots, overrides=None):
 		"""\
 		Deletes the order from a slot.
 		"""
-		if override is None:
-			self.RemoveListItem(slot, order)
+		if overrides is None:
+			for slot in slots:
+				self.RemoveListItem(slot)
 		else:
-			self.ColourListItem(slot, wx.RED)
+			for slot in slots:
+				self.ColourListItem(slot, wx.RED)
 			
 
 	####################################################
@@ -301,19 +300,16 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 		"""\
 		Called to delete the selected orders.
 		"""
-		slots = self.Orders.GetSelected()
-		for slot in slots:
-			self.RemoveOrder(slot, self.Orders.GetItemPyData(slot))
+		self.RemoveOrders()
 
 	def OnOrderSave(self, evt):
 		"""\
 		Called to save the current selected orders.
 		"""
 		# Figure out which slot is selected
-		slots = self.Orders.GetSelected()
-		if len(slots) != 1:
+		if len(self.slots) != 1:
 			return
-		slot = slots[0]
+		slot = self.slots[0]
 		
 		# Check we arn't trying to save an order with a pending changes
 		order = self.Orders.GetItemPyData(slot)
@@ -324,7 +320,7 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 		# Update the order
 		order = self.FromPanel(order)
 
-		self.ChangeOrder(slot, order)
+		self.ChangeOrder(order)
 
 	OnNew    = OnOrderNew
 	OnSave   = OnOrderSave
@@ -474,7 +470,7 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 	def FromPanel(self, order):
 		orderdesc = objects.OrderDescs()[order.subtype]
 		
-		args = [order.sequence, order.id, order.slot, order.subtype, 0, []]
+		args = [order.sequence, order.id, -1, order.subtype, 0, []]
 		subpanels = copy.copy(self.ArgumentsChildren)
 		for name, type in orderdesc.names:
 			panel = subpanels.pop(0)
