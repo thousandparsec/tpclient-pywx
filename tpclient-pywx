@@ -139,6 +139,7 @@ class GUI(wx.App):
 		def __init__(self, id):
 			wxPyEvent.__init__(self)
 
+			assert(id > 0)
 			self.id = id
 	
 		def __str__(self):
@@ -171,6 +172,10 @@ class GUI(wx.App):
 			self.id = id
 			if not hasattr(slots, '__getitem__'):
 				slots = [slots]
+
+			for slot in slots:
+				assert(slot > 0)
+
 			self.slots = slots
 		
 		def __str__(self):
