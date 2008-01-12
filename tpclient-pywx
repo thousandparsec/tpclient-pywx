@@ -174,7 +174,7 @@ class GUI(wx.App):
 				slots = [slots]
 
 			for slot in slots:
-				assert(slot > 0)
+				assert(slot >= 0)
 
 			self.slots = slots
 		
