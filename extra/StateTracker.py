@@ -1,4 +1,6 @@
 
+from extra.decorators import *
+
 # Raised when the game cache is made dirty. Contains a reference to what was updated.
 #  -- CacheDirtyEvent
 
@@ -16,6 +18,7 @@ class TrackerObject(object):
 	def __init__(self):
 		self.oid   = None
 
+		self.application.gui.Binder(self.application.CacheClass.CacheDirtyEvent,  self.OnCacheUpdate)
 		self.application.gui.Binder(self.application.CacheClass.CacheUpdateEvent, self.OnCacheUpdate)
 		self.application.gui.Binder(self.application.gui.SelectObjectEvent,       self.OnSelectObject)
 		self.application.gui.Binder(self.application.gui.PreviewObjectEvent,      self.OnPreviewObject)
@@ -23,11 +26,12 @@ class TrackerObject(object):
 	##########################################################################
 	# Callbacks for various events
 	##########################################################################
+	@freeze_wrapper
 	def OnCacheUpdate(self, evt):
 		"""
 		Called when something changes in the cache.
 		"""
-		assert self != evt.source, "Got event %s which I was the source of." % evt
+		assert(self != evt.source, "Got event %s which I was the source of." % evt)
 
 		# If there was a whole cache update
 		if evt.what is None:
@@ -37,11 +41,12 @@ class TrackerObject(object):
 			else:
 				self._ObjectSelect(None)
 
+	@freeze_wrapper
 	def OnSelectObject(self, evt):
 		"""
 		Called when something else selects an object.
 		"""
-		assert self != evt.source, "Got event %s which I was the source of." % evt
+		assert(self != evt.source, "Got event %s which I was the source of." % evt)
 
 		# Check that if object is not already selected
 		if self.oid == evt.id:
@@ -49,11 +54,12 @@ class TrackerObject(object):
 
 		self._ObjectSelect(evt.id)
 
+	@freeze_wrapper
 	def OnPreviewObject(self, evt):
 		"""
 		Called when something else previews an object.
 		"""
-		assert self != evt.source, "Got event %s which I was the source of." % evt
+		assert(self != evt.source, "Got event %s which I was the source of." % evt)
 
 		# Check that if object is not already selected
 		if self.oid == evt.id:
@@ -118,6 +124,8 @@ class TrackerObject(object):
 		self.application.Post(self.application.gui.PreviewObjectEvent(oid), source=self)
 
 
+from tp.netlib.objects import Order
+
 class TrackerObjectOrder(TrackerObject):
 	"""
 	Tracks the currently selected object and order.
@@ -136,7 +144,8 @@ class TrackerObjectOrder(TrackerObject):
 	# Callbacks for various events
 	##########################################################################
 	def OnCacheUpdate(self, evt):
-		assert self != evt.source, "Got event %s which I was the source of." % evt
+		assert(self != evt.source, "Got event %s which I was the source of." % evt)
+
 
 		# If there was a whole cache update
 		if evt.what is None:
@@ -160,7 +169,7 @@ class TrackerObjectOrder(TrackerObject):
 		CacheDirtyEvent, CacheUpdateEvent = self.application.cache.CacheDirtyEvent, self.application.cache.CacheUpdateEvent
 		if evt.what == "objects":
 			if isinstance(evt, CacheDirtyEvent):
-				self.ObjectRefresh(evt.id, "---")
+				self.ObjectRefresh(evt.id, evt.change)
 			if isinstance(evt, CacheUpdateEvent):
 				self.ObjectRefresh(evt.id)
 			return
@@ -168,13 +177,13 @@ class TrackerObjectOrder(TrackerObject):
 		if evt.what == "orders":
 			if isinstance(evt, CacheDirtyEvent):
 				if evt.action == "create":
-					self.OrderInsert(evt.slot, "---")
+					self.OrderInsert(evt.slot, evt.change)
 
 				if evt.action == "change":
-					self.OrderRefresh(evt.slot, "---")
+					self.OrderRefresh(evt.slot, evt.change)
 
-				if evt.remove == "remove":
-					self.OrdersRemove(evt.slots, "---")
+				if evt.action == "remove":
+					self.OrdersRemove(evt.slots, True)
 
 				return
 
@@ -186,13 +195,20 @@ class TrackerObjectOrder(TrackerObject):
 					self.OrderRefresh(evt.slot)
 
 				if evt.action == "remove":
-					self._OrdersSelect([])
+					# Unselect any slots which are being removed
+					leftslots = []
+					for slot in self.slots:
+						if not slot in evt.slots:
+							leftslots.append(slot)
+					if self.slots != leftslots:
+						self._OrdersSelect(leftslots)
+
 					self.OrdersRemove(evt.slots)
 
 				return
 
 	def OnSelectObject(self, evt):
-		assert self != evt.source, "Got event %s which I was the source of." % evt
+		assert(self != evt.source, "Got event %s which I was the source of." % evt)
 
 		# Check that if object is not already selected
 		if self.oid == evt.id:
@@ -203,11 +219,16 @@ class TrackerObjectOrder(TrackerObject):
 
 		self._ObjectSelect(evt.id)
 
+	def _ObjectSelect(self, id):
+		self.oid = id
+		self.ObjectSelect(id)
+		self._OrdersSelect([])
+
 	def OnSelectOrder(self, evt):
 		"""
 		Called when something else selects an order.
 		"""
-		assert self != evt.source, "Got event %s which I was the source of." % evt
+		assert(self != evt.source, "Got event %s which I was the source of." % evt)
 
 		# Check this order is for the currently selected object
 		if self.oid != evt.id:
@@ -253,7 +274,7 @@ class TrackerObjectOrder(TrackerObject):
 		if override is None:
 			self.SelectOrder(slots)
 
-	def OrdersRemove(self, slots, overrides=None):
+	def OrdersRemove(self, slots, override=False):
 		"""
 		Called when an order is removed.
 		"""
@@ -268,8 +289,9 @@ class TrackerObjectOrder(TrackerObject):
 		"""
 		# Select orders is only valid when an object is selected
 		assert(self.oid != None)
+		# Slots must be posative
 		for slot in slots:
-			assert(slot > 0)
+			assert(slot >= 0)
 
 		if self.slots == slots:
 			return
@@ -280,6 +302,8 @@ class TrackerObjectOrder(TrackerObject):
 	def InsertOrder(self, order, slot=None):
 		# Insert order is only valid when an object is selected
 		assert(self.oid != None)
+		# Order must be an order, duh!
+		assert(isinstance(order, Order))
 
 		if slot is None:
 			if len(self.slots) > 0:
@@ -287,11 +311,14 @@ class TrackerObjectOrder(TrackerObject):
 			else:
 				slot = -1
 
+		self.OrderInsert(slot, order)
 		self.application.Post(self.application.cache.CacheDirtyEvent("orders", "create", self.oid, slot, order), source=self)
 
 	def AppendOrder(self, order, slot=None):
 		# Append order is only valid when an object is selected
 		assert(self.oid != None)
+		# Order must be an order, duh!
+		assert(isinstance(order, Order))
 
 		if slot is None:
 			if len(self.slots) > 0:
@@ -301,11 +328,14 @@ class TrackerObjectOrder(TrackerObject):
 		else:
 			slot += 1
 
+		self.OrderInsert(slot, order)
 		self.application.Post(self.application.cache.CacheDirtyEvent("orders", "create", self.oid, slot, order), source=self)
 
 	def DirtyOrder(self, order, slot=None):
 		# Dirty order is only valid when an object is selected
 		assert(self.oid != None)
+		# Order must be an order, duh!
+		assert(isinstance(order, Order))
 
 		if slot is None:
 			assert(len(self.slots) == 1)
@@ -316,11 +346,14 @@ class TrackerObjectOrder(TrackerObject):
 	def ChangeOrder(self, order, slot=None):
 		# Change order is only valid when an object is selected
 		assert(self.oid != None)
+		# Order must be an order, duh!
+		assert(isinstance(order, Order))
 
 		if slot is None:
 			assert(len(self.slots) == 1)
 			slot = self.slots[0]
 
+		self.OrderRefresh(slot, order)
 		self.application.Post(self.application.cache.CacheDirtyEvent("orders", "change", self.oid, slot, order), source=self)
 
 	def RemoveOrders(self, slots=None):
@@ -331,5 +364,6 @@ class TrackerObjectOrder(TrackerObject):
 			assert(len(self.slots) > 0)
 			slots = self.slots
 
+		self.OrdersRemove(slots, True)
 		self.application.Post(self.application.cache.CacheDirtyEvent("orders", "remove", self.oid, slots=slots), source=self)
 
