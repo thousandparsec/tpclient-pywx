@@ -10,6 +10,8 @@ import wx
 from extra.wxFloatCanvas import FloatCanvas
 from extra.wxFloatCanvas.FloatCanvas   import Point, Group, Line
 
+from extra.StateTracker import TrackerObjectOrder
+
 # tp imports
 from tp.netlib.objects                        import Object
 from tp.netlib.objects                        import Order
@@ -29,13 +31,13 @@ def FindPath(cache, obj):
 		raise TypeError("Object must be an object not %r" % obj)
 
 	locations = [(-1, obj.pos)]
-	for order in cache.orders[obj.id]:
+	for slot, order in enumerate(cache.orders[obj.id]):
 		# FIXME: Needs to be a better way to do this...
 		if order._name in ("Move", "Move To", "Intercept"):
 			if hasattr(order, "pos"):
-				locations.append((order.slot, order.pos))
+				locations.append((slot, order.pos))
 			if hasattr(order, "to"):
-				locations.append((order.slot, cache.objects[order.to].pos))
+				locations.append((slot, cache.objects[order.to].pos))
 	if len(locations) == 1:
 		return None
 	return locations
@@ -76,10 +78,6 @@ class PathSegment(Group):
 	XY = property(XY)
 
 	def __init__(self, what, endingat, previous):
-		# Check the what parameter
-		if not isinstance(what, Order):
-			raise TypeError("The what parameter must be an Order object")
-
 		# Check the ending at parameter
 		# Must be a set of corrdinates or an object
 
@@ -159,7 +157,7 @@ class PathSegment(Group):
 			self.SetState(self.States.Inactive)
 
 # FIXME: The hitpath and the actual path should be seperated for speed reasons..
-class Paths(Overlay):
+class Paths(Overlay, TrackerObjectOrder):
 	"""\
 	Draws a path of ships and similar objects.
 	"""
@@ -170,15 +168,31 @@ class Paths(Overlay):
 	def __init__(self, parent, canvas, panel, cache, *args, **kw):
 		Overlay.__init__(self, parent, canvas, panel, cache, *args, **kw)
 
-		self.oid = None
+		TrackerObjectOrder.__init__(self)	
 		self.active = []
 
 	def UpdateOne(self, oid, overrides={}):
+		# Remove all the previous segments
+		for nid, slot in self.keys():
+			if oid == nid:
+				del self[(oid, slot)]
+
+		if oid == self.oid:
+			self.active = []
+
+		# Create the new path
 		path = FindPath(self.cache, self.cache.objects[oid])
 		if not path is None:
 			previous = self.cache.objects[oid]
 			for slot, end in path[1:]:
-				segment = PathSegment(self.cache.orders[oid][slot], end, previous)
+				segment = PathSegment((oid, slot), end, previous)
+
+				# Make sure the selected bits are still selected..
+				if oid == self.oid:
+					segment.Active(True)
+					if slot in self.slots:
+						segment.Select(True)
+					self.active.append(segment)
 
 				self[(oid, slot)] = segment
 
@@ -195,18 +209,12 @@ class Paths(Overlay):
 
 				previous = segment
 
-
-	def SelectObject(self, oid, force=False):
+	def ObjectSelect(self, oid):
 		"""
 		Select an object using an external event.
 
 		Simulates this as a mouse click.
 		"""
-		if self.oid == oid and not force:
-			return
-		else:
-			self.oid = oid
-
 		# FIXME: This is kind of suckily slow!
 		for nid, slot in self.keys():
 			if oid == nid:
@@ -216,14 +224,14 @@ class Paths(Overlay):
 
 		self.canvas.Draw(True)
 
-	def SelectOrder(self, id, slots):
+	def OrdersSelect(self, slots):
 		for active in self.active:
 			active.Select(False)
 
 		self.active = []
 		for slot in slots:
 			try:
-				self.active.append(self[(id, slot)])
+				self.active.append(self[(self.oid, slot)])
 			except KeyError:
 				pass
 
@@ -232,9 +240,26 @@ class Paths(Overlay):
 
 		self.canvas.Draw(True)
 
+	def OrderInsert(self, slot, override=None):
+		if not override is None:
+			return
+
+		self.UpdateOne(self.oid)
+		self.canvas.Draw()
+
+	def OrderRefresh(self, slot, override=None):
+		pass
+
+	def OrdersRemove(self, slots, overrides=None):
+		if not overrides is None:
+			return
+
+		self.UpdateOne(self.oid)
+		self.canvas.Draw()
+
 	def OnClickSegment(self, evt):
-		self.parent.OnOverlayObjectSelected(self, evt.what.id)
-		self.parent.OnOverlayOrderSelected(self, evt.what.id, evt.what.slot)
+		self.SelectObject(evt.what[0])
+		self.SelectOrders([evt.what[1]])
 
 	def Empty(self, evt):
 		pass
