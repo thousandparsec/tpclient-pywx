@@ -18,6 +18,7 @@ class TrackerObject(object):
 
 		self.application.gui.Binder(self.application.CacheClass.CacheUpdateEvent, self.OnCacheUpdate)
 		self.application.gui.Binder(self.application.gui.SelectObjectEvent,       self.OnSelectObject)
+		self.application.gui.Binder(self.application.gui.PreviewObjectEvent,      self.OnPreviewObject)
 
 	##########################################################################
 	# Callbacks for various events
@@ -34,7 +35,7 @@ class TrackerObject(object):
 			if not self.oid is None:
 				self.ObjectRefresh(oid)
 			else:
-				self.ObjectSelect(None)
+				self._ObjectSelect(None)
 
 	def OnSelectObject(self, evt):
 		"""
@@ -46,18 +47,40 @@ class TrackerObject(object):
 		if self.oid == evt.id:
 			return
 
-		self.ObjectSelect(evt.id)
+		self._ObjectSelect(evt.id)
+
+	def OnPreviewObject(self, evt):
+		"""
+		Called when something else previews an object.
+		"""
+		assert self != evt.source, "Got event %s which I was the source of." % evt
+
+		# Check that if object is not already selected
+		if self.oid == evt.id:
+			return
+
+		self.ObjectPreview(evt.id)
 
 	##########################################################################
 	# Methods called when state changes with an object
 	##########################################################################
+	def _ObjectSelect(self, id):
+		self.oid = id
+		self.ObjectSelect(id)
+
 	def ObjectSelect(self, id):
 		"""
 		Called when an object is selected.
-	
-		(By default updates the currently selected oid.)
 		"""
-		self.oid = id
+		pass
+
+	def ObjectPreview(self, id):
+		"""
+		Called when an object is "previewed".
+		
+		(By default calls ObjectSelect method).
+		"""
+		self._ObjectSelect(id)
 	
 	def ObjectRefresh(self, id, object=None):
 		"""
@@ -69,7 +92,7 @@ class TrackerObject(object):
 		(By default calls SelectObject.)
 		"""
 		if object is None:
-			self.ObjectSelect(id)
+			self._ObjectSelect(id)
 
 	##########################################################################
 	# Methods to change the state
@@ -81,8 +104,18 @@ class TrackerObject(object):
 		if self.oid == id:
 			return
 
-		self.ObjectSelect(id)
+		self._ObjectSelect(id)
 		self.application.Post(self.application.gui.SelectObjectEvent(id), source=self)
+
+	def PreviewObject(self, id):
+		"""
+		Called to select an object.
+		"""
+		if self.oid == id:
+			return
+
+		self.ObjectPreview(id)
+		self.application.Post(self.application.gui.PreviewObjectEvent(oid), source=self)
 
 
 class TrackerObjectOrder(TrackerObject):
@@ -111,7 +144,7 @@ class TrackerObjectOrder(TrackerObject):
 			if not self.oid is None:
 				self.ObjectRefresh(oid)
 			else:
-				self.ObjectSelect(None)
+				self._ObjectSelect(None)
 
 			# Refresh the currently selected order
 			if len(self.slots) > 0:
@@ -141,7 +174,7 @@ class TrackerObjectOrder(TrackerObject):
 					self.OrderRefresh(evt.slot, "---")
 
 				if evt.remove == "remove":
-					self.OrderRemove(evt.slot, "---")
+					self.OrdersRemove(evt.slots, "---")
 
 				return
 
@@ -153,7 +186,8 @@ class TrackerObjectOrder(TrackerObject):
 					self.OrderRefresh(evt.slot)
 
 				if evt.action == "remove":
-					self.OrderRemove(evt.slot)
+					self._OrdersSelect([])
+					self.OrdersRemove(evt.slots)
 
 				return
 
@@ -167,7 +201,7 @@ class TrackerObjectOrder(TrackerObject):
 		# Clear the selected slots
 		self.slots = []
 
-		self.ObjectSelect(evt.id)
+		self._ObjectSelect(evt.id)
 
 	def OnSelectOrder(self, evt):
 		"""
@@ -183,16 +217,23 @@ class TrackerObjectOrder(TrackerObject):
 		if self.slots == evt.slots:
 			return
 
-		self.OrdersSelect(evt.slots)
+		self._OrdersSelect(evt.slots)
 
 	##########################################################################
 	# Methods called when state changes with the order
 	##########################################################################
-	def OrdersSelect(self, slots):
+	def _OrdersSelect(self, slots):
 		"""
 		Select an order (using slots).
 		"""
 		self.slots = slots
+		self.OrdersSelect(slots)
+
+	def OrdersSelect(self, slots):
+		"""
+		Select an order (using slots).
+		"""
+		pass
 
 	def OrderInsert(self, slot, override=None):
 		"""
@@ -212,7 +253,7 @@ class TrackerObjectOrder(TrackerObject):
 		if override is None:
 			self.SelectOrder(slots)
 
-	def OrderRemove(self, slot, override=None):
+	def OrdersRemove(self, slots, overrides=None):
 		"""
 		Called when an order is removed.
 		"""
@@ -225,23 +266,70 @@ class TrackerObjectOrder(TrackerObject):
 		"""
 		Called to select orders on the current object.
 		"""
+		# Select orders is only valid when an object is selected
+		assert(self.oid != None)
+		for slot in slots:
+			assert(slot > 0)
+
 		if self.slots == slots:
 			return
 
-		self.OrdersSelect(slots)
+		self._OrdersSelect(slots)
 		self.application.Post(self.application.gui.SelectOrderEvent(self.oid, slots), source=self)
 
-	def InsertOrder(self, slot, order):
+	def InsertOrder(self, order, slot=None):
+		# Insert order is only valid when an object is selected
+		assert(self.oid != None)
+
+		if slot is None:
+			if len(self.slots) > 0:
+				slot = self.slots[0]
+			else:
+				slot = -1
+
 		self.application.Post(self.application.cache.CacheDirtyEvent("orders", "create", self.oid, slot, order), source=self)
 
-	def DirtyOrder(self, slot, order):
-		order.slot = slot
+	def AppendOrder(self, order, slot=None):
+		# Append order is only valid when an object is selected
+		assert(self.oid != None)
+
+		if slot is None:
+			if len(self.slots) > 0:
+				slot = self.slots[-1]+1
+			else:
+				slot = -1
+		else:
+			slot += 1
+
+		self.application.Post(self.application.cache.CacheDirtyEvent("orders", "create", self.oid, slot, order), source=self)
+
+	def DirtyOrder(self, order, slot=None):
+		# Dirty order is only valid when an object is selected
+		assert(self.oid != None)
+
+		if slot is None:
+			assert(len(self.slots) == 1)
+			slot = self.slots[0]
+
 		self.application.Post(self.application.gui.DirtyOrderEvent(order), source=self)
 
-	def ChangeOrder(self, slot, order):
-		order.slot = slot
+	def ChangeOrder(self, order, slot=None):
+		# Change order is only valid when an object is selected
+		assert(self.oid != None)
+
+		if slot is None:
+			assert(len(self.slots) == 1)
+			slot = self.slots[0]
+
 		self.application.Post(self.application.cache.CacheDirtyEvent("orders", "change", self.oid, slot, order), source=self)
 
-	def RemoveOrder(self, slot, order=None):
-		self.application.Post(self.application.cache.CacheDirtyEvent("orders", "remove", self.oid, slot, order), source=self)
+	def RemoveOrders(self, slots=None):
+		# Remove orders is only valid when an object is selected
+		assert(self.oid != None)
+
+		if slots is None:
+			assert(len(self.slots) > 0)
+			slots = self.slots
+
+		self.application.Post(self.application.cache.CacheDirtyEvent("orders", "remove", self.oid, slots=slots), source=self)
 
