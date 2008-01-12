@@ -209,12 +209,20 @@ class Paths(Overlay, TrackerObjectOrder):
 
 				previous = segment
 
+	def ClearActive(self):
+		for active in self.active:
+			active.Select(False)
+
+		self.active = []
+
 	def ObjectSelect(self, oid):
 		"""
 		Select an object using an external event.
 
 		Simulates this as a mouse click.
 		"""
+		self.ClearActive()
+
 		# FIXME: This is kind of suckily slow!
 		for nid, slot in self.keys():
 			if oid == nid:
@@ -225,10 +233,8 @@ class Paths(Overlay, TrackerObjectOrder):
 		self.canvas.Draw(True)
 
 	def OrdersSelect(self, slots):
-		for active in self.active:
-			active.Select(False)
+		self.ClearActive()
 
-		self.active = []
 		for slot in slots:
 			try:
 				self.active.append(self[(self.oid, slot)])
@@ -250,8 +256,8 @@ class Paths(Overlay, TrackerObjectOrder):
 	def OrderRefresh(self, slot, override=None):
 		pass
 
-	def OrdersRemove(self, slots, overrides=None):
-		if not overrides is None:
+	def OrdersRemove(self, slots, override=False):
+		if override:
 			return
 
 		self.UpdateOne(self.oid)

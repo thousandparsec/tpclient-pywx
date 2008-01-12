@@ -6,6 +6,8 @@ The order window.
 import time
 import copy
 
+from extra.decorators import *
+
 # wxPython Imports
 import wx
 
@@ -217,9 +219,10 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 		print "OrderInsert", repr(order)
 
 		# Update the list box
-		self.InsertListItem(slot, order)
-
-		if not override is None:
+		if override is None:
+			self.UpdateListItem(slot, order)
+		else:
+			self.InsertListItem(slot, order)
 			self.ColourListItem(slot, wx.BLUE)
 
 	def OrderRefresh(self, slot, override=None):
@@ -236,22 +239,23 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 		if not override is None:
 			self.ColourListItem(slot, wx.BLUE)
 
-	def OrdersRemove(self, slots, overrides=None):
+	def OrdersRemove(self, slots, override=False):
 		"""\
 		Deletes the order from a slot.
 		"""
-		if overrides is None:
-			for slot in slots:
-				self.RemoveListItem(slot)
-		else:
+		if override:
 			for slot in slots:
 				self.ColourListItem(slot, wx.RED)
+		else:
+			for slot in slots:
+				self.RemoveListItem(slot)
 			
 
 	####################################################
 	# Local Event Handlers
 	####################################################
 
+	@freeze_wrapper
 	def OnOrderSelect(self, evt):
 		"""\
 		Called when somebody selects an order.
@@ -265,6 +269,7 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 			return
 		self.SelectOrders(slots)
 		
+	@freeze_wrapper
 	def OnOrderNew(self, evt, after=True):
 		"""\
 		Called to add a new order.
@@ -294,14 +299,16 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 		new._dirty = True
 
 		# Insert the new order
-		self.InsertOrder(slot, new)
+		self.InsertOrder(new, slot)
 
+	@freeze_wrapper
 	def OnOrderDelete(self, evt):
 		"""\
 		Called to delete the selected orders.
 		"""
 		self.RemoveOrders()
 
+	@freeze_wrapper
 	def OnOrderSave(self, evt):
 		"""\
 		Called to save the current selected orders.
@@ -326,10 +333,12 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 	OnSave   = OnOrderSave
 	OnDelete = OnOrderDelete
 
+	@freeze_wrapper
 	def OnRevert(self, evt):
 #		self.OnOrderSelect(evt, force=True)
 		pass
 
+	@freeze_wrapper
 	def OnOrderDirty(self, evt):
 		"""\
 		Called when an order is updated but not yet saved.
@@ -355,6 +364,7 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 	####################################################
 	# Panel Functions
 	####################################################
+	@freeze_wrapper
 	def BuildPanel(self, order):
 		"""\
 		Builds a panel for the entering of orders arguments.
