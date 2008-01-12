@@ -10,6 +10,8 @@ import numpy as N
 
 # wxPython imports
 import wx
+
+from extra.StateTracker import TrackerObject
 from extra.wxFloatCanvas import FloatCanvas
 
 from overlays.Resource import Resource
@@ -20,7 +22,7 @@ from windows.xrc.panelStarMap import panelStarMapBase
 
 from tp.netlib.objects import OrderDescs
 
-class panelStarMap(panelStarMapBase):
+class panelStarMap(panelStarMapBase, TrackerObject):
 	title = _("StarMap")
 
 	Overlays = [(Paths, Systems), (Paths, Resource)]
@@ -70,11 +72,7 @@ class panelStarMap(panelStarMapBase):
 		self.Bind(wx.EVT_ENTER_WINDOW, self.OnMouseEnter)
 		self.Bind(wx.EVT_LEAVE_WINDOW, self.OnMouseLeave)
 
-		self.application.gui.Binder(self.application.CacheClass.CacheUpdateEvent, self.OnCacheUpdate)
-		self.application.gui.Binder(self.application.gui.SelectObjectEvent, self.OnSelectObject)
-		self.application.gui.Binder(self.application.gui.SelectOrderEvent,  self.OnSelectOrder)
-
-		self.oid = None
+		TrackerObject.__init__(self)
 
 	def OnMouseEnter(self, evt):
 		print "OnMouseEnter!", evt
@@ -235,21 +233,13 @@ class panelStarMap(panelStarMapBase):
 			self.OnZoomLevel('fit')
 			self.Canvas.Draw()
 
-		if evt.what == "orders" and evt.id == self.oid:
-			self.OnSelectObject(evt, True)
-
-	def OnSelectObject(self, evt, update=False):
+	def ObjectSelect(self, id):
 		"""\
 		Called when an object is selected.
 		"""
-		if isinstance(evt, self.application.gui.PreviewObjectEvent):
-			return
-
-		self.oid = evt.id
-
 		# Check if this object can move so we can enable waypoint mode
 		canmove = False
-		for orderid in self.application.cache.objects[evt.id].order_types:
+		for orderid in self.application.cache.objects[id].order_types:
 			order = OrderDescs()[orderid]
 
 			# FIXME: Needs to be a better way to do this...
@@ -261,75 +251,3 @@ class panelStarMap(panelStarMapBase):
 			self.WaypointButton.Enable()
 		else:
 			self.WaypointButton.Disable()
-
-		for Overlay in self.Overlay:
-			if evt.source == Overlay:
-				continue
-
-			if update:
-				Overlay.UpdateOne(evt.id)
-
-			Overlay.SelectObject(evt.id, update)
-
-	def OnSelectOrder(self, evt):
-		"""
-		Called when an order is selected.
-		"""
-		for Overlay in self.Overlay:
-			if evt.source == Overlay:
-				continue
-
-			try:
-				Overlay.SelectOrder(evt.id, evt.slots)
-			except AttributeError, e:
-				print e
-
-	def OnUpdateOrder(self, evt):
-		"""\
-		Called when an order is updated.
-		"""
-		pass
-
-	def OnDirtyOrder(self, evt):
-		"""\
-		Called when the order has been updated but not yet saved.
-		"""
-		pass
-
-	##########################################################################
-	# These methods are called by the overlays to post information about user
-	# interactions with them.
-	##########################################################################
-
-	def OnOverlayObjectSelected(self, overlay, oid):
-		"""
-		Called when an object is selected on the starmap. Given the object id.
-		"""
-		self.application.Post(self.application.gui.SelectObjectEvent(oid), source=overlay)
-
-	def OnOverlayObjectPreview(self, overlay, oid):
-		"""
-		Called when an object is previewed on the starmap. Given the object id.
-		"""
-		self.application.Post(self.application.gui.PreviewObjectEvent(oid), source=overlay)
-
-	def OnOverlayOrderSelected(self, overlay, oid, slot):
-		"""
-		Called when an order (on an object) is selected on the starmap). Given
-		the object id and the slot.
-		"""
-		self.application.Post(self.application.gui.SelectOrderEvent(oid, slot), source=overlay)
-
-	def OnOverlaySpaceSelected(self, overlay, coords):
-		"""
-		Called when empty space is selected on the starmap. Given the
-		coordinates.  
-		"""
-		pass
-
-	def OnOverlaySpacePreview(self, overlay, coords):
-		"""
-		Called when empty space is previewed on the starmap. Given the
-		coordinates.  
-		"""
-		pass
