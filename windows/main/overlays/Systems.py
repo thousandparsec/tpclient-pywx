@@ -227,13 +227,44 @@ class Systems(SystemLevelOverlay, TrackerObjectOrder):
 		if i > 0:
 			arrow.SetOffset(icon.ChildOffset(i-1))
 
-	def ObjectLeftClick(self, icon, obj):
+	def ObjectLeftClick(self, icon, obj, samesystem=False):
 		"""
 		Move the red arrow to the current object.
 		"""
-		self.ArrowTo(self['selected-arrow'], icon, obj)
-		self.canvas.Draw()
-		return True
+		# FIXME: This really is a horrible hack :(
+		if self.parent.mode is self.parent.GUISelect:
+			self.ArrowTo(self['selected-arrow'], icon, obj)
+			self.canvas.Draw()
+
+			return True
+		elif self.parent.mode is self.parent.GUIWaypoint:
+			if samesystem:
+				# Modify the last move order
+				pass
+			else:
+				# Insert new move order
+				for orderdesc in OrderDescs().values():
+					if orderdesc._name in ("Move",) :
+						break
+
+				neworder = orderdesc(0, self.oid, -1, orderdesc.subtype, 0, [], self.Selected.current.pos)
+				self.AppendOrder(neworder)
+			return False
+
+	def SelectObject(self, id):
+		if self.parent.mode is self.parent.GUIWaypoint:
+			return
+		TrackerObjectOrder.SelectObject(self, id)
+
+	def OrderInsert(self, slot, override=None):
+		if override is None:
+			if self.parent.mode is self.parent.GUIWaypoint:
+				self.SelectOrders([slot])
+
+	def SystemHovering(self, event):
+		if self.parent.mode is self.parent.GUIWaypoint:
+			return
+		SystemLevelOverlay.SystemHovering(self, event)
 
 	def ObjectRightClick(self, icon, hover):
 		"""
@@ -244,17 +275,17 @@ class Systems(SystemLevelOverlay, TrackerObjectOrder):
 		# MoveTo quick add
 		# FIXME: Horrible hack!
 		moveorder = None
-		if not self.Selected is None:
-			for id in self.Selected.current.order_types:
+		if not self.oid is None:
+			obj = self.cache.objects[self.oid]
+
+			for id in obj.order_types:
 				orderdesc = OrderDescs()[id]
 
-				print orderdesc, orderdesc._name
-
 				if orderdesc._name in ("Move",) and moveorder is None:
-					def s(to, what=self.Selected.current, how=orderdesc, type=id):
+					def s(to, what=obj, how=orderdesc):
 						print "move order what: %r to: %r (%r) how: %r" % (what, to, to.pos, how)
 
-						neworder = how(0, what.id, -1, type, 0, [], to.pos)
+						neworder = how(0, what.id, -1, orderdesc.subtype, 0, [], to.pos)
 						neworder._dirty = True
 
 						self.AppendOrder(neworder)
@@ -262,7 +293,7 @@ class Systems(SystemLevelOverlay, TrackerObjectOrder):
 					moveorder = s
 
 				if orderdesc._name in ("Move To", "Intercept"):
-					def s(to, what=self.Selected.current, how=orderdesc):
+					def s(to, what=obj, how=orderdesc):
 						print "move order what: %r to: %r how: %r" % (what, to, how)
 					moveorder = s
 

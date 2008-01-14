@@ -324,6 +324,7 @@ class SystemLevelOverlay(Overlay, TrackerObject):
 		HoveredOn = self.SystemLeave(self.Hovering)
 
 		# Are we clicking on the same object?
+		SameSystem = (self.Selected == icon)
 		if self.Selected == icon:
 			# Cycle throught the children on each click
 			self.Selected.NextLoop()
@@ -340,7 +341,7 @@ class SystemLevelOverlay(Overlay, TrackerObject):
 		if self.Selected.current == None:
 			self.Selected.NextLoop()
 
-		if self.ObjectLeftClick(self.Selected, self.Selected.current):
+		if self.ObjectLeftClick(self.Selected, self.Selected.current, SameSystem):
 			# Post a selected event
 			self.SelectObject(self.Selected.current.id)
 
@@ -397,7 +398,7 @@ class SystemLevelOverlay(Overlay, TrackerObject):
 	##########################################################################
 	##########################################################################
 
-	def ObjectLeftClick(self, icon, subobject):
+	def ObjectLeftClick(self, icon, subobject, samesystem=False):
 		"""
 		Called when a person clicks on a system icon. 
 
