@@ -22,6 +22,21 @@ from windows.xrc.panelStarMap import panelStarMapBase
 
 from tp.netlib.objects import OrderDescs
 
+import extra.wxFloatCanvas.GUIMode as GUIMode
+class GUIWaypoint(GUIMode.GUIMouse):
+	def __init__(self, *args, **kw):
+		GUIMode.GUIMouse.__init__(self, *args, **kw)
+		self.overlay = None
+
+	def OnLeftUp(self, event):
+		EventType = FloatCanvas.EVT_FC_LEFT_UP
+		if not self.parent.HitTest(event, EventType):
+			if hasattr(self.overlay, "OnLeftUpMiss"):
+				self.overlay.OnLeftUpMiss(event)
+
+	def SetOverlay(self, overlay):
+		self.overlay = overlay
+
 class panelStarMap(panelStarMapBase, TrackerObject):
 	title = _("StarMap")
 
@@ -32,13 +47,6 @@ class panelStarMap(panelStarMapBase, TrackerObject):
 		self.application = application
 
 		self.Canvas = FloatCanvas.FloatCanvas(self.FloatCanvas, Debug=1, BackgroundColor="black")
-
-		import extra.wxFloatCanvas.GUIMode as GUIMode
-		self.GUIZoomIn  =  GUIMode.GUIZoomIn(self.Canvas)
-		self.GUIZoomOut =  GUIMode.GUIZoomOut(self.Canvas)
-		self.GUIMove    =  GUIMode.GUIMove(self.Canvas)
-		self.GUIMouse   =  GUIMode.GUIMouseAndMove(self.Canvas)
-		self.SetMode(self.GUIMouse)
 
 		# Create the mouse-mode popup
 		self.MouseModePopup = wx.PopupWindow(self)
@@ -68,6 +76,13 @@ class panelStarMap(panelStarMapBase, TrackerObject):
 		for overlay in self.Overlays:
 			self.DisplayMode.Append(overlay[-1].name, overlay)
 		self.DisplayMode.SetSelection(0)
+
+		self.GUIZoomIn   = GUIMode.GUIZoomIn(self.Canvas)
+		self.GUIZoomOut  = GUIMode.GUIZoomOut(self.Canvas)
+		self.GUIMove     = GUIMode.GUIMove(self.Canvas)
+		self.GUISelect   = GUIMode.GUIMouseAndMove(self.Canvas)
+		self.GUIWaypoint =         GUIWaypoint(self.Canvas)
+		self.SetMode(self.GUISelect)
 
 		self.Bind(wx.EVT_ENTER_WINDOW, self.OnMouseEnter)
 		self.Bind(wx.EVT_LEAVE_WINDOW, self.OnMouseLeave)
@@ -109,7 +124,7 @@ class panelStarMap(panelStarMapBase, TrackerObject):
 		mode = evt.GetEventObject().GetLabel()
 		mode = mode.replace(' ', '')
 		
-		GUIMode = getattr(self, 'GUI%s' % mode, self.GUIMouse)
+		GUIMode = getattr(self, 'GUI%s' % mode, self.GUISelect)
 		self.SetMode(GUIMode)
 
 	def SetMode(self, mode):
@@ -117,9 +132,7 @@ class panelStarMap(panelStarMapBase, TrackerObject):
 		Set the current mode of the canvas to a given type.
 		"""
 		self.Canvas.SetMode(mode)
-
-		if mode == self.GUIMouse:
-			self.Canvas.SetCursor(wx.StockCursor(wx.CURSOR_RIGHT_ARROW))
+		self.mode = mode
 
 	def OnDisplayMode(self, evt):
 		"""
@@ -160,6 +173,8 @@ class panelStarMap(panelStarMapBase, TrackerObject):
 			self.Overlay.append(Overlay(self, self.Canvas, self.DisplayModePanel, self.application.cache))
 			self.Overlay[-1].UpdateAll()
 
+		self.GUIWaypoint.SetOverlay(self.Overlay[-1])
+
 		if oid != -1:
 			for Overlay in self.Overlay:
 				try:
@@ -199,7 +214,7 @@ class panelStarMap(panelStarMapBase, TrackerObject):
 			to = str(evt).lower()
 
 		if self.Canvas.GUIMode == self.GUIZoomIn:
-			self.SetMode(self.GUIMouse)
+			self.SetMode(self.GUISelect)
 
 		if to == 'fit':
 			self.Canvas.ZoomToBB()
