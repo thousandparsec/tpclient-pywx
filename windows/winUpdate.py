@@ -264,6 +264,8 @@ class winUpdate(winUpdateBase, winBaseXRC):
 			end = self.Message.GetLastPosition()
 			self.Message.SetStyle(end-len(message)-1, end, wx.TextAttr(wx.RED))
 
+		wx.GetApp().Yield(onlyIfNeeded=True)
+
 
 	# Config Functions -----------------------------------------------------------------------------  
 	def ConfigDefault(self, config=None):
