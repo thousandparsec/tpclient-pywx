@@ -9,6 +9,8 @@ class Overlay(dict):
 	"""\
 	A layer which displays something on the StarMap.
 	"""	
+	layer = None
+
 	def name():
 		raise NotImplementedError("This overlay has not specified a name! - This is bad!")
 	name = property(staticmethod(name))
@@ -52,8 +54,12 @@ class Overlay(dict):
 
 		if type(value) in (list, tuple):
 			for v in value:
+				if not self.layer is None:
+					v.DrawOrder = self.layer
 				self.canvas.AddObject(v)
 		else:
+			if not self.layer is None:
+				value.DrawOrder = self.layer
 			self.canvas.AddObject(value)
 		dict.__setitem__(self, key, value)
 

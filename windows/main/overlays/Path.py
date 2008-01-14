@@ -164,6 +164,7 @@ class Paths(Overlay, TrackerObjectOrder):
 	name     = "Paths"
 	toplevel = Galaxy, Universe
 
+	layer = -1
 
 	def __init__(self, parent, canvas, panel, cache, *args, **kw):
 		Overlay.__init__(self, parent, canvas, panel, cache, *args, **kw)
