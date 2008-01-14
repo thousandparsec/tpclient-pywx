@@ -150,6 +150,7 @@ class DrawObject:
              \param IsVisible (Bool)
         """
         self.InForeground = InForeground
+        self.DrawOrder = 0
 
         self._Canvas = None
 
@@ -2895,6 +2896,15 @@ class FloatCanvas(wx.Panel):
         else:
             self._DrawList.append(obj)
             self._BackgroundDirty = True
+
+        def DrawOrder(a, b):
+            try:
+                return cmp(a.DrawOrder, b.DrawOrder)
+            except AttributeError:
+                return 1
+
+        self._DrawList.sort(DrawOrder)
+
         self.BoundingBoxDirty = True
         return True
 
