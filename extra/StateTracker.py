@@ -121,7 +121,7 @@ class TrackerObject(object):
 			return
 
 		self.ObjectPreview(id)
-		self.application.Post(self.application.gui.PreviewObjectEvent(oid), source=self)
+		self.application.Post(self.application.gui.PreviewObjectEvent(id), source=self)
 
 
 from tp.netlib.objects import Order
