@@ -257,6 +257,8 @@ class SystemLevelOverlay(Overlay):
 		# This is needed to the hit test doesn't fall through
 		icon.Bind(EVT_FC_LEFT_DOWN, lambda x: True) 
 		icon.Bind(EVT_FC_LEFT_UP, self.SystemLeftClick)
+		icon.Bind(EVT_FC_RIGHT_DOWN, lambda x: True) 
+		icon.Bind(EVT_FC_RIGHT_UP, self.SystemRightClick)
 
 	def Focus(self):
 		"""\
@@ -267,9 +269,8 @@ class SystemLevelOverlay(Overlay):
 			return self.Selected.primary.id, self.Selected.XY
 		except Exception, e:
 			return 0, (0,0)
-			
 
-	def SelectObject(self, oid):
+	def SelectObject(self, oid, update=False):
 		"""
 		Select an object using an external event.
 
@@ -291,6 +292,14 @@ class SystemLevelOverlay(Overlay):
 		self.Selected = icon
 
 		self.ObjectLeftClick(icon, real)
+		if update:
+			self.SystemEnter(self.Selected)
+
+	def SystemRightClick(self, icon):
+		# Leave the currently hovered system
+		HoveredOn = self.SystemLeave(self.Hovering)
+
+		self.ObjectRightClick(icon, HoveredOn.current)
 
 	def SystemLeftClick(self, icon):
 		# Leave the currently hovered system

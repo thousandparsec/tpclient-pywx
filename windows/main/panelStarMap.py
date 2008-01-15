@@ -75,6 +75,8 @@ class panelStarMap(panelStarMapBase):
 		self.application.gui.Binder(self.application.gui.SelectObjectEvent, self.OnSelectObject)
 		self.application.gui.Binder(self.application.gui.SelectOrderEvent,  self.OnSelectOrder)
 
+		self.oid = None
+
 	def OnMouseEnter(self, evt):
 		print "OnMouseEnter!", evt
 		# FIXME: Should make sure we gain the keyboard focus
@@ -235,12 +237,17 @@ class panelStarMap(panelStarMapBase):
 			self.OnZoomLevel('fit')
 			self.Canvas.Draw()
 
-	def OnSelectObject(self, evt):
+		if evt.what == "orders" and evt.id == self.oid:
+			self.OnSelectObject(evt, True)
+
+	def OnSelectObject(self, evt, update=False):
 		"""\
 		Called when an object is selected.
 		"""
 		if isinstance(evt, self.application.gui.PreviewObjectEvent):
 			return
+
+		self.oid = evt.id
 
 		# Check if this object can move so we can enable waypoint mode
 		canmove = False
@@ -260,7 +267,10 @@ class panelStarMap(panelStarMapBase):
 		for Overlay in self.Overlay:
 			if evt.source == Overlay:
 				continue
-			Overlay.SelectObject(evt.id)
+			if update:
+				Overlay.UpdateOne(evt.id)
+
+			Overlay.SelectObject(evt.id, update)
 
 	def OnSelectOrder(self, evt):
 		"""
