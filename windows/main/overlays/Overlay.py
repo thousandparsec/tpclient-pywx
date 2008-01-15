@@ -9,6 +9,8 @@ class Overlay(dict):
 	"""\
 	A layer which displays something on the StarMap.
 	"""	
+	layer = None
+
 	def name():
 		raise NotImplementedError("This overlay has not specified a name! - This is bad!")
 	name = property(staticmethod(name))
@@ -22,10 +24,13 @@ class Overlay(dict):
 		panel  is the toolbar panel which the overlay can add it's own icons/widgets too.
 		cache  is the libtpclient-py cache containing the universe data.
 		"""
-		self.parent = parent
+		self.parent      = parent
+		self.application = self.parent.application 
+
 		if canvas is None:
 			raise TypeError("Canvas can not be none!")
 		self.canvas = canvas
+
 		if cache is None:
 			raise TypeError("Cache can not be none!")
 		self.cache  = cache
@@ -49,8 +54,12 @@ class Overlay(dict):
 
 		if type(value) in (list, tuple):
 			for v in value:
+				if not self.layer is None:
+					v.DrawOrder = self.layer
 				self.canvas.AddObject(v)
 		else:
+			if not self.layer is None:
+				value.DrawOrder = self.layer
 			self.canvas.AddObject(value)
 		dict.__setitem__(self, key, value)
 
@@ -74,11 +83,15 @@ class Overlay(dict):
 	def __del__(self):
 		self.CleanUp()
 
+	def __str__(self):
+		return "<Overlay-%s %s>" % (self.__class__.__name__, hex(id(self)))
+	__repr__ = __str__
+
 	def Update(self, oid=None):
 		"""\
 		Update the FloatCanvas objects for this oid.
 
-		Called when an order on oid changes.
+		Called when an object changes.
 		"""
 		if oid is None:
 			self.UpdateAll()
@@ -119,7 +132,7 @@ class Overlay(dict):
 		"""
 		return -1, (0,0)
 
-	def SelectObject(self, oid):
+	def ObjectSelect(self, oid):
 		"""
 		Select an object using an external event.
 
@@ -202,9 +215,10 @@ class Holder(list):
 		self.__current = self.index(v)
 		return self.__current
 
+from extra.StateTracker import TrackerObject
 from tp.netlib.objects.ObjectExtra.Universe   import Universe
 from tp.netlib.objects.ObjectExtra.Galaxy     import Galaxy
-class SystemLevelOverlay(Overlay):
+class SystemLevelOverlay(Overlay, TrackerObject):
 	"""
 	A SystemLevelOverlay groups objects together at the Systems level.
 	"""
@@ -223,6 +237,8 @@ class SystemLevelOverlay(Overlay):
 		self.Timer.Bind(wx.EVT_TIMER, self.SystemHovering)
 
 		self.Popup = ObjectPopup(self.canvas, wx.SIMPLE_BORDER)
+
+		TrackerObject.__init__(self)
 
 	def CleanUp(self):
 		if self.Hovering != None:
@@ -270,12 +286,15 @@ class SystemLevelOverlay(Overlay):
 		except Exception, e:
 			return 0, (0,0)
 
-	def SelectObject(self, oid, update=False):
+	def ObjectSelect(self, oid):
 		"""
 		Select an object using an external event.
 
 		Simulates this as a mouse click.
 		"""
+		if oid == None:
+			return
+
 		# Figure out which Icon this object is under
 		parentid = oid
 		while not self.has_key(parentid):
@@ -292,8 +311,7 @@ class SystemLevelOverlay(Overlay):
 		self.Selected = icon
 
 		self.ObjectLeftClick(icon, real)
-		if update:
-			self.SystemEnter(self.Selected)
+		#self.SystemEnter(self.Selected)
 
 	def SystemRightClick(self, icon):
 		# Leave the currently hovered system
@@ -306,6 +324,7 @@ class SystemLevelOverlay(Overlay):
 		HoveredOn = self.SystemLeave(self.Hovering)
 
 		# Are we clicking on the same object?
+		SameSystem = (self.Selected == icon)
 		if self.Selected == icon:
 			# Cycle throught the children on each click
 			self.Selected.NextLoop()
@@ -322,9 +341,9 @@ class SystemLevelOverlay(Overlay):
 		if self.Selected.current == None:
 			self.Selected.NextLoop()
 
-		if self.ObjectLeftClick(self.Selected, self.Selected.current):
+		if self.ObjectLeftClick(self.Selected, self.Selected.current, SameSystem):
 			# Post a selected event
-			self.parent.OnOverlayObjectSelected(self, self.Selected.current.id)
+			self.SelectObject(self.Selected.current.id)
 
 		self.SystemEnter(self.Selected)
 
@@ -355,7 +374,7 @@ class SystemLevelOverlay(Overlay):
 		i, object = self.Hovering.NextLoop()
 		if self.ObjectHovering(self.Hovering, object):
 			# Post a preview event
-			self.parent.OnOverlayObjectPreview(self, object.id)
+			self.PreviewObject(object.id)
 
 	def SystemLeave(self, icon):
 		if icon == None:
@@ -368,7 +387,7 @@ class SystemLevelOverlay(Overlay):
 
 		# Return back the originally selected object	
 		if self.Hovering != None and self.Selected != None:
-			self.parent.OnOverlayObjectSelected(self, self.Selected.current.id)
+			self.SelectObject(self.Selected.current.id)
 
 		t = self.Hovering
 		# Clear the currently hovering object
@@ -379,7 +398,7 @@ class SystemLevelOverlay(Overlay):
 	##########################################################################
 	##########################################################################
 
-	def ObjectLeftClick(self, icon, subobject):
+	def ObjectLeftClick(self, icon, subobject, samesystem=False):
 		"""
 		Called when a person clicks on a system icon. 
 

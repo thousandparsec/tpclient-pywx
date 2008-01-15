@@ -6,6 +6,8 @@ import time
 # wxPython Imports
 import wx
 
+from extra.decorators import freeze_wrapper
+
 # Config imports
 from requirements import graphicsdir
 
@@ -147,6 +149,7 @@ class winUpdate(winUpdateBase, winBaseXRC):
 		self.CenterOnScreen(wx.BOTH)
 		return winBaseXRC.Show(self)
 
+	@freeze_wrapper
 	def Callback(self, mode, state, message="", todownload=None, total=None, amount=None):
 		# We do a little bit different for this mode
 		if mode == "connecting":
@@ -260,6 +263,8 @@ class winUpdate(winUpdateBase, winBaseXRC):
 			# Don't do anything for now
 			end = self.Message.GetLastPosition()
 			self.Message.SetStyle(end-len(message)-1, end, wx.TextAttr(wx.RED))
+
+		wx.GetApp().Yield(onlyIfNeeded=True)
 
 
 	# Config Functions -----------------------------------------------------------------------------  

@@ -112,7 +112,7 @@ class EventBinder(dict):
 					continue
 
 				# If source is an class, get the function off the class so we can check
-				if hasattr(event.source, function.__name__) and getattr(event.source, function.__name__) in sentto:
+				if hasattr(event.source, function.__name__) and getattr(event.source, function.__name__) == function:
 					continue
 
 				try:
@@ -122,7 +122,7 @@ class EventBinder(dict):
 				
 				sentto.append(function)
 
-		print "I sent the following event %r to %r" % (event, sentto)
+		print "I sent the following event (from %r) %r to %r" % (event.source, event, sentto)
 
 class GUI(wx.App):
 	## These are window events
@@ -139,6 +139,7 @@ class GUI(wx.App):
 		def __init__(self, id):
 			wxPyEvent.__init__(self)
 
+			assert(id > 0)
 			self.id = id
 	
 		def __str__(self):
@@ -171,6 +172,10 @@ class GUI(wx.App):
 			self.id = id
 			if not hasattr(slots, '__getitem__'):
 				slots = [slots]
+
+			for slot in slots:
+				assert(slot >= 0)
+
 			self.slots = slots
 		
 		def __str__(self):
