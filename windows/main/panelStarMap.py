@@ -26,6 +26,7 @@ class panelStarMap(panelStarMapBase):
 	Overlays = [(Paths, Systems), (Paths, Resource)]
 	def __init__(self, application, parent):
 		panelStarMapBase.__init__(self, parent)
+		self.parent = parent
 
 		self.application = application
 

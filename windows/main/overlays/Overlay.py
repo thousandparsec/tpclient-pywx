@@ -426,6 +426,10 @@ class ObjectPopup(wx.PopupWindow):
 
 		self.SetBackgroundColour("#202020")
 		self.Bind(wx.EVT_MOTION, parent.MotionEvent)
+	
+	def AcceptsFocus(self):
+		print "AcceptsFocus?"
+		return false
 
 	def SetText(self, text):
 		try:

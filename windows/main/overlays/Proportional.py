@@ -3,6 +3,8 @@
 
 This overlay is the base for overlays which use proportional circles.
 """
+import operator
+
 # wxPython imports
 from extra.wxFloatCanvas import FloatCanvas
 from extra.wxFloatCanvas import PieChart
@@ -125,7 +127,7 @@ class Proportional(SystemLevelOverlay):
 		self.min = min(v)
 		self.max = max(v)
 
-		for oid, value in values.items():
+		for oid, value in sorted(values.items(), key=operator.itemgetter(1), reverse=True):
 			self.UpdateOne(oid, value)
 
 	def UpdateOne(self, oid, value=None):
