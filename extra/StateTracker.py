@@ -31,7 +31,7 @@ class TrackerObject(object):
 		"""
 		Called when something changes in the cache.
 		"""
-		assert(self != evt.source, "Got event %s which I was the source of." % evt)
+		assert self != evt.source, "Got event %s which I was the source of." % evt
 
 		# If there was a whole cache update
 		if evt.what is None:
@@ -46,7 +46,7 @@ class TrackerObject(object):
 		"""
 		Called when something else selects an object.
 		"""
-		assert(self != evt.source, "Got event %s which I was the source of." % evt)
+		assert self != evt.source, "Got event %s which I was the source of." % evt
 
 		# Check that if object is not already selected
 		if self.oid == evt.id:
@@ -59,7 +59,7 @@ class TrackerObject(object):
 		"""
 		Called when something else previews an object.
 		"""
-		assert(self != evt.source, "Got event %s which I was the source of." % evt)
+		assert self != evt.source, "Got event %s which I was the source of." % evt
 
 		# Check that if object is not already selected
 		if self.oid == evt.id:
@@ -144,7 +144,7 @@ class TrackerObjectOrder(TrackerObject):
 	# Callbacks for various events
 	##########################################################################
 	def OnCacheUpdate(self, evt):
-		assert(self != evt.source, "Got event %s which I was the source of." % evt)
+		assert self != evt.source, "Got event %s which I was the source of." % evt
 
 
 		# If there was a whole cache update
@@ -208,7 +208,7 @@ class TrackerObjectOrder(TrackerObject):
 				return
 
 	def OnSelectObject(self, evt):
-		assert(self != evt.source, "Got event %s which I was the source of." % evt)
+		assert self != evt.source, "Got event %s which I was the source of." % evt
 
 		# Check that if object is not already selected
 		if self.oid == evt.id:
@@ -228,7 +228,7 @@ class TrackerObjectOrder(TrackerObject):
 		"""
 		Called when something else selects an order.
 		"""
-		assert(self != evt.source, "Got event %s which I was the source of." % evt)
+		assert self != evt.source, "Got event %s which I was the source of." % evt
 
 		# Check this order is for the currently selected object
 		if self.oid != evt.id:
@@ -288,10 +288,10 @@ class TrackerObjectOrder(TrackerObject):
 		Called to select orders on the current object.
 		"""
 		# Select orders is only valid when an object is selected
-		assert(self.oid != None)
+		assert self.oid != None
 		# Slots must be posative
 		for slot in slots:
-			assert(slot >= 0)
+			assert slot >= 0
 
 		if self.slots == slots:
 			return
@@ -301,9 +301,9 @@ class TrackerObjectOrder(TrackerObject):
 
 	def InsertOrder(self, order, slot=None):
 		# Insert order is only valid when an object is selected
-		assert(self.oid != None)
+		assert self.oid != None
 		# Order must be an order, duh!
-		assert(isinstance(order, Order))
+		assert isinstance(order, Order)
 
 		if slot is None:
 			if len(self.slots) > 0:
@@ -316,9 +316,9 @@ class TrackerObjectOrder(TrackerObject):
 
 	def AppendOrder(self, order, slot=None):
 		# Append order is only valid when an object is selected
-		assert(self.oid != None)
+		assert self.oid != None
 		# Order must be an order, duh!
-		assert(isinstance(order, Order))
+		assert isinstance(order, Order)
 
 		if slot is None:
 			if len(self.slots) > 0:
@@ -333,24 +333,24 @@ class TrackerObjectOrder(TrackerObject):
 
 	def DirtyOrder(self, order, slot=None):
 		# Dirty order is only valid when an object is selected
-		assert(self.oid != None)
+		assert self.oid != None
 		# Order must be an order, duh!
-		assert(isinstance(order, Order))
+		assert isinstance(order, Order)
 
 		if slot is None:
-			assert(len(self.slots) == 1)
+			assert len(self.slots) == 1
 			slot = self.slots[0]
 
 		self.application.Post(self.application.gui.DirtyOrderEvent(order), source=self)
 
 	def ChangeOrder(self, order, slot=None):
 		# Change order is only valid when an object is selected
-		assert(self.oid != None)
+		assert self.oid != None
 		# Order must be an order, duh!
-		assert(isinstance(order, Order))
+		assert isinstance(order, Order)
 
 		if slot is None:
-			assert(len(self.slots) == 1)
+			assert len(self.slots) == 1
 			slot = self.slots[0]
 
 		self.OrderRefresh(slot, order)
@@ -358,10 +358,10 @@ class TrackerObjectOrder(TrackerObject):
 
 	def RemoveOrders(self, slots=None):
 		# Remove orders is only valid when an object is selected
-		assert(self.oid != None)
+		assert self.oid != None
 
 		if slots is None:
-			assert(len(self.slots) > 0)
+			assert len(self.slots) > 0
 			slots = self.slots
 
 		self.OrdersRemove(slots, True)
