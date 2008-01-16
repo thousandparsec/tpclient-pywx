@@ -29,8 +29,8 @@ class winIdleFinder(winReportXRC, IdleFinderBase, TrackerObject):
 
 		self.Bind(wx.EVT_SHOW, self.OnShow)
 		self.Bind(wx.EVT_ACTIVATE, self.OnShow)
-		self.idlelist.Bind(wx.EVT_LIST_ITEM_SELECTED,   self.SelectObject)
-		self.idlelist.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.SelectObject)
+		self.idlelist.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.SelectObject)
+		#self.idlelist.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.SelectObject)
 
 	def OnShow(self, evt):
 		"""\
