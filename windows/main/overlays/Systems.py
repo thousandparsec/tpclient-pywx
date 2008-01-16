@@ -332,12 +332,13 @@ class Systems(SystemLevelOverlay, TrackerObjectOrder):
 
 		#pos	= self.canvas.WorldToPixel(icon.XY)
 		self.parent.PopupMenu(menu)
+		self.menumap = None
 
 	def OnContextMenu(self, evt):
 		self.menumap[evt.GetId()](evt)
 		
 	def OnContextMenuClose(self, evt):
-		self.menumap = None
+		pass
 
 	def ObjectHoverEnter(self, icon, pos):
 		"""
