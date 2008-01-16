@@ -12,7 +12,8 @@ import wx.lib.anchors
 from windows.winBase import winReportXRC, ShiftMixIn
 from windows.xrc.winIdleFinder import IdleFinderBase
 # Shows messages from the game system to the player.
-class winIdleFinder(winReportXRC, IdleFinderBase):
+from extra.StateTracker import TrackerObject
+class winIdleFinder(winReportXRC, IdleFinderBase, TrackerObject):
 	title = _("Objects Without Orders")
 	
 	def __init__(self, application, parent):
@@ -20,7 +21,7 @@ class winIdleFinder(winReportXRC, IdleFinderBase):
 		winReportXRC.__init__(self, application, parent)
 		
 		self.application = application
-
+		self.oid = -1
 		# Create a panel for the current window.
 		self.idlelist.InsertColumn(0, "Item ID", width = 100)
 		self.idlelist.InsertColumn(1, "Item Name", width = 200)
@@ -28,6 +29,8 @@ class winIdleFinder(winReportXRC, IdleFinderBase):
 
 		self.Bind(wx.EVT_SHOW, self.OnShow)
 		self.Bind(wx.EVT_ACTIVATE, self.OnShow)
+		self.idlelist.Bind(wx.EVT_LIST_ITEM_SELECTED,   self.SelectObject)
+		self.idlelist.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.SelectObject)
 
 	def OnShow(self, evt):
 		"""\
@@ -95,3 +98,9 @@ class winIdleFinder(winReportXRC, IdleFinderBase):
 		Update the Display because it's changed externally.
 		"""
 		pass
+	
+	def SelectObject(self, id):
+		"""
+		Called to select an object.
+		"""
+		TrackerObject.SelectObject(self, int(id.GetText()))
