@@ -419,6 +419,7 @@ class SystemLevelOverlay(Overlay, TrackerObject):
 			self.Popup.Position(pos, icon.GetSize())
 			self.Popup.SetText(text)
 			self.Popup.Show()
+			self.canvas.SetFocus()
 
 	def ObjectHovering(self, icon, object):
 		"""
@@ -455,10 +456,6 @@ class ObjectPopup(wx.PopupWindow):
 		self.SetBackgroundColour("#202020")
 		self.Bind(wx.EVT_MOTION, parent.MotionEvent)
 	
-	def AcceptsFocus(self):
-		print "AcceptsFocus?"
-		return false
-
 	def SetText(self, text):
 		try:
 			self.st.Unbind(wx.EVT_MOTION)

@@ -64,6 +64,8 @@ class panelStarMap(panelStarMapBase, TrackerObject):
 		self.WaypointButton = wx.Button(p, -1, 'Waypoint')
 		self.WaypointButton.Bind(wx.EVT_BUTTON, self.OnMouseModeButton)
 		s.Add(self.WaypointButton, proportion=1, flag=wx.EXPAND)
+		
+		self.Home.Bind(wx.EVT_BUTTON, self.OnHome)
 
 		p.SetSizer(s)
 		p.Layout()
@@ -269,3 +271,11 @@ class panelStarMap(panelStarMapBase, TrackerObject):
 			self.WaypointButton.Enable()
 		else:
 			self.WaypointButton.Disable()
+
+	def OnHome(self, evt):
+		"""\
+		Called when home button is pressed.
+		"""
+		self.ZoomLevel.SetValue("Fit")
+		self.OnZoomLevel('fit')
+		self.Canvas.Draw()
