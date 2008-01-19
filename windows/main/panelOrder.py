@@ -216,8 +216,6 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 		else:
 			order = override
 
-		print "OrderInsert", repr(order)
-
 		# Update the list box
 		if override is None:
 			self.UpdateListItem(slot, order)
