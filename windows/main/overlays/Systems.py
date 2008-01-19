@@ -285,7 +285,7 @@ class Systems(SystemLevelOverlay, TrackerObjectOrder):
 					def s(to, what=obj, how=orderdesc):
 						print "move order what: %r to: %r (%r) how: %r" % (what, to, to.pos, how)
 
-						neworder = how(0, what.id, -1, orderdesc.subtype, 0, [], to.pos)
+						neworder = how(0, what.id, -1, how.subtype, 0, [], to.pos)
 						neworder._dirty = True
 
 						self.AppendOrder(neworder)
