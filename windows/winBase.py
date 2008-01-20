@@ -139,39 +139,6 @@ class winBaseMixIn(winMixIn):
 		winMixIn.__init__(self, application, None)
 		self.children = {}
 
-	def Post(self, event):
-		bases = [event.__class__]
-		while len(bases) > 0:
-			c = bases.pop(0)
-
-			func = 'On' + c.__name__[:-5]	
-			if hasattr(self, func):
-				try:
-					success = getattr(self, func)(event)
-				except:
-					utils.do_traceback()
-				break
-
-			bases += list(c.__bases__)
-
-		self.Update()
-
-		# Post an event to this window and it's children
-		for window in self.children.values():
-			bases = [event.__class__]
-			while len(bases) > 0:
-				c = bases.pop(0)
-
-				func = 'On' + c.__name__[:-5]	
-				if hasattr(window, func):
-					try:
-						getattr(window, func)(event)
-					except Exception, e:
-						utils.do_traceback()
-					break
-
-				bases += list(c.__bases__)
-
 	def PreCreate(self, pre):
 		pre.SetTitle('TP: ' + self.title)
 
