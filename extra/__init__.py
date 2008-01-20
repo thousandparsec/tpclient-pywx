@@ -411,24 +411,30 @@ class wxListCtrl(wx.ListCtrlOrig, mlc.ListCtrlAutoWidthMixin, mlc.ColumnSorterMi
 	def InsertItem(self, item):
 		slot = wx.ListCtrlOrig.InsertItem(self, item)
 		self._increasePyData(slot)
+		return slot
 		
 	def InsertStringItem(self, slot, label):
-		wx.ListCtrlOrig.InsertStringItem(self, slot, label)
+		r = wx.ListCtrlOrig.InsertStringItem(self, slot, label)
 		self._increasePyData(slot)
+		return r
 		
 	def InsertImageItem(self, slot, imageIndex):
-		wx.ListCtrlOrig.InsertImageItem(self, slot, imageIndex)
+		r = wx.ListCtrlOrig.InsertImageItem(self, slot, imageIndex)
 		self._increasePyData(slot)
+		return r
 		
 	def InsertImageStringItem(self, slot, label, imageIndex):
-		wx.ListCtrlOrig.InsertImageStringItem(self, slot, label, imageIndex)
+		r = wx.ListCtrlOrig.InsertImageStringItem(self, slot, label, imageIndex)
 		self._increasePyData(slot)
+		return r
 
 	def _increasePyData(self, slot):
 		self.objects.insert(slot, None)
 		self.SetItemData(slot, slot)
 
 	def SetItemPyData(self, slot, data):
+		assert slot >= 0
+		assert slot < len(self.objects)
 		self.objects[slot] = data
 
 	def GetItemPyData(self, slot):
