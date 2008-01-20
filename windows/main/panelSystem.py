@@ -80,14 +80,14 @@ class panelSystem(panelSystemBase):
 		if len(orders) == 0:
 			return "#"
 		elif len(orders) == 1:
-			return str(orders[0].turns)
+			return str(orders.first.CurrentOrder.turns)
 		else:
 			turns = 0
-			for order in orders:
-				turns += order.turns
-			turns -= orders[0].turns
+			for node in orders[1:]:
+				turns += node.CurrentOrder.turns
+			turns -= orders.first.CurrentOrder.turns
 
-			return str(orders[0].turns) + ", " + str(turns)
+			return str(orders.first.CurrentOrder.turns) + ", " + str(turns)
 
 	def Rebuild(self, evt=None):
 		"""\

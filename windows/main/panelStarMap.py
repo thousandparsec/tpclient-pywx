@@ -174,7 +174,11 @@ class panelStarMap(panelStarMapBase, TrackerObject):
 		self.Overlay = []
 		for Overlay in cls:
 			self.Overlay.append(Overlay(self, self.Canvas, self.DisplayModePanel, self.application.cache))
-			self.Overlay[-1].UpdateAll()
+			try:
+				self.Overlay[-1].UpdateAll()
+			except Exception, e:
+				import traceback
+				traceback.print_exc()
 
 		self.GUIWaypoint.SetOverlay(self.Overlay[-1])
 

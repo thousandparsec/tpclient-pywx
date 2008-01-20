@@ -248,7 +248,8 @@ class Systems(SystemLevelOverlay, TrackerObjectOrder):
 						break
 
 				neworder = orderdesc(0, self.oid, -1, orderdesc.subtype, 0, [], self.Selected.current.pos)
-				self.AppendOrder(neworder)
+				self.InsertAfterOrder(neworder)
+
 			return False
 
 	def SelectObject(self, id):
@@ -256,10 +257,11 @@ class Systems(SystemLevelOverlay, TrackerObjectOrder):
 			return
 		TrackerObjectOrder.SelectObject(self, id)
 
-	def OrderInsert(self, slot, override=None):
-		if override is None:
-			if self.parent.mode is self.parent.GUIWaypoint:
-				self.SelectOrders([slot])
+	def OrderInsertAfter(self, afterme, what):
+		if self.parent.mode is self.parent.GUIWaypoint:
+			self.SelectOrders([what])
+
+	OrderInsertBefore = OrderInsertAfter
 
 	def SystemHovering(self, event):
 		if self.parent.mode is self.parent.GUIWaypoint:
@@ -288,7 +290,7 @@ class Systems(SystemLevelOverlay, TrackerObjectOrder):
 						neworder = how(0, what.id, -1, how.subtype, 0, [], to.pos)
 						neworder._dirty = True
 
-						self.AppendOrder(neworder)
+						self.InsertAfterOrder(neworder)
 
 					moveorder = s
 
@@ -296,8 +298,6 @@ class Systems(SystemLevelOverlay, TrackerObjectOrder):
 					def s(to, what=obj, how=orderdesc):
 						print "move order what: %r to: %r how: %r" % (what, to, how)
 					moveorder = s
-
-		print moveorder
 
 		menu = wx.Menu()
 		for obj in icon:

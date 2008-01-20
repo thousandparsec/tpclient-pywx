@@ -26,6 +26,8 @@ from version import version
 from tp.netlib import failed
 from tp.client.threads import NotImportantEvent, Event
 
+from tp.client.ChangeList import ChangeNode
+
 pyid = id
 
 class ThreadExited(Exception):
@@ -166,35 +168,35 @@ class GUI(wx.App):
 		"""\
 		Raised when an order is selected.
 		"""
-		def __init__(self, id, slots):
+		def __init__(self, id, nodes):
 			wxPyEvent.__init__(self)
 
 			self.id = id
-			if not hasattr(slots, '__getitem__'):
-				slots = [slots]
+			if not hasattr(nodes, '__getitem__'):
+				nodes = [nodes]
 
-			for slot in slots:
-				assert slot >= 0
+			for node in nodes:
+				assert isinstance(node, ChangeNode)
 
-			self.slots = slots
+			self.nodes = nodes
 		
 		def __str__(self):
-			return "<SelectOrderEvent(%x) id=%s slots=%s>" % (pyid(self), self.id, self.slots)
+			return "<SelectOrderEvent(%x) id=%s nodes=%s>" % (pyid(self), self.id, self.nodes)
 		__repr__ = __str__
 
 	class DirtyOrderEvent(wxPyEvent):
 		"""\
 		Raised when an order value changes but hasn't been saved yet.
 		"""
-		def __init__(self, order):
+		def __init__(self, id, node):
 			wxPyEvent.__init__(self)
 
-			self.id = order.id
-			self.slot = order.slot
-			self.order = order
+			self.id = id
+			self.nodes = [node]
+			self.order = node.pending
 		
 		def __str__(self):
-			return "<DirtyOrderEvent id=%s slots=%s>" % (self.id, self.slots)
+			return "<DirtyOrderEvent id=%s nodes=%s>" % (self.id, self.nodes)
 		__repr__ = __str__
 
 	######################################

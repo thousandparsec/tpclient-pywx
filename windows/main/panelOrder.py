@@ -15,10 +15,14 @@ import wx
 from tp.netlib import objects
 from tp.netlib.objects import constants
 
+from tp.client.ChangeList import ChangeNode, ChangeHead
+
 TURNS_COL = 0
 ORDERS_COL = 1
 
 buttonSize = (wx.local.buttonSize[0], wx.local.buttonSize[1]+2)
+
+wx.YELLOW = wx.Color(150, 150, 0)
 
 # FIXME: This is quite annoying..
 defaults = {
@@ -46,9 +50,6 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 
 		self.clipboard = None
 		self.ignore = False
-
-		self.oid = None
-		self.slots = []
 
 		self.Orders.InsertColumn(TURNS_COL, _("Turns"))
 		self.Orders.SetColumnWidth(TURNS_COL, 40)
@@ -81,37 +82,55 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 	# Update the various bits in the order list
 	##########################################################################
 
-	def ColourListItem(self, slot, color):
+	def ColourListItem(self, listpos, color):
 		"""\
-		Makes a slot show that the item is pending changes.
+		Makes a listpos show that the item is pending changes.
 		"""
-		item = self.Orders.GetItem(slot)
+		item = self.Orders.GetItem(listpos)
 		item.SetTextColour(color)
 		self.Orders.SetItem(item)
 
-	def InsertListItem(self, slot, order):
+	def InsertListItem(self, listpos, node):
 		"""\
 		Inserts an order a certain position in the list.
 		"""
-		self.Orders.InsertStringItem(slot, "")
-		self.UpdateListItem(slot, order)
+		assert listpos <= self.Orders.GetItemCount()
+		assert not isinstance(node, ChangeHead)
+		assert isinstance(node, ChangeNode)
 
-	def UpdateListItem(self, slot, order):
+		newlistpos = self.Orders.InsertStringItem(listpos, "")
+		assert newlistpos == listpos, "%s == %s" % (newlistpos, listpos)
+		self.Orders.SetItemPyData(listpos, node)
+
+		self.UpdateListItem(listpos)
+
+	def UpdateListItem(self, listpos):
 		"""\
-		Updates an order at a certain position in the list.
+		Updates an node at a certain position in the list.
 		"""
-		self.Orders.SetStringItem(slot, TURNS_COL, str(order.turns))
-		self.Orders.SetStringItem(slot, ORDERS_COL, order._name)
-		#self.Orders.SetToolTipItem(slot, _("Tip %s") % slot)
+		node = self.Orders.GetItemPyData(listpos)
 
-		self.ColourListItem(slot, wx.BLACK)
-		self.Orders.SetItemPyData(slot, order)
-		
-	def RemoveListItem(self, slot):
+		if node.CurrentState is "idle":
+			self.Orders.SetStringItem(listpos, TURNS_COL, str(node.CurrentOrder.turns))
+		else:
+			self.Orders.SetStringItem(listpos, TURNS_COL, 'U')
+
+		self.Orders.SetStringItem(listpos, ORDERS_COL, node.CurrentOrder._name)
+
+		if node.LastState == "idle":
+			self.ColourListItem(listpos, wx.BLACK)
+		if node.LastState == "creating":
+			self.ColourListItem(listpos, wx.BLUE)
+		if node.LastState == "removing":
+			self.ColourListItem(listpos, wx.RED)
+		if node.LastState == "updating":
+			self.ColourListItem(listpos, wx.YELLOW)
+
+	def RemoveListItem(self, listpos):
 		"""\
 		Removes an order from a position in the list.
 		"""
-		self.Orders.DeleteItem(slot)
+		self.Orders.DeleteItem(listpos)
 
 	##########################################################################
 	# Methods called when state changes with an object
@@ -144,16 +163,11 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 		self.Orders.SetToolTipDefault(_("Current orders on %s.") % object.name)
 		
 		orders = self.application.cache.orders[self.oid]
-		# Add all the orders to the list
-		for slot, order in enumerate(orders):
-			self.InsertListItem(slot, order)
-	
-		# Enable the delete button if we have orders to delete	
-		if len(orders) > 0:
-			self.Delete.Enable()
-		else:
-			self.Delete.Disable()
 
+		# Add all the orders to the list
+		for listpos, node in enumerate(orders):
+			self.InsertListItem(listpos, node)
+	
 		# Set which order types can be added to this object
 		self.Possible.SetToolTipDefault(_("Order type to create"))
 		for type in object.order_types:
@@ -182,73 +196,97 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 	##########################################################################
 	# Methods called when state changes with the order
 	##########################################################################
-	def OrdersSelect(self, slots):
-		# FIXME: This is not going to work
-		self.Orders.SetSelected(self.slots)
+	def OrdersSelect(self, nodes):
+		# Orders Select is only valid when an object is selected
+		assert self.oid != None
+
+		d = self.application.cache.orders[self.oid]
+
+		listpos = []
+		for node in nodes:
+			assert node in d
+			listpos.append(d.index(node))
+
+			assert listpos[-1] < self.Orders.GetItemCount()
+
+		self.Orders.SetSelected(listpos)
+
+		# Enable the delete button if we have orders to delete	
+		if len(nodes) > 0:
+			self.Delete.Enable()
+		else:
+			self.Delete.Disable()
 
 		try:
 			object = self.application.cache.objects[self.oid]
 
 			if object.order_number == 0 and len(object.order_types) == 0:
-				order = _("No orders avaliable")
-			elif len(self.slots) > 1:
-				order = _("Multiple orders selected.")
-			elif len(self.slots) < 1:
-				order = None
+				node = _("No orders avaliable")
+			elif len(nodes) > 1:
+				node = _("Multiple orders selected.")
+			elif len(nodes) < 1:
+				node = None
 			else:
-				order = self.Orders.GetItemPyData(self.slots[0])
+				node = nodes[0]
 		except KeyError:
-			order = _("No object selected.")
+			node = _("No object selected.")
 
-		print 'Order!', repr(order)
-		self.BuildPanel(order)
+		self.BuildPanel(node)
 
 		# Ensure we can see the items
-		if len(self.slots) > 0:
-			self.Orders.EnsureVisible(self.slots[-1])
+		if len(listpos) > 0:
+			self.Orders.EnsureVisible(listpos[-1])
 
-	def OrderInsert(self, slot, override=None):
+	def OrderInsertAfter(self, afterme, toinsert):
 		"""\
 		Inserts the order into a slot.
 		"""
-		if override is None:
-			order = self.application.cache.orders[self.oid][slot]
-		else:
-			order = override
+		assert self.oid != None
+
+		d = self.application.cache.orders[self.oid]
+
+		assert afterme in d
+		assert toinsert in d
+
+		# Inserting into an empty list
+		listpos = d.index(afterme) + 1
 
 		# Update the list box
-		if override is None:
-			self.UpdateListItem(slot, order)
-		else:
-			self.InsertListItem(slot, order)
-			self.ColourListItem(slot, wx.BLUE)
+		self.InsertListItem(listpos, toinsert)
 
-	def OrderRefresh(self, slot, override=None):
+	def OrderRefresh(self, node):
 		"""\
 		"""
-		if override is None:
-			order = self.application.cache.orders[self.oid][slot]
-		else:
-			order = override
+		assert self.oid != None
 
-		# Update the list box
-		self.UpdateListItem(slot, order)
+		d = self.application.cache.orders[self.oid]
+		assert node in d
 
-		if not override is None:
-			self.ColourListItem(slot, wx.BLUE)
+		assert self.Orders.GetItemPyData(d.index(node)) is node
 
-	def OrdersRemove(self, slots, override=False):
+		self.UpdateListItem(d.index(node))
+
+	def OrdersRemove(self, nodes, override=False):
 		"""\
 		Deletes the order from a slot.
 		"""
-		if override:
-			for slot in slots:
-				self.ColourListItem(slot, wx.RED)
-		else:
-			for slot in slots:
-				self.RemoveListItem(slot)
-			
+		assert self.oid != None
 
+		d = self.application.cache.orders[self.oid]
+
+		listposes = []
+		for i in range(0, self.Orders.GetItemCount()):
+			if self.Orders.GetItemPyData(i) in nodes:
+				listposes.append(i)
+		listposes.sort(reverse=True)
+
+		if override:
+			for listpos in listposes:
+				self.UpdateListItem(listpos)
+		else:
+			for listpos in listposes:
+				self.RemoveListItem(listpos)
+			
 	####################################################
 	# Local Event Handlers
 	####################################################
@@ -262,33 +300,32 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 			self.Orders.ignore -= 1
 			return
 
-		slots = self.Orders.GetSelected()
-		if self.slots == slots:
+		nodes = []
+		for listpos in self.Orders.GetSelected():
+			nodes.append(self.Orders.GetItemPyData(listpos))
+
+		if self.nodes == nodes:
 			return
-		self.SelectOrders(slots)
+		self.SelectOrders(nodes)
 		
 	@freeze_wrapper
 	def OnOrderNew(self, evt, after=True):
 		"""\
 		Called to add a new order.
 		"""
+		assert self.oid != None
+
 		# Figure out what type of new order we are creating
 		type = self.Possible.GetSelection()
 		if type == wx.NOT_FOUND:
 			return
 		type = self.Possible.GetClientData(type)
 		
-		# Figure out the slot number
-		if len(self.slots) > 0:
-			slot = self.slots[-1] + after
-		else:
-			slot = self.Orders.GetItemCount()
-		
 		# Build the argument list
 		orderdesc = objects.OrderDescs()[type]	
 
 		# sequence, id, slot, type, turns, resources
-		args = [0, self.oid, slot, type, 0, []]
+		args = [0, self.oid, -1, type, 0, []]
 		for name, type in orderdesc.names:
 			args += defaults[type]
 
@@ -296,8 +333,8 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 		new = objects.Order(*args)
 		new._dirty = True
 
-		# Insert the new order
-		self.InsertOrder(new, slot)
+		# Insert the new order (after the currently selected)
+		self.InsertAfterOrder(new)
 
 	@freeze_wrapper
 	def OnOrderDelete(self, evt):
@@ -311,20 +348,10 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 		"""\
 		Called to save the current selected orders.
 		"""
-		# Figure out which slot is selected
-		if len(self.slots) != 1:
-			return
-		slot = self.slots[0]
-		
-		# Check we arn't trying to save an order with a pending changes
-		order = self.Orders.GetItemPyData(slot)
-		if hasattr(order, '_dirty'):
-			# FIXME: Need to pop-up an error
-			return
+		assert len(self.nodes) == 1
 			
 		# Update the order
-		order = self.FromPanel(order)
-
+		order = self.FromPanel(self.nodes[0].CurrentOrder)
 		self.ChangeOrder(order)
 
 	OnNew    = OnOrderNew
@@ -363,12 +390,10 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 	# Panel Functions
 	####################################################
 	@freeze_wrapper
-	def BuildPanel(self, order):
+	def BuildPanel(self, node):
 		"""\
 		Builds a panel for the entering of orders arguments.
 		"""
-		print "BuildPanel", type(order), repr(order)
-
 		# Remove the previous panel and stuff
 		if hasattr(self, "ArgumentsPanel"):
 			self.ArgumentsPanel.Hide()
@@ -381,19 +406,28 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 		self.Message.SetLabel("")
 		self.Message.Hide()
 
-		if isinstance(order, objects.Order):
+		if isinstance(node, ChangeNode):
+			order = node.CurrentOrder
+			assert not order is None
+
 			# Create a new panel
 			self.ArgumentsPanel = wx.Panel(self.DetailsPanel, -1)
+
+			# Colour the background of the argument panel depending on the current state of the node
+			if node.CurrentState == "idle":
+				pass
+			if node.CurrentState == "creating":
+				self.ArgumentsPanel.SetBackgroundColour(wx.BLUE)
+			if node.CurrentState == "removing":
+				self.ArgumentsPanel.SetBackgroundColour(wx.RED)
+			if node.CurrentState == "updating":
+				self.ArgumentsPanel.SetBackgroundColour(wx.YELLOW)
+
 			self.ArgumentsPanel.SetAutoLayout( True )
 			self.ArgumentsSizer = wx.FlexGridSizer( 0, 1, 0, 0)
 			self.ArgumentsPanel.SetSizer(self.ArgumentsSizer)
 			self.ArgumentsSizer.AddGrowableCol( 0 )
 
-			# Is this object dirty?
-			if hasattr(order, '_dirty'):
-				#self.ArgumentsPanel.SetBackgroundColour(wx.BLUE)
-				pass
-		
 			orderdesc = objects.OrderDescs()[order.subtype]
 			
 			# List for the argument subpanels
@@ -452,8 +486,8 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 			self.Revert.Show()
 			self.Delete.Show()
 	
-		elif isinstance(order, (unicode, str)):
-			self.Message.SetLabel(order)
+		elif isinstance(node, (unicode, str)):
+			self.Message.SetLabel(node)
 			self.Message.Show()
 
 			# Hide the Save/Revert buttons

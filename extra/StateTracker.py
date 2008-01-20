@@ -1,6 +1,8 @@
 
 from extra.decorators import *
 
+from tp.client.ChangeList import ChangeNode
+
 # Raised when the game cache is made dirty. Contains a reference to what was updated.
 #  -- CacheDirtyEvent
 
@@ -110,8 +112,8 @@ class TrackerObject(object):
 		if self.oid == id:
 			return
 
-		self._ObjectSelect(id)
 		self.application.Post(self.application.gui.SelectObjectEvent(id), source=self)
+		self._ObjectSelect(id)
 
 	def PreviewObject(self, id):
 		"""
@@ -120,8 +122,8 @@ class TrackerObject(object):
 		if self.oid == id:
 			return
 
-		self.ObjectPreview(id)
 		self.application.Post(self.application.gui.PreviewObjectEvent(id), source=self)
+		self.ObjectPreview(id)
 
 
 from tp.netlib.objects import Order
@@ -136,9 +138,9 @@ class TrackerObjectOrder(TrackerObject):
 	def __init__(self):
 		TrackerObject.__init__(self)
 
-		self.slots = []
+		self.nodes = []
 
-		self.application.gui.Binder(self.application.gui.SelectOrderEvent,        self.OnSelectOrder)
+		self.application.gui.Binder(self.application.gui.SelectOrderEvent, self.OnSelectOrder)
 
 	##########################################################################
 	# Callbacks for various events
@@ -156,9 +158,9 @@ class TrackerObjectOrder(TrackerObject):
 				self._ObjectSelect(None)
 
 			# Refresh the currently selected order
-			if len(self.slots) > 0:
-				for slot in self.slots:
-					self.OrderRefresh(slot)
+			if len(self.nodes) > 0:
+				for node in self.nodes:
+					self.OrderRefresh(node)
 
 			return
 	
@@ -176,34 +178,33 @@ class TrackerObjectOrder(TrackerObject):
 
 		if evt.what == "orders":
 			if isinstance(evt, CacheDirtyEvent):
-				if evt.action == "create":
-					self.OrderInsert(evt.slot, evt.change)
+				if evt.action == "create after":
+					self.OrderInsertAfter(evt.node, evt.change)
+				if evt.action == "create before":
+					self.OrderInsertBefore(evt.node, evt.change)
 
 				if evt.action == "change":
-					self.OrderRefresh(evt.slot, evt.change)
+					self.OrderRefresh(evt.change)
 
 				if evt.action == "remove":
-					self.OrdersRemove(evt.slots, True)
+					self.OrdersRemove(evt.nodes, True)
 
 				return
 
 			if isinstance(evt, CacheUpdateEvent):
-				if evt.action == "create":
-					self.OrderInsert(evt.slot)
-
-				if evt.action == "change":
-					self.OrderRefresh(evt.slot)
+				if evt.action in ("create before", "create after", "change"):
+					self.OrderRefresh(evt.change)
 
 				if evt.action == "remove":
 					# Unselect any slots which are being removed
-					leftslots = []
-					for slot in self.slots:
-						if not slot in evt.slots:
-							leftslots.append(slot)
-					if self.slots != leftslots:
-						self._OrdersSelect(leftslots)
+					leftnodes = []
+					for node in self.nodes:
+						if not node in evt.nodes:
+							leftnodes.append(node)
+					if self.nodes != leftnodes:
+						self._OrdersSelect(leftnodes)
 
-					self.OrdersRemove(evt.slots)
+					self.OrdersRemove(evt.nodes)
 
 				return
 
@@ -214,8 +215,8 @@ class TrackerObjectOrder(TrackerObject):
 		if self.oid == evt.id:
 			return
 
-		# Clear the selected slots
-		self.slots = []
+		# Clear the selected nodes
+		self.nodes = []
 
 		self._ObjectSelect(evt.id)
 
@@ -234,47 +235,51 @@ class TrackerObjectOrder(TrackerObject):
 		if self.oid != evt.id:
 			return			
 
-		# Check if these slots have already been selected
-		if self.slots == evt.slots:
+		# Check if these nodes have already been selected
+		if self.nodes == evt.nodes:
 			return
 
-		self._OrdersSelect(evt.slots)
+		self._OrdersSelect(evt.nodes)
 
 	##########################################################################
 	# Methods called when state changes with the order
 	##########################################################################
-	def _OrdersSelect(self, slots):
+	def _OrdersSelect(self, nodes):
 		"""
-		Select an order (using slots).
+		Select an order (using nodes).
 		"""
-		self.slots = slots
-		self.OrdersSelect(slots)
+		self.nodes = nodes
+		if self.oid != None:
+			self.OrdersSelect(nodes)
 
-	def OrdersSelect(self, slots):
+	def OrdersSelect(self, nodes):
 		"""
-		Select an order (using slots).
+		Select an order (using nodes).
 		"""
 		pass
 
-	def OrderInsert(self, slot, override=None):
+	def OrderInsertAfter(self, afterme, toinsert):
 		"""
 		Called when a new order is inserted.
 		"""
 		pass
 
-	def OrderRefresh(self, slot, override=None):
+	def OrderInsertBefore(self, beforeme, toinsert):
+		"""
+		Called when a new order is inserted.
+		"""
+		pass
+
+	def OrderRefresh(self, node, override=None):
 		"""
 		Refresh the selected orders (this might not be all orders).
 
 		If orders is given then it should be used as the source of information,
 		otherwise the cache should be used.
-	
-		(By default calls SelectOrder)
 		"""
-		if override is None:
-			self.SelectOrder(slots)
+		pass
 
-	def OrdersRemove(self, slots, override=False):
+	def OrdersRemove(self, nodes, override=False):
 		"""
 		Called when an order is removed.
 		"""
@@ -283,87 +288,105 @@ class TrackerObjectOrder(TrackerObject):
 	##########################################################################
 	# Methods to change the state (orders)
 	##########################################################################
-	def SelectOrders(self, slots):
+	def SelectOrders(self, nodes):
 		"""
 		Called to select orders on the current object.
 		"""
 		# Select orders is only valid when an object is selected
 		assert self.oid != None
-		# Slots must be posative
-		for slot in slots:
-			assert slot >= 0
 
-		if self.slots == slots:
+		if self.nodes == nodes:
 			return
 
-		self._OrdersSelect(slots)
-		self.application.Post(self.application.gui.SelectOrderEvent(self.oid, slots), source=self)
+		# Nodes must exist in the orders cache
+		d = self.application.cache.orders[self.oid]
+		for node in nodes:
+			assert isinstance(node, ChangeNode)
+			assert node in d
 
-	def InsertOrder(self, order, slot=None):
+		# Tell everyone else about the change
+		self.application.Post(self.application.gui.SelectOrderEvent(self.oid, nodes), source=self)
+		# Call our handler
+		self._OrdersSelect(nodes)
+
+	def InsertAfterOrder(self, order, node=None):
 		# Insert order is only valid when an object is selected
 		assert self.oid != None
 		# Order must be an order, duh!
 		assert isinstance(order, Order)
 
-		if slot is None:
-			if len(self.slots) > 0:
-				slot = self.slots[0]
+		if node is None:
+			if len(self.nodes) > 0:
+				node = self.nodes[0]
 			else:
-				slot = -1
+				node = self.application.cache.orders[self.oid].last
+			
+		assert not node is None
 
-		self.OrderInsert(slot, order)
-		self.application.Post(self.application.cache.CacheDirtyEvent("orders", "create", self.oid, slot, order), source=self)
+		# Make the change to the cache	
+		evt = self.application.cache.apply("orders", "create after", self.oid, node, order)
 
-	def AppendOrder(self, order, slot=None):
-		# Append order is only valid when an object is selected
+		# Do some sanity checking
+		assert not evt.change is None
+		d = self.application.cache.orders[self.oid]
+		assert evt.change in d
+
+		# Tell everyone else about the change
+		self.application.Post(evt, source=self)
+		# Call our handler
+		self.OrderInsertAfter(node, evt.change)
+
+	def InsertBeforeOrder(self, order, node=None):
+		# Insert order is only valid when an object is selected
 		assert self.oid != None
 		# Order must be an order, duh!
 		assert isinstance(order, Order)
 
-		if slot is None:
-			if len(self.slots) > 0:
-				slot = self.slots[-1]+1
-			else:
-				slot = -1
-		else:
-			slot += 1
+	def DirtyOrder(self, order, node=None):
+		pass
 
-		self.OrderInsert(slot, order)
-		self.application.Post(self.application.cache.CacheDirtyEvent("orders", "create", self.oid, slot, order), source=self)
+#		# Dirty order is only valid when an object is selected
+#		assert self.oid != None
+#		# Order must be an order, duh!
+#		assert isinstance(order, Order)
+#
+#		if node is None:
+#			assert len(self.nodes) == 1
+#			node = self.nodes[0]
+#
+#		self.application.Post(self.application.gui.DirtyOrderEvent(order), source=self)
 
-	def DirtyOrder(self, order, slot=None):
-		# Dirty order is only valid when an object is selected
-		assert self.oid != None
-		# Order must be an order, duh!
-		assert isinstance(order, Order)
-
-		if slot is None:
-			assert len(self.slots) == 1
-			slot = self.slots[0]
-
-		self.application.Post(self.application.gui.DirtyOrderEvent(order), source=self)
-
-	def ChangeOrder(self, order, slot=None):
+	def ChangeOrder(self, order, node=None):
 		# Change order is only valid when an object is selected
 		assert self.oid != None
 		# Order must be an order, duh!
 		assert isinstance(order, Order)
 
-		if slot is None:
-			assert len(self.slots) == 1
-			slot = self.slots[0]
+		if node is None:
+			assert len(self.nodes) == 1
+			node = self.nodes[0]
 
-		self.OrderRefresh(slot, order)
-		self.application.Post(self.application.cache.CacheDirtyEvent("orders", "change", self.oid, slot, order), source=self)
+		evt = self.application.cache.apply("orders", "change", self.oid, node, order)
 
-	def RemoveOrders(self, slots=None):
+		# Tell everyone else about the change
+		self.application.Post(evt, source=self)
+		# Call our handler
+		self.OrderRefresh(evt.change)
+
+	def RemoveOrders(self, nodes=None):
 		# Remove orders is only valid when an object is selected
 		assert self.oid != None
 
-		if slots is None:
-			assert len(self.slots) > 0
-			slots = self.slots
+		if nodes is None:
+			if len(self.nodes) == 0:
+				return
 
-		self.OrdersRemove(slots, True)
-		self.application.Post(self.application.cache.CacheDirtyEvent("orders", "remove", self.oid, slots=slots), source=self)
+			nodes = self.nodes
+			
+		evt = self.application.cache.apply("orders", "remove", self.oid, nodes=nodes)
+
+		# Tell everyone else about the change
+		self.application.Post(evt, source=self)
+		# Call our handler
+		self.OrdersRemove(nodes, True)
 

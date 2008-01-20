@@ -25,19 +25,21 @@ def FindPath(cache, obj):
 	Figure out the path this object will take.
 
 	Returns a list of tuples
-		(order slot, order destination)
+		(node, order destination)
 	"""
 	if not isinstance(obj, Object):
 		raise TypeError("Object must be an object not %r" % obj)
 
 	locations = [(-1, obj.pos)]
-	for slot, order in enumerate(cache.orders[obj.id]):
+	for listpos, node in enumerate(cache.orders[obj.id]):
+		order = node.CurrentOrder
+
 		# FIXME: Needs to be a better way to do this...
 		if order._name in ("Move", "Move To", "Intercept"):
 			if hasattr(order, "pos"):
-				locations.append((slot, order.pos))
+				locations.append((node, order.pos))
 			if hasattr(order, "to"):
-				locations.append((slot, cache.objects[order.to].pos))
+				locations.append((node, cache.objects[order.to].pos))
 	if len(locations) == 1:
 		return None
 	return locations
@@ -174,9 +176,9 @@ class Paths(Overlay, TrackerObjectOrder):
 
 	def UpdateOne(self, oid, overrides={}):
 		# Remove all the previous segments
-		for nid, slot in self.keys():
+		for nid, nodeid in self.keys():
 			if oid == nid:
-				del self[(oid, slot)]
+				del self[(oid, nodeid)]
 
 		if oid == self.oid:
 			self.active = []
@@ -185,17 +187,19 @@ class Paths(Overlay, TrackerObjectOrder):
 		path = FindPath(self.cache, self.cache.objects[oid])
 		if not path is None:
 			previous = self.cache.objects[oid]
-			for slot, end in path[1:]:
-				segment = PathSegment((oid, slot), end, previous)
+			for node, end in path[1:]:
+				segment = PathSegment((oid, node), end, previous)
 
 				# Make sure the selected bits are still selected..
 				if oid == self.oid:
 					segment.Active(True)
-					if slot in self.slots:
+
+					if node in self.nodes:
 						segment.Select(True)
+
 					self.active.append(segment)
 
-				self[(oid, slot)] = segment
+				self[(oid, node.id)] = segment
 
 				from extra.wxFloatCanvas.FloatCanvas import EVT_FC_ENTER_OBJECT, EVT_FC_LEAVE_OBJECT
 				from extra.wxFloatCanvas.FloatCanvas import EVT_FC_LEFT_UP, EVT_FC_RIGHT_UP
@@ -225,20 +229,20 @@ class Paths(Overlay, TrackerObjectOrder):
 		self.ClearActive()
 
 		# FIXME: This is kind of suckily slow!
-		for nid, slot in self.keys():
+		for nid, nodeid in self.keys():
 			if oid == nid:
-				self[(nid, slot)].Active(True)
+				self[(nid, nodeid)].Active(True)
 			else:
-				self[(nid, slot)].Active(False)
+				self[(nid, nodeid)].Active(False)
 
 		self.canvas.Draw(True)
 
-	def OrdersSelect(self, slots):
+	def OrdersSelect(self, nodes):
 		self.ClearActive()
 
-		for slot in slots:
+		for node in nodes:
 			try:
-				self.active.append(self[(self.oid, slot)])
+				self.active.append(self[(self.oid, node.id)])
 			except KeyError:
 				pass
 
@@ -247,20 +251,14 @@ class Paths(Overlay, TrackerObjectOrder):
 
 		self.canvas.Draw(True)
 
-	def OrderInsert(self, slot, override=None):
-		if not override is None:
-			return
-
+	def OrderInsertAfter(self, node, override=None):
 		self.UpdateOne(self.oid)
 		self.canvas.Draw()
 
-	def OrderRefresh(self, slot, override=None):
-		pass
+	OrderInsertBefore = OrderInsertAfter
+	OrderRefresh      = OrderInsertAfter
 
-	def OrdersRemove(self, slots, override=False):
-		if override:
-			return
-
+	def OrdersRemove(self, nodes, override=False):
 		self.UpdateOne(self.oid)
 		self.canvas.Draw()
 
@@ -270,3 +268,4 @@ class Paths(Overlay, TrackerObjectOrder):
 
 	def Empty(self, evt):
 		pass
+
