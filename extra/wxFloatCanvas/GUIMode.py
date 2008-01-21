@@ -391,10 +391,10 @@ class GUIZoomOut(GUIBase):
     Cursor = MagMinusCursor
 
     def OnLeftDown(self, event):
-        self.parent.Zoom(1/1.5, event.GetPosition(), centerCoords="pixel")
+        self.parent.Zoom(1/1.5, event.GetPosition(), centerCoords="Pixel")
 
     def OnRightDown(self, event):
-        self.parent.Zoom(1.5, event.GetPosition(), centerCoords="pixel")
+        self.parent.Zoom(1.5, event.GetPosition(), centerCoords="Pixel")
 
     def OnWheel(self, event):
         if event.GetWheelRotation() < 0:
