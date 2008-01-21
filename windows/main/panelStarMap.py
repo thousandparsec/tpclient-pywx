@@ -64,15 +64,33 @@ class panelStarMap(panelStarMapBase, TrackerObject):
 		self.WaypointButton = wx.Button(p, -1, 'Waypoint')
 		self.WaypointButton.Bind(wx.EVT_BUTTON, self.OnMouseModeButton)
 		s.Add(self.WaypointButton, proportion=1, flag=wx.EXPAND)
-		
-		self.Home.Bind(wx.EVT_BUTTON, self.OnHome)
 
 		p.SetSizer(s)
 		p.Layout()
 		p.SetSize(p.GetBestSize())
 		self.MouseModePopup.SetSize(p.GetBestSize())
+		
+		# Create the find popup
+		self.FindPopup = wx.PopupWindow(self)
+		pf = wx.Panel(self.FindPopup)
+		sf = wx.BoxSizer(wx.HORIZONTAL)
+
+		findtext = wx.TextCtrl(pf, -1, "Enter Text")
+		findbutton = wx.Button(pf, -1, 'Go')
+		#findtext.Bind(wx.EVT_COMMAND_TEXT_ENTER, self.OnFindButton)
+		findbutton.Bind(wx.EVT_BUTTON, self.OnFindButton)
+		sf.Add(findtext, proportion=1, flag=wx.EXPAND)
+		sf.Add(findbutton, proportion=0, flag=wx.EXPAND)
+
+		pf.SetSizer(sf)
+		pf.Layout()
+		pf.SetSize(pf.GetBestSize())
+		self.FindPopup.SetSize(pf.GetBestSize())
 
 		self.Bind(wx.EVT_SIZE, self.OnSize)
+				
+		self.Home.Bind(wx.EVT_BUTTON, self.OnHome)
+		self.Find.Bind(wx.EVT_BUTTON, self.OnFind)
 
 		# Populate the overlay chooser
 		self.Overlay = None
@@ -283,3 +301,22 @@ class panelStarMap(panelStarMapBase, TrackerObject):
 		self.ZoomLevel.SetValue("Fit")
 		self.OnZoomLevel('fit')
 		self.Canvas.Draw()
+		
+	def OnFind(self, evt):
+ 		"""\
+ 		Called when find button is pressed.
+ 		"""
+ 		if self.FindPopup.IsShown():
+ 			self.FindPopup.Hide()
+ 		else:
+ 			size = (0, self.Find.GetSize()[1])
+ 			self.FindPopup.Position(self.Find.GetScreenPosition(), size)
+ 			self.FindPopup.Show()
+ 	
+ 	def OnFindButton(self, evt):
+ 		"""\
+ 		Called when the enter key is pressed in the find text box
+ 		or the find button next to the text box is pressed.
+ 		"""
+ 		# TODO: Either pop up a list of possible choices matching the selection,
+ 		# or just select the object that matches most closely.
