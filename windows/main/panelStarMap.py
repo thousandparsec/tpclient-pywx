@@ -11,7 +11,7 @@ import numpy as N
 # wxPython imports
 import wx
 
-from extra.StateTracker import TrackerObject
+from extra.StateTracker import TrackerObjectOrder
 from extra.wxFloatCanvas import FloatCanvas
 
 from overlays.Resource import Resource
@@ -37,7 +37,7 @@ class GUIWaypoint(GUIMode.GUIMouse):
 	def SetOverlay(self, overlay):
 		self.overlay = overlay
 
-class panelStarMap(panelStarMapBase, TrackerObject):
+class panelStarMap(panelStarMapBase, TrackerObjectOrder):
 	title = _("StarMap")
 
 	Overlays = [(Paths, Systems), (Paths, Resource)]
@@ -50,13 +50,6 @@ class panelStarMap(panelStarMapBase, TrackerObject):
 		self.Canvas = FloatCanvas.FloatCanvas(self.FloatCanvas, Debug=1, BackgroundColor="black")
 
 		self.Find.Hide()
-		
-		# Initialize mouse-mode bitmaps
-		self.mousemodeicons = { "Mouse": wx.Bitmap("graphics/mousemode-icon.png"), \
-									"Move": wx.Bitmap("graphics/mousemove-icon16.png"), \
-									"ZoomIn": wx.Bitmap("graphics/mousezoomin-icon16.png"), \
-									"ZoomOut": wx.Bitmap("graphics/mousezoomout-icon16.png"), \
-									"Waypoint": wx.Bitmap("graphics/mousewaypoint-icon16.png") }
 		
 		# Create the mouse-mode popup
 		self.MouseModePopup = wx.PopupWindow(self)
@@ -107,23 +100,32 @@ class panelStarMap(panelStarMapBase, TrackerObject):
 			self.DisplayMode.Append(overlay[-1].name, overlay)
 		self.DisplayMode.SetSelection(0)
 
+		self.GUISelect   = GUIMode.GUIMouseAndMove(self.Canvas)
+		self.GUIMove     = GUIMode.GUIMove(self.Canvas)
 		self.GUIZoomIn   = GUIMode.GUIZoomIn(self.Canvas)
 		self.GUIZoomOut  = GUIMode.GUIZoomOut(self.Canvas)
-		self.GUIMove     = GUIMode.GUIMove(self.Canvas)
-		self.GUISelect   = GUIMode.GUIMouseAndMove(self.Canvas)
 		self.GUIWaypoint =         GUIWaypoint(self.Canvas)
+
+		# Initialize mouse-mode bitmaps
+		self.GUISelect.Icon   = wx.Bitmap("graphics/mousemode-icon.png")
+		self.GUIMove.Icon     = wx.Bitmap("graphics/mousemove-icon16.png")
+		self.GUIZoomIn.Icon   = wx.Bitmap("graphics/mousezoomin-icon16.png")
+		self.GUIZoomOut.Icon  = wx.Bitmap("graphics/mousezoomout-icon16.png")
+		self.GUIWaypoint.Icon = wx.Bitmap("graphics/mousewaypoint-icon16.png")
+		
 		self.SetMode(self.GUISelect)
 
 		self.Bind(wx.EVT_ENTER_WINDOW, self.OnMouseEnter)
 		self.Bind(wx.EVT_LEAVE_WINDOW, self.OnMouseLeave)
 
-		TrackerObject.__init__(self)
+		self.Bind(wx.EVT_KEY_UP, self.OnKeyUp)
+
+		TrackerObjectOrder.__init__(self)
 
 	def OnMouseEnter(self, evt):
 #		print "OnMouseEnter!", evt
 		# FIXME: Should make sure we gain the keyboard focus
-#		self.Canvas.SetFocus()
-		pass
+		self.Canvas.SetFocus()
 
 	def OnMouseLeave(self, evt):
 #		print "OnMouseLeave!", evt
@@ -153,7 +155,6 @@ class panelStarMap(panelStarMapBase, TrackerObject):
 
 		mode = evt.GetEventObject().GetLabel()
 		mode = mode.replace(' ', '')
-		self.MouseMode.SetBitmapLabel(self.mousemodeicons[mode])
 		
 		GUIMode = getattr(self, 'GUI%s' % mode, self.GUISelect)
 		self.SetMode(GUIMode)
@@ -162,6 +163,8 @@ class panelStarMap(panelStarMapBase, TrackerObject):
 		"""
 		Set the current mode of the canvas to a given type.
 		"""
+		self.MouseMode.SetBitmapLabel(mode.Icon)
+
 		self.Canvas.SetMode(mode)
 		self.mode = mode
 
@@ -330,3 +333,34 @@ class panelStarMap(panelStarMapBase, TrackerObject):
  		"""
  		# TODO: Either pop up a list of possible choices matching the selection,
  		# or just select the object that matches most closely.
+
+	def OnKeyUp(self, evt):
+		print "OnKeyUp", evt, evt.GetKeyCode()
+
+		if evt.GetKeyCode() == wx.WXK_ESCAPE:
+			self.SetMode(self.GUISelect)	
+
+		if evt.GetKeyCode() == wx.WXK_DELETE:
+			if len(self.nodes) == 1:
+				self.RemoveOrders(self.nodes)
+			else:
+				dlg = wx.MessageDialog(self,
+						"You are about to remove multiple\norders, are you sure?",
+ 						"Remove orders?", 
+						wx.OK | wx.CANCEL)
+
+				if dlg.ShowModal() == wx.ID_OK:
+					self.RemoveOrders(self.nodes)
+
+				dlg.Destroy()
+
+		print self.nodes
+		print self.nodes[0].left, self.nodes[-1].right
+
+		if evt.GetKeyCode() in (60, 44): # <
+			if len(self.nodes) > 0 and not self.nodes[0].left.left is None:
+				self.SelectOrders([self.nodes[0].left])
+
+		if evt.GetKeyCode() in (46,): # >
+			if len(self.nodes) > 0 and not self.nodes[-1].right is None:
+				self.SelectOrders([self.nodes[-1].right])
