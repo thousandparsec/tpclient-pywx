@@ -49,6 +49,15 @@ class panelStarMap(panelStarMapBase, TrackerObject):
 
 		self.Canvas = FloatCanvas.FloatCanvas(self.FloatCanvas, Debug=1, BackgroundColor="black")
 
+		self.Find.Hide()
+		
+		# Initialize mouse-mode bitmaps
+		self.mousemodeicons = { "Mouse": wx.Bitmap("graphics/mousemode-icon.png"), \
+									"Move": wx.Bitmap("graphics/mousemove-icon16.png"), \
+									"ZoomIn": wx.Bitmap("graphics/mousezoomin-icon16.png"), \
+									"ZoomOut": wx.Bitmap("graphics/mousezoomout-icon16.png"), \
+									"Waypoint": wx.Bitmap("graphics/mousewaypoint-icon16.png") }
+		
 		# Create the mouse-mode popup
 		self.MouseModePopup = wx.PopupWindow(self)
 		p = wx.Panel(self.MouseModePopup)
@@ -144,6 +153,7 @@ class panelStarMap(panelStarMapBase, TrackerObject):
 
 		mode = evt.GetEventObject().GetLabel()
 		mode = mode.replace(' ', '')
+		self.MouseMode.SetBitmapLabel(self.mousemodeicons[mode])
 		
 		GUIMode = getattr(self, 'GUI%s' % mode, self.GUISelect)
 		self.SetMode(GUIMode)
