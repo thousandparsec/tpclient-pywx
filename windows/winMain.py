@@ -159,6 +159,8 @@ class winMain(winBase):
 		self.SetMenuBar(self.Menu(self))
 
 		self.updatepending = False
+		
+		self.application.gui.Binder(self.application.NetworkClass.NetworkTimeRemainingEvent, self.OnNetworkTimeRemaining)
 
 	def Show(self, show=True):
 		# Show this window and it's children - also fixes menus for MacOS
