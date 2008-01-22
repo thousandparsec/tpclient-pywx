@@ -265,7 +265,10 @@ class TrackerObjectOrder(TrackerObject):
 
 		if evt.GetKeyCode() in (60, 44): # <
 			if len(self.nodes) > 0 and not self.nodes[0].left.left is None:
-				self.SelectOrders([self.nodes[0].left])
+				if evt.ShiftDown():
+					self.SelectOrders([self.nodes[0].left] + self.nodes[:])
+				else:
+					self.SelectOrders([self.nodes[0].left])
 			if len(self.nodes) == 0:
 				d = self.application.cache.orders[self.oid]
 				if len(d) > 0:
@@ -273,7 +276,10 @@ class TrackerObjectOrder(TrackerObject):
 
 		if evt.GetKeyCode() in (46,): # >
 			if len(self.nodes) > 0 and not self.nodes[-1].right is None:
-				self.SelectOrders([self.nodes[-1].right])
+				if evt.ShiftDown():
+					self.SelectOrders(self.nodes[:] + [self.nodes[-1].right])
+				else:
+					self.SelectOrders([self.nodes[-1].right])
 
 			if len(self.nodes) == 0:
 				d = self.application.cache.orders[self.oid]
