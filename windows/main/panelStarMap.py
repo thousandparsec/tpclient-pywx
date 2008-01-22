@@ -292,6 +292,8 @@ class panelStarMap(panelStarMapBase, TrackerObjectOrder):
 		"""\
 		Called when an object is selected.
 		"""
+		self.SetMode(self.GUISelect)	
+
 		# Check if this object can move so we can enable waypoint mode
 		canmove = False
 		for orderid in self.application.cache.objects[id].order_types:
