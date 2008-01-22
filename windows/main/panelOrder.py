@@ -62,6 +62,7 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 		self.Orders.Bind(wx.EVT_LIST_ITEM_SELECTED,   self.OnOrderSelect)
 		self.Orders.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.OnOrderSelect)
 #		self.Orders.Bind(wx.EVT_RIGHT_UP, self.OnRightClick)
+		self.Bind(wx.EVT_KEY_UP, self.OnKeyUp)
 
 	##########################################################################
 	# AUI interface bits

@@ -1,4 +1,6 @@
 
+import wx
+
 from extra.decorators import *
 
 from tp.client.ChangeList import ChangeNode
@@ -240,6 +242,43 @@ class TrackerObjectOrder(TrackerObject):
 			return
 
 		self._OrdersSelect(evt.nodes)
+
+	def OnKeyUp(self, evt):
+		print "OnKeyUp", evt, evt.GetKeyCode()
+
+		if evt.GetKeyCode() == wx.WXK_ESCAPE:
+			self.SetMode(self.GUISelect)	
+
+		if evt.GetKeyCode() == wx.WXK_DELETE:
+			if len(self.nodes) == 1:
+				self.RemoveOrders(self.nodes)
+			else:
+				dlg = wx.MessageDialog(self,
+						"You are about to remove multiple\norders, are you sure?",
+ 						"Remove orders?", 
+						wx.OK | wx.CANCEL)
+
+				if dlg.ShowModal() == wx.ID_OK:
+					self.RemoveOrders(self.nodes)
+
+				dlg.Destroy()
+
+		if evt.GetKeyCode() in (60, 44): # <
+			if len(self.nodes) > 0 and not self.nodes[0].left.left is None:
+				self.SelectOrders([self.nodes[0].left])
+			if len(self.nodes) == 0:
+				d = self.application.cache.orders[self.oid]
+				if len(d) > 0:
+					self.SelectOrders([d.last])
+
+		if evt.GetKeyCode() in (46,): # >
+			if len(self.nodes) > 0 and not self.nodes[-1].right is None:
+				self.SelectOrders([self.nodes[-1].right])
+
+			if len(self.nodes) == 0:
+				d = self.application.cache.orders[self.oid]
+				if len(d) > 0:
+					self.SelectOrders([d.first])
 
 	##########################################################################
 	# Methods called when state changes with the order

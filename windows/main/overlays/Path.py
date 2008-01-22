@@ -171,8 +171,8 @@ class Paths(Overlay, TrackerObjectOrder):
 	def __init__(self, parent, canvas, panel, cache, *args, **kw):
 		Overlay.__init__(self, parent, canvas, panel, cache, *args, **kw)
 
-		TrackerObjectOrder.__init__(self)	
 		self.active = []
+		TrackerObjectOrder.__init__(self)	
 
 	def UpdateOne(self, oid, overrides={}):
 		# Remove all the previous segments
