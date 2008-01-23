@@ -299,7 +299,7 @@ class GUIMouseAndMove(GUIMouse, GUIMove):
     def OnLeftDouble(self, event):
         EventType = FloatCanvas.EVT_FC_LEFT_DCLICK
         if not self.parent.HitTest(event, EventType):
-            self.parent.Zoom(1.0,event.GetPosition(),"pixel")
+            self.parent.Zoom(1.0,event.GetPosition(),"Pixel")
 #            self.parent._RaiseMouseEvent(event, EventType)
 
     def OnMove(self, event):
