@@ -5,7 +5,7 @@ universe.
 # Python imports
 import os
 from math import *
-
+import sys
 import numpy as N
 
 # wxPython imports
@@ -107,11 +107,18 @@ class panelStarMap(panelStarMapBase, TrackerObjectOrder):
 		self.GUIWaypoint =         GUIWaypoint(self.Canvas)
 
 		# Initialize mouse-mode bitmaps
-		self.GUISelect.Icon   = wx.Bitmap("graphics/mousemode-icon.png")
-		self.GUIMove.Icon     = wx.Bitmap("graphics/mousemove-icon16.png")
-		self.GUIZoomIn.Icon   = wx.Bitmap("graphics/mousezoomin-icon16.png")
-		self.GUIZoomOut.Icon  = wx.Bitmap("graphics/mousezoomout-icon16.png")
-		self.GUIWaypoint.Icon = wx.Bitmap("graphics/mousewaypoint-icon16.png")
+		if sys.platform == "darwin":
+			self.GUISelect.Icon   = wx.Bitmap("graphics/mousemode-icon16.png")
+			self.GUIMove.Icon     = wx.Bitmap("graphics/mousemove-icon16.png")
+			self.GUIZoomIn.Icon   = wx.Bitmap("graphics/mousezoomin-icon16.png")
+			self.GUIZoomOut.Icon  = wx.Bitmap("graphics/mousezoomout-icon16.png")
+			self.GUIWaypoint.Icon = wx.Bitmap("graphics/mousewaypoint-icon16.png")
+		else:
+			self.GUISelect.Icon   = wx.Bitmap("graphics/mousemode-icon24.png")
+			self.GUIMove.Icon     = wx.Bitmap("graphics/mousemove-icon24.png")
+			self.GUIZoomIn.Icon   = wx.Bitmap("graphics/mousezoomin-icon24.png")
+			self.GUIZoomOut.Icon  = wx.Bitmap("graphics/mousezoomout-icon24.png")
+			self.GUIWaypoint.Icon = wx.Bitmap("graphics/mousewaypoint-icon24.png")
 		
 		self.SetMode(self.GUISelect)
 

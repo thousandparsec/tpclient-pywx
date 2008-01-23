@@ -10,7 +10,7 @@
         <object class="wxFlexGridSizer">
           <object class="sizeritem">
             <object class="wxBitmapButton" name="MouseMode">
-              <bitmap>graphics/mousemode-icon.png</bitmap>
+              <bitmap>graphics/mousemode-icon16.png</bitmap>
             </object>
           </object>
           <object class="sizeritem">
