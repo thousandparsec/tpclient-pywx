@@ -33,12 +33,7 @@ class panelMessage(panelMessageBase, ShiftMixIn):
 		self.Message.Bind(wx.html.EVT_HTML_LINK_CLICKED, self.OnLinkEvent)
 
 		# The current message slot
-		self.slot = 0
-		self.position = 0
-		self.dirty = True
-
-		# Contains the message types to be filtered
-		self.filtered = Set()
+		self.node = None
 
 		self.application.gui.Binder(self.application.CacheClass.CacheUpdateEvent, self.OnCacheUpdate)
 
@@ -175,16 +170,16 @@ class panelMessage(panelMessageBase, ShiftMixIn):
 		if evt.what != "messages" or evt.id != self.bid:
 			return
 			
-		self.BoardSet(0, evt.slot)
-		self.dirty = True
+		self.BoardSet(0, evt.node)
 
+	@property
 	def message(self):
 		"""\
 		Returns the currently displayed message.
 		"""
-		return self.messages[self.slot]
-	message = property(message)
+		return self.node.CurrentOrder
 
+	@property
 	def messages(self):
 		"""\
 		Returns all the messages for the current board.
@@ -193,37 +188,18 @@ class panelMessage(panelMessageBase, ShiftMixIn):
 			return self.application.cache.messages[self.bid]
 		else:
 			return []
-	messages = property(messages)
 
-	def messages_unfiltered(self):
-		"""\
-		Returns a list of the slots for unfiltered messages.
-		"""
-		if self.dirty:
-			unfiltered = []
-			for i in range(0, len(self.messages)):
-				if self.filtered > Set(self.messages[i].types):
-					continue
-				unfiltered.append(i)
-			self.__unfiltered = unfiltered
-			return unfiltered
-		else:
-			return self.__unfiltered 
-	messages_unfiltered = property(messages_unfiltered)
-
-	def BoardSet(self, id, slot=0):
+	def BoardSet(self, id, node=None):
 		"""\
 		Set the currently displayed board to id.
 		"""
 		self.bid = id
-		self.MessageSet(direction=0)
+		if not self.messages.first is None:
+			self.MessageSet(node=self.messages.first)
 	
-	def MessageSet(self, direction=None, slot=None):
+	def MessageSet(self, direction=None, node=None):
 		"""\
-		Set the currently displayed message to the given slot.
-
-		Only shows messages which havn't been filtered.
-		Giving -1 will find first unfiltered message.
+		Set the currently displayed message to the given node.
 		"""
 		# Are there any messages?
 		if len(self.messages) == 0:
@@ -233,56 +209,35 @@ class panelMessage(panelMessageBase, ShiftMixIn):
 			message_filter = False
 			message_buttons = [False, False, False, False]
 
-		# Well are there any 
-		elif len(self.messages_unfiltered) == 0:
-			print "All messages were filtered"
-			message_subject = _("All filtered")
-			message_counter = _("")
-			message_body = self.html_allfiltered
-			message_filter = False
-			message_buttons = [False, False, False, False]
+		else:
+			if not direction is None:
+				if direction > 0 and not self.node.right is None:
+					self.node = self.node.right
 
-		elif direction != None or slot != None:
-			# Are we going to a specific message?
-			if slot != None:
-				if slot > len(self.messages) or slot < 0:
-					raise IOError("Tried to go to a place that doesn't exist!")
+				elif direction < 0 and not self.node.left.left is None:
+					self.node = self.node.left
 
-				self.slot = slot
+				else:
+					raise SystemError("Need to give a direction or node")
 
-				# Find the closest unfiltered position
-				for i in range(1, len(self.messages_unfiltered)):
-					if self.messages_unfiltered[i] > self.slot:
-						self.position = i-1
+			elif not node is None:
+				assert node in self.messages
 
-			# Are we just going in a general direction
-			if direction != None:
-				self.position += direction
-
-				# Can't go of the end
-				if self.position >= len(self.messages_unfiltered):
-					self.position = len(self.messages_unfiltered)-1
-				if self.position < 0:
-					self.position = 0
-				
-				self.slot = self.messages_unfiltered[self.position]
+				self.node = node
+			else:
+				raise SystemError("Need to give a direction or node")
 
 			message_subject = self.message.subject
-			if self.slot in self.messages_unfiltered:
-				message_body = self.html_message % self.message.__dict__
-			else:
-				message_body = self.html_filtered % self.message.__dict__
-
-			print "references", self.message.references
+			message_body = self.html_message % self.message.__dict__
 			
-			message_filter = not self.slot in self.messages_unfiltered
+			message_filter = False
 			message_buttons = [
-				self.position > 0, 
+				not self.node.left.left is None, 
 				GenericRS.Types["Object"] in self.message.references.types,
-				self.position < len(self.messages_unfiltered)-1,
+				not self.node.right is None,
 				True
 			]
-			message_counter = _("%i of %i") % (self.slot+1, len(self.messages))
+			message_counter = _("%i of %i") % (self.messages.index(self.node)+1, len(self.messages))
 
 		self.Title.SetLabel(message_subject)
 		self.Counter.SetLabel(message_counter)
@@ -296,26 +251,20 @@ class panelMessage(panelMessageBase, ShiftMixIn):
 		self.Delete.Enable(message_buttons[3])
 
 	def OnFirst(self, evt=None):
-		self.MessageSet(-len(self.messages))
+		self.MessageSet(node=self.messages.first)
 
 	def OnNext(self, evt=None):
 		self.MessageSet(1)
 	
 	def OnLast(self, evt=None):
-		self.MessageSet(len(self.messages))
+		self.MessageSet(node=self.messages.last)
 
 	def OnPrev(self, evt=None):
 		self.MessageSet(-1)
 		
 	def OnDelete(self, evt=None):
-		# Get the current slot
-		slot = self.slot
-
-		if slot == -1:
-			return
-
 		# Tell everyone about the change
-		self.application.Post(self.application.cache.CacheDirtyEvent("messages", "remove", self.bid, slot, None), source=self)
+		self.application.Post(self.application.cache.apply("messages", "remove", self.bid, self.node, None), source=self)
 
 	def OnGoto(self, slot):
 		# Select the object this message references
