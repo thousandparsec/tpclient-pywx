@@ -262,6 +262,15 @@ class Paths(Overlay, TrackerObjectOrder):
 		self.UpdateOne(self.oid)
 		self.canvas.Draw()
 
+	def ObjectRefresh(self, oid):
+		if oid is None:
+			return
+		
+		self.UpdateOne(self.oid)
+		
+	def ObjectRefreshAll(self):
+		self.UpdateAll()
+
 	def OnClickSegment(self, evt):
 		self.SelectObject(evt.what[0])
 		self.SelectOrders([evt.what[1]])

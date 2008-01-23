@@ -39,6 +39,8 @@ class TrackerObject(object):
 
 		# If there was a whole cache update
 		if evt.what is None:
+			self.ObjectRefreshAll()
+
 			# Refresh the currently selected object
 			if not self.oid is None:
 				self.ObjectRefresh(oid)
@@ -104,6 +106,12 @@ class TrackerObject(object):
 		if object is None:
 			self._ObjectSelect(id)
 
+	def ObjectRefreshAll(self):
+		"""
+		Refresh all objects (apart from the one that is selected.
+		"""
+		pass
+
 	##########################################################################
 	# Methods to change the state
 	##########################################################################
@@ -153,9 +161,13 @@ class TrackerObjectOrder(TrackerObject):
 
 		# If there was a whole cache update
 		if evt.what is None:
+			print self, evt, "Full cache update"
+
+			self.ObjectRefreshAll()
+
 			# Refresh the currently selected object
 			if not self.oid is None:
-				self.ObjectRefresh(oid)
+				self.ObjectRefresh(self.oid)
 			else:
 				self._ObjectSelect(None)
 

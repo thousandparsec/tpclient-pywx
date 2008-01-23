@@ -403,3 +403,5 @@ class Systems(SystemLevelOverlay, TrackerObjectOrder):
 
 		return s
 
+	def ObjectRefreshAll(self):
+		self.UpdateAll()
