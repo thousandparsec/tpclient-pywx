@@ -166,7 +166,11 @@ try:
 	import tp.netlib
 
 	print "Thousand Parsec Protocol Library Version", tp.netlib.__version__ 
-	print "    (installed at %s)" % tp.netlib.__installpath__
+	try:
+		print "    (installed at %s)" % tp.netlib.__installpath__
+	except AttributeError:
+		print "    (version to old to work out install path)"
+
 	try:
 		from tp.netlib.version import version_git
 		print "    (git %s)" % version_git
@@ -185,7 +189,11 @@ try:
 	import tp.client
 
 	print "Thousand Parsec Client Library Version", tp.client.__version__
-	print "    (installed at %s)" % tp.client.__installpath__
+	try:
+		print "    (installed at %s)" % tp.client.__installpath__
+	except AttributeError:
+		print "    (version to old to work out install path)"
+	
 	try:
 		from tp.client.version import version_git
 		print "    (git %s)" % version_git
