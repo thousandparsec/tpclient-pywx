@@ -3,7 +3,7 @@
     <object class="wxFrame" name="winUpdate">
         <style>wxCAPTION|wxRESIZE_BORDER|wxSYSTEM_MENU|wxCLOSE_BOX</style>
         <size>600,600</size>
-        <title>TP: Downloading Universe</title>
+        <title>TP: Universe update</title>
         <object class="wxPanel" name="Panel">
             <style>wxSUNKEN_BORDER|wxTAB_TRAVERSAL</style>
             <object class="wxFlexGridSizer">
