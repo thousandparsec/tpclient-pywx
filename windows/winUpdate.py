@@ -74,7 +74,7 @@ class winUpdate(winUpdateBase, winBaseXRC):
 		# Enable the cancel button
 		self.Cancel.Enable()
 
-		self.TopText.SetLabel("")
+		#self.TopText.SetLabel("")
 		self.Message.SetValue("")
 
 		self.ConnectingGauge.Enable()
