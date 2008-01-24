@@ -39,10 +39,13 @@ class winIdleFinder(winReportXRC, IdleFinderBase, TrackerObject):
 		self.idlelist.DeleteAllItems()
 		universe = self.application.cache.objects.keys()
 		for object in universe:
+			numorders = 0
 			if hasattr(self.application.cache.objects[object], "owner"):
 				if self.application.cache.objects[object].owner == self.application.cache.players[0].id:
 					if object in self.application.cache.orders.keys():
-						if self.application.cache.orders[object] == []:
+						for listpos, node in enumerate(self.application.cache.orders[object]):
+							numorders = numorders + 1
+						if numorders == 0:
 							self.idlelist.InsertStringItem(0, "%d" % object)
 							self.idlelist.SetStringItem(self.idlelist.FindItem(-1, "%d" % object), 1, self.application.cache.objects[object].name)
 							if self.application.cache.objects[object].subtype == 0:
