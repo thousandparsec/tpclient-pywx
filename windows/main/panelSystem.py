@@ -80,14 +80,14 @@ class panelSystem(panelSystemBase):
 		if len(orders) == 0:
 			return "#"
 		elif len(orders) == 1:
-			return str(orders.first.CurrentOrder.turns)
+			return unicode(orders.first.CurrentOrder.turns)
 		else:
 			turns = 0
 			for node in orders[1:]:
 				turns += node.CurrentOrder.turns
 			turns -= orders.first.CurrentOrder.turns
 
-			return str(orders.first.CurrentOrder.turns) + ", " + str(turns)
+			return unicode(orders.first.CurrentOrder.turns) + ", " + unicode(turns)
 
 	def Rebuild(self, evt=None):
 		"""\
@@ -127,8 +127,11 @@ class panelSystem(panelSystemBase):
 		filter = self.Search.GetValue()
 		if len(filter) == 0:
 			return "*"
-		if filter[-1] != '*':
+		elif not '*' in filter:
 			return filter.lower()+'*'
+		else:
+			return filter
+
 	Filter = property(Filter)
 
 	def Add(self, parent, object, selected=None):
