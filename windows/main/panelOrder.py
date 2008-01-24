@@ -237,30 +237,13 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 
 		self.Orders.SetSelected(listpos)
 
+		self.BuildPanel()
+
 		# Enable the delete button if we have orders to delete	
 		if len(nodes) > 0:
 			self.Delete.Enable()
 		else:
 			self.Delete.Disable()
-
-		try:
-			object = self.application.cache.objects[self.oid]
-
-			if object.order_number == 0 and len(object.order_types) == 0:
-				node = _("No orders avaliable")
-			elif len(nodes) > 1:
-				node = _("Multiple orders selected.")
-			elif len(nodes) < 1:
-				node = None
-			else:
-				node = nodes[0]
-		except KeyError:
-			node = _("No object selected.")
-
-		if node.LastState in ("removing", "removed"):
-			node = _("Order queued for removal.")
-
-		self.BuildPanel(node)
 
 		# Ensure we can see the items
 		if len(listpos) > 0:
@@ -296,7 +279,9 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 		assert self.Orders.GetItemPyData(d.index(node)) is node
 
 		self.UpdateListItem(d.index(node))
-		self.ColourOrderPanel()
+
+		if node in self.nodes:
+			self.BuildPanel()
 
 	@freeze_wrapper
 	def OrdersRemove(self, nodes, override=False):
@@ -309,17 +294,21 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 
 		listposes = []
 		for i in range(0, self.Orders.GetItemCount()):
-			if self.Orders.GetItemPyData(i) in nodes:
-				listposes.append(i)
+			node = self.Orders.GetItemPyData(i)
+			if node in nodes:
+				listposes.append((i, node))
 		listposes.sort(reverse=True)
 
 		if override:
-			for listpos in listposes:
+			for listpos, node in listposes:
 				self.UpdateListItem(listpos)
+
+				if node in self.nodes:
+					self.BuildPanel()
 		else:
-			for listpos in listposes:
+			for listpos, node in listposes:
 				self.RemoveListItem(listpos)
-			
+
 	####################################################
 	# Local Event Handlers
 	####################################################
@@ -393,8 +382,7 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 
 	@freeze_wrapper
 	def OnRevert(self, evt):
-#		self.OnOrderSelect(evt, force=True)
-		pass
+		self.BuildPanel()
 
 	@freeze_wrapper
 	def OnOrderDirty(self, evt):
@@ -423,10 +411,28 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 	# Panel Functions
 	####################################################
 	@freeze_wrapper
-	def BuildPanel(self, node):
+	def BuildPanel(self):
 		"""\
 		Builds a panel for the entering of orders arguments.
 		"""
+		try:
+			object = self.application.cache.objects[self.oid]
+			nodes = self.nodes
+
+			if object.order_number == 0 and len(object.order_types) == 0:
+				node = _("No orders avaliable")
+			elif len(nodes) > 1:
+				node = _("Multiple orders selected.")
+			elif len(nodes) < 1:
+				node = None
+			else:
+				node = nodes[0]
+
+				if node.LastState in ("removing", "removed"):
+					node = _("Order queued for removal.")
+		except KeyError:
+			node = _("No object selected.")
+
 		self.ColourOrderPanel()
 
 		# Remove the previous panel and stuff

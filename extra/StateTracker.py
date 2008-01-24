@@ -215,6 +215,7 @@ class TrackerObjectOrder(TrackerObject):
 					for node in self.nodes:
 						if not node in evt.nodes:
 							leftnodes.append(node)
+
 					if self.nodes != leftnodes:
 						self._OrdersSelect(leftnodes)
 

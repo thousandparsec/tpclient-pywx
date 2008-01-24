@@ -119,7 +119,7 @@
                                     <family>swiss</family>
                                     <face>Sans</face>
                                   </font>
-                                  <style>wxALIGN_CENTRE|wxST_NO_AUTORESIZE</style>
+                                  <style>wxALIGN_CENTRE</style>
                                   <label></label>
                                 </object>
                               </object>
