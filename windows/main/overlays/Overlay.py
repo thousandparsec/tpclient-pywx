@@ -463,7 +463,7 @@ class ObjectPopup(wx.PopupWindow):
 		except AttributeError:
 			pass
 
-		self.st = StaticFancyText(self.Window, -1, text, pos=(self.Padding, self.Padding))
+		self.st = StaticFancyText(self.Window, -1, text.encode('UTF-8'), pos=(self.Padding, self.Padding))
 		sz = self.st.GetSize()
 		self.SetSize( (sz.width+2*self.Padding, sz.height+2*self.Padding) )
 
