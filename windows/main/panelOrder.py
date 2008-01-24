@@ -22,7 +22,9 @@ ORDERS_COL = 1
 
 buttonSize = (wx.local.buttonSize[0], wx.local.buttonSize[1]+2)
 
-wx.YELLOW = wx.Color(150, 150, 0)
+CREATING = wx.Color(0, 0, 150)
+UPDATING = wx.Color(150, 150, 0)
+REMOVING = wx.Color(150, 0, 0)
 
 # FIXME: This is quite annoying..
 defaults = {
@@ -91,6 +93,22 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 		item.SetTextColour(color)
 		self.Orders.SetItem(item)
 
+	def ColourOrderPanel(self):
+		if len(self.nodes) != 1:
+			self.DetailsBorderPanel.SetBackgroundColour(wx.SystemSettings_GetColour(wx.SYS_COLOUR_BACKGROUND))
+		else:
+			node = self.nodes[0]
+
+			# Colour the background of the argument panel depending on the current state of the node
+			if node.LastState == "idle":
+				self.DetailsBorderPanel.SetBackgroundColour(wx.SystemSettings_GetColour(wx.SYS_COLOUR_BACKGROUND))
+			if node.LastState == "creating":
+				self.DetailsBorderPanel.SetBackgroundColour(CREATING)
+			if node.LastState == "removing":
+				self.DetailsBorderPanel.SetBackgroundColour(REMOVING)
+			if node.LastState == "updating":
+				self.DetailsBorderPanel.SetBackgroundColour(UPDATING)
+
 	def InsertListItem(self, listpos, node):
 		"""\
 		Inserts an order a certain position in the list.
@@ -118,19 +136,25 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 
 		self.Orders.SetStringItem(listpos, ORDERS_COL, node.CurrentOrder._name)
 
+		# FIXME: Hack
+		self.ColourOrderPanel()
+
 		if node.LastState == "idle":
 			self.ColourListItem(listpos, wx.BLACK)
 		if node.LastState == "creating":
-			self.ColourListItem(listpos, wx.BLUE)
+			self.ColourListItem(listpos, CREATING)
 		if node.LastState == "removing":
-			self.ColourListItem(listpos, wx.RED)
+			self.ColourListItem(listpos, REMOVING)
 		if node.LastState == "updating":
-			self.ColourListItem(listpos, wx.YELLOW)
+			self.ColourListItem(listpos, UPDATING)
 
 	def RemoveListItem(self, listpos):
 		"""\
 		Removes an order from a position in the list.
 		"""
+		# FIXME: Hack
+		self.ColourOrderPanel()
+
 		self.Orders.DeleteItem(listpos)
 
 	##########################################################################
@@ -197,6 +221,7 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 	##########################################################################
 	# Methods called when state changes with the order
 	##########################################################################
+	@freeze_wrapper
 	def OrdersSelect(self, nodes):
 		# Orders Select is only valid when an object is selected
 		assert self.oid != None
@@ -232,12 +257,16 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 		except KeyError:
 			node = _("No object selected.")
 
+		if node.LastState in ("removing", "removed"):
+			node = _("Order queued for removal.")
+
 		self.BuildPanel(node)
 
 		# Ensure we can see the items
 		if len(listpos) > 0:
 			self.Orders.EnsureVisible(listpos[-1])
 
+	@freeze_wrapper
 	def OrderInsertAfter(self, afterme, toinsert):
 		"""\
 		Inserts the order into a slot.
@@ -255,6 +284,7 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 		# Update the list box
 		self.InsertListItem(listpos, toinsert)
 
+	@freeze_wrapper
 	def OrderRefresh(self, node):
 		"""\
 		"""
@@ -266,7 +296,9 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 		assert self.Orders.GetItemPyData(d.index(node)) is node
 
 		self.UpdateListItem(d.index(node))
+		self.ColourOrderPanel()
 
+	@freeze_wrapper
 	def OrdersRemove(self, nodes, override=False):
 		"""\
 		Deletes the order from a slot.
@@ -395,6 +427,8 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 		"""\
 		Builds a panel for the entering of orders arguments.
 		"""
+		self.ColourOrderPanel()
+
 		# Remove the previous panel and stuff
 		if hasattr(self, "ArgumentsPanel"):
 			self.ArgumentsPanel.Hide()
@@ -404,6 +438,7 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 
 		# Show the details panel
 		self.DetailsPanel.Show()
+		self.ArgumentLine.Show()
 		self.Message.SetLabel("")
 		self.Message.Hide()
 
@@ -413,16 +448,6 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 
 			# Create a new panel
 			self.ArgumentsPanel = wx.Panel(self.DetailsPanel, -1)
-
-			# Colour the background of the argument panel depending on the current state of the node
-			if node.CurrentState == "idle":
-				pass
-			if node.CurrentState == "creating":
-				self.ArgumentsPanel.SetBackgroundColour(wx.BLUE)
-			if node.CurrentState == "removing":
-				self.ArgumentsPanel.SetBackgroundColour(wx.RED)
-			if node.CurrentState == "updating":
-				self.ArgumentsPanel.SetBackgroundColour(wx.YELLOW)
 
 			self.ArgumentsPanel.SetAutoLayout( True )
 			self.ArgumentsSizer = wx.FlexGridSizer( 0, 1, 0, 0)
@@ -460,7 +485,7 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 				self.ArgumentsChildren.append( subpanel )
 				
 				if namepos == wx.TOP:
-					self.ArgumentsSizer.Add( name_text, 0, wx.ALIGN_CENTER|wx.RIGHT, 4 )
+					self.ArgumentsSizer.Add( name_text, 0, wx.ALIGN_CENTER|wx.RIGHT|wx.LEFT,  border=4)
 					self.ArgumentsSizer.Add( subpanel, 1,  wx.GROW|wx.EXPAND|wx.ALIGN_CENTER)
 		
 				elif namepos == wx.LEFT:
@@ -477,10 +502,10 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 				name_text = wx.StaticText( self.ArgumentsPanel, -1, "No arguments" )
 				name_text.SetFont(wx.local.normalFont)
 				self.ArgumentsSizer.Add( name_text, 0, wx.ALIGN_CENTER|wx.CENTER, 4 )
-	
-#			self.DetailsPanel.SetClientSize(wx.Size(self.GetBestSize()[0], -1))
-			self.DetailsSizer.Add( self.ArgumentsPanel, 1, wx.GROW|wx.EXPAND|wx.ALIGN_CENTER|wx.ALL)
 
+#			self.DetailsPanel.SetClientSize(wx.Size(self.GetBestSize()[0], -1))
+			self.DetailsSizer.Add( self.ArgumentsPanel, flag=wx.GROW|wx.EXPAND|wx.ALIGN_CENTER|wx.ALL)
+		
 			# Show the Save/Revert/Delete buttons
 			self.Message.Show()
 			self.Save.Show()
@@ -499,14 +524,17 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 			self.Delete.Show()
 		else:
 			self.DetailsPanel.Hide()
+			self.ArgumentLine.Hide()
 
 			# Hide the Save/Revert/Delete buttons
 			self.Save.Hide()
 			self.Revert.Hide()
 			self.Delete.Hide()
-		
+
 		self.DetailsPanel.Layout()
+		self.DetailsParentPanel.Layout()
 		self.Master.Layout()
+
 		self.Layout()
 		self.Update()
 

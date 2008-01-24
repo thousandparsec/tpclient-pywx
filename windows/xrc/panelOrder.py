@@ -33,12 +33,17 @@ class panelOrderBase(wx.Panel):
 		self.Master = XRCCTRL(self, "Master")
 		self.Orders = XRCCTRL(self, "Orders")
 		self.Possible = XRCCTRL(self, "Possible")
+		if hasattr(self, "OnPossible"):
+			self.Possible.Bind(wx.EVT_CHOICE, self.OnPossible)
+
 		self.New = XRCCTRL(self, "New")
 		if hasattr(self, "OnNew"):
 			self.Bind(wx.EVT_BUTTON, self.OnNew, self.New)
 
-		self.DetailsPanel = XRCCTRL(self, "DetailsPanel")
+		self.DetailsParentPanel = XRCCTRL(self, "DetailsParentPanel")
+		self.DetailsBorderPanel = XRCCTRL(self, "DetailsBorderPanel")
 		self.ArgumentLine = XRCCTRL(self, "ArgumentLine")
+		self.DetailsPanel = XRCCTRL(self, "DetailsPanel")
 		self.Message = XRCCTRL(self, "Message")
 		self.Save = XRCCTRL(self, "Save")
 		if hasattr(self, "OnSave"):
@@ -55,6 +60,7 @@ class panelOrderBase(wx.Panel):
 
 
 def strings():
+	pass
 	_("Insert new order.");
 	_("&New");
 	_("&Save");
