@@ -44,6 +44,16 @@ class winConnectBase:
 		# Define variables for the controls
 		self.Panel = XRCCTRL(self, "Panel")
 		self.Server = XRCCTRL(self, "Server")
+		if hasattr(self, "OnServer"):
+			self.Bind(wx.EVT_COMBOBOX, self.OnServer, self.Server)
+			self.Bind(wx.EVT_TEXT_ENTER, self.OnServer, self.Server)
+		if hasattr(self, "OnDirtyServer"):
+			self.Bind(wx.EVT_TEXT, self.OnServer, self.Server)
+
+		self.Find = XRCCTRL(self, "wxID_FIND")
+		if hasattr(self, "OnFind"):
+			self.Bind(wx.EVT_BUTTON, self.OnFind, self.Find)
+
 		self.Username = XRCCTRL(self, "Username")
 		self.GameShow = XRCCTRL(self, "GameShow")
 		if hasattr(self, "OnGameShow"):
@@ -60,10 +70,6 @@ class winConnectBase:
 		if hasattr(self, "OnCancel"):
 			self.Bind(wx.EVT_BUTTON, self.OnCancel, self.Cancel)
 
-		self.Find = XRCCTRL(self, "wxID_FIND")
-		if hasattr(self, "OnFind"):
-			self.Bind(wx.EVT_BUTTON, self.OnFind, self.Find)
-
 		self.Config = XRCCTRL(self, "wxID_PREFERENCES")
 		if hasattr(self, "OnConfig"):
 			self.Bind(wx.EVT_BUTTON, self.OnConfig, self.Config)
@@ -71,10 +77,12 @@ class winConnectBase:
 
 
 def strings():
+	pass
 	_("TP: Connect to a Server");
 	_("Connect to Thousand Parsec Server");
 	_("Server");
 	_("The URL for the Thousand Parsec server.");
+	_("&Find");
 	_("Username");
 	_("The username for the account on the Thousand Parsec server.");
 	_("Show seperate game box.");
@@ -84,5 +92,4 @@ def strings():
 	_("The password for the account on the Thousand Parsec Server");
 	_("&OK");
 	_("&Cancel");
-	_("&Find");
 	_("&Preferences");

@@ -48,4 +48,4 @@ class IdleFinderBase:
 
 def strings():
 	pass
-	#_("Objects Without Orders");
+	_("Objects Without Orders");

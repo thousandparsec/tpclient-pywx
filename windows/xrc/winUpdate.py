@@ -79,7 +79,8 @@ class winUpdateBase:
 
 
 def strings():
-	_("TP: Downloading Universe");
+	pass
+	_("TP: Universe update");
 	_("Universe Download");
 	_("Done!");
 	_("Progress");

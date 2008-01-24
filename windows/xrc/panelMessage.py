@@ -64,6 +64,7 @@ class panelMessageBase(wx.Panel):
 
 
 def strings():
+	pass
 	_("Filter");
 	_("Static text");
 	_("100 of 100");

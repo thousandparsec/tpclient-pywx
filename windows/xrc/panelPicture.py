@@ -41,6 +41,7 @@ class panelPictureBase(wx.Panel):
 
 
 def strings():
+	pass
 	_("Name goes here");
 	_("10kb/s");
 	_("43s");

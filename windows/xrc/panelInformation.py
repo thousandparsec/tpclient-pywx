@@ -35,4 +35,5 @@ class panelInformationBase(wx.Panel):
 
 
 def strings():
+	pass
 	_("Name of object goes here");

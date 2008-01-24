@@ -69,6 +69,7 @@ class winServerBrowserBase:
 
 
 def strings():
+	pass
 	_("TP: Server Browser");
 	_("Thousand Parsec Server Browser");
 	_("Servers");

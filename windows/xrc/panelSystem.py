@@ -33,5 +33,7 @@ class panelSystemBase(wx.Panel):
 		self.Tree = XRCCTRL(self, "Tree")
 		self.Search = XRCCTRL(self, "Search")
 
+
 def strings():
 	pass
+

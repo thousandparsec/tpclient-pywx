@@ -44,6 +44,12 @@ class winAccountBase:
 		# Define variables for the controls
 		self.Panel = XRCCTRL(self, "Panel")
 		self.Server = XRCCTRL(self, "Server")
+		if hasattr(self, "OnServer"):
+			self.Bind(wx.EVT_COMBOBOX, self.OnServer, self.Server)
+			self.Bind(wx.EVT_TEXT_ENTER, self.OnServer, self.Server)
+		if hasattr(self, "OnDirtyServer"):
+			self.Bind(wx.EVT_TEXT, self.OnServer, self.Server)
+
 		self.Checking = XRCCTRL(self, "Checking")
 		self.Check = XRCCTRL(self, "Check")
 		if hasattr(self, "OnCheck"):
@@ -70,6 +76,7 @@ class winAccountBase:
 
 
 def strings():
+	pass
 	_("TP: Connect to a Server");
 	_("Create an Account");
 	_("Server");

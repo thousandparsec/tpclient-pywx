@@ -51,6 +51,7 @@ class configConnectBase(wx.Panel):
 
 
 def strings():
+	pass
 	_("Login for");
 	_("Username");
 	_("The username for the account on the Thousand Parsec server.");

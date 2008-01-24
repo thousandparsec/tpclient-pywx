@@ -45,8 +45,8 @@ class winDesignBase:
 		self.Panel = XRCCTRL(self, "Panel")
 		self.DesignsSearch = XRCCTRL(self, "DesignsSearch")
 		self.TitlePanel = XRCCTRL(self, "TitlePanel")
-		self.TitleEditable = XRCCTRL(self, "TitleEditable")
 		self.TitleStatic = XRCCTRL(self, "TitleStatic")
+		self.TitleEditable = XRCCTRL(self, "TitleEditable")
 		self.Used = XRCCTRL(self, "Used")
 		self.ComponentsSearch = XRCCTRL(self, "ComponentsSearch")
 		self.DesignsPanel = XRCCTRL(self, "DesignsPanel")
@@ -57,7 +57,6 @@ class winDesignBase:
 		self.PartsList = XRCCTRL(self, "PartsList")
 		self.DesignProperties = XRCCTRL(self, "DesignProperties")
 		self.DesignPropertyGroup1 = XRCCTRL(self, "DesignPropertyGroup1")
-		self.DesignPropertyGroup2 = XRCCTRL(self, "DesignPropertyGroup2")
 		self.DesignButtonsPanel = XRCCTRL(self, "DesignButtonsPanel")
 		self.Edit = XRCCTRL(self, "Edit")
 		if hasattr(self, "OnEdit"):
@@ -93,15 +92,12 @@ class winDesignBase:
 
 
 def strings():
+	pass
 	_("Design");
 	_("Title");
 	_("Title");
 	_("0000");
 	_("Some Categories, Will Go, Here");
-	_("Property 1:");
-	_("The value of property 1");
-	_("Property 2:");
-	_("The value of property 2");
 	_("Property 1:");
 	_("The value of property 1");
 	_("Property 2:");
