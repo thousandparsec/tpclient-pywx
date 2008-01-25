@@ -151,6 +151,9 @@ class winUpdate(winUpdateBase, winBaseXRC):
 
 	@freeze_wrapper
 	def Callback(self, mode, state, message="", todownload=None, total=None, amount=None):
+		self.ObjectdescsAnim.LoadFile(okay)
+		self.ObjectdescsAnim.Play()
+
 		# We do a little bit different for this mode
 		if mode == "connecting":
 			animation = getattr(self, "%sAnim" % mode.title())
@@ -182,6 +185,12 @@ class winUpdate(winUpdateBase, winBaseXRC):
 				animation.Disable()
 
 		elif mode == "finishing":
+			self.ProgressTitle.SetLabel(_("Update done!"))
+
+			# Change to the tick
+			self.ProgressAnim.LoadFile(okay)
+			self.ProgressAnim.Play()
+
 			# Change the buttons
 			self.Okay.Enable()
 			self.Save.Enable()
@@ -255,6 +264,7 @@ class winUpdate(winUpdateBase, winBaseXRC):
 
 		if len(message) > 0:
 			self.Message.AppendText(message+"\n")
+
 		self.Panel.Layout()
 		self.Panel.Update()
 		self.GoDown = True
