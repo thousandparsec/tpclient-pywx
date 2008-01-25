@@ -97,6 +97,33 @@ import __builtin__
 try:
 	import gettext
 	__builtin__._ = gettext.gettext	
+
+	if True:
+		import os
+		import wx
+		import gettext
+		basepath = os.path.abspath(os.path.dirname(__file__))
+		localedir = os.path.join(basepath, "locale")
+
+		langid = wx.LANGUAGE_DEFAULT    # use OS default; or use LANGUAGE_JAPANESE, etc.
+		domain = "tpclient-pywx"        # the translation file is tpclient-pywx.mo
+
+		# Set locale for wxWidgets
+		mylocale = wx.Locale(langid)
+		mylocale.AddCatalogLookupPathPrefix(localedir)
+		mylocale.AddCatalog(domain)
+
+		# Set up Python's gettext
+		print domain
+		print localedir
+		print mylocale.GetCanonicalName()
+
+		mytranslation = gettext.translation(domain, localedir, [mylocale.GetCanonicalName()], fallback=True)
+		mytranslation.install()
+
+		import __builtin__
+		__builtin__.__dict__['_'] = wx.GetTranslation
+
 except ImportError, e:
 	print e
 	def _(s):
