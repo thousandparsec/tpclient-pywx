@@ -191,6 +191,9 @@ class winMain(winBase):
 		if not show:
 			return self.Show()
 
+		#if hasattr(self, "tips"):
+		#	self.tips.Close()
+
 		for window in self.children.values():
 			window.Hide()
 		super(self.__class__, self).Hide()
@@ -332,9 +335,10 @@ class winMain(winBase):
 			config = [True, 0]
 
 		if config[0] or override != None:
-			tp = wx.CreateFileTipProvider(os.path.join(docdir, "tips.txt"), config[1])
-			config[0] = wx.ShowTip(self, tp)
-			config[1] = tp.GetCurrentTip()
+			self.tips = wx.CreateFileTipProvider(os.path.join(docdir, "tips.txt"), config[1])
+
+			config[0] = wx.ShowTip(self, self.tips)
+			config[1] = self.tips.GetCurrentTip()
 
 			save_data("pywx_tips", config)
 
