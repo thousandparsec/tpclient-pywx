@@ -33,7 +33,9 @@ class winConfig(winBase):
 
 			panel.SetAutoLayout(True)
 			panel.SetSizer(sizer)
-			
+
+			if len(sizer.GetChildren()) == 0:
+				continue
 			notebook.AddPage(panel, window.title)
 
 		# FIXME: This is only temporary till they fix this on mac!
