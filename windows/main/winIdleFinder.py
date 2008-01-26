@@ -45,7 +45,7 @@ class winIdleFinder(winReportXRC, IdleFinderBase, TrackerObject):
 		for object in universe:
 			numorders = 0
 			if hasattr(self.application.cache.objects[object], "owner"):
-				#if self.application.cache.objects[object].owner == self.application.cache.players[0].id:
+				if self.application.cache.objects[object].owner == self.application.cache.players[0].id:
 					if object in self.application.cache.orders.keys():
 						for listpos, node in enumerate(self.application.cache.orders[object]):
 							numorders = numorders + 1
