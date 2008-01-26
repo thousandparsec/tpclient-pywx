@@ -27,9 +27,12 @@ class winIdleFinder(winReportXRC, IdleFinderBase, TrackerObject):
 		self.idlelist.InsertColumn(1, "Item Name", width = 200)
 		self.idlelist.InsertColumn(2, "Item Type", width = 100)
 
+		self.ascending = 1
+
 		self.Bind(wx.EVT_SHOW, self.OnShow)
 		self.Bind(wx.EVT_ACTIVATE, self.OnShow)
 		self.idlelist.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.SelectObject)
+		self.idlelist.Bind(wx.EVT_LIST_COL_CLICK, self.OnColClick)
 		#self.idlelist.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.SelectObject)
 
 	def OnShow(self, evt):
@@ -37,28 +40,55 @@ class winIdleFinder(winReportXRC, IdleFinderBase, TrackerObject):
 		Runs when the window is shown.
 		"""
 		self.idlelist.DeleteAllItems()
+		numinlist = 0
 		universe = self.application.cache.objects.keys()
 		for object in universe:
 			numorders = 0
 			if hasattr(self.application.cache.objects[object], "owner"):
-				if self.application.cache.objects[object].owner == self.application.cache.players[0].id:
+				#if self.application.cache.objects[object].owner == self.application.cache.players[0].id:
 					if object in self.application.cache.orders.keys():
 						for listpos, node in enumerate(self.application.cache.orders[object]):
 							numorders = numorders + 1
 						if numorders == 0:
-							self.idlelist.InsertStringItem(0, "%d" % object)
-							self.idlelist.SetStringItem(self.idlelist.FindItem(-1, "%d" % object), 1, self.application.cache.objects[object].name)
+							self.idlelist.InsertStringItem(numinlist, "%d" % object)
+							self.idlelist.SetStringItem(numinlist, 1, self.application.cache.objects[object].name)
+							self.idlelist.SetItemData(numinlist, object)
 							if self.application.cache.objects[object].subtype == 0:
-								self.idlelist.SetStringItem(self.idlelist.FindItem(-1, "%d" % object), 2, "Universe")
+								self.idlelist.SetStringItem(numinlist, 2, "Universe")
 							elif self.application.cache.objects[object].subtype == 1:
-								self.idlelist.SetStringItem(self.idlelist.FindItem(-1, "%d" % object), 2, "Galaxy")
+								self.idlelist.SetStringItem(numinlist, 2, "Galaxy")
 							elif self.application.cache.objects[object].subtype == 2:
-								self.idlelist.SetStringItem(self.idlelist.FindItem(-1, "%d" % object), 2, "System")
+								self.idlelist.SetStringItem(numinlist, 2, "System")
 							elif self.application.cache.objects[object].subtype == 3:
-								self.idlelist.SetStringItem(self.idlelist.FindItem(-1, "%d" % object), 2, "Planet")
+								self.idlelist.SetStringItem(numinlist, 2, "Planet")
 							elif self.application.cache.objects[object].subtype == 4:
-								self.idlelist.SetStringItem(self.idlelist.FindItem(-1, "%d" % object), 2, "Fleet")
-
+								self.idlelist.SetStringItem(numinlist, 2, "Fleet")
+							numinlist = numinlist + 1
+		
+	def Sort(self, d1, d2):
+		data1 = self.GetColData(d1, self.col)
+		data2 = self.GetColData(d2, self.col)
+		if data1 == data2:
+			return 0
+		elif data1 > data2:
+			return self.ascending*1
+		else:
+			return self.ascending*-1
+				
+	def GetColData(self, obj, col):
+		if col == 0:
+			return obj
+		elif col == 1:
+			return self.application.cache.objects[obj].name.lower()
+		elif col == 2:
+			return self.application.cache.objects[obj].subtype
+	
+	def OnColClick(self, event):
+		self.col = event.GetColumn()
+		self.ascending *= -1
+		self.idlelist.SortItems(self.Sort)
+		#event.Skip()
+	
 	def OnClose(self, evt):
 		"""\
 		Runs when the window is closed.

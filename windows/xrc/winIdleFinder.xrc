@@ -3,11 +3,17 @@
   <object class="wxFrame" name="IdleFinder">
     <title>Objects Without Orders</title>
     <object class="wxPanel" name="base">
-      <object class="wxListCtrl" name="idlelist">
-        <size>400, 400</size>
-        <style>wxLC_REPORT</style>
+      <object class="wxBoxSizer">
+        <orient>wxVERTICAL</orient>
+        <object class="sizeritem">
+          <object class="wxListCtrl" name="idlelist">
+            <style>wxLC_REPORT</style>
+          </object>
+          <option>1</option>
+          <flag>wxALL|wxEXPAND|wxALIGN_CENTRE</flag>
+          <minsize>300, 300</minsize>
+        </object>
       </object>
-      <size>400, 400</size>
     </object>
   </object>
 </resource>
