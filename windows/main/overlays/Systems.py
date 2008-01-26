@@ -238,15 +238,23 @@ class Systems(SystemLevelOverlay, TrackerObjectOrder):
 
 			return True
 		elif self.parent.mode is self.parent.GUIWaypoint:
+			orderdesc = None
+			for orderdesc in OrderDescs().values():
+				if orderdesc._name in ("Move",) :
+					break
+
+			assert not orderdesc is None
+
 			if samesystem:
+				assert len(self.nodes) > 0
+
 				# Modify the last move order
-				pass
+				updatedorder = orderdesc(0, self.oid, -1, orderdesc.subtype, 0, [], self.Selected.current.pos)
+				self.ChangeOrder(updatedorder,self.nodes[-1])
+
+				self.ObjectHoverEnter(self.Selected, self.canvas.WorldToPixel(self.Selected.XY))
 			else:
 				# Insert new move order
-				for orderdesc in OrderDescs().values():
-					if orderdesc._name in ("Move",) :
-						break
-
 				neworder = orderdesc(0, self.oid, -1, orderdesc.subtype, 0, [], self.Selected.current.pos)
 				self.InsertAfterOrder(neworder)
 
