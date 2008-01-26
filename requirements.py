@@ -98,7 +98,7 @@ try:
 	import gettext
 	__builtin__._ = gettext.gettext	
 
-	if True:
+	if not sys.platform == "darwin":
 		import os
 		import wx
 		import gettext
