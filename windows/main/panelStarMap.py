@@ -346,7 +346,18 @@ class panelStarMap(panelStarMapBase, TrackerObjectOrder):
 	
 	def OnKeyUp(self, evt):
 		if evt.GetKeyCode() in (77,):
-			self.SetMode(self.GUIWaypoint)
+			# FIXME: Duplicate code!!!!
+			canmove = False
+			for orderid in self.application.cache.objects[self.oid].order_types:
+				order = OrderDescs()[orderid]
+
+				# FIXME: Needs to be a better way to do this...
+				if order._name in ("Move", "Move To", "Intercept"):
+					canmove = True
+					break
+
+			if canmove:
+				self.SetMode(self.GUIWaypoint)
 		else:
 			TrackerObjectOrder.OnKeyUp(self, evt)
 
