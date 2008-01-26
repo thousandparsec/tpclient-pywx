@@ -35,7 +35,7 @@ arguments = dict(
 		],
 	data_files=[(".",			("LICENSE", "COPYING", "README")),
 				("doc",			("doc/tips.txt",)),
-				("windows/xrc", glob.glob("windows/xrc/*.xrc")),
+				("windows/xrc",	glob.glob("windows/xrc/*.xrc")),
 				("graphics",	glob.glob("graphics/*.gif")),
 				("graphics",	glob.glob("graphics/*.png")),
 				("graphics",	glob.glob("graphics/*.ico"))],
@@ -155,7 +155,11 @@ if sys.platform == 'darwin':
 	from setuptools import find_packages
 	print find_packages()
 
+	# Fix the version path
+	os.system('python version.py --fix > %s' % os.path.join(privatepath, 'version.py'))
+
 	shutil.copy('tpclient-pywx', 'tpclient-pywx.py')
+
 	arguments['scripts']=["tpclient-pywx.py"]
 	
 	# Py2App stuff
@@ -169,7 +173,9 @@ if sys.platform == 'darwin':
 				"optimize"	: 2,
 				"packages"	: find_packages(),
 				"includes"	: [],
-				"excludes"	: ['Tkconstants', 'Tkinter', 'tcl', 'pydoc',],
+				"excludes"	: ['Tkconstants', 'Tkinter', 'tcl', 'pydoc', 
+					'numpy.numarray', 'numpy.oldnumeric',
+					'numpy.distutils', 'numpy.doc', 'numpy.f2py', 'numpy.fft', 'numpy.lib.tests', 'numpy.testing'],
 				"resources"	: arguments['data_files'],
 				"iconfile"	: "graphics/tp.icns",
 				"plist"		: {
@@ -218,6 +224,7 @@ elif sys.platform == 'win32':
 			}
 		}, 
 	)
+
 else:
 	print "You shouldn't be running this (as it's only for Mac or Windows maintainers).."
 	sys.exit()
@@ -229,13 +236,17 @@ if sys.platform == 'darwin':
 		# Need to do some cleanup because the modulegraph is a bit brain dead
 		base = os.path.join("dist", "tpclient-pywx.app", "Contents", "Resources", "lib", "python2.5")
 		for i in (
-				"netlib", "objects", "ObjectExtra", "OrderExtra", "support",
-				"client", "pyscheme",
+				"xrc", "main", "overlays", "wxFloatCanvas", "Utilities", # local excesses
+				"netlib", "objects", "ObjectExtra", "OrderExtra", "support", "discover", "pyZeroconf",  # tp.netlib
+				"client", "pyscheme", "discover", # tp.client
 				):
 			p = os.path.join(base, i)
 			if os.path.exists(p):
 				print "Removing", p
 				shutil.rmtree(p)
+
+		# Need to clean up any .py$ files which got included for some unknown reason...
+		# Need to clean up any .pyc$ when a .pyo$ exists too
 
 	# Create a package
 	dmg = "tpclient-pywx_%s.dmg" % version
