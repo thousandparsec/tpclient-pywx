@@ -342,4 +342,11 @@ class panelStarMap(panelStarMapBase, TrackerObjectOrder):
  		"""
  		# TODO: Either pop up a list of possible choices matching the selection,
  		# or just select the object that matches most closely.
+		pass
+	
+	def OnKeyUp(self, evt):
+		if evt.GetKeyCode() in (77,):
+			self.SetMode(self.GUIWaypoint)
+		else:
+			TrackerObjectOrder.OnKeyUp(self, evt)
 
