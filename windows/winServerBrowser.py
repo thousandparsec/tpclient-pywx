@@ -40,6 +40,11 @@ class winServerBrowser(winServerBrowserBase, winBaseXRC):
 
 		self.OnToggleLocation(False)
 
+		self.application.gui.Binder(self.application.FinderClass.FoundLocalGameEvent,  self.OnFoundLocalGame,  self.IsShown)
+		self.application.gui.Binder(self.application.FinderClass.FoundRemoteGameEvent, self.OnFoundRemoteGame, self.IsShown)
+#		self.application.gui.Binder(self.application.FinderClass.LostLocalGameEvent,   self.OnCacheUpdate)
+#		self.application.gui.Binder(self.application.FinderClass.LostRemoteGameEvent,  self.OnCacheUpdate)
+
 	def AddGame(self, game=None, resize=True):
 		ctrl = self.Servers
 		Columns, Columns_Sizes = self.ServersColumns, self.ServersColumns_Sizes
