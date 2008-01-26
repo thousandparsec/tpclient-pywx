@@ -65,15 +65,15 @@ class winServerBrowser(winServerBrowserBase, winBaseXRC):
 #			except AttributeError: pass
 
 			try:
-				ctrl.SetStringItem(i, Columns.index(_("C")),  str(game.cons))
+				ctrl.SetStringItem(i, Columns.index(_("C")),  unicode(game.cons))
 			except AttributeError: pass
 
 			try:
-				ctrl.SetStringItem(i, Columns.index(_("O")),  str(game.objs))
+				ctrl.SetStringItem(i, Columns.index(_("O")),  unicode(game.objs))
 			except AttributeError: pass
 
 			try:
-				ctrl.SetStringItem(i, Columns.index(_("P")),  str(game.plys))
+				ctrl.SetStringItem(i, Columns.index(_("P")),  unicode(game.plys))
 			except AttributeError: pass
 
 			try:
@@ -133,7 +133,7 @@ class winServerBrowser(winServerBrowserBase, winBaseXRC):
 				ctrl.SetStringItem(i, Columns.index(_("Type")), type)
 				ctrl.SetStringItem(i, Columns.index(_("DNS")),  dns)
 				ctrl.SetStringItem(i, Columns.index(_("IP")),	 ip)
-				ctrl.SetStringItem(i, Columns.index(_("Port")), str(port))
+				ctrl.SetStringItem(i, Columns.index(_("Port")), unicode(port))
 
 				ctrl.SetItemPyData(i, (game, (type, dns, ip, port)))
 		# Set the column widths
@@ -233,7 +233,7 @@ class winServerBrowser(winServerBrowserBase, winBaseXRC):
 		self.Progress.SetToolTip(message)
 
 	def OnFinderError(self, evt):
-		self.RefreshFinished(False, str(evt))
+		self.RefreshFinished(False, unicode(evt))
 
 	def OnFinderFinished(self, evt):
 		self.RefreshFinished(True)

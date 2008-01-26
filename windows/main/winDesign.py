@@ -221,7 +221,7 @@ class winDesign(winDesignBase, winReportXRC, ShiftMixIn):
 		self.TitleEditable.SetValue(design.name)
 
 		# Set the Used
-		self.Used.SetLabel(str(design.used))
+		self.Used.SetLabel(unicode(design.used))
 		if design.used == -1:
 			self.Used.SetForegroundColour(wx.Color(255, 0, 0))
 		elif design.used == 0:
@@ -305,7 +305,7 @@ class winDesign(winDesignBase, winReportXRC, ShiftMixIn):
 		for cid, number in design.components:
 			component = self.application.cache.components[cid]
 		
-			self.PartsList.InsertStringItem(0, str(number))
+			self.PartsList.InsertStringItem(0, unicode(number))
 			self.PartsList.SetStringItem(0, 1, component.name)
 
 	# Functions to update the component lists

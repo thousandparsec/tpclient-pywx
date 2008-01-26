@@ -130,7 +130,7 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 		node = self.Orders.GetItemPyData(listpos)
 
 		if node.CurrentState is "idle":
-			self.Orders.SetStringItem(listpos, TURNS_COL, str(node.CurrentOrder.turns))
+			self.Orders.SetStringItem(listpos, TURNS_COL, unicode(node.CurrentOrder.turns))
 		else:
 			self.Orders.SetStringItem(listpos, TURNS_COL, 'U')
 
@@ -818,7 +818,7 @@ def argListPanel(parent, parent_panel, args):
 		type, number = args[1][slot]
 
 		selected.InsertStringItem(slot, "")
-		selected.SetStringItem(slot, 0, str(number))
+		selected.SetStringItem(slot, 0, unicode(number))
 		selected.SetStringItem(slot, 1, types[type][0])
 		selected.SetItemPyData(slot, type)
 		
@@ -865,7 +865,7 @@ def argListPanel(parent, parent_panel, args):
 			slot = 0
 
 			selected.InsertStringItem(slot, "")
-			selected.SetStringItem(slot, 0, str(amount))
+			selected.SetStringItem(slot, 0, unicode(amount))
 			selected.SetStringItem(slot, 1, types[type][0])
 			selected.SetItemPyData(slot, type)
 
@@ -880,7 +880,7 @@ def argListPanel(parent, parent_panel, args):
 			if amount + oldamount < 0:
 				amount = -1 * oldamount
 			
-			selected.SetStringItem(slot, 0, str(amount + oldamount))
+			selected.SetStringItem(slot, 0, unicode(amount + oldamount))
 
 	def deletef(evt, selected=selected):
 		"""\
@@ -959,7 +959,7 @@ def argTimePanel(parent, parent_panel, args):
 	panel.SetSizer(item0)
 	panel.SetAutoLayout( True )
 	
-	item1 = wx.SpinCtrl( panel, -1, str(args[0]), min=min, max=max, size=(wx.local.spinSize[0]*2, wx.local.spinSize[1]) )
+	item1 = wx.SpinCtrl( panel, -1, unicode(args[0]), min=min, max=max, size=(wx.local.spinSize[0]*2, wx.local.spinSize[1]) )
 	item1.SetFont(wx.local.tinyFont)
 	item0.Add( item1, 1, wx.ALIGN_CENTRE|wx.LEFT|wx.EXPAND, 1 )
 	
@@ -981,7 +981,7 @@ def argCoordPanel(parent, parent_panel, args):
 	item1.SetFont(wx.local.normalFont)
 	item0.Add( item1, 0, wx.ALIGN_CENTRE|wx.LEFT, 0 )
 
-	item2 = wx.TextCtrl( panel, -1, str(args[X]), size=wx.local.spinSize, validator=wx.SimpleValidator(wx.DIGIT_ONLY) )
+	item2 = wx.TextCtrl( panel, -1, unicode(args[X]), size=wx.local.spinSize, validator=wx.SimpleValidator(wx.DIGIT_ONLY) )
 	item2.SetFont(wx.local.tinyFont)
 	item0.Add( item2, 1, wx.EXPAND|wx.ALIGN_CENTRE|wx.LEFT, 1 )
 
@@ -989,7 +989,7 @@ def argCoordPanel(parent, parent_panel, args):
 	item3.SetFont(wx.local.normalFont)
 	item0.Add( item3, 0, wx.ALIGN_CENTRE|wx.LEFT, 3 )
 
-	item4 = wx.TextCtrl( panel, -1, str(args[Y]), size=wx.local.spinSize, validator=wx.SimpleValidator(wx.DIGIT_ONLY) )
+	item4 = wx.TextCtrl( panel, -1, unicode(args[Y]), size=wx.local.spinSize, validator=wx.SimpleValidator(wx.DIGIT_ONLY) )
 	item4.SetFont(wx.local.tinyFont)
 	item0.Add( item4, 1, wx.EXPAND|wx.ALIGN_CENTRE|wx.LEFT, 1 )
 
@@ -997,7 +997,7 @@ def argCoordPanel(parent, parent_panel, args):
 	item5.SetFont(wx.local.normalFont)
 	item0.Add( item5, 0, wx.ALIGN_CENTRE|wx.LEFT, 3 )
 
-	item6 = wx.TextCtrl( panel, -1, str(args[Z]), size=wx.local.spinSize, validator=wx.SimpleValidator(wx.DIGIT_ONLY) )
+	item6 = wx.TextCtrl( panel, -1, unicode(args[Z]), size=wx.local.spinSize, validator=wx.SimpleValidator(wx.DIGIT_ONLY) )
 	item6.SetFont(wx.local.tinyFont)
 	item0.Add( item6, 1, wx.EXPAND|wx.ALIGN_CENTRE|wx.LEFT, 1 )
 
@@ -1007,9 +1007,9 @@ def argCoordPanel(parent, parent_panel, args):
 
 	def OnSelectPosition(evt, x=item2, y=item4, z=item6, p=parent):
 		p.ignore = True
-		x.SetValue(str(evt.x))
-		y.SetValue(str(evt.y))
-		z.SetValue(str(evt.z))
+		x.SetValue(unicode(evt.x))
+		y.SetValue(unicode(evt.y))
+		z.SetValue(unicode(evt.z))
 		p.ignore = False
 
 		p.OnOrderDirty(None)

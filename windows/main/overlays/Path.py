@@ -143,7 +143,7 @@ class PathSegment(Group):
 		self.State = state
 
 		# Change the color of this segment
-		color = getattr(self, str(state) + 'Color')
+		color = getattr(self, unicode(state) + 'Color')
 		self.ObjectList[-1].SetColor(color)
 
 	def Select(self, yes):

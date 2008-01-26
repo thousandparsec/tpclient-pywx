@@ -176,11 +176,11 @@ class winAccount(winAccountBase, winBaseXRC, usernameMixIn):
 
 	def OnNetworkAccount(self, evt):
 		self.application.gui.Show(self.application.gui.connectto)
-		dlg = wx.MessageDialog(self.application.gui.current, str(evt), _("Account Created"), wx.OK|wx.ICON_INFORMATION)
+		dlg = wx.MessageDialog(self.application.gui.current, unicode(evt), _("Account Created"), wx.OK|wx.ICON_INFORMATION)
 		dlg.ShowModal()
 
 	def OnNetworkFailure(self, evt):
-		dlg = wx.MessageDialog(self.application.gui.current, str(evt), _("Network Error"), wx.OK|wx.ICON_ERROR)
+		dlg = wx.MessageDialog(self.application.gui.current, unicode(evt), _("Network Error"), wx.OK|wx.ICON_ERROR)
 		dlg.ShowModal()
 
 		self.State("start")

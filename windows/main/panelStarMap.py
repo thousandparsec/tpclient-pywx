@@ -256,7 +256,7 @@ class panelStarMap(panelStarMapBase, TrackerObjectOrder):
 		if isinstance(evt, wx.Event):
 			to = evt.GetString().lower()
 		else:
-			to = str(evt).lower()
+			to = unicode(evt).lower()
 
 		if self.Canvas.GUIMode == self.GUIZoomIn:
 			self.SetMode(self.GUISelect)

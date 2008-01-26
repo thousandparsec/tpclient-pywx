@@ -359,7 +359,7 @@ class GUI(wx.App):
 			self.Show(self.connectto)
 
 			# When the network fails pop-up a dialog then go to the connectto screen
-			dlg = wx.MessageDialog(self.application.gui.current, str(evt), _("Network Error"), wx.OK|wx.ICON_ERROR)
+			dlg = wx.MessageDialog(self.application.gui.current, unicode(evt), _("Network Error"), wx.OK|wx.ICON_ERROR)
 			dlg.ShowModal()
 			dlg.Destroy()
 
