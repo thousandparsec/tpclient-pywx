@@ -50,34 +50,39 @@ class wxPyEvent(wx.PyEvent, Event):
 class EventBinder(dict):
 	def __init__(self, *args, **kw):
 		self.LastEvent = {}
+		self.Preconditions = {}
 		dict.__init__(self, *args, **kw)
 
-	def Bind(self, event, function):
+	def Bind(self, event, function, precondition=None):
 		if not issubclass(event, Event):
 			raise TypeError("First argument must be an event object.")
 		if not callable(function):
 			raise TypeError("Second argument must be a callable.")
+		if not precondition is None and not callable(precondition):
+			raise TypeError("precondition must be a callable.")
 
 		name = event.__name__
 
 		if not self.has_key(name):
 			self[name] = []
-		self[name].append(function)
+		self[name].append((function, precondition))
 
 	__call__ = Bind
 
-	def Unbind(self, event, function):
+	def Unbind(self, event, function, precondition=None):
 		if not issubclass(event, Event):
 			raise TypeError("First argument must be an event object.")
 		if not callable(function):
 			raise TypeError("Argument must be a callable.")
+		if not precondition is None and not callable(precondition):
+			raise TypeError("precondition must be a callable.")
 
 		name = event.__name__
 
 		if not self.has_key(name) or not function in self[name]:
 			raise KeyError("That function is not bound to that argument!")
 
-		self[name].remove(function)
+		self[name].remove((function, precondition))
 
 		if len(self[name]) == 0:
 			del self[name]
@@ -108,7 +113,7 @@ class EventBinder(dict):
 			if not self.has_key(name):
 				continue
 
-			for function in self[name]:
+			for function, precondition in self[name]:
 				# Source is a function
 				if function in sentto:
 					continue
@@ -118,6 +123,9 @@ class EventBinder(dict):
 					continue
 
 				try:
+					if not precondition is None and not precondition():
+						continue
+
 					function(event)
 				except Exception, e:
 					utils.do_traceback()
