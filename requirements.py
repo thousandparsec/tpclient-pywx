@@ -67,31 +67,32 @@ except ImportError:
 		notfound.append("python-numpy-ext")
 	else:
 		notfound.append("NumPy or SciPy")
-
-wx_version = (2, 8, 0, 0)
-wx_version_str = '.'.join([str(x) for x in wx_version[0:2]])
-try:
-	import wxversion
-	if os.path.exists("wxversion"):
-		wxversion.select(open("wxversion").read())
-	else:
-		wxversion.ensureMinimal(wx_version_str)
-except ImportError, e:
-	pass
-
-try:
-	import wx
-	if not cmp(wx_version, wx.__version__.split('.')):
-		raise ImportError("wxPython was too old")
-
-	print "wxPython version is", wx.__version__
-except (ImportError, KeyError), e:
-	print e
-
-	if system == "debian-based":
-		notfound.append("python-wxgtk2.8")
-	else:
-		notfound.append("wxPython > " + wx_version_str)
+		
+if not hasattr(sys, "frozen") or sys.frozen != 'macosx_app':
+	wx_version = (2, 8, 0, 0)
+	wx_version_str = '.'.join([str(x) for x in wx_version[0:2]])
+	try:
+		import wxversion
+		if os.path.exists("wxversion"):
+			wxversion.select(open("wxversion").read())
+		else:
+			wxversion.ensureMinimal(wx_version_str)
+	except ImportError, e:
+		pass
+	
+	try:
+		import wx
+		if not cmp(wx_version, wx.__version__.split('.')):
+			raise ImportError("wxPython was too old")
+	
+		print "wxPython version is", wx.__version__
+	except (ImportError, KeyError), e:
+		print e
+	
+		if system == "debian-based":
+			notfound.append("python-wxgtk2.8")
+		else:
+			notfound.append("wxPython > " + wx_version_str)
 
 import __builtin__
 try:

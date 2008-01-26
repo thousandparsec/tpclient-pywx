@@ -5,7 +5,7 @@ This module contains the idle objects finder display.
 # wxPython imports
 import wx
 import wx.gizmos
-from wx import *
+#from wx import *
 import wx.lib.anchors
 
 # Local imports

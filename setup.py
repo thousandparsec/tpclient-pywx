@@ -26,11 +26,16 @@ arguments = dict(
 	packages=[ \
 		'.',
 		'windows',
+		'windows.main',
+		'windows.main.overlays',
+		'windows.xrc',
 		'extra',
 		'extra.wxFloatCanvas',
+		'extra.wxFloatCanvas.Utilities',
 		],
 	data_files=[(".",			("LICENSE", "COPYING", "README")),
 				("doc",			("doc/tips.txt",)),
+				("windows/xrc", glob.glob("windows/xrc/*.xrc")),
 				("graphics",	glob.glob("graphics/*.gif")),
 				("graphics",	glob.glob("graphics/*.png")),
 				("graphics",	glob.glob("graphics/*.ico"))],
@@ -150,7 +155,7 @@ if sys.platform == 'darwin':
 	from setuptools import find_packages
 	print find_packages()
 
-	os.copy('tpclient-pywx', 'tpclient-pywx.py')
+	shutil.copy('tpclient-pywx', 'tpclient-pywx.py')
 	arguments['scripts']=["tpclient-pywx.py"]
 	
 	# Py2App stuff
@@ -222,7 +227,7 @@ setup(**arguments)
 if sys.platform == 'darwin':
 	if "py2app" in sys.argv:
 		# Need to do some cleanup because the modulegraph is a bit brain dead
-		base = os.path.join("dist", "tpclient-pywx.app", "Contents", "Resources", "lib", "python2.4")
+		base = os.path.join("dist", "tpclient-pywx.app", "Contents", "Resources", "lib", "python2.5")
 		for i in (
 				"netlib", "objects", "ObjectExtra", "OrderExtra", "support",
 				"client", "pyscheme",
