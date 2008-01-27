@@ -286,14 +286,14 @@ class winMain(winBase):
 
 		win.AppendSeparator()
 		win.Append(ID_WIN_TIPS, _("Show Tips"), _(""), True )
-		win.Append(ID_WIN_HELP, _("Help"),      _(""), True)
+		#win.Append(ID_WIN_HELP, _("Help"),      _(""), True)
 
 		help = wx.Menu()
 
 		bar.Append( file, _("File") )
 		#bar.Append( stat, _("Statistics") )
 		bar.Append( win,  _("Windows") )
-		bar.Append( help, _("&Help") )
+		#bar.Append( help, _("&Help") )
 
 		source.Bind(wx.EVT_MENU, self.OnConnect,     id=ID_OPEN)
 		source.Bind(wx.EVT_MENU, self.UpdateCache,   id=ID_UNIV)
