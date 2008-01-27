@@ -3,7 +3,7 @@ This overlay draws Star Systems on the Starmap.
 """
 # Python imports
 from math import *
-
+import copy
 import numpy as N
 
 # wxPython imports
@@ -275,6 +275,16 @@ class Systems(SystemLevelOverlay, TrackerObjectOrder):
 		if self.parent.mode is self.parent.GUIWaypoint:
 			return
 		SystemLevelOverlay.SystemHovering(self, event)
+
+	def ModeChange(self, oldmode, newmode):
+		print "ModeChange", oldmode, newmode
+
+		if newmode == self.parent.GUIWaypoint:
+			self.RealSelected = copy.copy(self.Selected)
+
+		if oldmode == self.parent.GUIWaypoint:
+			self.Selected = self.RealSelected
+			self.RealSelected = None
 
 	def ObjectRightClick(self, icon, hover):
 		"""

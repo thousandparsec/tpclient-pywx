@@ -3,6 +3,7 @@ This module contains the StarMap window. This window displays a view of the
 universe.
 """
 # Python imports
+import copy
 import os
 from math import *
 import sys
@@ -26,16 +27,30 @@ import extra.wxFloatCanvas.GUIMode as GUIMode
 class GUIWaypoint(GUIMode.GUIMouse):
 	def __init__(self, *args, **kw):
 		GUIMode.GUIMouse.__init__(self, *args, **kw)
-		self.overlay = None
+		self.Overlay  = None
+		self.CallNext = None
 
 	def OnLeftUp(self, event):
+		print "OnLeftUp", event
+
 		EventType = FloatCanvas.EVT_FC_LEFT_UP
 		if not self.parent.HitTest(event, EventType):
-			if hasattr(self.overlay, "OnLeftUpMiss"):
-				self.overlay.OnLeftUpMiss(event)
+			if hasattr(self.Overlay, "OnLeftUpMiss"):
+				self.Overlay.OnLeftUpMiss(event)
 
-	def SetOverlay(self, overlay):
-		self.overlay = overlay
+		if not self.CallNext is None:
+			CallNext = self.CallNext
+			self.CallNext = None
+
+			wx.CallAfter(CallNext)
+
+	def SetOverlay(self, Overlay):
+		self.Overlay = Overlay
+
+	def SetCallNext(self, tocall):
+		assert callable(tocall)
+
+		self.CallNext = tocall
 
 class panelStarMap(panelStarMapBase, TrackerObjectOrder):
 	title = _("StarMap")
@@ -169,7 +184,12 @@ class panelStarMap(panelStarMapBase, TrackerObjectOrder):
 	def SetMode(self, mode):
 		"""
 		Set the current mode of the canvas to a given type.
-		"""
+		"""		
+		if not self.Overlay is None:
+			for overlay in self.Overlay:
+				if hasattr(overlay, "ModeChange"):
+					overlay.ModeChange(self.mode, mode)
+
 		self.MouseMode.SetBitmapLabel(mode.Icon)
 
 		self.Canvas.SetMode(mode)
@@ -343,9 +363,12 @@ class panelStarMap(panelStarMapBase, TrackerObjectOrder):
  		# TODO: Either pop up a list of possible choices matching the selection,
  		# or just select the object that matches most closely.
 		pass
-	
+
 	def OnKeyUp(self, evt):
 		if evt.GetKeyCode() in (77,):
+			if self.oid is None:
+				return
+
 			# FIXME: Duplicate code!!!!
 			canmove = False
 			for orderid in self.application.cache.objects[self.oid].order_types:
@@ -357,6 +380,10 @@ class panelStarMap(panelStarMapBase, TrackerObjectOrder):
 					break
 
 			if canmove:
+				if evt.ShiftDown():
+					def n(mode=self.mode):
+						self.SetMode(mode)
+					self.GUIWaypoint.SetCallNext(n)
 				self.SetMode(self.GUIWaypoint)
 		else:
 			TrackerObjectOrder.OnKeyUp(self, evt)
