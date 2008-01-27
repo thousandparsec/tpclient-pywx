@@ -52,6 +52,9 @@ class GUIWaypoint(GUIMode.GUIMouse):
 
 		self.CallNext = tocall
 
+class GUIWaypointEdit(GUIWaypoint):
+	pass
+
 class panelStarMap(panelStarMapBase, TrackerObjectOrder):
 	title = _("StarMap")
 
@@ -120,6 +123,7 @@ class panelStarMap(panelStarMapBase, TrackerObjectOrder):
 		self.GUIZoomIn   = GUIMode.GUIZoomIn(self.Canvas)
 		self.GUIZoomOut  = GUIMode.GUIZoomOut(self.Canvas)
 		self.GUIWaypoint =         GUIWaypoint(self.Canvas)
+		self.GUIWaypointEdit =     GUIWaypointEdit(self.Canvas)
 
 		# Initialize mouse-mode bitmaps
 		if sys.platform == "darwin":
@@ -128,12 +132,14 @@ class panelStarMap(panelStarMapBase, TrackerObjectOrder):
 			self.GUIZoomIn.Icon   = wx.Bitmap("graphics/mousezoomin-icon16.png")
 			self.GUIZoomOut.Icon  = wx.Bitmap("graphics/mousezoomout-icon16.png")
 			self.GUIWaypoint.Icon = wx.Bitmap("graphics/mousewaypoint-icon16.png")
+			self.GUIWaypointEdit.Icon = wx.Bitmap("graphics/mousewaypoint-icon16.png")
 		else:
 			self.GUISelect.Icon   = wx.Bitmap("graphics/mousemode-icon24.png")
 			self.GUIMove.Icon     = wx.Bitmap("graphics/mousemove-icon24.png")
 			self.GUIZoomIn.Icon   = wx.Bitmap("graphics/mousezoomin-icon24.png")
 			self.GUIZoomOut.Icon  = wx.Bitmap("graphics/mousezoomout-icon24.png")
 			self.GUIWaypoint.Icon = wx.Bitmap("graphics/mousewaypoint-icon24.png")
+			self.GUIWaypointEdit.Icon = wx.Bitmap("graphics/mousewaypoint-icon16.png")
 		
 		self.SetMode(self.GUISelect)
 
