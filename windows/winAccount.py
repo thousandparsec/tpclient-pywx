@@ -35,6 +35,10 @@ class winAccount(winAccountBase, winBaseXRC, usernameMixIn):
 		winBaseXRC.__init__(self, application)	
 		usernameMixIn.__init__(self)
 
+		self.application.gui.Binder(self.application.NetworkClass.NetworkConnectEvent,   self.OnNetworkConnect)
+		self.application.gui.Binder(self.application.NetworkClass.NetworkAccountEvent,   self.OnNetworkAccount)
+		self.application.gui.Binder(self.application.NetworkClass.NetworkFailureEvent,   self.OnNetworkFailure)
+
 	def Show(self, show=True):
 		if not show:
 			return self.Hide()
