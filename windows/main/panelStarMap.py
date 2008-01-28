@@ -319,6 +319,7 @@ class panelStarMap(panelStarMapBase, TrackerObjectOrder):
 
 			self.ZoomLevel.SetValue("Fit")
 			self.OnZoomLevel('fit')
+			self.OnHome(None)
 			self.Canvas.Draw()
 
 	def ObjectSelect(self, id):
@@ -384,12 +385,13 @@ class panelStarMap(panelStarMapBase, TrackerObjectOrder):
 
 		# Select the object
 		self.SelectObject(foundhomeworld)
+		for Overlay in self.Overlay:
+			try:
+				Overlay.SelectObject(oid)
+			except NotImplementedError:
+				pass
 		self.Canvas.Zoom(1, self.application.cache.objects[foundhomeworld].pos[:2])
 		self.Canvas.Draw()
-
-		if not foundhomeworld:
-			self.SelectObject(0)
-
 		
 	def OnFind(self, evt):
  		"""\
