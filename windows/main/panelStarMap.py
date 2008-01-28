@@ -346,32 +346,50 @@ class panelStarMap(panelStarMapBase, TrackerObjectOrder):
 		"""\
 		Called when home button is pressed.
 		"""
-		homeresource = -1
+		# Figure out the homeworld resource
+		homeresource = None
 		for number, resource in self.application.cache.resources.items():
-			#print resource.name
-			if (resource.name == "Home Planet"):
-				homeresource = number
-				
-		foundhomeworld = -1
-		if (homeresource != -1):
-			for object in self.application.cache.objects.keys():
-				if hasattr(self.application.cache.objects[object], "owner"):
-					if self.application.cache.objects[object].owner == self.application.cache.players[0].id:
-						if (hasattr(self.application.cache.objects[object], "resources")):
-							for resource in self.application.cache.objects[object].resources:
-								if resource[0] == homeresource:
-									if reduce(int.__add__, resource[1:]) != 0:
-										for Overlay in self.Overlay:
-											try:
-												Overlay.SelectObject(object)
-											except NotImplementedError:
-												pass
-										foundhomeworld = object
-						
-				
-		if foundhomeworld != -1:
-			self.Canvas.Zoom(1, self.application.cache.objects[foundhomeworld].pos[:2])
-			self.Canvas.Draw()
+			if resource.name != "Home Planet":
+				continue
+			homeresource = number
+		
+		# Figure out the homeworld		
+		foundhomeworld = 0
+		if not homeresource is None:
+			for oid in self.application.cache.objects.keys():
+				# Is this object ownable?
+				if not hasattr(self.application.cache.objects[oid], "owner"):
+					continue
+
+				# Does the player own this object
+				if self.application.cache.objects[oid].owner != self.application.cache.players[0].id:
+					continue
+			
+				# Does this object have any resources?
+				if not (hasattr(self.application.cache.objects[oid], "resources")):
+					continue
+
+				for resources in self.application.cache.objects[oid].resources:
+					if not resources[0] == homeresource:
+						continue
+
+					if reduce(int.__add__, resources[1:]) == 0:
+						continue
+
+					foundhomeworld = oid
+					break
+
+				if foundhomeworld != 0:
+					break
+
+		# Select the object
+		self.SelectObject(foundhomeworld)
+		self.Canvas.Zoom(1, self.application.cache.objects[foundhomeworld].pos[:2])
+		self.Canvas.Draw()
+
+		if not foundhomeworld:
+			self.SelectObject(0)
+
 		
 	def OnFind(self, evt):
  		"""\
