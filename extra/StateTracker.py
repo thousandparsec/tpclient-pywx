@@ -394,11 +394,13 @@ class TrackerObjectOrder(TrackerObject):
 		# Call our handler
 		self.OrderInsertAfter(node, evt.change)
 
-	def InsertBeforeOrder(self, order, node=None):
-		# Insert order is only valid when an object is selected
-		assert self.oid != None
-		# Order must be an order, duh!
-		assert isinstance(order, Order)
+		return evt.change
+
+#	def InsertBeforeOrder(self, order, node=None):
+#		# Insert order is only valid when an object is selected
+#		assert self.oid != None
+#		# Order must be an order, duh!
+#		assert isinstance(order, Order)
 
 	def DirtyOrder(self, order, node=None):
 		pass

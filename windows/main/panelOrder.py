@@ -356,7 +356,9 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 		new._dirty = True
 
 		# Insert the new order (after the currently selected)
-		self.InsertAfterOrder(new)
+		node = self.InsertAfterOrder(new)
+
+		self.SelectOrders([node])
 
 	@freeze_wrapper
 	def OnOrderDelete(self, evt):
