@@ -385,11 +385,6 @@ class panelStarMap(panelStarMapBase, TrackerObjectOrder):
 
 		# Select the object
 		self.SelectObject(foundhomeworld)
-		for Overlay in self.Overlay:
-			try:
-				Overlay.SelectObject(oid)
-			except NotImplementedError:
-				pass
 		self.Canvas.Zoom(1, self.application.cache.objects[foundhomeworld].pos[:2])
 		self.Canvas.Draw()
 		
