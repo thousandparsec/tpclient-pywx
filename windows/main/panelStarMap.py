@@ -3,6 +3,7 @@ This module contains the StarMap window. This window displays a view of the
 universe.
 """
 # Python imports
+import copy
 import os
 from math import *
 import sys
@@ -26,16 +27,33 @@ import extra.wxFloatCanvas.GUIMode as GUIMode
 class GUIWaypoint(GUIMode.GUIMouse):
 	def __init__(self, *args, **kw):
 		GUIMode.GUIMouse.__init__(self, *args, **kw)
-		self.overlay = None
+		self.Overlay  = None
+		self.CallNext = None
 
 	def OnLeftUp(self, event):
+		print "OnLeftUp", event
+
 		EventType = FloatCanvas.EVT_FC_LEFT_UP
 		if not self.parent.HitTest(event, EventType):
-			if hasattr(self.overlay, "OnLeftUpMiss"):
-				self.overlay.OnLeftUpMiss(event)
+			if hasattr(self.Overlay, "OnLeftUpMiss"):
+				self.Overlay.OnLeftUpMiss(event)
 
-	def SetOverlay(self, overlay):
-		self.overlay = overlay
+		if not self.CallNext is None:
+			CallNext = self.CallNext
+			self.CallNext = None
+
+			wx.CallAfter(CallNext)
+
+	def SetOverlay(self, Overlay):
+		self.Overlay = Overlay
+
+	def SetCallNext(self, tocall):
+		assert callable(tocall)
+
+		self.CallNext = tocall
+
+class GUIWaypointEdit(GUIWaypoint):
+	pass
 
 class panelStarMap(panelStarMapBase, TrackerObjectOrder):
 	title = _("StarMap")
@@ -105,6 +123,7 @@ class panelStarMap(panelStarMapBase, TrackerObjectOrder):
 		self.GUIZoomIn   = GUIMode.GUIZoomIn(self.Canvas)
 		self.GUIZoomOut  = GUIMode.GUIZoomOut(self.Canvas)
 		self.GUIWaypoint =         GUIWaypoint(self.Canvas)
+		self.GUIWaypointEdit =     GUIWaypointEdit(self.Canvas)
 
 		# Initialize mouse-mode bitmaps
 		if sys.platform == "darwin":
@@ -113,12 +132,14 @@ class panelStarMap(panelStarMapBase, TrackerObjectOrder):
 			self.GUIZoomIn.Icon   = wx.Bitmap("graphics/mousezoomin-icon16.png")
 			self.GUIZoomOut.Icon  = wx.Bitmap("graphics/mousezoomout-icon16.png")
 			self.GUIWaypoint.Icon = wx.Bitmap("graphics/mousewaypoint-icon16.png")
+			self.GUIWaypointEdit.Icon = wx.Bitmap("graphics/mousewaypoint-icon16.png")
 		else:
 			self.GUISelect.Icon   = wx.Bitmap("graphics/mousemode-icon24.png")
 			self.GUIMove.Icon     = wx.Bitmap("graphics/mousemove-icon24.png")
 			self.GUIZoomIn.Icon   = wx.Bitmap("graphics/mousezoomin-icon24.png")
 			self.GUIZoomOut.Icon  = wx.Bitmap("graphics/mousezoomout-icon24.png")
 			self.GUIWaypoint.Icon = wx.Bitmap("graphics/mousewaypoint-icon24.png")
+			self.GUIWaypointEdit.Icon = wx.Bitmap("graphics/mousewaypoint-icon16.png")
 		
 		self.SetMode(self.GUISelect)
 
@@ -169,7 +190,12 @@ class panelStarMap(panelStarMapBase, TrackerObjectOrder):
 	def SetMode(self, mode):
 		"""
 		Set the current mode of the canvas to a given type.
-		"""
+		"""		
+		if not self.Overlay is None:
+			for overlay in self.Overlay:
+				if hasattr(overlay, "ModeChange"):
+					overlay.ModeChange(self.mode, mode)
+
 		self.MouseMode.SetBitmapLabel(mode.Icon)
 
 		self.Canvas.SetMode(mode)
@@ -366,9 +392,12 @@ class panelStarMap(panelStarMapBase, TrackerObjectOrder):
  		# TODO: Either pop up a list of possible choices matching the selection,
  		# or just select the object that matches most closely.
 		pass
-	
+
 	def OnKeyUp(self, evt):
 		if evt.GetKeyCode() in (77,):
+			if self.oid is None:
+				return
+
 			# FIXME: Duplicate code!!!!
 			canmove = False
 			for orderid in self.application.cache.objects[self.oid].order_types:
@@ -380,6 +409,10 @@ class panelStarMap(panelStarMapBase, TrackerObjectOrder):
 					break
 
 			if canmove:
+				if evt.ShiftDown():
+					def n(mode=self.mode):
+						self.SetMode(mode)
+					self.GUIWaypoint.SetCallNext(n)
 				self.SetMode(self.GUIWaypoint)
 		else:
 			TrackerObjectOrder.OnKeyUp(self, evt)

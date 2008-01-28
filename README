@@ -1,21 +1,66 @@
 
-The pywx-client for Thousand Parsec (TP)
+The wxPython client for Thousand Parsec (TP)
 ============================================
 
 Requirements (all versions must be greater):
-	python			2.2
-	wxPython		2.6.0
+	python			>2.4
+	wxPython		>2.8.0
 
 	python-numpy
 
-	libtpclient-py	0.3.x
-	libtpproto-py	0.2.x
+	libtpclient-py	>0.3.0
+	libtpproto-py	>0.2.2
 
 Recommendations:
-	Python Imaging Library 1.0.0
+	Pygame
+	pyopenssl or python-openssl
+	Pysco
+	Python Imaging Library
+
+To check that you have all the requirements installed you can run the
+requirements.py file. It will give you information about is installed and what
+it couldn't find. On Debian (such as Ubuntu) based platforms it will even give
+you instructions how to install them.
+
 
 How to use
 ============================================
-In windows, double click on tpclient-pywx
-In linux, change to the tpclient-pywx directory and run "tpclient-pywx"
+
+The client can be run from the location you downloaded on Linux, Windows and Mac
+or installed on the system on Linux.
+
+In windows, double click on tpclient-pywx file.
+In linux, change to the tpclient-pywx directory and run "./tpclient-pywx".
+
+
+Disabling the splash movie
+============================================
+The splash movie can annoy some people. If you wish to disable it you can
+create a "NOSPLASHMOVIE" file in the top level directory.
+
+Keyboard Short Cuts
+============================================
+The client has a number of keyboard shortcuts,
+
+	Menu shortcuts:
+
+		* Ctrl-U, Download the universe
+		* Crtl-O, Connect to a different server
+
+	Star Map shortcuts:
+
+		* arrow keys, scroll the star map
+		* wasd, scroll the star map
+		* +, zoom in the star map (at the mouse position)
+		* -, zoom out the star map (at the mouse position)
+
+		* Esc, change back to mouse mode
+		* m, change to waypoint mode (shift will add a single move order)
+
+	Order manipulation:
+	 
+		* Delete, remove the currently selected order 
+		* <, next order (shift will add the next order to the selection)
+		* >, previous order (shift will add the previous order to the selection)
+
 

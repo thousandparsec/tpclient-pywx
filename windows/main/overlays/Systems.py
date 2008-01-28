@@ -3,7 +3,7 @@ This overlay draws Star Systems on the Starmap.
 """
 # Python imports
 from math import *
-
+import copy
 import numpy as N
 
 # wxPython imports
@@ -237,6 +237,17 @@ class Systems(SystemLevelOverlay, TrackerObjectOrder):
 			self.canvas.Draw()
 
 			return True
+		elif self.parent.mode is self.parent.GUIWaypointEdit:
+			# FIXME: Hack
+			from windows.main.panelOrder import panelOrder
+
+			order = self.parent.application.gui.main.panels[panelOrder.title]
+
+			if hasattr(order, "OnSelectPosition"):
+				order.OnSelectPosition(self.Selected.current.pos)
+
+			return False
+
 		elif self.parent.mode is self.parent.GUIWaypoint:
 			orderdesc = None
 			for orderdesc in OrderDescs().values():
@@ -261,20 +272,30 @@ class Systems(SystemLevelOverlay, TrackerObjectOrder):
 			return False
 
 	def SelectObject(self, id):
-		if self.parent.mode is self.parent.GUIWaypoint:
+		if self.parent.mode in (self.parent.GUIWaypoint, self.parent.GUIWaypointEdit) :
 			return
 		TrackerObjectOrder.SelectObject(self, id)
 
 	def OrderInsertAfter(self, afterme, what):
-		if self.parent.mode is self.parent.GUIWaypoint:
+		if self.parent.mode in (self.parent.GUIWaypoint, self.parent.GUIWaypointEdit):
 			self.SelectOrders([what])
 
 	OrderInsertBefore = OrderInsertAfter
 
 	def SystemHovering(self, event):
-		if self.parent.mode is self.parent.GUIWaypoint:
+		if self.parent.mode in (self.parent.GUIWaypoint, self.parent.GUIWaypointEdit):
 			return
 		SystemLevelOverlay.SystemHovering(self, event)
+
+	def ModeChange(self, oldmode, newmode):
+		print "ModeChange", oldmode, newmode
+
+		if newmode in (self.parent.GUIWaypoint, self.parent.GUIWaypointEdit):
+			self.RealSelected = copy.copy(self.Selected)
+
+		if oldmode in (self.parent.GUIWaypoint, self.parent.GUIWaypointEdit):
+			self.Selected = self.RealSelected
+			self.RealSelected = None
 
 	def ObjectRightClick(self, icon, hover):
 		"""

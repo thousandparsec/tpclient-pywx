@@ -356,7 +356,9 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 		new._dirty = True
 
 		# Insert the new order (after the currently selected)
-		self.InsertAfterOrder(new)
+		node = self.InsertAfterOrder(new)
+
+		self.SelectOrders([node])
 
 	@freeze_wrapper
 	def OnOrderDelete(self, evt):
@@ -392,20 +394,14 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 		# Ignore programatic changes
 		if self.ignore:
 			return 
-		
-		# Figure out which slot to use
-		if len(self.slots) != 1:
-			return
-		slot = self.slots[0]
 
-		# Check if the order is pending changes
-		order = self.Orders.GetItemPyData(slot)
+		assert len(self.nodes) == 1
 		
 		# Update the order
-		order = self.FromPanel(order)
+		order = self.FromPanel(self.nodes[0].CurrentOrder)
 
 		# Tell the gui about the change
-		self.DirtyOrder(slot, order)	
+		self.DirtyOrder(order)
 	
 	####################################################
 	# Panel Functions
@@ -1007,9 +1003,9 @@ def argCoordPanel(parent, parent_panel, args):
 
 	def OnSelectPosition(evt, x=item2, y=item4, z=item6, p=parent):
 		p.ignore = True
-		x.SetValue(unicode(evt.x))
-		y.SetValue(unicode(evt.y))
-		z.SetValue(unicode(evt.z))
+		x.SetValue(unicode(evt[0]))
+		y.SetValue(unicode(evt[1]))
+		z.SetValue(unicode(evt[2]))
 		p.ignore = False
 
 		p.OnOrderDirty(None)
@@ -1017,9 +1013,12 @@ def argCoordPanel(parent, parent_panel, args):
 	parent.OnSelectPosition = OnSelectPosition
 
 	# FIXME: Better way to get the children is needed...
-#	def p(evt, starmap=parent.parent.children[_('StarMap')]):
-#		starmap.SetMode("Position")
-#	parent.Bind(wx.EVT_BUTTON, p, item7)
+	from windows.main.panelStarMap import panelStarMap
+
+	starmap = parent.parent.application.gui.main.panels[panelStarMap.title]
+	def p(evt, starmap=starmap):
+		starmap.SetMode(starmap.GUIWaypointEdit)
+	parent.Bind(wx.EVT_BUTTON, p, item7)
 
 	parent.Bind(wx.EVT_TEXT, parent.OnOrderDirty, item2)
 	parent.Bind(wx.EVT_TEXT, parent.OnOrderDirty, item4)

@@ -115,10 +115,6 @@ try:
 		mylocale.AddCatalog(domain)
 
 		# Set up Python's gettext
-		print domain
-		print localedir
-		print mylocale.GetCanonicalName()
-
 		mytranslation = gettext.translation(domain, localedir, [mylocale.GetCanonicalName()], fallback=True)
 		mytranslation.install()
 
@@ -140,8 +136,6 @@ except ImportError, e:
 try:
 	import psyco
 except ImportError, e:
-	print e
-
 	reason = "Installing pysco can give a 10-20% speed increase in starmap calculations. (Pysco is x86 only.)"
 	if system == "debian-based":
 		recommended.append(("python-psyco", reason))
@@ -152,8 +146,6 @@ try:
 	try:
 		import pyOpenSSL
 	except ImportError, e:
-		print e
-
 		# Maybe it's using a different name
 		import OpenSSL as pyOpenSSL
 except ImportError, e:

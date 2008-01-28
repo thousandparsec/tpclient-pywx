@@ -16,13 +16,9 @@ Short Term
 Longer Term
 	* Make data in the info panel good looking
 		
-	* Add right click pop-up menu to starmap
-		* Include useful options on this menu, Quick add Order?
-		* Left (or right) click and hold for pan?
-
-	* Add option to not use MDI interface under windows
 	* Let the fonts be selected
 	* Fix the default fonts
 
 Longest Term
 	* Check what it looks like under windows / MacOSX
+
