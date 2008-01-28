@@ -39,7 +39,6 @@ class panelMessage(panelMessageBase, ShiftMixIn):
 
 	def OnLinkEvent(self, evt):
 		link = evt.GetLinkInfo().GetHref()
-		print link
 		from extra.Opener import open
 		open(link)
 
