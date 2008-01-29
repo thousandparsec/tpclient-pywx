@@ -13,6 +13,15 @@ from windows.winBase import winReportXRC, ShiftMixIn
 from windows.xrc.winIdleFinder import IdleFinderBase
 # Shows messages from the game system to the player.
 from extra.StateTracker import TrackerObject
+
+# tp imports
+from tp.netlib.objects                        import Object, OrderDescs
+from tp.netlib.objects.ObjectExtra.Universe   import Universe
+from tp.netlib.objects.ObjectExtra.Galaxy     import Galaxy
+from tp.netlib.objects.ObjectExtra.StarSystem import StarSystem
+from tp.netlib.objects.ObjectExtra.Planet     import Planet
+from tp.netlib.objects.ObjectExtra.Fleet      import Fleet
+
 class winIdleFinder(winReportXRC, IdleFinderBase, TrackerObject):
 	title = _("Objects Without Orders")
 	
@@ -53,16 +62,20 @@ class winIdleFinder(winReportXRC, IdleFinderBase, TrackerObject):
 							self.idlelist.InsertStringItem(numinlist, "%d" % object)
 							self.idlelist.SetStringItem(numinlist, 1, self.application.cache.objects[object].name)
 							self.idlelist.SetItemData(numinlist, object)
-							if self.application.cache.objects[object].subtype == 0:
+							
+							if isinstance(self.application.cache.objects[object], Universe):
 								self.idlelist.SetStringItem(numinlist, 2, "Universe")
-							elif self.application.cache.objects[object].subtype == 1:
+							elif isinstance(self.application.cache.objects[object], Galaxy):
 								self.idlelist.SetStringItem(numinlist, 2, "Galaxy")
-							elif self.application.cache.objects[object].subtype == 2:
+							elif isinstance(self.application.cache.objects[object], StarSystem):
 								self.idlelist.SetStringItem(numinlist, 2, "System")
-							elif self.application.cache.objects[object].subtype == 3:
+							elif isinstance(self.application.cache.objects[object], Planet):
 								self.idlelist.SetStringItem(numinlist, 2, "Planet")
-							elif self.application.cache.objects[object].subtype == 4:
+							elif isinstance(self.application.cache.objects[object], Fleet):
 								self.idlelist.SetStringItem(numinlist, 2, "Fleet")
+							else:
+								self.idlelist.SetStringItem(numinlist, 2, "Unknown")
+								
 							numinlist = numinlist + 1
 		
 	def Sort(self, d1, d2):
