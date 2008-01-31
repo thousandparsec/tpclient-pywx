@@ -36,7 +36,9 @@ def cmp(ver1, ver2):
 			ver2[i] = int(re.search('(\d+)', x).group())-1
 
 	for a, b in zip(ver1, ver2):
-		if a <= b:
+		if a < b:
+			break
+		if a == b:
 			continue
 		return False
 	return True
