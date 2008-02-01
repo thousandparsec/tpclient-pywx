@@ -46,7 +46,7 @@ installpath = os.path.split(os.path.split(__path__)[0])[0]
 		print """
 try:
 	print version_str+'+'+version_target_str, "(git %s)" % version_git, "(installed at %s)" % installpath
-except ValueError:
+except (ValueError, NameError):
 	print version_str, "(installed at %s)" % installpath
 """
 		sys.exit(0)
