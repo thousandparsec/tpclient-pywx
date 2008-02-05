@@ -9,6 +9,8 @@ from math import *
 import sys
 import numpy as N
 
+from requirements import graphicsdir
+
 # wxPython imports
 import wx
 
@@ -127,19 +129,19 @@ class panelStarMap(panelStarMapBase, TrackerObjectOrder):
 
 		# Initialize mouse-mode bitmaps
 		if sys.platform == "darwin":
-			self.GUISelect.Icon   = wx.Bitmap("graphics/mousemode-icon16.png")
-			self.GUIMove.Icon     = wx.Bitmap("graphics/mousemove-icon16.png")
-			self.GUIZoomIn.Icon   = wx.Bitmap("graphics/mousezoomin-icon16.png")
-			self.GUIZoomOut.Icon  = wx.Bitmap("graphics/mousezoomout-icon16.png")
-			self.GUIWaypoint.Icon = wx.Bitmap("graphics/mousewaypoint-icon16.png")
-			self.GUIWaypointEdit.Icon = wx.Bitmap("graphics/mousewaypoint-icon16.png")
+			self.GUISelect.Icon   = wx.Bitmap(os.path.join(graphicsdir, "mousemode-icon16.png"))
+			self.GUIMove.Icon     = wx.Bitmap(os.path.join(graphicsdir, "mousemove-icon16.png"))
+			self.GUIZoomIn.Icon   = wx.Bitmap(os.path.join(graphicsdir, "mousezoomin-icon16.png"))
+			self.GUIZoomOut.Icon  = wx.Bitmap(os.path.join(graphicsdir, "mousezoomout-icon16.png"))
+			self.GUIWaypoint.Icon = wx.Bitmap(os.path.join(graphicsdir, "mousewaypoint-icon16.png"))
+			self.GUIWaypointEdit.Icon = wx.Bitmap(os.path.join(graphicsdir, "mousewaypoint-icon16.png"))
 		else:
-			self.GUISelect.Icon   = wx.Bitmap("graphics/mousemode-icon24.png")
-			self.GUIMove.Icon     = wx.Bitmap("graphics/mousemove-icon24.png")
-			self.GUIZoomIn.Icon   = wx.Bitmap("graphics/mousezoomin-icon24.png")
-			self.GUIZoomOut.Icon  = wx.Bitmap("graphics/mousezoomout-icon24.png")
-			self.GUIWaypoint.Icon = wx.Bitmap("graphics/mousewaypoint-icon24.png")
-			self.GUIWaypointEdit.Icon = wx.Bitmap("graphics/mousewaypoint-icon16.png")
+			self.GUISelect.Icon   = wx.Bitmap(os.path.join(graphicsdir, "mousemode-icon24.png"))
+			self.GUIMove.Icon     = wx.Bitmap(os.path.join(graphicsdir, "mousemove-icon24.png"))
+			self.GUIZoomIn.Icon   = wx.Bitmap(os.path.join(graphicsdir, "mousezoomin-icon24.png"))
+			self.GUIZoomOut.Icon  = wx.Bitmap(os.path.join(graphicsdir, "mousezoomout-icon24.png"))
+			self.GUIWaypoint.Icon = wx.Bitmap(os.path.join(graphicsdir, "mousewaypoint-icon24.png"))
+			self.GUIWaypointEdit.Icon = wx.Bitmap(os.path.join(graphicsdir, "mousewaypoint-icon16.png"))
 		
 		self.SetMode(self.GUISelect)
 

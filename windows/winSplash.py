@@ -13,6 +13,10 @@ try:
 	os.environ['SDL_VIDEO_WINDOW_POS'] = "center"
 	import pygame
 
+	if not os.path.exists(os.path.join(graphicsdir, "intro-high.mpg")):
+		print "Could not find the intro movie", os.path.join(graphicsdir, "intro-high.mpg")
+		raise ImportError
+
 	class winSplash(object):
 		def __init__(self, application):
 			pass

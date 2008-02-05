@@ -101,20 +101,28 @@ if sys.platform.startswith('linux') and "install" in sys.argv:
 	# Graphics files
 	graphicspath = os.path.join(temp, "share/tpclient-pywx")
 	print 'graphicspath', graphicspath
+	if os.path.exists(graphicspath):
+		shutil.rmtree(graphicspath)
 	shutil.copytree('graphics', graphicspath)
 
 	# Private python file
 	libpath = 'lib/tpclient-pywx/';
 	privatepath = os.path.join(temp, libpath)
 	print 'librarypath', privatepath
-	makedirs(privatepath)
+	try:
+		makedirs(privatepath)
+	except OSError:
+		pass
 
 	privatefiles = ['tpclient-pywx', 'version.py', 'requirements.py', 'utils.py', 'windows', 'extra']
 	for file in privatefiles:
 		if os.path.isfile(file):
 			shutil.copy2(file, privatepath)
 		if os.path.isdir(file):
-			shutil.copytree(file, os.path.join(privatepath, file))
+			p = os.path.join(privatepath, file)
+			if os.path.exists(p):
+				shutil.rmtree(p)
+			shutil.copytree(file, p)
 
 	# Fix the version path
 	os.system('python version.py --fix > %s' % os.path.join(privatepath, 'version.py'))
@@ -131,7 +139,14 @@ if sys.platform.startswith('linux') and "install" in sys.argv:
 	binpath     = os.path.join(temp, "bin")
 	print 'binpath', binpath
 	makedirs(binpath)
-	os.symlink(os.path.join(prefix, libpath, 'tp-pywx-installed'), os.path.join(binpath, 'tpclient-pywx'))
+
+	
+	binp = os.path.join(binpath, 'tpclient-pywx')
+	if os.path.exists(binp):
+		os.unlink(binp)
+	os.symlink(os.path.join(prefix, libpath, 'tp-pywx-installed'), binp)
+
+	print "Client installed!"
 
 	sys.exit()
 
