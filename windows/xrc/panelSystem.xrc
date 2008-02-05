@@ -15,6 +15,25 @@
         <flag>wxEXPAND|wxGROW</flag>
       </object>
       <object class="sizeritem">
+        <object class="wxBoxSizer">
+          <orient>wxHORIZONTAL</orient>
+          <object class="sizeritem">
+            <object class="wxBitmapButton" name="PrevObject">
+              <bitmap stock_id="wxART_GO_BACK"></bitmap>
+            </object>
+            <option>1</option>
+          </object>
+          <object class="sizeritem">
+            <object class="wxBitmapButton" name="NextObject">
+              <bitmap stock_id="wxART_GO_FORWARD"></bitmap>
+            </object>
+            <option>1</option>
+          </object>
+        </object>
+        <option>1</option>
+        <flag>wxALL|wxALIGN_CENTRE</flag>
+      </object>
+      <object class="sizeritem">
         <object class="wxSearchCtrl" name="Search">
           <style>wxSEARCH_CANCEL_BTN|wxSEARCH_SEARCH_BTN|wxTE_PROCESS_ENTER</style>
         </object>

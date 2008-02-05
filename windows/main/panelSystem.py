@@ -17,8 +17,9 @@ from requirements import graphicsdir
 NAME = 0
 DESC = 1
 
+from extra.StateTracker import TrackerObject
 from windows.xrc.panelSystem import panelSystemBase
-class panelSystem(panelSystemBase):
+class panelSystem(panelSystemBase, TrackerObject):
 	title = _("System")
 
 	def __init__(self, application, parent):
@@ -48,6 +49,9 @@ class panelSystem(panelSystemBase):
 		self.Tree.SetFont(wx.local.normalFont)
 		self.Tree.Bind(wx.EVT_TREE_SEL_CHANGED, self.OnSelectItem)
 
+		self.NextObject.Bind(wx.EVT_BUTTON, self.OnNextObject)
+		self.PrevObject.Bind(wx.EVT_BUTTON, self.OnPrevObject)
+
 		self.Search.Bind(wx.EVT_TEXT, self.Rebuild)
 		self.Search.Bind(wx.EVT_TEXT_ENTER, self.Rebuild)
 		self.Search.Bind(wx.EVT_SEARCHCTRL_SEARCH_BTN, self.Rebuild)
@@ -55,6 +59,8 @@ class panelSystem(panelSystemBase):
 
 		self.application.gui.Binder(self.application.CacheClass.CacheUpdateEvent, self.OnCacheUpdate)
 		self.application.gui.Binder(self.application.gui.SelectObjectEvent, self.OnSelectObject)
+		
+		TrackerObject.__init__(self)
 
 	def OnSearchCancel(self, evt):
 		self.Search.SetValue("")
@@ -184,9 +190,22 @@ class panelSystem(panelSystemBase):
 		id = self.Tree.GetPyData(evt.GetItem())
 		if id != None:
 			# Okay we need to post an event now
+			self.oid = id
 			self.application.Post(self.application.gui.SelectObjectEvent(id), source=self)
 				
 		self.Refresh()
+	
+	def OnNextObject(self, evt):
+		"""\
+		When someone clicks the "Next Object" button.
+		"""
+		self.SelectNextObject()
+	
+	def OnPrevObject(self, evt):
+		"""\
+		When someone clicks the "Prev Object" button.
+		"""
+		self.SelectPreviousObject()
 
 	####################################################
 	# Remote Event Handlers
@@ -198,6 +217,7 @@ class panelSystem(panelSystemBase):
 		"""\
 		When somebody selects an object.
 		"""
+		TrackerObject.OnSelectObject(self, evt)
 		id = self.Tree.GetPyData(self.Tree.GetSelection())
 		if id == evt.id:
 			return

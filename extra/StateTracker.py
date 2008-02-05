@@ -134,7 +134,59 @@ class TrackerObject(object):
 
 		self.application.Post(self.application.gui.PreviewObjectEvent(id), source=self)
 		self.ObjectPreview(id)
-
+	
+	def SelectNextObject(self):
+		"""
+		Called to select the next object.
+		"""
+		if not self.oid is None:
+			#print self.application.cache.objects[self.oid].name
+			if hasattr(self.application.cache.objects[self.oid], "contains") and self.application.cache.objects[self.oid].contains != []:
+				#print "Contains:"
+				#for oid in self.application.cache.objects[self.oid].contains:
+				#	print oid
+				self.application.Post(self.application.gui.SelectObjectEvent(self.application.cache.objects[self.application.cache.objects[self.oid].contains[0]].id))
+			else:
+				self.SelectNextSibling(self.oid)
+	
+	def SelectNextSibling(self, objectid):
+		if hasattr(self.application.cache.objects[objectid], "parent"):
+			parentid = self.application.cache.objects[objectid].parent
+			objectfound = 0;
+			for object in self.application.cache.objects[parentid].contains:
+				if (object == objectid):
+					objectfound = 1
+					continue
+				if (objectfound == 1):
+					self.application.Post(self.application.gui.SelectObjectEvent(self.application.cache.objects[object].id))
+					objectfound = 2
+					break
+			if objectfound == 1:
+				self.SelectNextSibling(parentid)
+						
+	def SelectPreviousObject(self):
+		"""
+		Called to select the previous object.
+		"""
+		if not self.oid is None:
+			self.SelectPreviousSibling(self.oid)
+	
+	def SelectPreviousSibling(self, objectid):
+		if hasattr(self.application.cache.objects[objectid], "parent"):
+			parentid = self.application.cache.objects[objectid].parent
+			timesthrough = 0;
+			objectfound = -1;
+			for object in self.application.cache.objects[parentid].contains:
+				if (object == objectid):
+					objectfound = timesthrough
+					print timesthrough
+					continue
+				timesthrough = timesthrough + 1
+			if objectfound != -1:
+				if objectfound == 0:
+					self.application.Post(self.application.gui.SelectObjectEvent(parentid))
+				else:
+					self.application.Post(self.application.gui.SelectObjectEvent(self.application.cache.objects[parentid].contains[objectfound-1]))
 
 from tp.netlib.objects import Order
 

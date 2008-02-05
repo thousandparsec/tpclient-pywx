@@ -32,6 +32,14 @@ class panelSystemBase(wx.Panel):
 		# Define variables for the controls
 		self.Tree = XRCCTRL(self, "Tree")
 		self.Search = XRCCTRL(self, "Search")
+		self.NextObject = XRCCTRL(self, "NextObject")
+		if hasattr(self, "OnNextObject"):
+			self.Bind(wx.EVT_BUTTON, self.OnNextObject, self.NextObject)
+
+		self.PrevObject = XRCCTRL(self, "PrevObject")
+		if hasattr(self, "OnPrevObject"):
+			self.Bind(wx.EVT_BUTTON, self.OnPrevObject, self.PrevObject)
+
 
 
 def strings():
