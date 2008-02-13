@@ -3,6 +3,8 @@ This module contains the base classes used to build a new overlays for the
 Starmap.
 """
 
+import sys
+
 from tp.netlib.objects import Object
 
 class Overlay(dict):
@@ -416,6 +418,8 @@ class SystemLevelOverlay(Overlay, TrackerObject):
 		"""
 		text = self.ObjectPopupText(icon)
 		if text != None:
+			if sys.platform == "win32":
+				pos = self.canvas.ScreenToClient(pos)
 			self.Popup.Position(pos, icon.GetSize())
 			self.Popup.SetText(text)
 			self.Popup.Show()
