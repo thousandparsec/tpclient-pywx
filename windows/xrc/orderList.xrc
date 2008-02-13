@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource>
+  <object class="wxPanel" name="Base">
+    <object class="wxFlexGridSizer">
+      <cols>1</cols>
+      <rows>2</rows>
+      <object class="sizeritem">
+        <object class="wxListCtrl" name="Choices"/>
+        <option>1</option>
+        <flag>wxEXPAND|wxGROW</flag>
+      </object>
+      <object class="sizeritem">
+        <object class="wxFlexGridSizer">
+          <cols>4</cols>
+          <rows>1</rows>
+          <object class="sizeritem">
+            <object class="wxChoice" name="Type">
+              <content>
+                <item>Choice 1</item>
+                <item>Choice 2</item>
+              </content>
+            </object>
+            <option>1</option>
+            <flag>wxEXPAND|wxGROW</flag>
+          </object>
+          <object class="sizeritem">
+            <object class="wxSpinCtrl" name="Number"/>
+          </object>
+          <object class="sizeritem">
+            <object class="wxButton" name="Add">
+              <label>Add</label>
+              <style>wxBU_EXACTFIT</style>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <object class="wxButton" name="Delete">
+              <label>D</label>
+              <style>wxBU_EXACTFIT</style>
+            </object>
+          </object>
+          <growablecols>0</growablecols>
+        </object>
+        <option>1</option>
+        <flag>wxEXPAND|wxGROW</flag>
+      </object>
+      <growablerows>0</growablerows>
+      <growablecols>0</growablecols>
+    </object>
+  </object>
+</resource>

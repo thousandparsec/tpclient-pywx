@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource>
+  <object class="wxPanel" name="Base">
+    <object class="wxFlexGridSizer">
+      <cols>1</cols>
+      <rows>1</rows>
+      <object class="sizeritem">
+        <object class="wxTextCtrl" name="Value"/>
+        <option>1</option>
+        <flag>wxEXPAND|wxGROW</flag>
+      </object>
+    </object>
+  </object>
+</resource>

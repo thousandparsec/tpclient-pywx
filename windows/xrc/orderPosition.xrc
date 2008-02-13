@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource>
+  <object class="wxPanel" name="Position">
+    <object class="wxFlexGridSizer">
+      <cols>4</cols>
+      <rows>1</rows>
+      <object class="sizeritem">
+        <object class="wxTextCtrl" name="X"/>
+        <option>1</option>
+        <flag>wxEXPAND|wxGROW</flag>
+      </object>
+      <object class="sizeritem">
+        <object class="wxTextCtrl" name="Y"/>
+        <option>1</option>
+        <flag>wxEXPAND|wxGROW</flag>
+      </object>
+      <object class="sizeritem">
+        <object class="wxTextCtrl" name="Z"/>
+        <option>1</option>
+        <flag>wxEXPAND|wxGROW</flag>
+      </object>
+      <object class="sizeritem">
+        <object class="wxButton" name="Locate">
+          <label>P</label>
+          <style>wxBU_EXACTFIT</style>
+        </object>
+      </object>
+      <growablecols>0,1,2</growablecols>
+    </object>
+  </object>
+</resource>
