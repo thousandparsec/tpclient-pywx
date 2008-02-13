@@ -36,6 +36,7 @@ arguments = dict(
 	data_files=[(".",			("LICENSE", "COPYING", "README")),
 				("doc",			("doc/tips.txt",)),
 				("windows/xrc",	glob.glob("windows/xrc/*.xrc")),
+				("graphics",	glob.glob("graphics/*.mpg")),
 				("graphics",	glob.glob("graphics/*.gif")),
 				("graphics",	glob.glob("graphics/*.png")),
 				("graphics",	glob.glob("graphics/*.ico"))],
