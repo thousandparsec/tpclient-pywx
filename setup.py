@@ -231,10 +231,10 @@ elif sys.platform == 'win32':
 			"icon_resources": [(1, "graphics/icon.ico")],
 		}],
 		options={
-			"py2exe": { 
+			"py2exe": {
 				"dll_excludes": [], 
 				"packages": ["tp.netlib", "tp.client"], 
-				"excludes": ["Tkconstants", "Tkinter", "tcl", "pydoc", "unittest"],
+				"excludes": ["Tkconstants", "Tkinter", "tcl", "pydoc" ],
 				"optimize": 2,
 				"compressed": 0,
 			}
