@@ -8,8 +8,11 @@ import os.path
 import wx
 from wx.xrc import XRCCTRL, XmlResourceWithHandlers
 
+# Local imports
+from requirements import location
+
 class panelSystemBase(wx.Panel):
-	xrc = 'panelSystem.xrc'
+	xrc = os.path.join(location(), "windows", "xrc", 'panelSystem.xrc')
 
 	def PreCreate(self, pre):
 		""" This function is called during the class's initialization.
@@ -31,15 +34,15 @@ class panelSystemBase(wx.Panel):
 
 		# Define variables for the controls
 		self.Tree = XRCCTRL(self, "Tree")
-		self.Search = XRCCTRL(self, "Search")
-		self.NextObject = XRCCTRL(self, "NextObject")
-		if hasattr(self, "OnNextObject"):
-			self.Bind(wx.EVT_BUTTON, self.OnNextObject, self.NextObject)
-
 		self.PrevObject = XRCCTRL(self, "PrevObject")
 		if hasattr(self, "OnPrevObject"):
 			self.Bind(wx.EVT_BUTTON, self.OnPrevObject, self.PrevObject)
 
+		self.NextObject = XRCCTRL(self, "NextObject")
+		if hasattr(self, "OnNextObject"):
+			self.Bind(wx.EVT_BUTTON, self.OnNextObject, self.NextObject)
+
+		self.Search = XRCCTRL(self, "Search")
 
 
 def strings():

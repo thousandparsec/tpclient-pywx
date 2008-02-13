@@ -8,8 +8,11 @@ import os.path
 import wx
 from wx.xrc import XRCCTRL, XmlResourceWithHandlers
 
+# Local imports
+from requirements import location
+
 class configConnectBase(wx.Panel):
-	xrc = 'configConnect.xrc'
+	xrc = os.path.join(location(), "windows", "xrc", 'configConnect.xrc')
 
 	def PreCreate(self, pre):
 		""" This function is called during the class's initialization.

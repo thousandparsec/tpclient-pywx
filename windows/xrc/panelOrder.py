@@ -8,8 +8,11 @@ import os.path
 import wx
 from wx.xrc import XRCCTRL, XmlResourceWithHandlers
 
+# Local imports
+from requirements import location
+
 class panelOrderBase(wx.Panel):
-	xrc = 'panelOrder.xrc'
+	xrc = os.path.join(location(), "windows", "xrc", 'panelOrder.xrc')
 
 	def PreCreate(self, pre):
 		""" This function is called during the class's initialization.
@@ -41,9 +44,10 @@ class panelOrderBase(wx.Panel):
 			self.Bind(wx.EVT_BUTTON, self.OnNew, self.New)
 
 		self.DetailsParentPanel = XRCCTRL(self, "DetailsParentPanel")
-		self.DetailsBorderPanel = XRCCTRL(self, "DetailsBorderPanel")
 		self.ArgumentLine = XRCCTRL(self, "ArgumentLine")
+		self.DetailsBorderPanel = XRCCTRL(self, "DetailsBorderPanel")
 		self.DetailsPanel = XRCCTRL(self, "DetailsPanel")
+		self.ButtonsPanel = XRCCTRL(self, "ButtonsPanel")
 		self.Message = XRCCTRL(self, "Message")
 		self.Save = XRCCTRL(self, "Save")
 		if hasattr(self, "OnSave"):

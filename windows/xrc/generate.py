@@ -18,11 +18,14 @@ import os.path
 # wxPython imports
 import wx
 from wx.xrc import XRCCTRL, XmlResourceWithHandlers
+
+# Local imports
+from requirements import location
 """
 
 frameTemplate = """\
 class %(windowName)sBase:
-	xrc = '%(fileName)s'
+	xrc = os.path.join(location(), "windows", "xrc", '%(fileName)s')
 
 	def PreCreate(self, pre):
 		\"\"\" This function is called during the class's initialization.
@@ -58,7 +61,7 @@ class %(windowName)sBase:
 
 panelTemplate = """\
 class %(windowName)sBase(wx.Panel):
-	xrc = '%(fileName)s'
+	xrc = os.path.join(location(), "windows", "xrc", '%(fileName)s')
 
 	def PreCreate(self, pre):
 		\"\"\" This function is called during the class's initialization.
@@ -261,6 +264,7 @@ def main():
 				outStream.write('def strings():\n')
 				outStream.write('\tpass\n')
 				outStream.write(transStream.read().replace('_(', '\t_('))
+				transStream.close()
 
 				os.unlink('.translation')
 

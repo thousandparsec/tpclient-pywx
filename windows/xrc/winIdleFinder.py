@@ -8,8 +8,11 @@ import os.path
 import wx
 from wx.xrc import XRCCTRL, XmlResourceWithHandlers
 
+# Local imports
+from requirements import location
+
 class IdleFinderBase:
-	xrc = 'winIdleFinder.xrc'
+	xrc = os.path.join(location(), "windows", "xrc", 'winIdleFinder.xrc')
 
 	def PreCreate(self, pre):
 		""" This function is called during the class's initialization.

@@ -8,8 +8,11 @@ import os.path
 import wx
 from wx.xrc import XRCCTRL, XmlResourceWithHandlers
 
+# Local imports
+from requirements import location
+
 class panelStarMapBase(wx.Panel):
-	xrc = 'panelStarMap.xrc'
+	xrc = os.path.join(location(), "windows", "xrc", 'panelStarMap.xrc')
 
 	def PreCreate(self, pre):
 		""" This function is called during the class's initialization.
