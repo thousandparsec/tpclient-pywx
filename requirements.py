@@ -133,7 +133,7 @@ except ImportError, e:
 	if system == "debian-based":
 		recommended.append(("Python gettext should come with Python, please check your python install", reason))
 	else:
-		recommended.append(("Python with gettext enabled.", reason))
+		recommended.append(("Python with gettext enabled", reason))
 
 try:
 	import psyco
@@ -142,7 +142,7 @@ except ImportError, e:
 	if system == "debian-based":
 		recommended.append(("python-psyco", reason))
 	else:
-		recommended.append(("Pysco JIT compiler.", reason))
+		recommended.append(("Pysco JIT compiler", reason))
 
 try:
 	try:
@@ -169,7 +169,7 @@ except ImportError, e:
 	if system == "debian-based":
 		recommended.append(("python-imaging", reason))
 	else:
-		recommended.append(("Python Imaging library.", reason))
+		recommended.append(("Python Imaging library", reason))
 
 try:
 	import pygame
@@ -180,7 +180,7 @@ except ImportError, e:
 	if system == "debian-based":
 		recommended.append(("python-pygame", reason))
 	else:
-		recommended.append(("Pygame library.", reason))
+		recommended.append(("Pygame library", reason))
 
 
 netlib_version = (0, 2, 1)
@@ -257,7 +257,7 @@ if len(notfound) == 0:
 				if system == "debian-based":
 					recommended.append(("python-gconf", reason))
 				else:
-					recommended.append(("Recent version of pyGTK.", reason))
+					recommended.append(("Recent version of pyGTK", reason))
 
 	print
 	print "Checking locations:"
