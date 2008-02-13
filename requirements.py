@@ -12,19 +12,21 @@ import os.path
 notfound    = []
 recommended = []
 
-# Try and figure out what type of system this computer is running.
-import os
-result = os.system('apt-get --version > /dev/null 2>&1') 
-if result == 0:
-	system = "debian-based"
-else:
-	system = "unknown"
-
 if hasattr(sys, "frozen"):
 	f = open("log.txt", "a")
 	import sys
 	sys.stderr = f
 	sys.stdout = f
+
+	system = "unknown"
+else:
+	# Try and figure out what type of system this computer is running.
+	import os
+	result = os.system('apt-get --version > /dev/null 2>&1') 
+	if result == 0:
+		system = "debian-based"
+	else:
+		system = "unknown"
 
 def location():
 	if hasattr(sys, "frozen") and sys.frozen == "windows_exe":

@@ -272,9 +272,15 @@ if sys.platform == 'darwin':
 	print "Creating dmg package"
 	os.system("cd doc/mac/; chmod a+x pkg-dmg make-diskimage; ./make-diskimage ../../%s  ../../dist tpclient-pywx -null- dstore background.jpg" % dmg)
 elif sys.platform == 'win32':
+	# Copy in the manifest file for that "Windows XP look"
+	shutil.copy("tpclient-pywx.exe.manifest", os.path.join("dist", "tpclient-pywx.exe.manifest"))
+
 	# Check that gdi.dll exists, some windows need it
-	if not os.path.exists(os.path.join("dist", "gdiplus.dll")):
+	import wx
+	gdisrc = os.path.join(os.path.dirname(wx.__file__), "gdiplus.dll")
+	if not os.path.exists(gdisrc):
 		raise IOError("gdiplus.dll doesn't exist! Copy it to dist!")
+	shutil.copy(gdisrc, os.path.join("dist", "gdiplus.dll"))
 
 	# Repack the library.zip file
 	os.system(os.path.join("..", "scratchpad", "repack.bat"))
