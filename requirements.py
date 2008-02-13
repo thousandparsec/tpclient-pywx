@@ -20,6 +20,19 @@ if result == 0:
 else:
 	system = "unknown"
 
+if hasattr(sys, "frozen"):
+	f = open("log.txt", "a")
+	import sys
+	sys.stderr = f
+	sys.stdout = f
+
+def location():
+	if hasattr(sys, "frozen") and sys.frozen == "windows_exe":
+	        return os.path.dirname(unicode(sys.executable, sys.getfilesystemencoding( )))
+	else:
+		return os.path.dirname(unicode(__file__, sys.getfilesystemencoding( )))
+
+
 from types import StringTypes
 import re
 def cmp(ver1, ver2):
@@ -70,7 +83,7 @@ except ImportError:
 	else:
 		notfound.append("NumPy or SciPy")
 		
-if not hasattr(sys, "frozen") or sys.frozen != 'macosx_app':
+if not hasattr(sys, "frozen"):
 	wx_version = (2, 8, 0, 0)
 	wx_version_str = '.'.join([str(x) for x in wx_version[0:2]])
 	try:
