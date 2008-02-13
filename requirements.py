@@ -32,7 +32,6 @@ def location():
 	else:
 		return os.path.dirname(unicode(__file__, sys.getfilesystemencoding( )))
 
-
 from types import StringTypes
 import re
 def cmp(ver1, ver2):
@@ -245,14 +244,14 @@ if len(notfound) == 0:
 	import sys
 	if sys.platform == 'linux2':
 		import os.path, stat
-		location = os.path.join(os.path.dirname(os.path.join(os.path.abspath(__file__))), "tpclient-pywx")
-		if not os.path.exists(location):
+		linux_location = os.path.join(os.path.dirname(os.path.join(os.path.abspath(__file__))), "tpclient-pywx")
+		if not os.path.exists(linux_location):
 			print "Hrm, unable to find tpclient-pywx are you running outside a tpclient-pywx tree?"
 		else:
 			#print location
 			# Check the file is executable
 			try:
-				os.chmod(location, stat.S_IRUSR|stat.S_IWUSR|stat.S_IXUSR|stat.S_IRGRP|stat.S_IXGRP|stat.S_IROTH|stat.S_IXOTH)
+				os.chmod(linux_location, stat.S_IRUSR|stat.S_IWUSR|stat.S_IXUSR|stat.S_IRGRP|stat.S_IXGRP|stat.S_IROTH|stat.S_IXOTH)
 			except Exception, e:
 				pass
 
@@ -261,7 +260,7 @@ if len(notfound) == 0:
 				import gconf
 				for prefix in ['tp', 'tps', 'tphttp', 'tphttps', 'tp+http', 'tp+https']:
 					prefix = gconf.escape_key(prefix, len(prefix))
-					gconf.client_get_default().set_string('/desktop/gnome/url-handlers/%s/command' % prefix, location)
+					gconf.client_get_default().set_string('/desktop/gnome/url-handlers/%s/command' % prefix, linux_location)
 					gconf.client_get_default().set_bool('/desktop/gnome/url-handlers/%s/enabled' % prefix, True)
 			except ImportError, e:
 				print e
