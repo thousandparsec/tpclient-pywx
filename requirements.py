@@ -308,11 +308,11 @@ if len(recommended) > 0:
 	for module, reason in recommended:
 		
 		lines = [""]
-		lines[-1] += '    %s,' % module
+		lines[-1] += '    %s, ' % module
 		lines[-1] += ' ' * (ALIGN-len(lines[-1]))
 
 		for word in reason.split(" "):
-			if (len(lines[-1]) + len(word) + 1) > COLS:
+			if (len(lines[-1]) + len(word) + 2) > COLS:
 				lines.append(' '*ALIGN)
 
 			lines[-1] += word + " "
