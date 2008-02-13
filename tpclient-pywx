@@ -9,7 +9,7 @@ if hasattr(sys, 'frozen'):
 	import warnings
 	warnings.simplefilter('ignore', DeprecationWarning)
 
-import requirements
+from requirements import location
 import extra
 
 # wx.Python imports
@@ -27,6 +27,7 @@ from tp.netlib import failed
 from tp.client.threads import NotImportantEvent, Event
 
 from tp.client.ChangeList import ChangeNode
+
 
 pyid = id
 
@@ -221,7 +222,7 @@ class GUI(wx.App):
 		# Setup the translation stuff...
 		import gettext
 		# Hack to get the locale directory
-		basepath = os.path.abspath(os.path.dirname(__file__))
+		basepath  = os.path.abspath(location())
 		localedir = os.path.join(basepath, "locale")
 
 		langid = wx.LANGUAGE_DEFAULT    # use OS default; or use LANGUAGE_JAPANESE, etc.
