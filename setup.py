@@ -76,76 +76,96 @@ if sys.platform.startswith('linux') and "install" in sys.argv:
 		temp = prefix
 
 	print "Installing to...", temp
-	print "Target is...", prefix
+	print "Target     is...", prefix
 
 	# Documentation goes to
-	docpath  = os.path.join(temp, "share/doc/tpclient-pywx")
-	print 'docpath', docpath
-	makedirs(docpath)
+	#########################################################################
+	docpath_temp  = os.path.join(temp,   "share/doc/tpclient-pywx")
+	docpath       = os.path.join(prefix, "share/doc/tpclient-pywx")
+	print 'docpath', docpath, "(copying to %s)" % docpath_temp
 
+	makedirs(docpath_temp)
 	docfiles = ['AUTHORS', 'COPYING', 'LICENSE', 'doc/tips.txt']
 	for file in docfiles:
-		shutil.copy2(file, docpath)
+		shutil.copy2(file, docpath_temp)
 
 	# Locale files
-	localepath = os.path.join(temp, "share/locale/%s/LC_MESSAGES/")
-	print 'localepath', localepath
+	#########################################################################
+	localepath_temp = os.path.join(temp,   "share/locale/%s/LC_MESSAGES/")
+	localepath      = os.path.join(prefix, "share/locale/%s/LC_MESSAGES/")
+	print 'localepath', localepath, "(copying to %s)" % localepath_temp
+
 	for dir in os.listdir('locale'):
 		if os.path.isfile(os.path.join('locale', dir)):
 			continue
 		print "Installing language files for %s" % dir
 
-		llocalepath = localepath % dir
+		llocalepath = localepath_temp % dir
 		makedirs(llocalepath)
 		shutil.copy2(os.path.join('locale', dir, 'tpclient-pywx.mo'), llocalepath)
 
 	# Graphics files
-	graphicspath = os.path.join(temp, "share/tpclient-pywx")
-	print 'graphicspath', graphicspath
-	if os.path.exists(graphicspath):
-		shutil.rmtree(graphicspath)
-	shutil.copytree('graphics', graphicspath)
+	#########################################################################
+	graphicspath_temp = os.path.join(temp,   "share/tpclient-pywx/graphics")
+	graphicspath      = os.path.join(prefix, "share/tpclient-pywx/graphics") 
+	print 'graphicspath', graphicspath, "(copying to %s)" % graphicspath_temp
+
+	if os.path.exists(graphicspath_temp):
+		shutil.rmtree(graphicspath_temp)
+	shutil.copytree('graphics', graphicspath_temp)
 
 	# Private python file
-	libpath = 'lib/tpclient-pywx/';
-	privatepath = os.path.join(temp, libpath)
-	print 'librarypath', privatepath
+	#########################################################################
+	codepath_temp = os.path.join(temp,   "share/tpclient-pywx")
+	codepath      = os.path.join(prefix, "share/tpclient-pywx")
+	print 'librarypath', codepath, "(copying to %s)" % codepath_temp
+
 	try:
-		makedirs(privatepath)
+		makedirs(codepath_temp)
 	except OSError:
 		pass
 
 	privatefiles = ['tpclient-pywx', 'version.py', 'requirements.py', 'utils.py', 'windows', 'extra']
 	for file in privatefiles:
 		if os.path.isfile(file):
-			shutil.copy2(file, privatepath)
+			shutil.copy2(file, codepath_temp)
 		if os.path.isdir(file):
-			p = os.path.join(privatepath, file)
+			p = os.path.join(codepath_temp, file)
 			if os.path.exists(p):
 				shutil.rmtree(p)
 			shutil.copytree(file, p)
 
 	# Fix the version path
-	os.system('python version.py --fix > %s' % os.path.join(privatepath, 'version.py'))
+	os.system('python version.py --fix > %s' % os.path.join(codepath_temp, 'version.py'))
 
 	# Cleanup some files which shouldn't have been copied...
 	cleanupfiles = ['windows/xrc/generate.sh', 'windows/xrc/tp.pjd', 'windows/xrc/tp.xrc']
 	for file in cleanupfiles:
-		os.unlink(os.path.join(privatepath, file))
+		os.unlink(os.path.join(codepath_temp, file))
 
-	# Copy the startup script
-	shutil.copy2(os.path.join('doc', 'tp-pywx-installed'), os.path.join(privatepath, 'tp-pywx-installed'))
+	# Create the startup script
+	tpin = open(os.path.join('doc', 'tp-pywx-installed'), 'rb').read()
+	tpin = tpin.replace("$$CODEPATH$$",     codepath)
+	tpin = tpin.replace("$$GRAPHICSPATH$$", graphicspath)
+	tpin = tpin.replace("$$DOCPATH$$",      docpath)
+
+	tpout = open(os.path.join(codepath_temp, 'tp-pywx-installed'), 'wb')
+	tpout.write(tpin)
+	tpout.close()
+	os.chmod(os.path.join(codepath_temp, 'tp-pywx-installed'), 0755)
+
 
 	# Executables
-	binpath     = os.path.join(temp, "bin")
-	print 'binpath', binpath
-	makedirs(binpath)
+	binpath_temp = os.path.join(temp,   "bin")
+	binpath      = os.path.join(prefix, "bin")
 
+	print 'binpath', binpath, "(copying to %s)" % binpath_temp
+	makedirs(binpath_temp)
 	
-	binp = os.path.join(binpath, 'tpclient-pywx')
+	binp = os.path.join(binpath_temp, 'tpclient-pywx')
 	if os.path.exists(binp):
 		os.unlink(binp)
-	os.symlink(os.path.join(prefix, libpath, 'tp-pywx-installed'), binp)
+	os.symlink(os.path.join(codepath, 'tp-pywx-installed'), binp)
 
 	print "Client installed!"
 

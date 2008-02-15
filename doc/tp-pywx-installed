@@ -1,31 +1,15 @@
 #! /bin/sh
 
-TMP=/tmp/to-search
-echo $LD_LIBRARY_PATH | sed -e's/:/\n/g'	 > $TMP 2> /dev/null
-cat /etc/ld.so.conf 						>> $TMP 2> /dev/null
-echo /home/tim/temp5/lib 					>> $TMP 2> /dev/null
-echo /usr/local/lib							>> $TMP 2> /dev/null
-echo /usr/lib 								>> $TMP
-echo /lib									>> $TMP
+ARGS=""
+for ARG in "$@"; do
+	ARGS="$ARGS \"$ARG\""
+done
 
-while read LIB_DIR; do
-	if [ -e "$LIB_DIR" ]; then
-		TPDIR="$LIB_DIR/tpclient-pywx"
+echo "The client is installed in $$CODEPATH$$"
+export TPCLIENT_GRAPHICS=$$GRAPHICSPATH$$
+export TPCLIENT_DOC=$$DOCPATH$$
+echo "Graphics  are installed in $TPCLIENT_GRAPHICS"
+echo "Documents are installed in $TPCLIENT_DOC"
 
-		ARGS=""
-		for ARG in "$@"; do
-			ARGS="$ARGS \"$ARG\""
-		done
-
-		if [ -e "$TPDIR" ]; then
-			echo "Found the client in $TPDIR"
-			export TPCLIENT_GRAPHICS=`dirname $LIB_DIR`/share/tpclient-pywx
-			export TPCLIENT_DOC=`dirname $LIB_DIR`/share/doc/tpclient-pywx
-			#echo "Graphics  are in $TPCLIENT_GRAPHICS"
-			#echo "Documents are in $TPCLIENT_DOC"
-
-			cd $TPDIR
-			./tpclient-pywx $ARGS
-		fi
-	fi
-done < $TMP
+cd $$CODEPATH$$
+$$CODEPATH$$/tpclient-pywx $ARGS
