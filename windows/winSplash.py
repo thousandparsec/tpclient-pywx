@@ -26,15 +26,19 @@ try:
 			screen = pygame.display.set_mode((640,480), pygame.NOFRAME)
 			pygame.mixer.quit()
 
-			self.movie = pygame.movie.Movie(os.path.join(graphicsdir, "intro-high.mpg"))
-			self.movie.set_display(screen, (0,0), )
-			self.movie.play()
+			try:
+				self.movie = pygame.movie.Movie(os.path.join(graphicsdir, "intro-high.mpg"))
+				self.movie.set_display(screen, (0,0), )
+				self.movie.play()
+			except:
+				pass
+
 			pygame.display.flip()
 
 		def Hide(self, *args, **kw):
 			print "Entered splash hide!"
 			while True:
-				if not self.movie.get_busy():
+				if not hasattr(self, "movie") or not self.movie.get_busy():
 					break
 
 				event = pygame.event.poll()
@@ -43,7 +47,7 @@ try:
 				elif event.type in (pygame.MOUSEBUTTONUP, pygame.MOUSEBUTTONDOWN, pygame.KEYDOWN, pygame.KEYUP):
 					break
 
-			while self.movie.get_busy():
+			while hasattr(self, "movie") and self.movie.get_busy():
 				self.movie.stop()
 
 			pygame.quit()
