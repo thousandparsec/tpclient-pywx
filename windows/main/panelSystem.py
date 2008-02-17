@@ -51,6 +51,7 @@ class panelSystem(panelSystemBase, TrackerObject):
 
 		self.NextObject.Bind(wx.EVT_BUTTON, self.OnNextObject)
 		self.PrevObject.Bind(wx.EVT_BUTTON, self.OnPrevObject)
+		self.StepInto.Bind(wx.EVT_BUTTON, self.OnStepInto)
 
 		self.Search.Bind(wx.EVT_TEXT, self.Rebuild)
 		self.Search.Bind(wx.EVT_TEXT_ENTER, self.Rebuild)
@@ -206,6 +207,12 @@ class panelSystem(panelSystemBase, TrackerObject):
 		When someone clicks the "Prev Object" button.
 		"""
 		self.SelectPreviousObject()
+	
+	def OnStepInto(self, evt):
+		"""\
+		When someone clicks the "Step Into" button.
+		"""
+		self.SelectNextChild()
 
 	####################################################
 	# Remote Event Handlers

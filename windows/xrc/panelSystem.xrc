@@ -29,6 +29,12 @@
             </object>
             <option>1</option>
           </object>
+          <object class="sizeritem">
+            <object class="wxBitmapButton" name="StepInto">
+              <bitmap stock_id="wxART_GO_DOWN"></bitmap>
+            </object>
+            <option>1</option>
+          </object>
         </object>
         <option>1</option>
         <flag>wxALL|wxALIGN_CENTRE</flag>

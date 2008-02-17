@@ -135,10 +135,7 @@ class TrackerObject(object):
 		self.application.Post(self.application.gui.PreviewObjectEvent(id), source=self)
 		self.ObjectPreview(id)
 	
-	def SelectNextObject(self):
-		"""
-		Called to select the next object.
-		"""
+	def SelectNextChild(self):
 		if not self.oid is None:
 			#print self.application.cache.objects[self.oid].name
 			if hasattr(self.application.cache.objects[self.oid], "contains") and self.application.cache.objects[self.oid].contains != []:
@@ -146,8 +143,13 @@ class TrackerObject(object):
 				#for oid in self.application.cache.objects[self.oid].contains:
 				#	print oid
 				self.application.Post(self.application.gui.SelectObjectEvent(self.application.cache.objects[self.application.cache.objects[self.oid].contains[0]].id))
-			else:
-				self.SelectNextSibling(self.oid)
+	
+	def SelectNextObject(self):
+		"""
+		Called to select the next object.
+		"""
+		if not self.oid is None:
+			self.SelectNextSibling(self.oid)
 	
 	def SelectNextSibling(self, objectid):
 		if hasattr(self.application.cache.objects[objectid], "parent"):

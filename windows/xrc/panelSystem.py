@@ -42,6 +42,10 @@ class panelSystemBase(wx.Panel):
 		if hasattr(self, "OnNextObject"):
 			self.Bind(wx.EVT_BUTTON, self.OnNextObject, self.NextObject)
 
+		self.StepInto = XRCCTRL(self, "StepInto")
+		if hasattr(self, "OnStepInto"):
+			self.Bind(wx.EVT_BUTTON, self.OnStepInto, self.StepInto)
+
 		self.Search = XRCCTRL(self, "Search")
 
 
