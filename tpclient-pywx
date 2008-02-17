@@ -320,7 +320,25 @@ class GUI(wx.App):
 		"""\
 		Call a method in this thread.
 		"""
-		wx.CallAfter(method, *args, **kw)
+		if not hasattr(self, "tocall"):
+			self.tocall = []
+
+		self.tocall.append((method, args, kw))
+
+	def MainLoop(self):
+		last = time.time()
+		while True:
+			while len(self.tocall) == 0:
+				self.Yield()
+
+			method, args, kw = self.tocall.pop(0)
+			method(*args, **kw)
+
+			if last + 0.05 > time.time():
+				continue
+			self.Yield()
+			last = time.time()
+
 
 	def Post(self, event):
 		"""

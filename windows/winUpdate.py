@@ -274,6 +274,7 @@ class winUpdate(winUpdateBase, winBaseXRC):
 			end = self.Message.GetLastPosition()
 			self.Message.SetStyle(end-len(message)-1, end, wx.TextAttr(wx.RED))
 
+		self.UpdateWindowUI(wx.UPDATE_UI_RECURSE)
 		wx.GetApp().Yield(onlyIfNeeded=True)
 
 
