@@ -425,7 +425,11 @@ class Systems(SystemLevelOverlay, TrackerObjectOrder):
 			s += "<font style='%s' color='%s'>%s" % (style, color, cobj.name)
 			if isinstance(cobj, Fleet):
 				for shipid, amount in cobj.ships:
-					s+= "\n  %s %ss" % (amount, self.cache.designs[shipid].name)
+					try:
+						s+= "\n  %s %ss" % (amount, self.cache.designs[shipid].name)
+					except KeyError:
+						s+= "\n  %s %ss" % (amount, "Unknown Ship")
+
 			s += "</font>\n"
 
 		s = s[:-1]+"</font>"
