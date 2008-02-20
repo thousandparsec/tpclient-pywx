@@ -378,6 +378,9 @@ class SystemLevelOverlay(Overlay, TrackerObject):
 			# Post a preview event
 			self.PreviewObject(object.id)
 
+	def ObjectPreview(self, id):
+		pass
+
 	def SystemLeave(self, icon):
 		if icon == None:
 			return
