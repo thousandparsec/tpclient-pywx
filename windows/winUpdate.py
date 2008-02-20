@@ -193,6 +193,7 @@ class winUpdate(winUpdateBase, winBaseXRC):
 
 			# Change the buttons
 			self.Okay.Enable()
+			self.Okay.SetFocus()
 			self.Save.Enable()
 			self.Cancel.Disable()
 
