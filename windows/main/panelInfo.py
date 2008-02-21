@@ -64,6 +64,13 @@ class panelInformation(panelInformationBase):
 				('protocol', 'sequence', 'otype', 'length', 'order_types', 'order_number', 'contains'):
 				continue
 
+			if key == "owner":
+				if self.application.cache.players.has_key(value):
+					s += "Owner: %s (%s)\n" % (self.application.cache.players[value].name, value)
+				else:
+					s += "Owner: Unknown (%s)\n" % (value,)
+				continue
+
 			if key == "ships":
 				s += _("Ships: ")
 				# FIXME: This is a hack :/
