@@ -115,15 +115,17 @@ class TrackerObject(object):
 	##########################################################################
 	# Methods to change the state
 	##########################################################################
-	def SelectObject(self, id):
+	def SelectObject(self, id, forceother=False):
 		"""
 		Called to select an object.
 		"""
-		if self.oid == id:
+		if self.oid == id and not forceother:
 			return
-
+		
 		self.application.Post(self.application.gui.SelectObjectEvent(id), source=self)
-		self._ObjectSelect(id)
+
+		if self.oid != id:
+			self._ObjectSelect(id)
 
 	def PreviewObject(self, id):
 		"""

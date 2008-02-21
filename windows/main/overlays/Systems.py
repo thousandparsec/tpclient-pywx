@@ -271,10 +271,10 @@ class Systems(SystemLevelOverlay, TrackerObjectOrder):
 
 			return False
 
-	def SelectObject(self, id):
+	def SelectObject(self, id, forceother=False):
 		if self.parent.mode in (self.parent.GUIWaypoint, self.parent.GUIWaypointEdit) :
 			return
-		TrackerObjectOrder.SelectObject(self, id)
+		TrackerObjectOrder.SelectObject(self, id, forceother)
 
 	def OrderInsertAfter(self, afterme, what):
 		if self.parent.mode in (self.parent.GUIWaypoint, self.parent.GUIWaypointEdit):

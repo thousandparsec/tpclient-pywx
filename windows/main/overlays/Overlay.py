@@ -392,7 +392,7 @@ class SystemLevelOverlay(Overlay, TrackerObject):
 
 		# Return back the originally selected object	
 		if self.Hovering != None and self.Selected != None:
-			self.SelectObject(self.Selected.current.id)
+			self.SelectObject(self.Selected.current.id, True)
 
 		t = self.Hovering
 		# Clear the currently hovering object
