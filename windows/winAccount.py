@@ -190,6 +190,10 @@ class winAccount(winAccountBase, winBaseXRC, usernameMixIn):
 		self.State("start")
 
 	def OnOkay(self, evt):
+		if not self.IsShown():
+			self.application.gui.current.AddPendingEvent(evt)
+			return
+
 		username = self.GetUsername()
 		password1 = self.Password1.GetValue().strip()
 		password2 = self.Password2.GetValue().strip()
