@@ -254,6 +254,9 @@ class GUI(wx.App):
 	def Create(self):
 		self.count = 0
 
+		self.UpdateUILock = threading.Lock()
+		self.GUIThread = threading.currentThread()
+
 		application = self.application
 
 		try:
@@ -322,16 +325,23 @@ class GUI(wx.App):
 		"""\
 		Call a method in this thread.
 		"""
-		if not hasattr(self, "tocall"):
-			self.tocall = []
-	
-		self.count += 1
-		wx.CallAfter(method, *args, **kw)
-		if self.count % 20 == 0:
-			wx.CallAfter(self.UpdateUI)
+		if (threading.currentThread() == self.GUIThread):
+			wx.CallAfter(method, *args, **kw)
+		else:
+			self.UpdateUILock.acquire()
+
+			wx.CallAfter(method, *args, **kw)
+
+			self.count += 1
+			if self.count % 5 == 0:
+				wx.CallAfter(self.UpdateUI)
+			else:
+				self.UpdateUILock.release()
 
 	def UpdateUI(self):
-		self.current.UpdateWindowUI(wx.UPDATE_UI_RECURSE)
+		print "UpdateUI"
+		wx.Yield()
+		self.UpdateUILock.release()
 
 	def Post(self, event):
 		"""
