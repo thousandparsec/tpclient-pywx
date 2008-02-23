@@ -276,8 +276,6 @@ class winUpdate(winUpdateBase, winBaseXRC):
 			self.Message.SetStyle(end-len(message)-1, end, wx.TextAttr(wx.RED))
 
 		self.UpdateWindowUI(wx.UPDATE_UI_RECURSE)
-		wx.GetApp().Yield(onlyIfNeeded=True)
-
 
 	# Config Functions -----------------------------------------------------------------------------  
 	def ConfigDefault(self, config=None):
