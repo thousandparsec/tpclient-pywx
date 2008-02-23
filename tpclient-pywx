@@ -252,6 +252,8 @@ class GUI(wx.App):
 		self.Show(self.splash)
 
 	def Create(self):
+		self.count = 0
+
 		application = self.application
 
 		try:
@@ -322,23 +324,14 @@ class GUI(wx.App):
 		"""
 		if not hasattr(self, "tocall"):
 			self.tocall = []
+	
+		self.count += 1
+		wx.CallAfter(method, *args, **kw)
+		if self.count % 20 == 0:
+			wx.CallAfter(self.UpdateUI)
 
-		self.tocall.append((method, args, kw))
-
-	def MainLoop(self):
-		last = time.time()
-		while True:
-			while len(self.tocall) == 0:
-				self.Yield()
-
-			method, args, kw = self.tocall.pop(0)
-			method(*args, **kw)
-
-			if last + 0.05 > time.time():
-				continue
-			self.Yield()
-			last = time.time()
-
+	def UpdateUI(self):
+		self.current.UpdateWindowUI(wx.UPDATE_UI_RECURSE)
 
 	def Post(self, event):
 		"""
