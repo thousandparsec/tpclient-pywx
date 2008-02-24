@@ -429,6 +429,7 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 		except KeyError:
 			node = _("No object selected.")
 
+		print "BuildPanel", node
 		self.ColourOrderPanel()
 
 		# Remove the previous panel and stuff
@@ -533,11 +534,9 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 			self.Revert.Hide()
 			self.Delete.Hide()
 
-		self.DetailsPanel.Layout()
-		self.DetailsParentPanel.Layout()
+		self.Orders.SetSize((0,0))
 		self.Master.Layout()
 
-		self.Layout()
 		self.Update()
 
 	def FromPanel(self, order):
