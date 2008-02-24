@@ -31,7 +31,7 @@
                     <border>5</border>
                     <object class="wxTextCtrl" name="Message">
                         <size>100,100</size>
-                        <style>wxTE_MULTILINE|wxDOUBLE_BORDER</style>
+                        <style>wxTE_MULTILINE|wxDOUBLE_BORDER|wxTE_READONLY</style>
                     </object>
                 </object>
                 <object class="sizeritem">
