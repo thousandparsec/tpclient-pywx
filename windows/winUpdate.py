@@ -182,7 +182,9 @@ class winUpdate(winUpdateBase, winBaseXRC):
 				self.ConnectingText.SetLabel(_("Done!"))
 
 			elif state == "alreadydone":
-				self.ConnectingGauge.Disable()
+				self.ConnectingGauge.SetRange(1)
+				self.ConnectingGauge.SetValue(1)
+				#self.ConnectingGauge.Disable()
 				self.ConnectingText.Disable()
 				animation.Disable()
 
