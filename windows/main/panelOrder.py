@@ -62,7 +62,7 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 		self.DetailsSizer = self.DetailsPanel.GetSizer()
 
 		self.Orders.Bind(wx.EVT_LIST_ITEM_SELECTED,   self.OnOrderSelect)
-		self.Orders.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.OnOrderSelect)
+		self.Orders.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.OnOrderDeselect)
 #		self.Orders.Bind(wx.EVT_RIGHT_UP, self.OnRightClick)
 		self.Bind(wx.EVT_KEY_UP, self.OnKeyUp)
 
@@ -161,6 +161,7 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 	# Methods called when state changes with an object
 	##########################################################################
 
+	@freeze_wrapper
 	def ObjectSelect(self, id):
 		"""\
 		Called when an object is selected.
@@ -183,7 +184,7 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 		else:
 			self.Master.Show()
 			self.Master.Layout()
-			self.Master.Update()
+			#self.Master.Update()
 
 		self.Orders.SetToolTipDefault(_("Current orders on %s.") % object.name)
 		
@@ -312,6 +313,8 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 	####################################################
 	# Local Event Handlers
 	####################################################
+	def OnOrderDeselect(self, evt):
+		wx.CallAfter(self.OnOrderSelect, evt)
 
 	@freeze_wrapper
 	def OnOrderSelect(self, evt):
@@ -534,10 +537,9 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 			self.Revert.Hide()
 			self.Delete.Hide()
 
-		self.Orders.SetSize((0,0))
-		self.Master.Layout()
-
-		self.Update()
+#		self.Orders.SetSize((-1,0))
+		self.Layout()
+		self.Orders._doResize()
 
 	def FromPanel(self, order):
 		orderdesc = objects.OrderDescs()[order.subtype]
