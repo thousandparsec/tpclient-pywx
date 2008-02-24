@@ -173,17 +173,26 @@ class winAccount(winAccountBase, winBaseXRC, usernameMixIn):
 				debug=self.application.gui.connectto.config['debug'])
 
 	def OnNetworkConnect(self, evt):
+		if not self.IsShown():
+			return
+
 		if features.FEATURE_ACCOUNT_REGISTER in evt.args[0]:
 			self.State("details")
 		else:
 			self.OnNetworkFailure(_("This server does not support account creation."))
 
 	def OnNetworkAccount(self, evt):
+		if not self.IsShown():
+			return
+
 		self.application.gui.Show(self.application.gui.connectto)
 		dlg = wx.MessageDialog(self.application.gui.current, unicode(evt), _("Account Created"), wx.OK|wx.ICON_INFORMATION)
 		dlg.ShowModal()
 
 	def OnNetworkFailure(self, evt):
+		if not self.IsShown():
+			return
+
 		dlg = wx.MessageDialog(self.application.gui.current, unicode(evt), _("Network Error"), wx.OK|wx.ICON_ERROR)
 		dlg.ShowModal()
 
