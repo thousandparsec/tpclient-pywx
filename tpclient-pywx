@@ -380,8 +380,6 @@ class GUI(wx.App):
 		return r
 
 	def OnNetworkFailure(self, evt):
-		utils.do_traceback()
-
 		if hasattr(self.current, "OnNetworkFailure"):
 			return
 		else:
