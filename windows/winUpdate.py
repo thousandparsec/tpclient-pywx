@@ -62,6 +62,8 @@ class winUpdate(winUpdateBase, winBaseXRC):
 		self.Message.SaveFile(path)
 
 	def OnOkay(self, evt):
+		if not self.Okay.IsEnabled():
+			return
 		self.application.gui.Show(self.application.gui.main)
 		self.application.Post(self.application.cache.CacheUpdateEvent(None))
 
