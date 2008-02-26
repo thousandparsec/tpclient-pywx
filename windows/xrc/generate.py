@@ -25,6 +25,14 @@ from requirements import location
 
 frameTemplate = """\
 class %(windowName)sBase:
+	\"\"\"\\
+Unlike a normal XRC generated class, this is a not a full class but a MixIn.
+Any class which uses this as a base must also inherit from a proper wx object
+such as the wx.Frame class.
+
+This is so that a the same XRC can be used for both MDI and non-MDI frames.
+\"\"\"
+
 	xrc = os.path.join(location(), "windows", "xrc", '%(fileName)s')
 
 	def PreCreate(self, pre):
