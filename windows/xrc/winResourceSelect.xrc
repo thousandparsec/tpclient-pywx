@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+<resource>
+  <object class="wxFrame" name="ResourceSelect">
+    <object class="wxPanel" name="sizerpanel">
+      <object class="wxBoxSizer">
+        <orient>wxVERTICAL</orient>
+        <object class="sizeritem">
+          <object class="wxCheckListBox" name="resourcelist"/>
+          <option>1</option>
+          <flag>wxALL|wxEXPAND|wxALIGN_CENTRE</flag>
+        </object>
+        <object class="sizeritem">
+          <object class="wxButton" name="done">
+            <label>Done</label>
+          </object>
+          <option>1</option>
+          <flag>wxALL|wxEXPAND|wxALIGN_CENTRE</flag>
+        </object>
+      </object>
+    </object>
+    <hidden>1</hidden>
+    <style>wxNO_BORDER</style>
+  </object>
+</resource>

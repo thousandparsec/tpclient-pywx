@@ -23,6 +23,47 @@ from Proportional import SystemIcon, FindChildren
 
 from Overlay import SystemLevelOverlay, Holder
 
+import  wx.lib.popupctl as popupctrl
+import  wx.calendar as calendar
+
+from windows.xrc.winResourceSelect import ResourceSelectBase
+class ResourceSelect(ResourceSelectBase):
+	def __init__(self, parent):
+		ResourceSelectBase.__init__(self, parent)
+
+class ResourceSelectorControl(popupctrl.PopupControl):
+    def __init__(self,*_args,**_kwargs):
+        apply(popupctrl.PopupControl.__init__,(self,) + _args,_kwargs)
+
+        self.win = ResourceSelect(self)
+
+        #bz = self.rsrclist.GetBestSize()
+        #self.win.SetSize(bz)
+
+        # This method is needed to set the contents that will be displayed
+        # in the popup
+        self.SetPopupContent(self.win)
+
+        # Event registration for selection finished
+        #self.rsrclist.Bind()
+
+    # Method called when a day is selected in the calendar
+    def OnRsrcSelected(self,evt):
+        self.PopDown()
+        evt.Skip()
+
+    # Method overridden from PopupControl
+    # This method is called just before the popup is displayed
+    # Use this method to format any controls in the popup
+    def FormatContent(self):
+        pass
+            
+class TestPanel(wx.Panel):
+    def __init__(self, parent, log):
+        self.log = log
+        wx.Panel.__init__(self, parent, -1)
+        date = ResourceSelectorControl(self, -1, pos = (0,0), size = (100,22))
+
 class PieChartIcon(SystemIcon):
 	def copy(self):
 		return PieChartIcon(self.cache, self.primary, self.proportional, self.scale, self.valuesforchart)
@@ -68,17 +109,19 @@ class Resource(Proportional):
 		self.type     = type
 		
 		# Create a drop-down on the panel for resource selection
-		self.ResourceSelector = wx.Choice(panel)
-		self.ResourceSelector.Bind(wx.EVT_CHOICE, self.OnResourceSelected)
+		#self.ResourceSelector = wx.Choice(panel)
+		#self.ResourceSelector.Bind(wx.EVT_CHOICE, self.OnResourceSelected)
 
+		sizer = wx.FlexGridSizer(len(self.ResourceTypeList))
+		sizer.Add(TestPanel(panel, None), proportion=1, flag=wx.EXPAND)
 		# Populate the dropdown with information
-		for name, resource in sorted(self.ResourceTypeList.items(), key=operator.itemgetter(1)):
-			self.ResourceSelector.Append(name, resource)
-		self.ResourceSelector.SetSelection(0)
-
-		sizer = wx.FlexGridSizer(10)
+		#for name, resource in sorted(self.ResourceTypeList.items(), key=operator.itemgetter(1)):
+			#nametext = wx.StaticText(panel, -1, name)
+			#sizer.Add(nametext, proportion=1, flag=wx.EXPAND)
+		#self.ResourceSelector.SetSelection(0)
+		
 		sizer.AddGrowableRow(0)
-		sizer.Add(self.ResourceSelector, proportion=1, flag=wx.EXPAND)
+		#sizer.Add(self.ResourceSelector, proportion=1, flag=wx.EXPAND)
 		panel.SetSizer(sizer)
 		
 		self.UpdateAll()
