@@ -537,8 +537,8 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 			self.Revert.Hide()
 			self.Delete.Hide()
 
-#		self.Orders.SetSize((-1,0))
-		self.Layout()
+		self.Orders.SetSize((-1,0))
+		self.Master.Layout()
 		self.Orders._doResize()
 
 	def FromPanel(self, order):
