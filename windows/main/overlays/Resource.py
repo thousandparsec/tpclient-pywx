@@ -27,9 +27,10 @@ import  wx.lib.popupctl as popupctrl
 import  wx.calendar as calendar
 
 from windows.xrc.winResourceSelect import ResourceSelectBase
-class ResourceSelect(ResourceSelectBase):
+class ResourceSelect(ResourceSelectBase, wx.Frame):
 	def __init__(self, parent):
 		ResourceSelectBase.__init__(self, parent)
+		self.Hide()
 
 class ResourceSelectorControl(popupctrl.PopupControl):
     def __init__(self,*_args,**_kwargs):
