@@ -184,7 +184,7 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 		else:
 			self.Master.Show()
 			self.Master.Layout()
-			#self.Master.Update()
+			self.Master.Update()
 
 		self.Orders.SetToolTipDefault(_("Current orders on %s.") % object.name)
 		
@@ -432,7 +432,6 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 		except KeyError:
 			node = _("No object selected.")
 
-		print "BuildPanel", node
 		self.ColourOrderPanel()
 
 		# Remove the previous panel and stuff
@@ -539,6 +538,7 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 
 		self.Orders.SetSize((-1,0))
 		self.Master.Layout()
+		self.Layout()
 		self.Orders._doResize()
 
 	def FromPanel(self, order):
