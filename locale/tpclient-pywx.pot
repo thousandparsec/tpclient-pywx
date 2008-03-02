@@ -3,14 +3,14 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#: windows/main/panelMessage.py:207 windows/winMain.py:278
-#: windows/winMain.py:285 windows/winMain.py:286
+#: windows/main/panelMessage.py:206 windows/winMain.py:281
+#: windows/winMain.py:288
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-01-24 22:08+1030\n"
+"POT-Creation-Date: 2008-03-02 22:57+1030\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,33 +18,39 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: windows/winAccount.py:30 windows/winAccount.py:31
+#: windows/winAccount.py:30 windows/winAccount.py:31 windows/winAccount.py:31
 msgid "Account"
 msgstr ""
 
 #: windows/winAccount.py:174 windows/winAccount.py:175
+#: windows/winAccount.py:182
 msgid "This server does not support account creation."
 msgstr ""
 
 #: windows/winAccount.py:178 windows/winAccount.py:179
+#: windows/winAccount.py:189
 msgid "Account Created"
 msgstr ""
 
 #: windows/winAccount.py:182 windows/winBase.py:369 tpclient-pywx:264
 #: tpclient-pywx:268 windows/winAccount.py:183 tpclient-pywx:362
+#: windows/winAccount.py:196 tpclient-pywx:390
 msgid "Network Error"
 msgstr ""
 
 #: windows/winAccount.py:195 windows/winAccount.py:196
+#: windows/winAccount.py:213
 msgid "All fields are required."
 msgstr ""
 
 #: windows/winAccount.py:195 windows/winAccount.py:199
 #: windows/winAccount.py:196 windows/winAccount.py:200
+#: windows/winAccount.py:213 windows/winAccount.py:217
 msgid "Fields Required"
 msgstr ""
 
 #: windows/winAccount.py:199 windows/winAccount.py:200
+#: windows/winAccount.py:217
 msgid "Password fields do not match."
 msgstr ""
 
@@ -94,15 +100,18 @@ msgid "Config"
 msgstr ""
 
 #: windows/winConnect.py:141 windows/winConnect.py:137
+#: windows/winConnect.py:137
 #, python-format
 msgid "Login for %s"
 msgstr ""
 
 #: windows/winConnect.py:166 windows/winConnect.py:162
+#: windows/winConnect.py:162
 msgid "Connect"
 msgstr ""
 
 #: windows/winConnect.py:250 windows/winConnect.py:263
+#: windows/winConnect.py:263
 msgid ""
 "It appears you are using a different password for \n"
 "this account, would you like to update the saved \n"
@@ -110,10 +119,12 @@ msgid ""
 msgstr ""
 
 #: windows/winConnect.py:255 windows/winConnect.py:269
+#: windows/winConnect.py:269
 msgid "Update Password?"
 msgstr ""
 
 #: windows/winConnect.py:264 windows/winConnect.py:246
+#: windows/winConnect.py:246
 msgid ""
 "It appears you havn't access this account before.\n"
 "\n"
@@ -121,16 +132,20 @@ msgid ""
 msgstr ""
 
 #: windows/winConnect.py:269 windows/winConnect.py:251
+#: windows/winConnect.py:251
 msgid "Add Account?"
 msgstr ""
 
 #: windows/winConnect.py:436 windows/winConnect.py:441
 #: windows/winConnect.py:446 windows/winConnect.py:431
 #: windows/winConnect.py:435 windows/winConnect.py:439
+#: windows/winConnect.py:431 windows/winConnect.py:435
+#: windows/winConnect.py:439
 msgid "Login for "
 msgstr ""
 
 #: windows/winConnect.py:453 windows/winConnect.py:446
+#: windows/winConnect.py:446
 #, python-format
 msgid ""
 "\n"
@@ -140,6 +155,7 @@ msgid ""
 msgstr ""
 
 #: windows/winConnect.py:458 windows/winConnect.py:451
+#: windows/winConnect.py:451
 msgid "Autoconnect to?"
 msgstr ""
 
@@ -148,85 +164,103 @@ msgid "Debug"
 msgstr ""
 
 #: windows/winDesign.py:43 windows/main/winDesign.py:43
-#: windows/xrc/winDesign.py:96
+#: windows/xrc/winDesign.py:96 windows/main/winDesign.py:43
+#: windows/xrc/winDesign.py:99
 msgid "Design"
 msgstr ""
 
 #: windows/winDesign.py:78 windows/winDesign.py:83 windows/xrc/winDesign.py:97
-#: windows/xrc/winDesign.py:98
+#: windows/xrc/winDesign.py:98 windows/xrc/winDesign.py:100
+#: windows/xrc/winDesign.py:101
 msgid "Title"
 msgstr ""
 
 #: windows/winDesign.py:106 windows/main/winDesign.py:75
+#: windows/main/winDesign.py:75
 msgid "Component"
 msgstr ""
 
 #: windows/winDesign.py:129 windows/xrc/winDesign.py:105
+#: windows/xrc/winDesign.py:108
 msgid "Edit"
 msgstr ""
 
 #: windows/winDesign.py:134 windows/xrc/winDesign.py:106
+#: windows/xrc/winDesign.py:109
 msgid "Duplicate"
 msgstr ""
 
 #: windows/winDesign.py:139 windows/winOrder.py:220 windows/winOrder.py:253
 #: windows/xrc/panelMessage.py:76 windows/xrc/panelMessage.py:77
-#: windows/xrc/winDesign.py:107
+#: windows/xrc/winDesign.py:107 windows/xrc/panelMessage.py:80
+#: windows/xrc/winDesign.py:110
 msgid "Delete"
 msgstr ""
 
 #: windows/winDesign.py:144 windows/xrc/winDesign.py:108
+#: windows/xrc/winDesign.py:111
 msgid "Revert"
 msgstr ""
 
 #: windows/winDesign.py:149 windows/xrc/winDesign.py:109
+#: windows/xrc/winDesign.py:112
 msgid "Save"
 msgstr ""
 
 #: windows/winDesign.py:165 windows/winOrder.py:766
 #: windows/main/panelOrder.py:834 windows/xrc/winDesign.py:110
+#: windows/main/panelOrder.py:831 windows/xrc/orderList.py:56
+#: windows/xrc/winDesign.py:113
 msgid "Add"
 msgstr ""
 
 #: windows/winDesign.py:169 windows/xrc/winDesign.py:111
+#: windows/xrc/winDesign.py:114
 msgid "Add Many"
 msgstr ""
 
 #: windows/winDesign.py:237 windows/xrc/winUpdate.py:94
 #: windows/main/winDesign.py:150 windows/xrc/winUpdate.py:95
+#: windows/main/winDesign.py:150 windows/xrc/winUpdate.py:98
 msgid "Designs"
 msgstr ""
 
 #: windows/winDesign.py:242 windows/main/winDesign.py:155
+#: windows/main/winDesign.py:155
 msgid "New Design"
 msgstr ""
 
 #: windows/winDesign.py:267 windows/xrc/winUpdate.py:95
 #: windows/main/winDesign.py:191 windows/xrc/winUpdate.py:96
+#: windows/main/winDesign.py:191 windows/xrc/winUpdate.py:99
 msgid "Components"
 msgstr ""
 
 #: windows/winDesign.py:398 windows/main/winDesign.py:333
+#: windows/main/winDesign.py:333
 msgid ""
 "\n"
 "Would you like to continue adding these components?"
 msgstr ""
 
 #: windows/winDesign.py:400 windows/main/winDesign.py:335
+#: windows/main/winDesign.py:335
 msgid ""
 "\n"
 "Would you like to continue adding this component?"
 msgstr ""
 
 #: windows/winDesign.py:401 windows/main/winDesign.py:336
+#: windows/main/winDesign.py:336
 msgid "Design Warning"
 msgstr ""
 
 #: windows/winInfo.py:57 windows/main/panelInfo.py:30
+#: windows/main/panelInfo.py:30
 msgid "Information"
 msgstr ""
 
-#: windows/winMain.py:212 windows/winMain.py:108
+#: windows/winMain.py:212 windows/winMain.py:108 windows/winMain.py:108
 msgid "Thousand Parsec"
 msgstr ""
 
@@ -234,7 +268,7 @@ msgstr ""
 msgid "Connect to Game\tCtrl-O"
 msgstr ""
 
-#: windows/winMain.py:332 windows/winMain.py:250
+#: windows/winMain.py:332 windows/winMain.py:250 windows/winMain.py:253
 msgid "Connect to a diffrent Game"
 msgstr ""
 
@@ -242,7 +276,7 @@ msgstr ""
 msgid "Download the Universe\tCtrl-U"
 msgstr ""
 
-#: windows/winMain.py:333 windows/winMain.py:251
+#: windows/winMain.py:333 windows/winMain.py:251 windows/winMain.py:254
 msgid "Download the Universe"
 msgstr ""
 
@@ -250,19 +284,19 @@ msgstr ""
 msgid "Preferences"
 msgstr ""
 
-#: windows/winMain.py:335 windows/winMain.py:253
+#: windows/winMain.py:335 windows/winMain.py:253 windows/winMain.py:256
 msgid "Configure the Client"
 msgstr ""
 
-#: windows/winMain.py:337 windows/winMain.py:255
+#: windows/winMain.py:337 windows/winMain.py:255 windows/winMain.py:258
 msgid "Exit"
 msgstr ""
 
-#: windows/winMain.py:370 windows/winMain.py:278
+#: windows/winMain.py:370 windows/winMain.py:278 windows/winMain.py:281
 msgid "Show "
 msgstr ""
 
-#: windows/winMain.py:377 windows/winMain.py:285
+#: windows/winMain.py:377 windows/winMain.py:285 windows/winMain.py:288
 msgid "Show Tips"
 msgstr ""
 
@@ -270,11 +304,11 @@ msgstr ""
 msgid "Help"
 msgstr ""
 
-#: windows/winMain.py:382 windows/winMain.py:290
+#: windows/winMain.py:382 windows/winMain.py:290 windows/winMain.py:293
 msgid "File"
 msgstr ""
 
-#: windows/winMain.py:384 windows/winMain.py:292
+#: windows/winMain.py:384 windows/winMain.py:292 windows/winMain.py:295
 msgid "Windows"
 msgstr ""
 
@@ -282,20 +316,22 @@ msgstr ""
 msgid "&Help"
 msgstr ""
 
-#: windows/winMain.py:440 windows/winMain.py:348
+#: windows/winMain.py:440 windows/winMain.py:348 windows/winMain.py:352
 msgid "The turn has ended. Would you like to download all the new details?\n"
 msgstr ""
 
-#: windows/winMain.py:443 windows/winMain.py:351
+#: windows/winMain.py:443 windows/winMain.py:351 windows/winMain.py:355
 msgid "Update?"
 msgstr ""
 
 #: windows/winMessage.py:93 windows/xrc/winUpdate.py:92
 #: windows/main/panelMessage.py:26 windows/xrc/winUpdate.py:93
+#: windows/main/panelMessage.py:26 windows/xrc/winUpdate.py:96
 msgid "Messages"
 msgstr ""
 
 #: windows/winMessage.py:226 windows/main/panelMessage.py:206
+#: windows/main/panelMessage.py:205
 msgid "No messages"
 msgstr ""
 
@@ -304,25 +340,29 @@ msgid "All filtered"
 msgstr ""
 
 #: windows/winMessage.py:281 windows/main/panelMessage.py:240
+#: windows/main/panelMessage.py:239
 #, python-format
 msgid "%i of %i"
 msgstr ""
 
 #: windows/winNewStarMap.py:51 windows/winStarMap.py:69
-#: windows/main/panelStarMap.py:41
+#: windows/main/panelStarMap.py:41 windows/main/panelStarMap.py:61
 msgid "StarMap"
 msgstr ""
 
 #: windows/winOrder.py:38 windows/xrc/winUpdate.py:90
 #: windows/main/panelOrder.py:43 windows/xrc/winUpdate.py:91
+#: windows/main/panelOrder.py:43 windows/xrc/winUpdate.py:94
 msgid "Orders"
 msgstr ""
 
 #: windows/winOrder.py:53 windows/main/panelOrder.py:56
+#: windows/main/panelOrder.py:56
 msgid "Turns"
 msgstr ""
 
 #: windows/winOrder.py:55 windows/main/panelOrder.py:58
+#: windows/main/panelOrder.py:58
 msgid "Order Information"
 msgstr ""
 
@@ -380,19 +420,23 @@ msgid "Warning: Object %s does not exist!"
 msgstr ""
 
 #: windows/winOrder.py:335 windows/main/panelOrder.py:188
+#: windows/main/panelOrder.py:189
 #, python-format
 msgid "Current orders on %s."
 msgstr ""
 
 #: windows/winOrder.py:347 windows/main/panelOrder.py:197
+#: windows/main/panelOrder.py:198
 msgid "Order type to create"
 msgstr ""
 
 #: windows/winOrder.py:413 windows/main/panelOrder.py:425
+#: windows/main/panelOrder.py:424
 msgid "Multiple orders selected."
 msgstr ""
 
 #: windows/winOrder.py:417 windows/main/panelOrder.py:434
+#: windows/main/panelOrder.py:433
 msgid "No object selected."
 msgstr ""
 
@@ -415,25 +459,30 @@ msgid "Argument type (ARG_RANGE) not implimented yet."
 msgstr ""
 
 #: windows/winOrder.py:676 windows/main/panelOrder.py:741
+#: windows/main/panelOrder.py:738
 msgid "Not implimented."
 msgstr ""
 
 #: windows/winOrder.py:709 windows/main/panelOrder.py:774
+#: windows/main/panelOrder.py:771
 msgid "No object"
 msgstr ""
 
 #: windows/winOrder.py:714 windows/main/panelOrder.py:779
+#: windows/main/panelOrder.py:776
 msgid "At "
 msgstr ""
 
 #: windows/winOrder.py:744 windows/winServerBrowser.py:26
 #: windows/winServerBrowser.py:133 windows/winServerBrowser.py:28
-#: windows/winServerBrowser.py:133 windows/main/panelOrder.py:812
+#: windows/main/panelOrder.py:812 windows/winServerBrowser.py:28
+#: windows/winServerBrowser.py:138 windows/main/panelOrder.py:809
 msgid "Type"
 msgstr ""
 
 # Short for "Delete"
 #: windows/winOrder.py:769 windows/main/panelOrder.py:837
+#: windows/main/panelOrder.py:834 windows/xrc/orderList.py:57
 msgid "D"
 msgstr ""
 
@@ -451,93 +500,112 @@ msgstr ""
 
 # The "X" coordinate
 #: windows/winOrder.py:916 windows/main/panelOrder.py:980
+#: windows/main/panelOrder.py:977
 msgid "X"
 msgstr ""
 
 # The "Y" coordinate
 #: windows/winOrder.py:924 windows/main/panelOrder.py:988
+#: windows/main/panelOrder.py:985
 msgid "Y"
 msgstr ""
 
 # The "Z" coordinate
 #: windows/winOrder.py:932 windows/main/panelOrder.py:996
+#: windows/main/panelOrder.py:993
 msgid "Z"
 msgstr ""
 
 #: windows/winOrder.py:940 windows/winServerBrowser.py:21
 #: windows/winServerBrowser.py:76 windows/winServerBrowser.py:23
-#: windows/winServerBrowser.py:76 windows/main/panelOrder.py:1004
+#: windows/main/panelOrder.py:1004 windows/winServerBrowser.py:23
+#: windows/winServerBrowser.py:81 windows/main/panelOrder.py:1001
+#: windows/xrc/orderPosition.py:47
 msgid "P"
 msgstr ""
 
 #: windows/winPicture.py:60 windows/main/panelPicture.py:47
+#: windows/main/panelPicture.py:47
 msgid "Picture"
 msgstr ""
 
 #: windows/winServerBrowser.py:19 windows/winUpdate.py:19
 #: windows/winServerBrowser.py:21 windows/winUpdate.py:23
+#: windows/winServerBrowser.py:21 windows/winUpdate.py:23
 msgid "Updating"
 msgstr ""
 
 #: windows/winServerBrowser.py:21 windows/winServerBrowser.py:52
-#: windows/winServerBrowser.py:23 windows/winServerBrowser.py:52
+#: windows/winServerBrowser.py:23 windows/winServerBrowser.py:23
+#: windows/winServerBrowser.py:57
 msgid "Name"
 msgstr ""
 
 #: windows/winServerBrowser.py:21 windows/winServerBrowser.py:57
-#: windows/winServerBrowser.py:23 windows/winServerBrowser.py:57
+#: windows/winServerBrowser.py:23 windows/winServerBrowser.py:23
+#: windows/winServerBrowser.py:62
 msgid "Playing"
 msgstr ""
 
 #: windows/winServerBrowser.py:21 windows/winServerBrowser.py:60
 #: windows/xrc/winAccount.py:75 windows/xrc/winConnect.py:76
-#: windows/winServerBrowser.py:23 windows/winServerBrowser.py:60
-#: windows/xrc/winAccount.py:82 windows/xrc/winConnect.py:83
+#: windows/winServerBrowser.py:23 windows/xrc/winAccount.py:82
+#: windows/xrc/winConnect.py:83 windows/winServerBrowser.py:23
+#: windows/winServerBrowser.py:65 windows/xrc/winAccount.py:85
+#: windows/xrc/winConnect.py:86
 msgid "Server"
 msgstr ""
 
 # Number of "Connected Players"
 #: windows/winServerBrowser.py:21 windows/winServerBrowser.py:68
-#: windows/winServerBrowser.py:23 windows/winServerBrowser.py:68
+#: windows/winServerBrowser.py:23 windows/winServerBrowser.py:23
+#: windows/winServerBrowser.py:73
 msgid "C"
 msgstr ""
 
 # Number of "Visible Objects"
 #: windows/winServerBrowser.py:21 windows/winServerBrowser.py:72
-#: windows/winServerBrowser.py:23 windows/winServerBrowser.py:72
+#: windows/winServerBrowser.py:23 windows/winServerBrowser.py:23
+#: windows/winServerBrowser.py:77
 msgid "O"
 msgstr ""
 
 #: windows/winServerBrowser.py:21 windows/winServerBrowser.py:80
-#: windows/winServerBrowser.py:23 windows/winServerBrowser.py:80
+#: windows/winServerBrowser.py:23 windows/winServerBrowser.py:23
+#: windows/winServerBrowser.py:85
 msgid "Other"
 msgstr ""
 
 #: windows/winServerBrowser.py:26 windows/winServerBrowser.py:134
-#: windows/winServerBrowser.py:28 windows/winServerBrowser.py:134
+#: windows/winServerBrowser.py:28 windows/winServerBrowser.py:28
+#: windows/winServerBrowser.py:139
 msgid "DNS"
 msgstr ""
 
 #: windows/winServerBrowser.py:26 windows/winServerBrowser.py:135
-#: windows/winServerBrowser.py:28 windows/winServerBrowser.py:135
+#: windows/winServerBrowser.py:28 windows/winServerBrowser.py:28
+#: windows/winServerBrowser.py:140
 msgid "IP"
 msgstr ""
 
 #: windows/winServerBrowser.py:26 windows/winServerBrowser.py:136
-#: windows/winServerBrowser.py:28 windows/winServerBrowser.py:136
+#: windows/winServerBrowser.py:28 windows/winServerBrowser.py:28
+#: windows/winServerBrowser.py:141
 msgid "Port"
 msgstr ""
 
 #: windows/winSystem.py:23 windows/main/panelSystem.py:22
-#: windows/xrc/panelStarMap.py:67
+#: windows/xrc/panelStarMap.py:67 windows/main/panelSystem.py:23
+#: windows/xrc/panelStarMap.py:70
 msgid "System"
 msgstr ""
 
 #: windows/winSystem.py:126 windows/main/panelSystem.py:143
+#: windows/main/panelSystem.py:152
 msgid "Known Universe"
 msgstr ""
 
-#: windows/winUpdate.py:50 windows/winUpdate.py:55
+#: windows/winUpdate.py:50 windows/winUpdate.py:55 windows/winUpdate.py:55
 msgid "Save log as ..."
 msgstr ""
 
@@ -545,39 +613,48 @@ msgstr ""
 #: windows/xrc/winUpdate.py:84 windows/xrc/winUpdate.py:86
 #: windows/xrc/winUpdate.py:85 windows/xrc/winUpdate.py:87
 #: windows/winUpdate.py:177 windows/winUpdate.py:251
+#: windows/xrc/winUpdate.py:88 windows/xrc/winUpdate.py:90
+#: windows/winUpdate.py:182 windows/winUpdate.py:265
 msgid "Done!"
 msgstr ""
 
-#: windows/winUpdate.py:194 windows/winUpdate.py:200
+#: windows/winUpdate.py:194 windows/winUpdate.py:200 windows/winUpdate.py:214
 #, python-format
 msgid "Getting %s"
 msgstr ""
 
 #: windows/winUpdate.py:222 windows/winUpdate.py:233 windows/winUpdate.py:228
-#: windows/winUpdate.py:239
+#: windows/winUpdate.py:239 windows/winUpdate.py:242 windows/winUpdate.py:253
 #, python-format
 msgid "%s of %s"
 msgstr ""
 
 #: windows/xrc/configConnect.py:54 windows/xrc/configConnect.py:55
+#: windows/xrc/configConnect.py:58
 msgid "Login for"
 msgstr ""
 
 #: windows/xrc/configConnect.py:55 windows/xrc/winAccount.py:79
 #: windows/xrc/winConnect.py:78 windows/xrc/configConnect.py:56
 #: windows/xrc/winAccount.py:86 windows/xrc/winConnect.py:86
+#: windows/xrc/configConnect.py:59 windows/xrc/winAccount.py:89
+#: windows/xrc/winConnect.py:89
 msgid "Username"
 msgstr ""
 
 #: windows/xrc/configConnect.py:56 windows/xrc/winAccount.py:80
 #: windows/xrc/winConnect.py:79 windows/xrc/configConnect.py:57
 #: windows/xrc/winAccount.py:87 windows/xrc/winConnect.py:87
+#: windows/xrc/configConnect.py:60 windows/xrc/winAccount.py:90
+#: windows/xrc/winConnect.py:90
 msgid "The username for the account on the Thousand Parsec server."
 msgstr ""
 
 #: windows/xrc/configConnect.py:57 windows/xrc/winAccount.py:81
 #: windows/xrc/winConnect.py:80 windows/xrc/configConnect.py:58
 #: windows/xrc/winAccount.py:88 windows/xrc/winConnect.py:88
+#: windows/xrc/configConnect.py:61 windows/xrc/winAccount.py:91
+#: windows/xrc/winConnect.py:91
 msgid "Show seperate game box."
 msgstr ""
 
@@ -585,46 +662,59 @@ msgstr ""
 #: windows/xrc/configConnect.py:58 windows/xrc/winAccount.py:82
 #: windows/xrc/winConnect.py:81 windows/xrc/configConnect.py:59
 #: windows/xrc/winAccount.py:89 windows/xrc/winConnect.py:89
+#: windows/xrc/configConnect.py:62 windows/xrc/winAccount.py:92
+#: windows/xrc/winConnect.py:92
 msgid "G"
 msgstr ""
 
 #: windows/xrc/configConnect.py:59 windows/xrc/winAccount.py:83
 #: windows/xrc/winConnect.py:82 windows/xrc/configConnect.py:60
 #: windows/xrc/winAccount.py:90 windows/xrc/winConnect.py:90
+#: windows/xrc/configConnect.py:63 windows/xrc/winAccount.py:93
+#: windows/xrc/winConnect.py:93
 msgid "Game"
 msgstr ""
 
 #: windows/xrc/configConnect.py:60 windows/xrc/winAccount.py:84
 #: windows/xrc/winConnect.py:83 windows/xrc/configConnect.py:61
 #: windows/xrc/winAccount.py:91 windows/xrc/winConnect.py:91
+#: windows/xrc/configConnect.py:64 windows/xrc/winAccount.py:94
+#: windows/xrc/winConnect.py:94
 msgid "Password"
 msgstr ""
 
 #: windows/xrc/configConnect.py:61 windows/xrc/configConnect.py:62
+#: windows/xrc/configConnect.py:65
 msgid "Autoconnect"
 msgstr ""
 
 #: windows/xrc/configConnect.py:62 windows/xrc/configConnect.py:63
+#: windows/xrc/configConnect.py:66
 msgid "Debug Output"
 msgstr ""
 
 #: windows/xrc/panelInformation.py:38 windows/xrc/panelInformation.py:39
+#: windows/xrc/panelInformation.py:42
 msgid "Name of object goes here"
 msgstr ""
 
 #: windows/xrc/panelMessage.py:67 windows/xrc/panelMessage.py:68
+#: windows/xrc/panelMessage.py:71
 msgid "Filter"
 msgstr ""
 
 #: windows/xrc/panelMessage.py:68 windows/xrc/panelMessage.py:69
+#: windows/xrc/panelMessage.py:72
 msgid "Static text"
 msgstr ""
 
 #: windows/xrc/panelMessage.py:69 windows/xrc/panelMessage.py:70
+#: windows/xrc/panelMessage.py:73
 msgid "100 of 100"
 msgstr ""
 
 #: windows/xrc/panelMessage.py:70 windows/xrc/panelMessage.py:71
+#: windows/xrc/panelMessage.py:74
 msgid ""
 "<html>\n"
 "<body>\n"
@@ -648,104 +738,129 @@ msgid ""
 msgstr ""
 
 #: windows/xrc/panelMessage.py:71 windows/xrc/panelMessage.py:72
+#: windows/xrc/panelMessage.py:75
 msgid "Prev"
 msgstr ""
 
 #: windows/xrc/panelMessage.py:72 windows/xrc/panelMessage.py:73
+#: windows/xrc/panelMessage.py:76
 msgid "First"
 msgstr ""
 
 #: windows/xrc/panelMessage.py:73 windows/xrc/panelMessage.py:74
+#: windows/xrc/panelMessage.py:77
 msgid "Goto"
 msgstr ""
 
 #: windows/xrc/panelMessage.py:74 windows/xrc/panelMessage.py:75
+#: windows/xrc/panelMessage.py:78
 msgid "Next"
 msgstr ""
 
 #: windows/xrc/panelMessage.py:75 windows/xrc/panelMessage.py:76
+#: windows/xrc/panelMessage.py:79
 msgid "Last"
 msgstr ""
 
 #: windows/xrc/panelOrder.py:57 windows/xrc/panelOrder.py:64
+#: windows/xrc/panelOrder.py:68
 msgid "Insert new order."
 msgstr ""
 
 #: windows/xrc/panelOrder.py:58 windows/xrc/panelOrder.py:65
+#: windows/xrc/panelOrder.py:69
 msgid "&New"
 msgstr ""
 
 #: windows/xrc/panelOrder.py:59 windows/xrc/winUpdate.py:102
 #: windows/xrc/panelOrder.py:66 windows/xrc/winUpdate.py:103
+#: windows/xrc/panelOrder.py:70 windows/xrc/winUpdate.py:106
 msgid "&Save"
 msgstr ""
 
 #: windows/xrc/panelOrder.py:60 windows/xrc/panelOrder.py:67
+#: windows/xrc/panelOrder.py:71
 msgid "&Revert"
 msgstr ""
 
 #: windows/xrc/panelOrder.py:61 windows/xrc/panelOrder.py:68
+#: windows/xrc/panelOrder.py:72
 msgid "Delete the currently selected order(s)"
 msgstr ""
 
 #: windows/xrc/panelOrder.py:62 windows/xrc/panelOrder.py:69
+#: windows/xrc/panelOrder.py:73
 msgid "&Delete"
 msgstr ""
 
 #: windows/xrc/panelPicture.py:43 windows/xrc/panelPicture.py:45
+#: windows/xrc/panelPicture.py:48
 msgid "Name goes here"
 msgstr ""
 
 #: windows/xrc/panelPicture.py:44 windows/xrc/panelPicture.py:46
+#: windows/xrc/panelPicture.py:49
 msgid "10kb/s"
 msgstr ""
 
 #: windows/xrc/panelPicture.py:45 windows/xrc/panelPicture.py:47
+#: windows/xrc/panelPicture.py:50
 msgid "43s"
 msgstr ""
 
 #: windows/xrc/winAccount.py:73 windows/xrc/winConnect.py:74
 #: windows/xrc/winAccount.py:80 windows/xrc/winConnect.py:81
+#: windows/xrc/winAccount.py:83 windows/xrc/winConnect.py:84
 msgid "TP: Connect to a Server"
 msgstr ""
 
 #: windows/xrc/winAccount.py:74 windows/xrc/winAccount.py:81
+#: windows/xrc/winAccount.py:84
 msgid "Create an Account"
 msgstr ""
 
 #: windows/xrc/winAccount.py:76 windows/xrc/winConnect.py:77
 #: windows/xrc/winAccount.py:83 windows/xrc/winConnect.py:84
+#: windows/xrc/winAccount.py:86 windows/xrc/winConnect.py:87
 msgid "The URL for the Thousand Parsec server."
 msgstr ""
 
 #: windows/xrc/winAccount.py:77 windows/xrc/winAccount.py:84
+#: windows/xrc/winAccount.py:87
 msgid "Choose a server to create an account on."
 msgstr ""
 
 #: windows/xrc/winAccount.py:78 windows/xrc/winAccount.py:85
+#: windows/xrc/winAccount.py:88
 msgid "Check"
 msgstr ""
 
 #: windows/xrc/winAccount.py:85 windows/xrc/winAccount.py:92
+#: windows/xrc/winAccount.py:95
 msgid "Choose your password here."
 msgstr ""
 
 #: windows/xrc/winAccount.py:86 windows/xrc/winAccount.py:93
+#: windows/xrc/winAccount.py:96
 msgid " "
 msgstr ""
 
 #: windows/xrc/winAccount.py:87 windows/xrc/winAccount.py:89
 #: windows/xrc/winAccount.py:94 windows/xrc/winAccount.py:96
+#: windows/xrc/winAccount.py:97 windows/xrc/winAccount.py:99
 msgid "Repeat the password"
 msgstr ""
 
 #: windows/xrc/winAccount.py:88 windows/xrc/winAccount.py:95
+#: windows/xrc/winAccount.py:98
 msgid "Email "
 msgstr ""
 
 #: windows/xrc/winAccount.py:90 windows/xrc/winConnect.py:85
 #: windows/xrc/winUpdate.py:100 windows/xrc/winAccount.py:97
 #: windows/xrc/winUpdate.py:101 windows/xrc/winConnect.py:93
+#: windows/xrc/winAccount.py:100 windows/xrc/winUpdate.py:104
+#: windows/xrc/winConnect.py:96
 msgid "&OK"
 msgstr ""
 
@@ -753,87 +868,108 @@ msgstr ""
 #: windows/xrc/winServerBrowser.py:88 windows/xrc/winUpdate.py:104
 #: windows/xrc/winServerBrowser.py:89 windows/xrc/winAccount.py:98
 #: windows/xrc/winUpdate.py:105 windows/xrc/winConnect.py:94
+#: windows/xrc/winServerBrowser.py:92 windows/xrc/winAccount.py:101
+#: windows/xrc/winUpdate.py:108 windows/xrc/winConnect.py:97
 msgid "&Cancel"
 msgstr ""
 
 #: windows/xrc/winConnect.py:75 windows/xrc/winConnect.py:82
+#: windows/xrc/winConnect.py:85
 msgid "Connect to Thousand Parsec Server"
 msgstr ""
 
 #: windows/xrc/winConnect.py:84 windows/xrc/winConnect.py:92
+#: windows/xrc/winConnect.py:95
 msgid "The password for the account on the Thousand Parsec Server"
 msgstr ""
 
 #: windows/xrc/winConnect.py:87 windows/xrc/winConnect.py:85
+#: windows/xrc/winConnect.py:88
 msgid "&Find"
 msgstr ""
 
 #: windows/xrc/winConnect.py:88 windows/xrc/winConnect.py:95
-#: windows/winMain.py:253
+#: windows/winMain.py:253 windows/xrc/winConnect.py:98 windows/winMain.py:256
 msgid "&Preferences"
 msgstr ""
 
 #: windows/xrc/winServerBrowser.py:72 windows/xrc/winServerBrowser.py:73
+#: windows/xrc/winServerBrowser.py:76
 msgid "TP: Server Browser"
 msgstr ""
 
 #: windows/xrc/winServerBrowser.py:73 windows/xrc/winServerBrowser.py:74
+#: windows/xrc/winServerBrowser.py:77
 msgid "Thousand Parsec Server Browser"
 msgstr ""
 
 #: windows/xrc/winServerBrowser.py:74 windows/xrc/winServerBrowser.py:75
+#: windows/xrc/winServerBrowser.py:78
 msgid "Servers"
 msgstr ""
 
 #: windows/xrc/winServerBrowser.py:75 windows/xrc/winServerBrowser.py:76
+#: windows/xrc/winServerBrowser.py:79
 msgid "List of all the servers registered on the metaserver."
 msgstr ""
 
 #: windows/xrc/winServerBrowser.py:76 windows/xrc/winServerBrowser.py:77
+#: windows/xrc/winServerBrowser.py:80
 msgid "Locations"
 msgstr ""
 
 #: windows/xrc/winServerBrowser.py:77 windows/xrc/winServerBrowser.py:78
+#: windows/xrc/winServerBrowser.py:81
 msgid "List of all the servers found on the local network."
 msgstr ""
 
 #: windows/xrc/winServerBrowser.py:78 windows/xrc/winServerBrowser.py:79
+#: windows/xrc/winServerBrowser.py:82
 msgid "URL"
 msgstr ""
 
 #: windows/xrc/winServerBrowser.py:79 windows/xrc/winServerBrowser.py:80
+#: windows/xrc/winServerBrowser.py:83
 msgid "URL of the currently selected server."
 msgstr ""
 
 #: windows/xrc/winServerBrowser.py:80 windows/xrc/winServerBrowser.py:81
+#: windows/xrc/winServerBrowser.py:84
 msgid "Copy the URL to the clipboard."
 msgstr ""
 
 #: windows/xrc/winServerBrowser.py:81 windows/xrc/winServerBrowser.py:82
+#: windows/xrc/winServerBrowser.py:85
 msgid "&Copy"
 msgstr ""
 
 #: windows/xrc/winServerBrowser.py:82 windows/xrc/winServerBrowser.py:83
+#: windows/xrc/winServerBrowser.py:86
 msgid "Force a refresh of the server list."
 msgstr ""
 
 #: windows/xrc/winServerBrowser.py:83 windows/xrc/winServerBrowser.py:84
+#: windows/xrc/winServerBrowser.py:87
 msgid "&Refresh"
 msgstr ""
 
 #: windows/xrc/winServerBrowser.py:84 windows/xrc/winServerBrowser.py:85
+#: windows/xrc/winServerBrowser.py:88
 msgid "Create a new account on the currently selected server."
 msgstr ""
 
 #: windows/xrc/winServerBrowser.py:85 windows/xrc/winServerBrowser.py:86
+#: windows/xrc/winServerBrowser.py:89
 msgid "&New Account"
 msgstr ""
 
 #: windows/xrc/winServerBrowser.py:86 windows/xrc/winServerBrowser.py:87
+#: windows/xrc/winServerBrowser.py:90
 msgid "Connect to the currently selected server."
 msgstr ""
 
 #: windows/xrc/winServerBrowser.py:87 windows/xrc/winServerBrowser.py:88
+#: windows/xrc/winServerBrowser.py:91
 msgid "C&onnect"
 msgstr ""
 
@@ -842,55 +978,68 @@ msgid "TP: Downloading Universe"
 msgstr ""
 
 #: windows/xrc/winUpdate.py:83 windows/xrc/winUpdate.py:84
+#: windows/xrc/winUpdate.py:87
 msgid "Universe Download"
 msgstr ""
 
 #: windows/xrc/winUpdate.py:85 windows/xrc/winUpdate.py:86
+#: windows/xrc/winUpdate.py:89
 msgid "Progress"
 msgstr ""
 
 #: windows/xrc/winUpdate.py:87 windows/xrc/winUpdate.py:88
+#: windows/xrc/winUpdate.py:91
 msgid "Objects Descs"
 msgstr ""
 
 #: windows/xrc/winUpdate.py:88 windows/xrc/winUpdate.py:89
+#: windows/xrc/winUpdate.py:92
 msgid "Order Descs"
 msgstr ""
 
 #: windows/xrc/winUpdate.py:89 windows/xrc/winUpdate.py:90
+#: windows/xrc/winUpdate.py:93
 msgid "Objects"
 msgstr ""
 
 #: windows/xrc/winUpdate.py:91 windows/xrc/winUpdate.py:92
+#: windows/xrc/winUpdate.py:95
 msgid "Boards"
 msgstr ""
 
 #: windows/xrc/winUpdate.py:93 windows/xrc/winUpdate.py:94
+#: windows/xrc/winUpdate.py:97
 msgid "Categories"
 msgstr ""
 
 #: windows/xrc/winUpdate.py:96 windows/xrc/winUpdate.py:97
+#: windows/xrc/winUpdate.py:100
 msgid "Properties"
 msgstr ""
 
 #: windows/xrc/winUpdate.py:97 windows/xrc/winUpdate.py:98
+#: windows/xrc/winUpdate.py:101
 msgid "Players"
 msgstr ""
 
 #: windows/xrc/winUpdate.py:98 windows/xrc/panelStarMap.py:68
-#: windows/xrc/winUpdate.py:99
+#: windows/xrc/winUpdate.py:99 windows/xrc/panelStarMap.py:71
+#: windows/xrc/winUpdate.py:102
 msgid "Resources"
 msgstr ""
 
 #: windows/xrc/winUpdate.py:99 windows/xrc/winUpdate.py:100
+#: windows/xrc/winUpdate.py:103
 msgid "Continue to the main game window."
 msgstr ""
 
 #: windows/xrc/winUpdate.py:101 windows/xrc/winUpdate.py:102
+#: windows/xrc/winUpdate.py:105
 msgid "Save a copy of the message box window to a file."
 msgstr ""
 
 #: windows/xrc/winUpdate.py:103 windows/xrc/winUpdate.py:104
+#: windows/xrc/winUpdate.py:107
 msgid "Cancel the current update and go back to the connect screen."
 msgstr ""
 
@@ -899,32 +1048,35 @@ msgid "SelectObject: No such object."
 msgstr ""
 
 #: windows/winInfo.py:96 windows/main/panelInfo.py:68
+#: windows/main/panelInfo.py:75
 msgid "Ships: "
 msgstr ""
 
 #: windows/winInfo.py:103 windows/main/panelInfo.py:75
+#: windows/main/panelInfo.py:82
 msgid "Unknown Design id:"
 msgstr ""
 
 #: windows/winInfo.py:104 windows/main/panelInfo.py:76
+#: windows/main/panelInfo.py:83
 #, python-format
 msgid "Unknown (type: %s)"
 msgstr ""
 
-#: tp/client/cache.py:348 tp/client/cache.py:438
+#: tp/client/cache.py:348 tp/client/cache.py:438 tp/client/cache.py:443
 msgid "Getting order descriptions..."
 msgstr ""
 
-#: tp/client/cache.py:349 tp/client/cache.py:439
+#: tp/client/cache.py:349 tp/client/cache.py:439 tp/client/cache.py:444
 msgid "Working out the number of order descriptions to get.."
 msgstr ""
 
-#: tp/client/cache.py:363 tp/client/cache.py:453
+#: tp/client/cache.py:363 tp/client/cache.py:453 tp/client/cache.py:458
 #, python-format
 msgid "Got order description %s (ID: %i) (last modified at %s)..."
 msgstr ""
 
-#: tp/client/cache.py:367 tp/client/cache.py:457
+#: tp/client/cache.py:367 tp/client/cache.py:457 tp/client/cache.py:462
 #, python-format
 msgid "Failed to get order description with id, %i (last modified at %s)..."
 msgstr ""
@@ -941,52 +1093,52 @@ msgstr ""
 msgid "Gotten your player object..."
 msgstr ""
 
-#: tp/client/cache.py:411 tp/client/cache.py:501
+#: tp/client/cache.py:411 tp/client/cache.py:501 tp/client/cache.py:534
 #, python-format
 msgid "Getting %s..."
 msgstr ""
 
-#: tp/client/cache.py:414 tp/client/cache.py:504
+#: tp/client/cache.py:414 tp/client/cache.py:504 tp/client/cache.py:537
 #, python-format
 msgid "Working out the number of %s to get.."
 msgstr ""
 
-#: tp/client/cache.py:429 tp/client/cache.py:519
+#: tp/client/cache.py:429 tp/client/cache.py:519 tp/client/cache.py:552
 #, python-format
 msgid "Got %s %s (id: %i) (last modified at %s)..."
 msgstr ""
 
-#: tp/client/cache.py:432 tp/client/cache.py:522
+#: tp/client/cache.py:432 tp/client/cache.py:522 tp/client/cache.py:555
 #, python-format
 msgid "No %s to get, skipping..."
 msgstr ""
 
-#: tp/client/cache.py:437 tp/client/cache.py:527
+#: tp/client/cache.py:437 tp/client/cache.py:527 tp/client/cache.py:560
 #, python-format
 msgid "Have %i %s to get..."
 msgstr ""
 
-#: tp/client/cache.py:448 tp/client/cache.py:538
+#: tp/client/cache.py:448 tp/client/cache.py:538 tp/client/cache.py:571
 #, python-format
 msgid "Failed to get the %s which was previously called %s."
 msgstr ""
 
-#: tp/client/cache.py:452 tp/client/cache.py:542
+#: tp/client/cache.py:452 tp/client/cache.py:542 tp/client/cache.py:575
 #, python-format
 msgid "Failed to get the %s with id %s."
 msgstr ""
 
-#: tp/client/cache.py:454 tp/client/cache.py:544
+#: tp/client/cache.py:454 tp/client/cache.py:544 tp/client/cache.py:577
 #, python-format
 msgid "Cleaning up %s which have disappeared..."
 msgstr ""
 
-#: tp/client/cache.py:461 tp/client/cache.py:551
+#: tp/client/cache.py:461 tp/client/cache.py:551 tp/client/cache.py:584
 #, python-format
 msgid "Removing %s %s as it has disappeared..."
 msgstr ""
 
-#: tp/client/cache.py:466 tp/client/cache.py:556
+#: tp/client/cache.py:466 tp/client/cache.py:556 tp/client/cache.py:589
 msgid "Building two way tree of the universe for speed..."
 msgstr ""
 
@@ -995,42 +1147,42 @@ msgstr ""
 msgid "Gotten all %s..."
 msgstr ""
 
-#: tp/client/cache.py:493 tp/client/cache.py:583
+#: tp/client/cache.py:493 tp/client/cache.py:583 tp/client/cache.py:616
 #, python-format
 msgid "Getting %s.."
 msgstr ""
 
-#: tp/client/cache.py:494 tp/client/cache.py:584
+#: tp/client/cache.py:494 tp/client/cache.py:584 tp/client/cache.py:617
 #, python-format
 msgid "Have to get %s for %i %s.."
 msgstr ""
 
-#: tp/client/cache.py:504 tp/client/cache.py:594
+#: tp/client/cache.py:504 tp/client/cache.py:594 tp/client/cache.py:627
 #, python-format
 msgid "Sending a request for all %s on %s.."
 msgstr ""
 
-#: tp/client/cache.py:508 tp/client/cache.py:598
+#: tp/client/cache.py:508 tp/client/cache.py:598 tp/client/cache.py:631
 #, python-format
 msgid "Skipping requesting %s on %s as there are none!"
 msgstr ""
 
-#: tp/client/cache.py:526 tp/client/cache.py:616
+#: tp/client/cache.py:526 tp/client/cache.py:616 tp/client/cache.py:649
 #, python-format
 msgid "Failed to get %s for %s (id: %s) (%s)..."
 msgstr ""
 
-#: tp/client/cache.py:530 tp/client/cache.py:620
+#: tp/client/cache.py:530 tp/client/cache.py:620 tp/client/cache.py:653
 #, python-format
 msgid "Got %i %s for %s (id: %s)..."
 msgstr ""
 
-#: tp/client/cache.py:533 tp/client/cache.py:628
+#: tp/client/cache.py:533 tp/client/cache.py:628 tp/client/cache.py:661
 #, python-format
 msgid "Cleaning up any stray %s.."
 msgstr ""
 
-#: tp/client/cache.py:536 tp/client/cache.py:631
+#: tp/client/cache.py:536 tp/client/cache.py:631 tp/client/cache.py:664
 #, python-format
 msgid "Found stray %s for %s.."
 msgstr ""
@@ -1041,206 +1193,207 @@ msgid "Gotten all the %s.."
 msgstr ""
 
 #: tp/client/threads.py:286 tp/client/threads.py:550 tp/client/threads.py:321
-#: tp/client/threads.py:616
+#: tp/client/threads.py:616 tp/client/threads.py:323 tp/client/threads.py:529
 msgid "There was an unknown network error.\n"
 msgstr ""
 
 #: tp/client/threads.py:287 tp/client/threads.py:551 tp/client/threads.py:322
-#: tp/client/threads.py:617
+#: tp/client/threads.py:617 tp/client/threads.py:324 tp/client/threads.py:530
 msgid "Any changes since last save have been lost.\n"
 msgstr ""
 
-#: tp/client/threads.py:289 tp/client/threads.py:324
+#: tp/client/threads.py:289 tp/client/threads.py:324 tp/client/threads.py:326
 msgid "A traceback of the error was printed to the console.\n"
 msgstr ""
 
-#: tp/client/threads.py:317 tp/client/threads.py:344
+#: tp/client/threads.py:317 tp/client/threads.py:344 tp/client/threads.py:346
 msgid "The client was unable to connect to the host.\n"
 msgstr ""
 
-#: tp/client/threads.py:318 tp/client/threads.py:345
+#: tp/client/threads.py:318 tp/client/threads.py:345 tp/client/threads.py:347
 msgid ""
 "This could be because the server is down or there is a problem with the "
 "network.\n"
 msgstr ""
 
-#: tp/client/threads.py:322 tp/client/threads.py:349
+#: tp/client/threads.py:322 tp/client/threads.py:349 tp/client/threads.py:351
 msgid "The client could not connect to the host.\n"
 msgstr ""
 
-#: tp/client/threads.py:323 tp/client/threads.py:350
+#: tp/client/threads.py:323 tp/client/threads.py:350 tp/client/threads.py:352
 msgid ""
 "This could be because the server is down or you mistyped the server "
 "address.\n"
 msgstr ""
 
-#: tp/client/threads.py:326 tp/client/threads.py:353
+#: tp/client/threads.py:326 tp/client/threads.py:353 tp/client/threads.py:355
 msgid "Successfully connected to the host..."
 msgstr ""
 
-#: tp/client/threads.py:329 tp/client/threads.py:356
+#: tp/client/threads.py:329 tp/client/threads.py:356 tp/client/threads.py:358
 msgid "Looking for Thousand Parsec Server..."
 msgstr ""
 
 #: tp/client/threads.py:333 tp/client/threads.py:342 tp/client/threads.py:360
-#: tp/client/threads.py:369
+#: tp/client/threads.py:369 tp/client/threads.py:362 tp/client/threads.py:371
 msgid ""
 "The client connected to the host but it did not appear to be a Thousand "
 "Parsec server.\n"
 msgstr ""
 
 #: tp/client/threads.py:334 tp/client/threads.py:343 tp/client/threads.py:361
-#: tp/client/threads.py:370
+#: tp/client/threads.py:370 tp/client/threads.py:363 tp/client/threads.py:372
 msgid ""
 "This could be because the server is down or the connection details are "
 "incorrect.\n"
 msgstr ""
 
-#: tp/client/threads.py:337 tp/client/threads.py:364
+#: tp/client/threads.py:337 tp/client/threads.py:364 tp/client/threads.py:366
 msgid "Found a Thousand Parsec Server..."
 msgstr ""
 
-#: tp/client/threads.py:339 tp/client/threads.py:366
+#: tp/client/threads.py:339 tp/client/threads.py:366 tp/client/threads.py:368
 msgid "Looking for supported features..."
 msgstr ""
 
-#: tp/client/threads.py:346 tp/client/threads.py:373
+#: tp/client/threads.py:346 tp/client/threads.py:373 tp/client/threads.py:375
 msgid "Got the supported features..."
 msgstr ""
 
-#: tp/client/threads.py:355 tp/client/threads.py:382
+#: tp/client/threads.py:355 tp/client/threads.py:382 tp/client/threads.py:384
 msgid "Connecting..."
 msgstr ""
 
-#: tp/client/threads.py:361 tp/client/threads.py:388
+#: tp/client/threads.py:361 tp/client/threads.py:388 tp/client/threads.py:390
 msgid "Trying to Login to the server..."
 msgstr ""
 
-#: tp/client/threads.py:363 tp/client/threads.py:390
+#: tp/client/threads.py:363 tp/client/threads.py:390 tp/client/threads.py:392
 msgid ""
 "The client connected to the host but could not login because the username of "
 "password was incorrect.\n"
 msgstr ""
 
-#: tp/client/threads.py:364 tp/client/threads.py:391
+#: tp/client/threads.py:364 tp/client/threads.py:391 tp/client/threads.py:393
 msgid ""
 "This could be because you are connecting to the wrong server or mistyped the "
 "username or password.\n"
 msgstr ""
 
-#: tp/client/threads.py:367 tp/client/threads.py:394
+#: tp/client/threads.py:367 tp/client/threads.py:394 tp/client/threads.py:396
 msgid "Logged in okay!"
 msgstr ""
 
-#: windows/main/panelSystem.py:145
+#: windows/main/panelSystem.py:145 windows/main/panelSystem.py:154
 #, python-format
 msgid "Finding %s"
 msgstr ""
 
-#: windows/main/panelOrder.py:423
+#: windows/main/panelOrder.py:423 windows/main/panelOrder.py:422
 msgid "No orders avaliable"
 msgstr ""
 
-#: windows/main/panelOrder.py:432
+#: windows/main/panelOrder.py:432 windows/main/panelOrder.py:431
 msgid "Order queued for removal."
 msgstr ""
 
-#: windows/main/panelInfo.py:81
+#: windows/main/panelInfo.py:81 windows/main/panelInfo.py:88
 msgid "Resources:\n"
 msgstr ""
 
-#: windows/main/panelInfo.py:90
+#: windows/main/panelInfo.py:90 windows/main/panelInfo.py:97
 #, python-format
 msgid "%s %s of %s on surface, "
 msgstr ""
 
-#: windows/main/panelInfo.py:94
+#: windows/main/panelInfo.py:94 windows/main/panelInfo.py:101
 #, python-format
 msgid "%s %s on surface, "
 msgstr ""
 
-#: windows/main/panelInfo.py:98
+#: windows/main/panelInfo.py:98 windows/main/panelInfo.py:105
 #, python-format
 msgid "%s %s of %s minable, "
 msgstr ""
 
-#: windows/main/panelInfo.py:102
+#: windows/main/panelInfo.py:102 windows/main/panelInfo.py:109
 #, python-format
 msgid "%s %s minable, "
 msgstr ""
 
-#: windows/main/panelInfo.py:106
+#: windows/main/panelInfo.py:106 windows/main/panelInfo.py:113
 #, python-format
 msgid "%s %s of %s inaccessible, "
 msgstr ""
 
-#: windows/main/panelInfo.py:110
+#: windows/main/panelInfo.py:110 windows/main/panelInfo.py:117
 #, python-format
 msgid "%s %s inaccessible, "
 msgstr ""
 
-#: windows/main/panelInfo.py:114
+#: windows/main/panelInfo.py:114 windows/main/panelInfo.py:121
 #, python-format
 msgid "\tUnknown Resource %i, S: %i, M: %i, I: %s\n"
 msgstr ""
 
 #: windows/main/winIdleFinder.py:17 windows/xrc/winIdleFinder.py:51
+#: windows/main/winIdleFinder.py:26 windows/xrc/winIdleFinder.py:54
 msgid "Objects Without Orders"
 msgstr ""
 
-#: windows/xrc/panelStarMap.py:62
+#: windows/xrc/panelStarMap.py:62 windows/xrc/panelStarMap.py:65
 msgid "Fit"
 msgstr ""
 
-#: windows/xrc/panelStarMap.py:63
+#: windows/xrc/panelStarMap.py:63 windows/xrc/panelStarMap.py:66
 msgid "80%"
 msgstr ""
 
-#: windows/xrc/panelStarMap.py:64
+#: windows/xrc/panelStarMap.py:64 windows/xrc/panelStarMap.py:67
 msgid "50%"
 msgstr ""
 
-#: windows/xrc/panelStarMap.py:65
+#: windows/xrc/panelStarMap.py:65 windows/xrc/panelStarMap.py:68
 msgid "10%"
 msgstr ""
 
-#: windows/xrc/panelStarMap.py:66
+#: windows/xrc/panelStarMap.py:66 windows/xrc/panelStarMap.py:69
 msgid "Box"
 msgstr ""
 
-#: windows/xrc/winDesign.py:99
+#: windows/xrc/winDesign.py:99 windows/xrc/winDesign.py:102
 msgid "0000"
 msgstr ""
 
-#: windows/xrc/winDesign.py:100
+#: windows/xrc/winDesign.py:100 windows/xrc/winDesign.py:103
 msgid "Some Categories, Will Go, Here"
 msgstr ""
 
-#: windows/xrc/winDesign.py:101
+#: windows/xrc/winDesign.py:101 windows/xrc/winDesign.py:104
 msgid "Property 1:"
 msgstr ""
 
-#: windows/xrc/winDesign.py:102
+#: windows/xrc/winDesign.py:102 windows/xrc/winDesign.py:105
 msgid "The value of property 1"
 msgstr ""
 
-#: windows/xrc/winDesign.py:103
+#: windows/xrc/winDesign.py:103 windows/xrc/winDesign.py:106
 msgid "Property 2:"
 msgstr ""
 
-#: windows/xrc/winDesign.py:104
+#: windows/xrc/winDesign.py:104 windows/xrc/winDesign.py:107
 msgid "The value of property 2"
 msgstr ""
 
-#: windows/xrc/winUpdate.py:83
+#: windows/xrc/winUpdate.py:83 windows/xrc/winUpdate.py:86
 msgid "TP: Universe update"
 msgstr ""
 
-#: windows/winMain.py:250
+#: windows/winMain.py:250 windows/winMain.py:253
 msgid "C&onnect to Game\tCtrl-O"
 msgstr ""
 
-#: windows/winMain.py:251
+#: windows/winMain.py:251 windows/winMain.py:254
 msgid "Download the &Universe\tCtrl-U"
 msgstr ""
 
@@ -1253,7 +1406,102 @@ msgstr ""
 msgid "Received all %s..."
 msgstr ""
 
-#: tp/client/cache.py:635
+#: tp/client/cache.py:635 tp/client/cache.py:668
 #, python-format
 msgid "Received all the %s.."
+msgstr ""
+
+#: windows/xrc/orderList.py:54
+msgid "Choice 1"
+msgstr ""
+
+#: windows/xrc/orderList.py:55
+msgid "Choice 2"
+msgstr ""
+
+#: windows/xrc/winResourceSelect.py:58
+msgid "Done"
+msgstr ""
+
+#: windows/winUpdate.py:192
+msgid "Update done!"
+msgstr ""
+
+#: tp/client/cache.py:464
+msgid "Recieved all order descriptions..."
+msgstr ""
+
+#: tp/client/cache.py:473
+msgid "Don't have any orders to get.."
+msgstr ""
+
+#: tp/client/cache.py:479
+msgid "Don't have any messages to get.."
+msgstr ""
+
+#: tp/client/cache.py:488
+msgid "Getting player objects..."
+msgstr ""
+
+#: tp/client/cache.py:506
+#, python-format
+msgid "Got player %s (id: %i)..."
+msgstr ""
+
+#: tp/client/cache.py:510
+msgid "Received all player objects..."
+msgstr ""
+
+#: tp/client/cache.py:598
+#, python-format
+msgid "received all %s..."
+msgstr ""
+
+#: doc/tips.txt:1
+msgid ""
+"Welcome to tpclient-pywx. This client is written in python using wxPython "
+"and should allow to connect to any Thousand Parsec server."
+msgstr ""
+
+#: doc/tips.txt:2
+msgid "You can click on the star map to select objects!"
+msgstr ""
+
+#: doc/tips.txt:3
+msgid ""
+"The client has many shortcuts, check out the help file for more information."
+msgstr ""
+
+#: doc/tips.txt:4
+msgid ""
+"You can quickly issue a move order by right clicking where you want an "
+"object to go."
+msgstr ""
+
+#: doc/tips.txt:5
+msgid "The waypoint mode is a good way of setting up a large path quickly."
+msgstr ""
+
+#: doc/tips.txt:6
+msgid ""
+"You can right click on the orders windows to access a bunch of quick "
+"functions including cut, copy and paste!"
+msgstr ""
+
+#: doc/tips.txt:7
+msgid ""
+"If the paste menu option is grayed out, the orders you are trying to paste "
+"are not valid on that object."
+msgstr ""
+
+#: doc/tips.txt:8
+msgid ""
+"If you hold down shift a number of buttons change to allow you to quickly "
+"jump to first or last of things."
+msgstr ""
+
+#: doc/tips.txt:9
+msgid ""
+"The system filter box uses standard matching pattern, you can use ? for a "
+"single character or * for any number."
 msgstr ""
