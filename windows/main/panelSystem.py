@@ -92,7 +92,6 @@ class panelSystem(panelSystemBase, TrackerObject):
 			turns = 0
 			for node in orders[1:]:
 				turns += node.CurrentOrder.turns
-			turns -= orders.first.CurrentOrder.turns
 
 			return unicode(orders.first.CurrentOrder.turns) + ", " + unicode(turns)
 
