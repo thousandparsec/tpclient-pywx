@@ -28,42 +28,62 @@ import  wx.calendar as calendar
 
 from windows.xrc.winResourceSelect import ResourceSelectBase
 class ResourceSelect(ResourceSelectBase, wx.Frame):
-	def __init__(self, parent):
+	def __init__(self, parent, cache):
 		ResourceSelectBase.__init__(self, parent)
+		self.parent = parent
+		
+		self.ResourceTypeList = {}
+		
+		for number, resource in cache.resources.items():
+			self.ResourceTypeList[resource.name] = number
+		
+		self.resourcelist.InsertItems(self.ResourceTypeList.keys(), 0)
+		self.panel.Layout()
+		self.Layout()
 		self.Hide()
+	
+	def Ondone(self, evt):
+		self.parent.PopDown()
 
 class ResourceSelectorControl(popupctrl.PopupControl):
-    def __init__(self,*_args,**_kwargs):
-        apply(popupctrl.PopupControl.__init__,(self,) + _args,_kwargs)
+	def __init__(self,resourceview,cache,*_args,**_kwargs):
+		apply(popupctrl.PopupControl.__init__,(self,) + _args,_kwargs)
+		self.cache = cache
+		self.resourceview = resourceview
+		self.selected=[]
+		self.win = ResourceSelect(self, cache)
 
-        self.win = ResourceSelect(self)
+		bz = self.win.panel.GetBestSize()
+		self.win.SetSize(bz)
 
-        #bz = self.rsrclist.GetBestSize()
-        #self.win.SetSize(bz)
+		# This method is needed to set the contents that will be displayed
+		# in the popup
+		self.SetPopupContent(self.win)
 
-        # This method is needed to set the contents that will be displayed
-        # in the popup
-        self.SetPopupContent(self.win)
+		# Event registration for selection finished
+		#self.rsrclist.Bind()
 
-        # Event registration for selection finished
-        #self.rsrclist.Bind()
-
-    # Method called when a day is selected in the calendar
-    def OnRsrcSelected(self,evt):
-        self.PopDown()
-        evt.Skip()
-
-    # Method overridden from PopupControl
-    # This method is called just before the popup is displayed
-    # Use this method to format any controls in the popup
-    def FormatContent(self):
-        pass
-            
+	def PopDown(self):
+		popupctrl.PopupControl.PopDown(self)
+		self.selected=[]
+		for i in range(0, self.win.resourcelist.GetCount()):
+			if self.win.resourcelist.IsChecked(i):
+				self.selected.append(self.win.ResourceTypeList[self.win.resourcelist.GetString(i)])
+		
+		self.resourceview.CleanUp()
+		self.resourceview.UpdateAll()
+		self.resourceview.canvas.Draw()
+		
+	# Method overridden from PopupControl
+	# This method is called just before the popup is displayed
+	# Use this method to format any controls in the popup
+	def FormatContent(self):
+		pass
+			
 class TestPanel(wx.Panel):
-    def __init__(self, parent, log):
-        self.log = log
-        wx.Panel.__init__(self, parent, -1)
-        date = ResourceSelectorControl(self, -1, pos = (0,0), size = (100,22))
+	def __init__(self, resourceview, parent, cache):
+		wx.Panel.__init__(self, parent, -1)
+		self.selector = ResourceSelectorControl(resourceview, cache, self, -1, pos = (0,0), size = (100,22))
 
 class PieChartIcon(SystemIcon):
 	def copy(self):
@@ -93,9 +113,9 @@ class Resource(Proportional):
 	"""
 	name = "Resources"
 
-	TOTAL        = -1
-	SURFACE	     =  1
-	MINABLE	     =  2
+	TOTAL		= -1
+	SURFACE		 =  1
+	MINABLE		 =  2
 	INACCESSABLE =  3	
 
 	def __init__(self, parent, canvas, panel, cache, resource=None, type=-1):
@@ -107,14 +127,15 @@ class Resource(Proportional):
 			self.ResourceTypeList[resource.name] = number
 
 		self.resource = resource
-		self.type     = type
+		self.type	 = type
 		
 		# Create a drop-down on the panel for resource selection
 		#self.ResourceSelector = wx.Choice(panel)
 		#self.ResourceSelector.Bind(wx.EVT_CHOICE, self.OnResourceSelected)
 
 		sizer = wx.FlexGridSizer(len(self.ResourceTypeList))
-		sizer.Add(TestPanel(panel, None), proportion=1, flag=wx.EXPAND)
+		self.selectpanel = TestPanel(self, panel, cache)
+		sizer.Add(self.selectpanel, proportion=1, flag=wx.EXPAND)
 		# Populate the dropdown with information
 		#for name, resource in sorted(self.ResourceTypeList.items(), key=operator.itemgetter(1)):
 			#nametext = wx.StaticText(panel, -1, name)
@@ -158,7 +179,8 @@ class Resource(Proportional):
 					if hasattr(c.objects[child], "resources"):
 						for resource in c.objects[child].resources:
 							if reduce(int.__add__, resource[1:]) != 0:
-								if self.type == Resource.TOTAL or resource[0] == self.type:
+								#if self.type == Resource.TOTAL or resource[0] == self.type:
+								if len(self.selectpanel.selector.selected) == 0 or resource[0] in self.selectpanel.selector.selected:
 									if self.valuesresources.has_key(resource[0]):
 										self.valuesresources[resource[0]] += reduce(int.__add__, resource[1:])
 									else:
@@ -231,18 +253,18 @@ class Resource(Proportional):
 		
 		for c in system.contains:
 			child = self.cache.objects[c]
-			if not self.type == Resource.TOTAL:
+			if len(self.selectpanel.selector.selected) != 0:
 				returnstring += "\n " + child.name + ":"
 			if hasattr(child, "resources"):
 				for resource in child.resources:
 					if reduce(int.__add__, resource[1:]) > 0:
-						if self.type == Resource.TOTAL:
+						if len(self.selectpanel.selector.selected) == 0:
 							if valuesresources.has_key(resource[0]):
 								valuesresources[resource[0]] += reduce(int.__add__, resource[1:])
 							else:
 								valuesresources[resource[0]] = reduce(int.__add__, resource[1:])
 						else:
-							if resource[0] == self.type:
+							if resource[0] in self.selectpanel.selector.selected:
 								thisresourcetotal += reduce(int.__add__, resource[1:]) 
 							 	returnstring += "\n  " + self.cache.resources[resource[0]].name \
 							 		+ ": %s " % reduce(int.__add__, resource[1:]) \
