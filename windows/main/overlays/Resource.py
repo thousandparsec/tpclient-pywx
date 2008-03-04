@@ -101,7 +101,10 @@ class PieChartIcon(SystemIcon):
 		ObjectList = []
 
 		# The center point
-		ObjectList.append(PieChart.PieChart(system.pos[0:2], self.proportional*self.scale, self.valuesforchart, Scaled=False, LineColor="Black"))
+		if (self.proportional*self.scale != 0 and self.valuesforchart != ()):
+			ObjectList.append(PieChart.PieChart(system.pos[0:2], self.proportional*self.scale, self.valuesforchart, Scaled=False, LineColor="Black"))
+		else:
+			ObjectList.append(PieChart.PieChart(system.pos[0:2], .0001, (1,1), Scaled=False, LineColor="Black"))
 
 		Group.__init__(self, ObjectList, False)
 
