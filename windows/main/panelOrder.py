@@ -63,7 +63,7 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 
 		self.Orders.Bind(wx.EVT_LIST_ITEM_SELECTED,   self.OnOrderSelect)
 		self.Orders.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.OnOrderDeselect)
-#		self.Orders.Bind(wx.EVT_RIGHT_UP, self.OnRightClick)
+		self.Orders.Bind(wx.EVT_RIGHT_UP, self.OnRightClick)
 		self.Bind(wx.EVT_KEY_UP, self.OnKeyUp)
 
 	##########################################################################
@@ -571,109 +571,109 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 	# Clipboard functionality
 	##########################################################################
 
-##	def BuildMenu(self, menu):
-##		"""\
-##		Build a menu containing the order types which could be inserted.
-##		"""
-##		object = self.application.cache.objects[self.oid]
-##		
-##		for type in object.order_types:
-##			if not objects.OrderDescs().has_key(type):
-##				continue
-##
-##			od = objects.OrderDescs()[type]
-##			
-##			if hasattr(od, "doc"):
-##				desc = od.doc
-##			else:
-##				desc = od.__doc__
-##			desc = desc.strip()
-##			menu.Append(-1, od._name, desc)
-##
-##	def CheckClipBoard(self):
-##		"""\
-##		Check if the items in the clipboard could be pasted on the currently selected object.
-##		"""
-##		if self.clipboard != None:
-##			for order in self.clipboard:
-##				if not objects.OrderDescs().has_key(order.subtype):
-##					return False
-##
-##				slot = self.Possible.FindString(objects.OrderDescs()[order.subtype]._name)
-##				if slot == wx.NOT_FOUND:
-##					return False
-##			return True
-##		return False
-##
-##	####################################################
-##	# Window Event Handlers
-##	####################################################
-##	def OnRightClick(self, evt):
-##		"""\
-##		Pop-up a menu when a person right clicks on the order list.
-##		"""
-##		slot = self.Orders.HitTest(evt.GetPosition())[0]
-##		if slot != wx.NOT_FOUND:
-##			if not evt.ControlDown() and not evt.ShiftDown():
-##				# Check if shift or ctrl is being held down...
-##				self.Orders.SetSelected([slot])
-##			else:
-##				self.Orders.AddSelected(slot)
-##
-##		id = wx.NewId()
-##		menu = wx.Menu()
-##		menu.SetTitle(_("Top"))
-##
-##		# Check to see if we can paste the stuff here...
-##		nopaste = self.CheckClipBoard()
-##
-##		slots = self.Orders.GetSelected()
-##		if len(slots) > 0:
-##			before = wx.Menu()
-##			before.SetTitle(_("Before"))
-##			menu.AppendMenu(-1, _("New Before"), before)
-##			self.BuildMenu(before)
-##
-##			after = wx.Menu()
-##			after.SetTitle(_("After"))
-##			menu.AppendMenu(-1, _("New After"), after)
-##			self.BuildMenu(after)
-##	
-##			menu.Append(-1, _("Delete"))
-##
-##			menu.AppendSeparator()
-##			
-##			menu.Append(-1, _("Cut"))
-##			menu.Append(-1, _("Copy"))
-##
-##			if self.clipboard != None:
-##				menu.Append(-1, _("Paste Before"))
-##				menu.Enable(menu.FindItem(_("Paste Before")), nopaste)
-##				menu.Append(-1, _("Paste After"))
-##				menu.Enable(menu.FindItem(_("Paste After")), nopaste)
-##		else:
-##			new = wx.Menu()
-##			new.SetTitle(_("New"))
-##			menu.AppendMenu(-1, _("New"), new)
-##			self.BuildMenu(new)
-##			
-##			if self.clipboard != None:
-##				menu.Append(-1, _("Paste"))
-##				menu.Enable(menu.FindItem(_("Paste")), nopaste)
-##			
-##		self.Bind(wx.EVT_MENU, self.OnOrderMenu)
-##		self.PopupMenu(menu, evt.GetPosition())
-##
-##	def OnOrderMenu(self, evt):
-##		"""\
-##		An action from the right click menu.
-##		"""
-##		menu = evt.GetEventObject()
-##		item = menu.FindItemById(evt.GetId())
-##		
-##		t = item.GetText()
-##		if t == _("Delete"):
-##			self.OnOrderDelete(None)
+	def BuildMenu(self, menu):
+		"""\
+		Build a menu containing the order types which could be inserted.
+		"""
+		object = self.application.cache.objects[self.oid]
+		
+		for type in object.order_types:
+			if not objects.OrderDescs().has_key(type):
+				continue
+
+			od = objects.OrderDescs()[type]
+			
+			if hasattr(od, "doc"):
+				desc = od.doc
+			else:
+				desc = od.__doc__
+			desc = desc.strip()
+			menu.Append(-1, od._name, desc)
+
+	def CheckClipBoard(self):
+		"""\
+		Check if the items in the clipboard could be pasted on the currently selected object.
+		"""
+		if self.clipboard != None:
+			for order in self.clipboard:
+				if not objects.OrderDescs().has_key(order.subtype):
+					return False
+
+				slot = self.Possible.FindString(objects.OrderDescs()[order.subtype]._name)
+				if slot == wx.NOT_FOUND:
+					return False
+			return True
+		return False
+
+	####################################################
+	# Window Event Handlers
+	####################################################
+	def OnRightClick(self, evt):
+		"""\
+		Pop-up a menu when a person right clicks on the order list.
+		"""
+		slot = self.Orders.HitTest(evt.GetPosition())[0]
+		if slot != wx.NOT_FOUND:
+			if not evt.ControlDown() and not evt.ShiftDown():
+				# Check if shift or ctrl is being held down...
+				self.Orders.SetSelected([slot])
+			else:
+				self.Orders.AddSelected(slot)
+
+		id = wx.NewId()
+		menu = wx.Menu()
+		menu.SetTitle(_("Top"))
+
+		# Check to see if we can paste the stuff here...
+		nopaste = self.CheckClipBoard()
+
+		slots = self.Orders.GetSelected()
+		if len(slots) > 0:
+			before = wx.Menu()
+			before.SetTitle(_("Before"))
+			menu.AppendMenu(-1, _("New Before"), before)
+			self.BuildMenu(before)
+
+			after = wx.Menu()
+			after.SetTitle(_("After"))
+			menu.AppendMenu(-1, _("New After"), after)
+			self.BuildMenu(after)
+	
+			menu.Append(-1, _("Delete"))
+
+			menu.AppendSeparator()
+			
+			menu.Append(-1, _("Cut"))
+			menu.Append(-1, _("Copy"))
+
+			if self.clipboard != None:
+				menu.Append(-1, _("Paste Before"))
+				menu.Enable(menu.FindItem(_("Paste Before")), nopaste)
+				menu.Append(-1, _("Paste After"))
+				menu.Enable(menu.FindItem(_("Paste After")), nopaste)
+		else:
+			new = wx.Menu()
+			new.SetTitle(_("New"))
+			menu.AppendMenu(-1, _("New"), new)
+			self.BuildMenu(new)
+			
+			if self.clipboard != None:
+				menu.Append(-1, _("Paste"))
+				menu.Enable(menu.FindItem(_("Paste")), nopaste)
+			
+		self.Bind(wx.EVT_MENU, self.OnOrderMenu)
+		self.PopupMenu(menu)
+
+	def OnOrderMenu(self, evt):
+		"""\
+		An action from the right click menu.
+		"""
+		menu = evt.GetEventObject()
+		item = menu.FindItemById(evt.GetId())
+		
+		t = item.GetText()
+		if t == _("Delete"):
+			self.OnOrderDelete(None)
 ##		elif t in (_("Copy"), _("Cut")):
 ##			slots = self.Orders.GetSelected()
 ##
