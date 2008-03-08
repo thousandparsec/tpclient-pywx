@@ -648,6 +648,8 @@ class wxSimpleValidator(wx.PyValidator):
 		# gets to the text control
 		return
 
+wx.SimpleValidator = wxSimpleValidator
+
 ########################
 # PopupWindow doesn't exist on Mac, this fakes it
 ########################
