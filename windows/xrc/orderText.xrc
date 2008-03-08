@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resource>
-  <object class="wxPanel" name="Base">
+  <object class="wxPanel" name="orderText">
     <object class="wxFlexGridSizer">
       <cols>1</cols>
       <rows>1</rows>

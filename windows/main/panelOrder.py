@@ -494,28 +494,30 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 				# Add the arguments bit
 				namepos = wx.LEFT
 				if subtype == constants.ARG_ABS_COORD:
-					subpanel = argCoordPanel( self, self.ArgumentsPanel, getattr(order, name) )
-				elif subtype == constants.ARG_TIME:
-					subpanel = argTimePanel( self, self.ArgumentsPanel, getattr(order, name) )
-				elif subtype == constants.ARG_OBJECT:
-					subpanel = argObjectPanel( self, self.ArgumentsPanel, getattr(order, name), self.application.cache )
+					subpanel = PositionArgumentPanel(self.ArgumentsPanel)
+					subpanel.set_value([getattr(order, name)])
 				elif subtype == constants.ARG_LIST:
-					namepos = wx.TOP
-					subpanel = argListPanel( self, self.ArgumentsPanel, getattr(order, name) )
+					subpanel = ListArgumentPanel(self.ArgumentsPanel)
+					subpanel.set_value(list(getattr(order, name)))
 				elif subtype == constants.ARG_STRING:
-					subpanel = argStringPanel( self, self.ArgumentsPanel, getattr(order, name) )
+					subpanel = TextArgumentPanel(self.ArgumentsPanel)
+					subpanel.set_value([getattr(order, name)])
+				elif subtype == constants.ARG_TIME:
+					pass
+				elif subtype == constants.ARG_OBJECT:
+					pass
 				else:
-					subpanel = argNotImplimentedPanel( self, self.ArgumentsPanel, None )
+					return
 
 				subpanel.SetToolTip(wx.ToolTip(getattr(orderdesc, name+'__doc__')))
 				subpanel.SetFont(wx.local.normalFont)
 				self.ArgumentsChildren.append( subpanel )
 				
-				if namepos == wx.TOP:
+				if subpanel.namepos == wx.TOP:
 					self.ArgumentsSizer.Add( name_text, 0, wx.ALIGN_CENTER|wx.RIGHT|wx.LEFT,  border=4)
 					self.ArgumentsSizer.Add( subpanel, 1,  wx.GROW|wx.EXPAND|wx.ALIGN_CENTER)
 		
-				elif namepos == wx.LEFT:
+				elif subpanel.namepos == wx.LEFT:
 					ArgumentSubSizer = wx.BoxSizer(wx.HORIZONTAL)
 					ArgumentSubSizer.Add( name_text, 0, wx.ALIGN_CENTER|wx.RIGHT, 4 )
 					ArgumentSubSizer.Add( subpanel,  1, wx.GROW|wx.EXPAND|wx.ALIGN_CENTER)
@@ -524,6 +526,8 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 
 				else:
 					raise TypeError('WTF?')
+
+				self.ArgumentsPanel.Layout()
 
 			if len(orderdesc.names) == 0:
 				name_text = wx.StaticText( self.ArgumentsPanel, -1, "No arguments" )
@@ -570,21 +574,7 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 		subpanels = copy.copy(self.ArgumentsChildren)
 		for name, type in orderdesc.names:
 			panel = subpanels.pop(0)
-				
-			if type == constants.ARG_ABS_COORD:
-				args += argCoordGet( panel )
-			elif type == constants.ARG_TIME:
-				args += argTimeGet( panel )
-			elif type == constants.ARG_OBJECT:
-				args += argObjectGet( panel )
-			elif type == constants.ARG_PLAYER:
-				pass
-			elif type == constants.ARG_RANGE:
-				pass
-			elif type == constants.ARG_LIST:
-				args += argListGet( panel )
-			elif type == constants.ARG_STRING:
-				args += argStringGet( panel )
+			args += panel.get_value()
 
 		return apply(objects.Order, args)
 
@@ -736,318 +726,185 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 				self.OnOrderNew(None)
 
 
+class ArgumentPanel(object):
+	"""\
+	Base class for all other Argument panels.
+	"""
 
-# The display for an ARG_COORD
-X = 0
-Y = 1
-Z = 2
+	# The position to place the name argument
+	namepos = wx.LEFT
 
-max = 2**31-1
-min = -1*max
+	pass
 
-def argNotImplimentedPanel(parent, parent_panel, args):
-	panel = wx.Panel(parent_panel, -1)
-	item0 = wx.BoxSizer( wx.HORIZONTAL )
+from windows.xrc.orderText import orderTextBase
+class TextArgumentPanel(ArgumentPanel, orderTextBase):
 
-	panel.SetSizer(item0)
-	panel.SetAutoLayout( True )
-	
-	item1 = wx.StaticText( panel, -1, _("Not implimented."))
-	item1.SetFont(wx.local.normalFont)
-	item0.Add( item1, 0, wx.ALIGN_CENTRE|wx.LEFT, 0 )
+	def set_value(self, list):
+		print "TextArgumentPanel", list
+		self.__max, self.__text = list.pop(0)
+		self.Value.SetValue(self.__text)
 
-	return panel
-
-def argStringPanel(parent, parent_panel, args):
-	panel = wx.Panel(parent_panel, -1)
-	item0 = wx.BoxSizer( wx.HORIZONTAL )
-
-	panel.SetSizer(item0)
-	panel.SetAutoLayout( True )
-
-	item1 = wx.TextCtrl( panel, -1, args[1], size=(wx.local.spinSize[0]*2, wx.local.spinSize[1]))
-	item1.SetFont(wx.local.tinyFont)
-	item0.Add( item1, 1, wx.ALIGN_CENTRE|wx.LEFT|wx.EXPAND, 1 )
-	
-	return panel
-	
-def argStringGet(panel):
-	windows = panel.GetChildren()
-	return [0, windows[0].GetValue()]
-	
-def argObjectPanel(parent, parent_panel, args, cache):
-	panel = wx.Panel(parent_panel, -1)
-	item0 = wx.BoxSizer( wx.HORIZONTAL )
-
-	panel.SetSizer(item0)
-	panel.SetAutoLayout( True )
-
-	item1 = wx.ComboBox( panel, -1, "", choices=(), style=wx.CB_READONLY, \
-				size=(wx.local.spinSize[0]*4, wx.local.spinSize[1]))
-
-	item1.Append(_("No object"), -1)
-	item1.SetSelection(0)
-	for id, object in cache.objects.items():
-		item1.Append(object.name + " (%s)" % object.id, object.id)
-		if hasattr(object, "parent"):
-			item1.SetToolTipItem(item1.GetCount()-1, _("At ") + cache.objects[object.parent].name)
-
-		if object.id == args:
-			item1.SetSelection(item1.GetCount()-1)
-	item1.OnSelection(None)
-
-	item1.SetFont(wx.local.tinyFont)
-	item0.Add( item1, 1, wx.ALIGN_CENTRE|wx.LEFT|wx.EXPAND|wx.GROW, 1 )
-	
-	return panel
-
-def argObjectGet(panel):
-	window = panel.GetChildren()[0]
-	return [window.GetClientData(window.GetSelection())]
-	
-def argListPanel(parent, parent_panel, args):
-	panel = wx.Panel(parent_panel, -1)
-
-	base = wx.FlexGridSizer(0, 1, 0, 0)
-	base.AddGrowableCol(0)
-	base.AddGrowableRow(0)
-
-	# Convert the first arg to a dictionary
-	types = {}
-	for type, name, max in args[0]:
-		types[type] = (name, max)
-
-	panel.SetSizer(base)
-	panel.SetAutoLayout( True )
-	
-	selected = wx.ListCtrl( panel, -1, wx.DefaultPosition, wx.Size(130,80), wx.LC_REPORT|wx.LC_SINGLE_SEL|wx.SUNKEN_BORDER )
-	selected.InsertColumn(0, "#")
-	selected.SetColumnWidth(0, 25)
-	selected.InsertColumn(1, _("Type"))
-	selected.SetColumnWidth(1, 100)
-	selected.SetFont(wx.local.tinyFont)
-
-	# Fill in the selected box
-	for slot in range(0, len(args[1])):
-		type, number = args[1][slot]
-
-		selected.InsertStringItem(slot, "")
-		selected.SetStringItem(slot, 0, unicode(number))
-		selected.SetStringItem(slot, 1, types[type][0])
-		selected.SetItemPyData(slot, type)
+	def get_value(self):
+		return [self.__max, unicode(self.Value.GetValue())]
 		
-	type_list = wx.Choice( panel, -1, choices=[], size=wx.local.buttonSize)
-	type_list.SetFont(wx.local.tinyFont)
+from windows.xrc.orderPosition import orderPositionBase
+class PositionArgumentPanel(ArgumentPanel, orderPositionBase):
 
-	for type, item in types.items():
-		type_list.Append(item[0], type)
+	def set_value(self, list):
+		print "PositionArgumentPanel", list
+		self.X.SetValue(list.pop(0))
+		self.Y.SetValue(list.pop(0))
+		self.Z.SetValue(list.pop(0))
 
-	number = wx.SpinCtrl( panel, -1, "", min=0, max=100, size=wx.local.spinSize )
-	number.SetFont(wx.local.tinyFont)
+	def get_value(self):
+		return [self.X.GetValue(), self.Y.GetValue(), self.Z.GetValue()]
 
-	add = wx.Button( panel, -1, _("Add"), size=wx.local.buttonSize )
-	add.SetFont(wx.local.normalFont)
+from windows.xrc.orderList import orderListBase
+class ListArgumentPanel(ArgumentPanel, orderListBase):
+	namepos = wx.TOP
+
+	NAME = 0
+	MAX  = 1
+
+	def __init__(self, parent, *args, **kw):
+		ArgumentPanel.__init__(self)
+		orderListBase.__init__(self, parent, *args, **kw)
+
+		self.__options = {}
+		self.__selections = {}
+		self.__choices = []
+
+		self.Choices.InsertColumn(0, "#")
+		self.Choices.SetColumnWidth(0, 25)
+		self.Choices.InsertColumn(1, _("Type"))
+		self.Choices.SetColumnWidth(1, 100)
+		self.Choices.Layout()
+
+		self.Bind(wx.EVT_LIST_ITEM_SELECTED,   self.OnChoicesSelect)
+		self.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.OnChoicesDeselect)
+
+	def set_value(self, list):
+		print "ListArgumentPanel", list
+
+		options_list   = list.pop(0)
+		selection_list = list.pop(0)
+
+		# Convert the options into a dictionary
+		options = {}
+		for type, name, max in options_list:
+			options[type] = (name, max)
+
+		# Convert the selection into a dictionary
+		selections = {}
+		for type, number in selection_list:
+			selections[type] = number
+		
+		if self.__options != options:
+			self.__options = options
+
+			# FIXME: Should sort by the name
+
+			self.Type.Clear()
+			for type, (name, max) in options.items():
+				self.Type.Append(name, type)
+
+		if self.__selections != selections:
+			self.__selections = selections
+
+			self.Choices.DeleteAllItems()
+			for slot, (type, number) in enumerate(selections.items()):
+				self.Choices.InsertStringItem(slot, "")
+				self.Choices.SetStringItem(slot, 0, unicode(number))
+				self.Choices.SetStringItem(slot, 1, options[type][self.NAME])
+				self.Choices.SetItemPyData(slot, type)
+
+			self.Choices.Layout()
+
+	def get_value(self):
+		options = []
+		for type, (name, max) in self.__options.items():
+			options.append((type, name, max))
+
+		selections = []
+		for type, number in self.__selections:
+			selections.append((type, number))
+
+		return [options, selections]
+
+	def OnAdd(self, evt):
+		amount = self.Number.GetValue()
 	
-	delete = wx.Button( panel, -1, _("D"), size=(wx.local.smallSize[0],wx.local.buttonSize[1]) )
-	delete.SetFont(wx.local.normalFont)
-
-	box_add = wx.BoxSizer(wx.HORIZONTAL)
-	box_add.Add( type_list, 2, wx.ALIGN_CENTRE|wx.LEFT|wx.EXPAND|wx.GROW, 1 )
-	box_add.Add( number, 0, wx.ALIGN_CENTRE|wx.LEFT|wx.EXPAND|wx.GROW, 1 )
-	box_add.Add( add, 0, wx.ALIGN_CENTRE|wx.LEFT, 1 )
-	box_add.Add( delete, 0, wx.ALIGN_CENTRE|wx.LEFT, 1 )
-
-	base.Add( selected, 1, wx.EXPAND|wx.ALIGN_CENTRE|wx.ALL, 1 )
-	base.Add( box_add,  1, wx.EXPAND|wx.ALIGN_CENTRE|wx.ALL, 1 )
-
-	base.Fit(panel)
-
-	def addf(evt, selected=selected, number=number, type_list=type_list):
-		"""\
-		Add a new selection to the list.
-		"""
-		amount = number.GetValue()
-	
-		type = type_list.GetSelection()
+		type = self.Type.GetSelection()
 		if type == wx.NOT_FOUND:
 			return
-		type = type_list.GetClientData(type)
+		type = self.Type.GetClientData(type)
 
-		slot = selected.FindItemByPyData(type)
-		if slot == wx.NOT_FOUND:
-			# Insert new object
-			slot = 0
+		s = self.__selections
 
-			selected.InsertStringItem(slot, "")
-			selected.SetStringItem(slot, 0, unicode(amount))
-			selected.SetStringItem(slot, 1, types[type][0])
-			selected.SetItemPyData(slot, type)
+		if not s.has_key(type):
+			s[type] = 0
 
-		else:
-			# Need to update the amount slot
-			oldamount = int(selected.GetStringItem(slot, 0))
+			self.Choices.InsertStringItem(slot, "")
+			self.Choices.SetStringItem(slot, 0, unicode(amount))
+			self.Choices.SetStringItem(slot, 1, self.__options[type][self.NAME])
+
+		s[type] += amount
+		s[type]  = max(min(s[type], self.__options[type][self.MAX]), 0)
 		
-			max = types[type][1]
-			if max != -1 and (amount + oldamount) > max:
-				amount = max - oldamount
+		slot = self.Choices.FindItemByPyData(type)
+		self.Choices.SetStringItem(slot, 0, unicode(s[type]))
+	
+	def OnDelete(self, evt):
+		selected = self.Choices.GetSelection()
+		
+		for selection in selected:
+			type = self.Choices.GetItemPyData(selection)
+			del self.__selections[type]
 
-			if amount + oldamount < 0:
-				amount = -1 * oldamount
-			
-			selected.SetStringItem(slot, 0, unicode(amount + oldamount))
+			self.Choices.DeleteItem(selection)
 
-	def deletef(evt, selected=selected):
-		"""\
-		Delete a selection from the list.
-		"""
-		slot = selected.GetNextItem(-1, wx.LIST_NEXT_ALL, wx.LIST_STATE_SELECTED)
-		if slot == wx.NOT_FOUND:
-			return
-
-		selected.DeleteItem(slot)
-
-	def typef(evt, selected=selected, number=number, types=types, type_list=type_list, nocallback=False):
-		"""\
-		Update the max for the spinner.
-		"""
-		type = type_list.GetSelection()
+	def OnType(self, evt):
+		type = self.Type.GetSelection()
 		if type == wx.NOT_FOUND:
-			number.SetRange(0, 0)
+			return
+		type = self.Type.GetClientData(type)
+
+		# Select the linst related to this type
+		slot = self.Choices.FindItemByPyData(type)
+		if slot == wx.NOT_FOUND:
+			self.Choices.SetSelected([])
 		else:
-			current = 0
-		
-			slot = selected.FindItemByPyData(type)
-			if slot != wx.NOT_FOUND:
-				if not nocallback:
-					selected.SetItemState(slot, wx.LIST_STATE_SELECTED, wx.LIST_STATE_SELECTED)
-				current = int(selected.GetStringItem(slot, 0))*-1
-		
-			type = type_list.GetClientData(type)
-			if types[type][1] == 4294967295:
-				number.SetRange(current, 1000)
+			self.Choices.SetSelected([slot])
+			self.Choices.EnsureVisible(slot)
+
+	def OnChoicesDeselect(self, evt):
+		wx.CallAfter(self.OnChoicesSelect, evt)
+
+	def OnChoicesSelect(self, evt):
+		choices = self.Choices.GetSelected()
+		if self.__choices == choices:
+			return
+		else:
+			self.__choices = choices
+
+		if len(choices) > 1:
+			self.Type.SetSelection(wx.NOT_FOUND)
+			self.Add.Disable()
+			self.Number.Disable()
+			self.Type.Disable()
+		else:
+			if len(choices) > 0:
+				self.Delete.Enable()
+
+				type = self.Choices.GetItemPyData(choices[0])
+				for slot in range(0, self.Type.GetCount()):
+					if self.Type.GetClientData(slot) == type:
+						self.Type.SetSelection(slot)
+						break
 			else:
-				number.SetRange(current, types[type][1])
+				self.Delete.Disable()
 
-	def selectf(evt, selected=selected, type_list=type_list, typef=typef):
-		slot = selected.GetNextItem(-1, wx.LIST_NEXT_ALL, wx.LIST_STATE_SELECTED)
-		if slot == wx.NOT_FOUND:
-			return
+			self.Add.Enable()
+			self.Number.Enable()
+			self.Type.Enable()
 
-		type = selected.GetItemPyData(slot)
-
-		for slot in range(0, type_list.GetCount()):
-			if type_list.GetClientData(slot) == type:
-				type_list.SetSelection(slot)
-				typef(None, nocallback=True)
-				return
-		
-	parent.Bind(wx.EVT_LIST_ITEM_SELECTED, selectf, selected)
-	parent.Bind(wx.EVT_BUTTON, addf, add)
-	parent.Bind(wx.EVT_BUTTON, deletef, delete)
-	parent.Bind(wx.EVT_CHOICE, typef, type_list)
-	
-	return panel
-
-def argListGet(panel):
-	selected = panel.GetChildren()[0]
-	
-	returns = [[], []]
-	
-	slot = -1
-	while True:
-		slot = selected.GetNextItem(slot, wx.LIST_NEXT_ALL, wx.LIST_STATE_DONTCARE);
-		if slot == wx.NOT_FOUND:
-			break
-		
-		type = selected.GetItemPyData(slot)
-		amount = int(selected.GetStringItem(slot, 0))
-		
-		returns[-1].append((type, amount))
-	
-	return returns
-
-def argTimePanel(parent, parent_panel, args):
-	panel = wx.Panel(parent_panel, -1)
-	item0 = wx.BoxSizer( wx.HORIZONTAL )
-
-	panel.SetSizer(item0)
-	panel.SetAutoLayout( True )
-	
-	item1 = wx.SpinCtrl( panel, -1, unicode(args[0]), min=min, max=max, size=(wx.local.spinSize[0]*2, wx.local.spinSize[1]) )
-	item1.SetFont(wx.local.tinyFont)
-	item0.Add( item1, 1, wx.ALIGN_CENTRE|wx.LEFT|wx.EXPAND, 1 )
-	
-	return panel
-	
-def argTimeGet(panel):
-	windows = panel.GetChildren()
-	return [windows[0].GetValue(), 0]
-
-def argCoordPanel(parent, parent_panel, args):
-
-	panel = wx.Panel(parent_panel, -1)
-	item0 = wx.BoxSizer( wx.HORIZONTAL )
-
-	panel.SetSizer(item0)
-	panel.SetAutoLayout( True )
-	
-	item1 = wx.StaticText( panel, -1, _("X"))
-	item1.SetFont(wx.local.normalFont)
-	item0.Add( item1, 0, wx.ALIGN_CENTRE|wx.LEFT, 0 )
-
-	item2 = wx.TextCtrl( panel, -1, unicode(args[X]), size=wx.local.spinSize, validator=wx.SimpleValidator(wx.DIGIT_ONLY) )
-	item2.SetFont(wx.local.tinyFont)
-	item0.Add( item2, 1, wx.EXPAND|wx.ALIGN_CENTRE|wx.LEFT, 1 )
-
-	item3 = wx.StaticText( panel, -1, _("Y"))
-	item3.SetFont(wx.local.normalFont)
-	item0.Add( item3, 0, wx.ALIGN_CENTRE|wx.LEFT, 3 )
-
-	item4 = wx.TextCtrl( panel, -1, unicode(args[Y]), size=wx.local.spinSize, validator=wx.SimpleValidator(wx.DIGIT_ONLY) )
-	item4.SetFont(wx.local.tinyFont)
-	item0.Add( item4, 1, wx.EXPAND|wx.ALIGN_CENTRE|wx.LEFT, 1 )
-
-	item5 = wx.StaticText( panel, -1, _("Z"))
-	item5.SetFont(wx.local.normalFont)
-	item0.Add( item5, 0, wx.ALIGN_CENTRE|wx.LEFT, 3 )
-
-	item6 = wx.TextCtrl( panel, -1, unicode(args[Z]), size=wx.local.spinSize, validator=wx.SimpleValidator(wx.DIGIT_ONLY) )
-	item6.SetFont(wx.local.tinyFont)
-	item0.Add( item6, 1, wx.EXPAND|wx.ALIGN_CENTRE|wx.LEFT, 1 )
-
-	item7 = wx.Button( panel, -1, _("P"), size=wx.local.smallSize )
-	item7.SetFont(wx.local.normalFont)
-	item0.Add( item7, 0, wx.ALIGN_CENTRE|wx.LEFT, 3 )
-
-	def OnSelectPosition(evt, x=item2, y=item4, z=item6, p=parent):
-		p.ignore = True
-		x.SetValue(unicode(evt[0]))
-		y.SetValue(unicode(evt[1]))
-		z.SetValue(unicode(evt[2]))
-		p.ignore = False
-
-		p.OnOrderDirty(None)
-
-	parent.OnSelectPosition = OnSelectPosition
-
-	# FIXME: Better way to get the children is needed...
-	from windows.main.panelStarMap import panelStarMap
-
-	starmap = parent.parent.application.gui.main.panels[panelStarMap.title]
-	def p(evt, starmap=starmap):
-		starmap.SetMode(starmap.GUIWaypointEdit)
-	parent.Bind(wx.EVT_BUTTON, p, item7)
-
-	parent.Bind(wx.EVT_TEXT, parent.OnOrderDirty, item2)
-	parent.Bind(wx.EVT_TEXT, parent.OnOrderDirty, item4)
-	parent.Bind(wx.EVT_TEXT, parent.OnOrderDirty, item6)
-
-	return panel
-
-def argCoordGet(panel):
-	windows = panel.GetChildren()
-	try:
-		return [int(windows[1].GetValue()), int(windows[3].GetValue()), int(windows[5].GetValue())]
-	except ValueError:
-		return [0, 0, 0]
-	

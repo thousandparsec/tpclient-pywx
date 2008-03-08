@@ -11,7 +11,7 @@ from wx.xrc import XRCCTRL, XmlResourceWithHandlers
 # Local imports
 from requirements import location
 
-class BaseBase(wx.Panel):
+class orderListBase(wx.Panel):
 	xrc = os.path.join(location(), "windows", "xrc", 'orderList.xrc')
 
 	def PreCreate(self, pre):
@@ -28,7 +28,7 @@ class BaseBase(wx.Panel):
 
 		# Two stage creation (see http://wiki.wxpython.org/index.cgi/TwoStageCreation)
 		pre = wx.PrePanel()
-		res.LoadOnPanel(pre, parent, "Base")
+		res.LoadOnPanel(pre, parent, "orderList")
 		self.PreCreate(pre)
 		self.PostCreate(pre)
 
