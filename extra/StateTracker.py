@@ -319,7 +319,9 @@ class TrackerObjectOrder(TrackerObject):
 			self.SetMode(self.GUISelect)	
 
 		if evt.GetKeyCode() == wx.WXK_DELETE:
-			if len(self.nodes) == 1:
+			if len(self.nodes) == 0:
+				return
+			elif len(self.nodes) == 1:
 				self.RemoveOrders(self.nodes)
 			else:
 				dlg = wx.MessageDialog(self,
