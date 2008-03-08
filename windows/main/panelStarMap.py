@@ -92,6 +92,9 @@ class panelStarMap(panelStarMapBase, TrackerObjectOrder):
 		p.SetSize(p.GetBestSize())
 		self.MouseModePopup.SetSize(p.GetBestSize())
 		
+		self.ZoomLevel.SetValidator(wx.SimpleValidator(wx.DIGIT_ONLY))
+		self.ZoomLevel.Bind(wx.EVT_SET_FOCUS, self.OnZoomLevelFocus)
+
 		# Create the find popup
 		self.FindPopup = wx.PopupWindow(self)
 		pf = wx.Panel(self.FindPopup)
@@ -275,12 +278,15 @@ class panelStarMap(panelStarMapBase, TrackerObjectOrder):
 		self.FloatCanvas.Layout()
 		self.Canvas.SetSize(self.FloatCanvas.GetClientSize())
 
+	def OnZoomLevelFocus(self, evt):
+		print "OnZoomLevelFocus", evt
+		self.ZoomLevel.SetMark(-1, -1)
+
 	def OnZoomLevel(self, evt):
 		"""
 		Called when the ZoomLevel box is changed.
 		"""
 		# FIXME: When the ZoomLevel is changed in any there way, we should get called too...
-
 		if isinstance(evt, wx.Event):
 			to = evt.GetString().lower()
 		else:
@@ -297,6 +303,8 @@ class panelStarMap(panelStarMapBase, TrackerObjectOrder):
 		else:
 			if to[-1] == '%':
 				to = to[:-1]
+			else:
+				self.ZoomLevel.SetValue(unicode(to+"%"))
 
 			try:
 				to = float(to)
@@ -306,6 +314,8 @@ class panelStarMap(panelStarMapBase, TrackerObjectOrder):
 			except ValueError:
 				# FIXME: This should pop-up some type of error.
 				print "Can not zoom to that level"
+
+		self.ZoomLevel.SetMark(0, len(self.ZoomLevel.GetValue()))
 
 	def OnCacheUpdate(self, evt):
 		"""\

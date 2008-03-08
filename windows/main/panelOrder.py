@@ -375,7 +375,8 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 		"""\
 		Called to save the current selected orders.
 		"""
-		assert len(self.nodes) == 1
+		if len(self.nodes) != 1:
+			return
 			
 		# Update the order
 		order = self.FromPanel(self.nodes[0].CurrentOrder)
