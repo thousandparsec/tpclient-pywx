@@ -72,6 +72,11 @@ class winUpdate(winUpdateBase, winBaseXRC):
 			self.Message.ShowPosition(self.Message.GetLastPosition())
 			self.GoDown = False
 
+		if self.Okay.IsEnabled():
+			self.Okay.SetFocus()
+
+		self.Message.Disable()
+
 	def Clear(self):
 		# Enable the cancel button
 		self.Cancel.Enable()
