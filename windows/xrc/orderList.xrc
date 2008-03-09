@@ -15,7 +15,7 @@
             <face>Sans</face>
             <encoding>UTF-8</encoding>
           </font>
-          <style>wxSUNKEN_BORDER|wxLC_REPORT</style>
+          <style>wxSUNKEN_BORDER|wxLC_REPORT|wxLC_EDIT_LABELS</style>
         </object>
         <option>1</option>
         <flag>wxEXPAND|wxGROW</flag>

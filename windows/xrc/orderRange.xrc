@@ -1,6 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resource>
-  <object class="wxPanel" name="Base">
-    <object class="wxSpinCtrl" name="Value"/>
+  <object class="wxPanel" name="orderRange">
+    <object class="wxFlexGridSizer">
+      <object class="sizeritem">
+        <object class="wxSpinCtrl" name="Value">
+          <font>
+            <size>8</size>
+            <style>normal</style>
+            <weight>normal</weight>
+            <underlined>0</underlined>
+            <family>swiss</family>
+            <face>Sans</face>
+            <encoding>UTF-8</encoding>
+          </font>
+        </object>
+        <option>1</option>
+        <flag>wxEXPAND|wxGROW</flag>
+      </object>
+      <cols>1</cols>
+      <rows>1</rows>
+      <growablecols>0</growablecols>
+    </object>
+    <font>
+      <size>8</size>
+      <style>normal</style>
+      <weight>normal</weight>
+      <underlined>0</underlined>
+      <family>swiss</family>
+      <face>Sans</face>
+      <encoding>UTF-8</encoding>
+    </font>
   </object>
 </resource>

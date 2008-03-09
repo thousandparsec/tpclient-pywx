@@ -503,7 +503,8 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 					subpanel = TextArgumentPanel(self.ArgumentsPanel)
 					subpanel.set_value([getattr(order, name)])
 				elif subtype == constants.ARG_TIME:
-					pass
+					subpanel = TimeArgumentPanel(self.ArgumentsPanel)
+					subpanel.set_value([getattr(order,name)])
 				elif subtype == constants.ARG_OBJECT:
 					pass
 				else:
@@ -746,6 +747,18 @@ class TextArgumentPanel(ArgumentPanel, orderTextBase):
 
 	def get_value(self):
 		return [self.__max, unicode(self.Value.GetValue())]
+
+
+from windows.xrc.orderRange import orderRangeBase
+class TimeArgumentPanel(ArgumentPanel, orderRangeBase):
+
+	def set_value(self, list):
+		print "RangeArgumentPanel", list
+		self.__text, self.__max = list.pop(0)
+		self.Value.SetValue(self.__text)
+
+	def get_value(self):
+		return [unicode(self.Value.GetValue()), self.__max]
 		
 from windows.xrc.orderPosition import orderPositionBase
 class PositionArgumentPanel(ArgumentPanel, orderPositionBase):
@@ -772,7 +785,7 @@ class ListArgumentPanel(ArgumentPanel, orderListBase):
 
 		self.__options = {}
 		self.__selections = {}
-		self.__choices = []
+		self.__choices = [None]
 
 		self.Choices.InsertColumn(0, "#")
 		self.Choices.SetColumnWidth(0, 25)
@@ -780,8 +793,16 @@ class ListArgumentPanel(ArgumentPanel, orderListBase):
 		self.Choices.SetColumnWidth(1, 100)
 		self.Choices.Layout()
 
+		self.Type.SetMaxSize((-1, self.Number.GetSize()[1]))
+
 		self.Bind(wx.EVT_LIST_ITEM_SELECTED,   self.OnChoicesSelect)
 		self.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.OnChoicesDeselect)
+
+		self.Bind(wx.EVT_LIST_BEGIN_LABEL_EDIT, self.OnChoicesEditStart)
+		self.Bind(wx.EVT_LIST_END_LABEL_EDIT,   self.OnChoicesEditEnd)
+
+		self.OnChoicesDeselect(None)
+		self.OnType(None)
 
 	def set_value(self, list):
 		print "ListArgumentPanel", list
@@ -826,14 +847,50 @@ class ListArgumentPanel(ArgumentPanel, orderListBase):
 			options.append((type, name, max))
 
 		selections = []
-		for type, number in self.__selections:
+		for type, number in self.__selections.items():
 			selections.append((type, number))
 
 		return [options, selections]
 
+	def OnChoicesEditStart(self, evt):
+		print "OnChoicesEditStart", evt
+	def OnChoicesEditEnd(self, evt):
+		print "OnChoicesEditEnd", evt.GetLabel()
+		try:
+			value = long(evt.GetLabel())
+
+			# Make sure the value is positive
+			if value < 0:
+				evt.Veto()		
+				return	
+
+			type = self.Choices.GetItemPyData(evt.GetIndex())
+
+			# Make sure that the value is not bigger then the maximum
+			value = min(value, self.__options[type][self.MAX])
+
+			slot = self.Choices.FindItemByPyData(type)
+			if value > 0:
+				# Set the value
+				self.__selections[type] = value
+
+				self.Choices.SetStringItem(slot, 0, unicode(value))
+				self.UpdateNumber(type)
+			else:
+				del self.__selections[type]
+				self.Choices.DeleteItem(slot)
+
+				self.UpdateNumber(type)
+
+		except ValueError:
+			pass
+		evt.Veto()
+
 	def OnAdd(self, evt):
 		amount = self.Number.GetValue()
-	
+		if amount == 0:
+			return	
+
 		type = self.Type.GetSelection()
 		if type == wx.NOT_FOUND:
 			return
@@ -844,15 +901,25 @@ class ListArgumentPanel(ArgumentPanel, orderListBase):
 		if not s.has_key(type):
 			s[type] = 0
 
+			slot = self.Choices.GetItemCount()
 			self.Choices.InsertStringItem(slot, "")
 			self.Choices.SetStringItem(slot, 0, unicode(amount))
 			self.Choices.SetStringItem(slot, 1, self.__options[type][self.NAME])
+			self.Choices.SetItemPyData(slot, type)
+
+		print "Adding", s[type], amount, self.__options[type][self.MAX]
 
 		s[type] += amount
 		s[type]  = max(min(s[type], self.__options[type][self.MAX]), 0)
 		
 		slot = self.Choices.FindItemByPyData(type)
-		self.Choices.SetStringItem(slot, 0, unicode(s[type]))
+		if s[type] == 0:
+			del s[type]
+			self.Choices.DeleteItem(slot)
+		else:
+			self.Choices.SetStringItem(slot, 0, unicode(s[type]))
+
+		self.UpdateNumber(type)
 	
 	def OnDelete(self, evt):
 		selected = self.Choices.GetSelection()
@@ -863,10 +930,25 @@ class ListArgumentPanel(ArgumentPanel, orderListBase):
 
 			self.Choices.DeleteItem(selection)
 
+	def UpdateNumber(self, type):
+		s = self.__selections
+		if s.has_key(type):
+			self.Number.SetRange(-1*self.__selections[type], self.__options[type][self.MAX]-self.__selections[type])
+		else:
+			self.Number.SetRange(1, self.__options[type][self.MAX])
+
 	def OnType(self, evt):
 		type = self.Type.GetSelection()
 		if type == wx.NOT_FOUND:
+			self.Add.Disable()
+			self.Number.Disable()
 			return
+		else:
+			self.Add.Enable()
+
+			self.Number.Enable()
+			self.UpdateNumber(type)
+
 		type = self.Type.GetClientData(type)
 
 		# Select the linst related to this type
@@ -882,6 +964,7 @@ class ListArgumentPanel(ArgumentPanel, orderListBase):
 
 	def OnChoicesSelect(self, evt):
 		choices = self.Choices.GetSelected()
+		print "Currently Selected", choices
 		if self.__choices == choices:
 			return
 		else:
@@ -893,6 +976,8 @@ class ListArgumentPanel(ArgumentPanel, orderListBase):
 			self.Number.Disable()
 			self.Type.Disable()
 		else:
+			self.Type.Enable()
+
 			if len(choices) > 0:
 				self.Delete.Enable()
 
@@ -900,11 +985,8 @@ class ListArgumentPanel(ArgumentPanel, orderListBase):
 				for slot in range(0, self.Type.GetCount()):
 					if self.Type.GetClientData(slot) == type:
 						self.Type.SetSelection(slot)
+						self.OnType(None)
 						break
 			else:
 				self.Delete.Disable()
-
-			self.Add.Enable()
-			self.Number.Enable()
-			self.Type.Enable()
 
