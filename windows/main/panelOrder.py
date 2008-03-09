@@ -853,9 +853,9 @@ class ListArgumentPanel(ArgumentPanel, orderListBase):
 		return [options, selections]
 
 	def OnChoicesEditStart(self, evt):
-		print "OnChoicesEditStart", evt
+		pass
+
 	def OnChoicesEditEnd(self, evt):
-		print "OnChoicesEditEnd", evt.GetLabel()
 		try:
 			value = long(evt.GetLabel())
 
@@ -907,8 +907,6 @@ class ListArgumentPanel(ArgumentPanel, orderListBase):
 			self.Choices.SetStringItem(slot, 1, self.__options[type][self.NAME])
 			self.Choices.SetItemPyData(slot, type)
 
-		print "Adding", s[type], amount, self.__options[type][self.MAX]
-
 		s[type] += amount
 		s[type]  = max(min(s[type], self.__options[type][self.MAX]), 0)
 		
@@ -943,13 +941,11 @@ class ListArgumentPanel(ArgumentPanel, orderListBase):
 			self.Add.Disable()
 			self.Number.Disable()
 			return
-		else:
-			self.Add.Enable()
-
-			self.Number.Enable()
-			self.UpdateNumber(type)
-
 		type = self.Type.GetClientData(type)
+
+		self.Add.Enable()
+		self.Number.Enable()
+		self.UpdateNumber(type)
 
 		# Select the linst related to this type
 		slot = self.Choices.FindItemByPyData(type)
@@ -964,7 +960,6 @@ class ListArgumentPanel(ArgumentPanel, orderListBase):
 
 	def OnChoicesSelect(self, evt):
 		choices = self.Choices.GetSelected()
-		print "Currently Selected", choices
 		if self.__choices == choices:
 			return
 		else:
