@@ -46,6 +46,7 @@
           </object>
           <object class="sizeritem">
             <object class="wxSpinCtrl" name="Number">
+              <size>40,-1</size>
               <font>
                 <size>8</size>
                 <style>normal</style>

@@ -2,13 +2,24 @@
 <resource>
   <object class="wxPanel" name="orderText">
     <object class="wxFlexGridSizer">
-      <cols>1</cols>
-      <rows>1</rows>
       <object class="sizeritem">
-        <object class="wxTextCtrl" name="Value"/>
+        <object class="wxTextCtrl" name="Value">
+          <font>
+            <size>8</size>
+            <style>normal</style>
+            <weight>normal</weight>
+            <underlined>0</underlined>
+            <family>swiss</family>
+            <face>Sans</face>
+            <encoding>UTF-8</encoding>
+          </font>
+        </object>
         <option>1</option>
         <flag>wxEXPAND|wxGROW</flag>
       </object>
+      <cols>1</cols>
+      <rows>1</rows>
+      <growablecols>0</growablecols>
     </object>
   </object>
 </resource>
