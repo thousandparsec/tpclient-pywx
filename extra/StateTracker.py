@@ -454,11 +454,35 @@ class TrackerObjectOrder(TrackerObject):
 
 		return evt.change
 
-#	def InsertBeforeOrder(self, order, node=None):
-#		# Insert order is only valid when an object is selected
-#		assert self.oid != None
-#		# Order must be an order, duh!
-#		assert isinstance(order, Order)
+	def InsertBeforeOrder(self, order, node=None):
+		# Insert order is only valid when an object is selected
+		assert self.oid != None
+		# Order must be an order, duh!
+		assert isinstance(order, Order)
+
+		if node is None:
+			if len(self.nodes) > 0:
+				node = self.nodes[-1]
+			else:
+				node = self.application.cache.orders[self.oid].first
+			
+		assert not node is None
+
+		# Make the change to the cache	
+		evt = self.application.cache.apply("orders", "create before", self.oid, node, order)
+
+		# Do some sanity checking
+		assert not evt.change is None
+		d = self.application.cache.orders[self.oid]
+		assert evt.change in d
+
+		# Tell everyone else about the change
+		self.application.Post(evt, source=self)
+		# Call our handler
+		self.OrderInsertBefore(node, evt.change)
+
+		return evt.change
+
 
 	def DirtyOrder(self, order, node=None):
 		pass

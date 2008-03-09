@@ -269,6 +269,24 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 		self.InsertListItem(listpos, toinsert)
 
 	@freeze_wrapper
+	def OrderInsertBefore(self, beforeme, toinsert):
+		"""\
+		Inserts the order into a slot.
+		"""
+		assert self.oid != None
+
+		d = self.application.cache.orders[self.oid]
+
+		assert beforeme in d
+		assert toinsert in d
+
+		# Inserting into an empty list
+		listpos = d.index(beforeme)-1
+
+		# Update the list box
+		self.InsertListItem(listpos, toinsert)
+
+	@freeze_wrapper
 	def OrderRefresh(self, node):
 		"""\
 		"""
@@ -359,7 +377,10 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 		new._dirty = True
 
 		# Insert the new order (after the currently selected)
-		node = self.InsertAfterOrder(new)
+		if after:
+			node = self.InsertAfterOrder(new)
+		else:
+			node = self.InsertBeforeOrder(new)
 
 		self.SelectOrders([node])
 
@@ -707,17 +728,17 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 ##				order = copy.copy(self.clipboard[i])
 ##				self.InsertOrder(slot+i, order)
 ##
-##		else:
-##			slot = self.Possible.FindString(t)
-##			if slot == wx.NOT_FOUND:
-##				return
-##
-##			self.Possible.SetSelection(slot)
-##			
-##			if menu.GetTitle() == _("Before"):
-##				self.OnOrderNew(None, after=False)
-##			else:
-##				self.OnOrderNew(None)
+		else:
+			slot = self.Possible.FindString(t)
+			if slot == wx.NOT_FOUND:
+				return
+
+			self.Possible.SetSelection(slot)
+			
+			if menu.GetTitle() == _("Before"):
+				self.OnOrderNew(None, after=False)
+			else:
+				self.OnOrderNew(None)
 
 
 
