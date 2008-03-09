@@ -695,39 +695,34 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 		t = item.GetText()
 		if t == _("Delete"):
 			self.OnOrderDelete(None)
-##		elif t in (_("Copy"), _("Cut")):
-##			slots = self.Orders.GetSelected()
-##
-##			if len(slots) < 1:
-##				return
-##
-##			slots.reverse()
-##
-##			self.clipboard = []
-##
-##			for slot in slots:
-##				order = self.Orders.GetItemPyData(slot)
-##				self.clipboard.append(order)
-##		
-##			if t == _("Cut"):
-##				self.OnOrderDelete(None)
-##				
-##		elif t.startswith(_("Paste")):
-##			if self.CheckClipBoard() == False:
-##				print _("Cant paste because the orders arn't valid on this object.")
-##				return
-##				
-##			# Figure out whats out new position
-##			slots = self.Orders.GetSelected()
-##			if len(slots) != 0:
-##				slot = slots[0] + t.endswith(_("After"))
-##			else:
-##				slot = self.Orders.GetItemCount()
-##
-##			for i in xrange(0, len(self.clipboard)):
-##				order = copy.copy(self.clipboard[i])
-##				self.InsertOrder(slot+i, order)
-##
+		elif t in (_("Copy"), _("Cut")):
+			if len(self.nodes) < 1:
+				return
+
+			self.clipboard = []
+
+			for node in self.nodes:
+				self.clipboard.append(node.CurrentOrder)
+		
+			if t == _("Cut"):
+				self.OnOrderDelete(None)
+				
+		elif t.startswith(_("Paste")):
+			if self.CheckClipBoard() == False:
+				print _("Cant paste because the orders arn't valid on this object.")
+				return
+				
+			# Figure out whats out new position
+
+			order = copy.deepcopy(self.clipboard[0])
+			if t.endswith(_("After")):
+				node = self.InsertAfterOrder(order)
+			else:
+				node = self.InsertBeforeOrder(order)
+
+			for order in self.clipboard[1:]:
+				node = self.InsertAfterOrder(order, node)
+
 		else:
 			slot = self.Possible.FindString(t)
 			if slot == wx.NOT_FOUND:
