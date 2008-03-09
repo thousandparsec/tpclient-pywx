@@ -290,25 +290,42 @@ xrc.ExtraHandlers.append(SearchCtrlXmlHandler)
 # This fix allows me to have tooltips on individual items rather then just the whole control.
 ########################
 class ToolTipItemMixIn:
+	"""
+	This MixIn allows you to have a seperate tooltip per item in a multi-item
+	control.  
+	"""
+
 	def __init__(self):
 		self.tooltips = {}
 
 	def SetToolTipDefault(self, tooltip):
+		"""
+		Set the tooltip for the control when not over any items.
+		"""
 		if isinstance(tooltip, wx.ToolTip):
 			tooltip = tooltip.GetTip()
 		self.tooltips[-1] = tooltip
 		self.SetToolTip(wx.ToolTip(tooltip))
 
 	def SetToolTipItem(self, slot, text):
+		"""
+		Set the tooltip for a given item.
+		"""
 		self.tooltips[slot] = text
 	
 	def GetToolTipItem(self, slot):
+		"""
+		Get the tooltip associated with a given item.
+		"""
 		if self.tooltips.has_key(slot):
 			return self.tooltips[slot]
 		else:
 			return None
 
 	def SetToolTipCurrent(self, slot):
+		"""
+		Set which tooltip should be currently displayed.
+		"""
 		if self.tooltips.has_key(slot):
 			if self.GetToolTip() == None:
 				self.SetToolTip(wx.ToolTip(self.tooltips[slot]))
@@ -317,6 +334,10 @@ class ToolTipItemMixIn:
 
 wx.ChoiceOrig = wx.Choice
 class wxChoice(wx.Choice, ToolTipItemMixIn):
+	"""
+	A modified version of a wxChoice control which supports tooltips per item.
+	"""
+
 	def __init__(self, *arg, **kw):
 		wx.ChoiceOrig.__init__(self, *arg, **kw)
 		ToolTipItemMixIn.__init__(self)
@@ -324,11 +345,18 @@ class wxChoice(wx.Choice, ToolTipItemMixIn):
 		self.Bind(wx.EVT_CHOICE, self.OnSelection)
 
 	def OnSelection(self, evt):
+		"""
+		Bind OnSelection so that we can change the tooltip when the selection
+		changes.  
+		"""
 		slot = self.GetSelection()
 		self.SetToolTipCurrent(slot)
 
 wx.ComboBoxOrig = wx.ComboBox
 class wxComboBox(wx.ComboBox, ToolTipItemMixIn):
+	"""
+	A modified version of a wxComboBox control which supports tooltips per item.
+	"""
 	def __init__(self, *arg, **kw):
 		wx.ComboBoxOrig.__init__(self, *arg, **kw)
 		ToolTipItemMixIn.__init__(self)
@@ -336,6 +364,10 @@ class wxComboBox(wx.ComboBox, ToolTipItemMixIn):
 		self.Bind(wx.EVT_COMBOBOX, self.OnSelection)
 
 	def OnSelection(self, evt):
+		"""
+		Bind OnSelection so that we can change the tooltip when the selection
+		changes.  
+		"""
 		slot = self.GetSelection()
 		self.SetToolTipCurrent(slot)
 
@@ -347,6 +379,16 @@ import wx.lib.mixins.listctrl as mlc
 
 wx.ListCtrlOrig = wx.ListCtrl
 class wxListCtrl(wx.ListCtrlOrig, mlc.ListCtrlAutoWidthMixin, mlc.ColumnSorterMixin, ToolTipItemMixIn):
+	"""
+	This is a custom version of wxListCtrl which should make the list control
+	easier to deal with, it also uses some of the default ListCtrl MixIns,
+	including:
+		wx.lib.mixins.listctrl.ListCtrlAutoWidthMixin
+		wx.lib.mixins.listctrl.ColumnSorterMixin
+
+	It also includes the ToolTipItemMixIn.
+	"""
+
 	def __init__(self, parent, ID, pos=wx.DefaultPosition, size=wx.DefaultSize, *args, **kw):
 		wx.ListCtrlOrig.__init__(self, parent, ID, pos, size, *args, **kw)
 		mlc.ListCtrlAutoWidthMixin.__init__(self)
@@ -488,6 +530,9 @@ class wxListCtrl(wx.ListCtrlOrig, mlc.ListCtrlAutoWidthMixin, mlc.ColumnSorterMi
 	# This stuff makes working with selected items much easier
 	#############################################################################
 	def GetSelected(self):
+		"""
+		Get the currently selected slots.
+		"""
 		slots = [-1,]
 		while True:
 			slot = self.GetNextItem(slots[-1], wx.LIST_NEXT_ALL, wx.LIST_STATE_SELECTED)
@@ -501,6 +546,9 @@ class wxListCtrl(wx.ListCtrlOrig, mlc.ListCtrlAutoWidthMixin, mlc.ColumnSorterMi
 		return slots
 
 	def SetSelected(self, slots):
+		"""
+		Set the selection to the given slots.
+		"""
 		self.Freeze()
 
 		# Unselect the currently selected items
@@ -515,12 +563,19 @@ class wxListCtrl(wx.ListCtrlOrig, mlc.ListCtrlAutoWidthMixin, mlc.ColumnSorterMi
 		self.Thaw()
 		
 	def AddSelected(self, slot):
+		"""
+		Make the given slot selected in addition.
+		"""
 		self.SetItemState(slot, wx.LIST_STATE_SELECTED, wx.LIST_STATE_SELECTED)
 
 ########################
 # This adds a TreeCtrl which orders itself by the Python Data.
 ########################
 class OrderedTreeCtrl(wx.TreeCtrl):
+	"""
+	A tree control which orders itself by the Python Data.
+	"""
+
 	def __init__(self, *args, **kw):
 		wx.TreeCtrl.__init__(self, *args, **kw)
 		self.Bind(wx.EVT_TREE_ITEM_ACTIVATED, self.OnActivate, self)
@@ -602,6 +657,9 @@ wx.OrderedTreeCtrl = OrderedTreeCtrl
 wx.DIGIT_ONLY = 1
 wx.ALPHA_ONLY = 2
 class wxSimpleValidator(wx.PyValidator):
+	"""
+	A simple validator which lets you only allow numbers or letters.
+	"""
 	def __init__(self, flag=None, pyVar=None):
 		wx.PyValidator.__init__(self)
 		self.flag = flag
@@ -657,6 +715,10 @@ wx.PopupWindowOrig = wx.PopupWindow
 
 if wx.Platform == '__WXMAC__':
 	class FakePopupWindow(wx.MiniFrame):
+		"""
+		A fake popup window which is used on wxPython on Mac OS X.
+		"""
+
 		def __init__(self, parent, style=None):
 			wx.MiniFrame.__init__(self, parent, style = wx.NO_BORDER | wx.FRAME_NO_TASKBAR | wx.STAY_ON_TOP)
 			self.Panel = wx.Panel(self)
@@ -689,6 +751,9 @@ def getCurrentColor(self):
 		return font.get("color", self.defaultColor)
 Renderer.getCurrentColor = getCurrentColor
 
+########################
+# Assign our versions into the wx namespace
+########################
 wx.ListCtrl = wxListCtrl
 wx.Choice = wxChoice
 wx.ComboBox = wxComboBox
@@ -697,6 +762,9 @@ wx.SimpleValidator = wxSimpleValidator
 from PopupCtrl import PopupCtrl
 wx.PopupCtrl = PopupCtrl
 
+########################
+# Figure out which AUI we should be using.
+########################
 if wx.VERSION_STRING < "2.8":
 		if wx.VERSION_STRING < "2.7.2" and wx.VERSION_STRING > "2.7.0":
 			import wx.aui as aui
