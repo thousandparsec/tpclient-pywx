@@ -364,7 +364,12 @@ class TrackerObjectOrder(TrackerObject):
 		"""
 		Select an order (using nodes).
 		"""
+		d = self.application.cache.orders[self.oid]
+		def nodecmp(a, b):
+			return cmp(d.index(a), d.index(b))			
+
 		self.nodes = nodes
+		self.nodes.sort(nodecmp, )
 		if self.oid != None:
 			self.OrdersSelect(nodes)
 
@@ -433,19 +438,23 @@ class TrackerObjectOrder(TrackerObject):
 
 		if node is None:
 			if len(self.nodes) > 0:
-				node = self.nodes[0]
+				node = self.nodes[-1]
 			else:
 				node = self.application.cache.orders[self.oid].last
 			
 		assert not node is None
+
+		# Do some sanity checking
+		d = self.application.cache.orders[self.oid]
+		assert node in d
 
 		# Make the change to the cache	
 		evt = self.application.cache.apply("orders", "create after", self.oid, node, order)
 
 		# Do some sanity checking
 		assert not evt.change is None
-		d = self.application.cache.orders[self.oid]
 		assert evt.change in d
+		assert node != evt.change
 
 		# Tell everyone else about the change
 		self.application.Post(evt, source=self)
@@ -462,7 +471,7 @@ class TrackerObjectOrder(TrackerObject):
 
 		if node is None:
 			if len(self.nodes) > 0:
-				node = self.nodes[-1]
+				node = self.nodes[0]
 			else:
 				node = self.application.cache.orders[self.oid].first
 			
