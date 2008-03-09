@@ -364,13 +364,14 @@ class TrackerObjectOrder(TrackerObject):
 		"""
 		Select an order (using nodes).
 		"""
-		d = self.application.cache.orders[self.oid]
-		def nodecmp(a, b):
-			return cmp(d.index(a), d.index(b))			
-
 		self.nodes = nodes
-		self.nodes.sort(nodecmp, )
+
 		if self.oid != None:
+			d = self.application.cache.orders[self.oid]
+			def nodecmp(a, b):
+				return cmp(d.index(a), d.index(b))
+			self.nodes.sort(nodecmp)
+
 			self.OrdersSelect(nodes)
 
 	def OrdersSelect(self, nodes):
