@@ -75,7 +75,8 @@ class winUpdate(winUpdateBase, winBaseXRC):
 		if self.Okay.IsEnabled():
 			self.Okay.SetFocus()
 
-		self.Message.Disable()
+		if wx.Platform == "__WXMAC__":
+			self.Message.Disable()
 
 	def Clear(self):
 		# Enable the cancel button
