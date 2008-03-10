@@ -10,13 +10,19 @@ installpath = __path__
 if os.path.exists(os.path.join(installpath, '.git')):
 	# Read in git's 'HEAD' file which points to the correct reff to look at
 	h = open(os.path.join(installpath, '.git', 'HEAD'))
-	# Read in the ref
-	ref = h.readline().strip().split(': ', 1)[1]
-	# This file has the SHA1
-	p = open(os.path.join(installpath, '.git', ref))
-	del ref
 
-	version_git = p.read().strip()
+	try:
+		# Read in the ref
+		ref = h.readline().strip().split(': ', 1)[1]
+		# This file has the SHA1
+		p = open(os.path.join(installpath, '.git', ref))
+		del ref
+
+		version_git = p.read().strip()
+
+	except IndexError:
+		h.seek(0)
+		version_git = h.readline().strip()
 
 	# What version are we trying to get too?
 	import time
