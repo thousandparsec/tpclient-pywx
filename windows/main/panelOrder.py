@@ -495,7 +495,8 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 				namepos = wx.LEFT
 				if subtype == constants.ARG_ABS_COORD:
 					subpanel = PositionArgumentPanel(self.ArgumentsPanel)
-					subpanel.set_value([getattr(order, name)])
+					subpanel.application = self.application
+					subpanel.set_value(list(getattr(order, name)))
 				elif subtype == constants.ARG_LIST:
 					subpanel = ListArgumentPanel(self.ArgumentsPanel)
 					subpanel.set_value(list(getattr(order, name)))
@@ -762,15 +763,25 @@ class TimeArgumentPanel(ArgumentPanel, orderRangeBase):
 		
 from windows.xrc.orderPosition import orderPositionBase
 class PositionArgumentPanel(ArgumentPanel, orderPositionBase):
+	def OnSelectPosition(self, evt):
+		self.X.SetValue(unicode(evt[0]))
+		self.Y.SetValue(unicode(evt[1]))
+		self.Z.SetValue(unicode(evt[2]))
+
+	def OnLocate(self, evt):
+		self.application.gui.main.panels[panelOrder.title].OnSelectPosition = self.OnSelectPosition
+		from windows.main.panelStarMap import panelStarMap
+		starmap = self.application.gui.main.panels[panelStarMap.title]
+		starmap.SetMode(starmap.GUIWaypointEdit)
 
 	def set_value(self, list):
 		print "PositionArgumentPanel", list
-		self.X.SetValue(list.pop(0))
-		self.Y.SetValue(list.pop(0))
-		self.Z.SetValue(list.pop(0))
+		self.X.SetValue(unicode(list.pop(0)))
+		self.Y.SetValue(unicode(list.pop(0)))
+		self.Z.SetValue(unicode(list.pop(0)))
 
 	def get_value(self):
-		return [self.X.GetValue(), self.Y.GetValue(), self.Z.GetValue()]
+		return [long(self.X.GetValue()), long(self.Y.GetValue()), long(self.Z.GetValue())]
 
 from windows.xrc.orderList import orderListBase
 class ListArgumentPanel(ArgumentPanel, orderListBase):

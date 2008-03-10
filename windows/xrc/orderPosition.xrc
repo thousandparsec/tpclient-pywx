@@ -5,23 +5,65 @@
       <cols>4</cols>
       <rows>1</rows>
       <object class="sizeritem">
-        <object class="wxTextCtrl" name="X"/>
+        <object class="wxTextCtrl" name="X">
+          <size>50,-1</size>
+          <font>
+            <size>8</size>
+            <style>normal</style>
+            <weight>normal</weight>
+            <underlined>0</underlined>
+            <family>swiss</family>
+            <face>Sans</face>
+            <encoding>UTF-8</encoding>
+          </font>
+        </object>
         <option>1</option>
         <flag>wxEXPAND|wxGROW</flag>
       </object>
       <object class="sizeritem">
-        <object class="wxTextCtrl" name="Y"/>
+        <object class="wxTextCtrl" name="Y">
+          <size>50,-1</size>
+          <font>
+            <size>8</size>
+            <style>normal</style>
+            <weight>normal</weight>
+            <underlined>0</underlined>
+            <family>swiss</family>
+            <face>Sans</face>
+            <encoding>UTF-8</encoding>
+          </font>
+        </object>
         <option>1</option>
         <flag>wxEXPAND|wxGROW</flag>
       </object>
       <object class="sizeritem">
-        <object class="wxTextCtrl" name="Z"/>
+        <object class="wxTextCtrl" name="Z">
+          <size>50,-1</size>
+          <font>
+            <size>8</size>
+            <style>normal</style>
+            <weight>normal</weight>
+            <underlined>0</underlined>
+            <family>swiss</family>
+            <face>Sans</face>
+            <encoding>UTF-8</encoding>
+          </font>
+        </object>
         <option>1</option>
         <flag>wxEXPAND|wxGROW</flag>
       </object>
       <object class="sizeritem">
         <object class="wxButton" name="Locate">
           <label>P</label>
+          <font>
+            <size>8</size>
+            <style>normal</style>
+            <weight>normal</weight>
+            <underlined>0</underlined>
+            <family>swiss</family>
+            <face>Sans</face>
+            <encoding>UTF-8</encoding>
+          </font>
           <style>wxBU_EXACTFIT</style>
         </object>
       </object>
