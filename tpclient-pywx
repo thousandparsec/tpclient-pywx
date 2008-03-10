@@ -339,7 +339,6 @@ class GUI(wx.App):
 				self.UpdateUILock.release()
 
 	def UpdateUI(self):
-		print "UpdateUI"
 		wx.Yield()
 		self.UpdateUILock.release()
 
