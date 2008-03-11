@@ -186,6 +186,14 @@ class winMain(winBase):
 
 		# Show the tips..
 		wx.CallAfter(self.ShowTips)
+		
+		# Show the "No Objects" warning message
+		foundanobject = False
+		for id in self.application.cache.objects:
+			if hasattr(self.application.cache.objects[id], "owner") and self.application.cache.objects[id].owner == self.application.cache.players[0].id:
+				foundanobject = True
+		if foundanobject == False:
+			wx.CallAfter(self.ShowNoObjectsWarning)
 
 	def Hide(self, show=True):
 		if not show:
@@ -341,6 +349,9 @@ class winMain(winBase):
 			config[1] = self.tips.GetCurrentTip()
 
 			save_data("pywx_tips", config)
+		
+	def ShowNoObjectsWarning(self):
+		wx.MessageBox("Warning: This account doesn't own any objects.", 'Info')
 
 	def UpdateCache(self, evt=None):
 		self.application.network.Call(self.application.network.CacheUpdate)
