@@ -6,7 +6,7 @@ import time
 # wxPython Imports
 import wx
 
-from extra.decorators import freeze_wrapper
+from extra.decorators import freeze_wrapper, onlyshown, onlyenabled
 
 # Config imports
 from requirements import graphicsdir
@@ -46,10 +46,14 @@ class winUpdate(winUpdateBase, winBaseXRC):
 		self.Panel.Layout()
 		self.Panel.Update()
 
+	@onlyshown
+	@onlyenabled("Cancel")
 	def OnCancel(self, evt):
 		self.application.network.Reset()
 		self.application.gui.Show(self.application.gui.connectto)
 
+	@onlyshown
+	@onlyenabled("Save")
 	def OnSave(self, evt):
 		dlg = wx.FileDialog(self, message=_("Save log as ..."), defaultDir=os.getcwd(), 
 								defaultFile="update.log", wildcard="Log file (*.log)|*.log", style=wx.SAVE)
@@ -60,13 +64,14 @@ class winUpdate(winUpdateBase, winBaseXRC):
 		path = dlg.GetPath()
 		self.Message.SaveFile(path)
 
+	@onlyshown
+	@onlyenabled("Okay")
 	def OnOkay(self, evt):
-		if not self.Okay.IsEnabled():
-			return
 		self.application.gui.Show(self.application.gui.main)
 		self.application.Post(self.application.cache.CacheUpdateEvent(None))
 
-	def MessageDown(self, evt):
+	@onlyshown
+	def MessageDown(self, evt=None):
 		if self.GoDown:
 			self.Message.ShowPosition(self.Message.GetLastPosition())
 			self.GoDown = False
@@ -156,6 +161,7 @@ class winUpdate(winUpdateBase, winBaseXRC):
 		self.CenterOnScreen(wx.BOTH)
 		return winBaseXRC.Show(self)
 
+	@onlyshown
 	@freeze_wrapper
 	def Callback(self, mode, state, message="", todownload=None, total=None, amount=None):
 		self.ObjectdescsAnim.LoadFile(okay)

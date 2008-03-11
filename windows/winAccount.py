@@ -10,6 +10,8 @@ import os
 # wxPython Imports
 import wx
 
+from extra.decorators import freeze_wrapper, onlyshown, onlyenabled
+
 from requirements import graphicsdir
 
 try:
@@ -166,42 +168,37 @@ class winAccount(winAccountBase, winBaseXRC, usernameMixIn):
 		self.Panel.Layout()
 		size = self.Panel.GetBestSize()
 		self.SetClientSize(size)
-			
+	
+	@onlyshown
+	@onlyenabled("Check")	
 	def OnCheck(self, evt):
 		self.State("connecting")
 		self.application.network.Call(self.application.network.Connect, self.Server.GetValue(), 
 				debug=self.application.gui.connectto.config['debug'])
 
+	@onlyshown
 	def OnNetworkConnect(self, evt):
-		if not self.IsShown():
-			return
-
 		if features.FEATURE_ACCOUNT_REGISTER in evt.args[0]:
 			self.State("details")
 		else:
 			self.OnNetworkFailure(_("This server does not support account creation."))
 
+	@onlyshown
 	def OnNetworkAccount(self, evt):
-		if not self.IsShown():
-			return
-
 		self.application.gui.Show(self.application.gui.connectto)
 		dlg = wx.MessageDialog(self.application.gui.current, unicode(evt), _("Account Created"), wx.OK|wx.ICON_INFORMATION)
 		dlg.ShowModal()
 
+	@onlyshown
 	def OnNetworkFailure(self, evt):
-		if not self.IsShown():
-			return
-
 		dlg = wx.MessageDialog(self.application.gui.current, unicode(evt), _("Network Error"), wx.OK|wx.ICON_ERROR)
 		dlg.ShowModal()
 
 		self.State("start")
 
+	@onlyshown
+	@onlyenabled("Okay")
 	def OnOkay(self, evt):
-		if not self.IsShown():
-			self.application.gui.current.AddPendingEvent(evt)
-			return
 
 		username = self.GetUsername()
 		password1 = self.Password1.GetValue().strip()
@@ -232,6 +229,8 @@ class winAccount(winAccountBase, winBaseXRC, usernameMixIn):
 		#self.application.network.Call(self.application.network.ConnectTo, host, username, password, debug=self.config['debug'])
 		self.application.network.Call(self.application.network.NewAccount, username, password1, email)
 
+	@onlyshown
+	@onlyenabled("Cancel")
 	def OnCancel(self, evt):
 		self.application.gui.Show(self.application.gui.servers)
 
