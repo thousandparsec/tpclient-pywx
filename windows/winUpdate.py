@@ -26,7 +26,6 @@ class winUpdate(winUpdateBase, winBaseXRC):
 		winUpdateBase.__init__(self, None)
 		winBaseXRC.__init__(self, application)
 
-		self.Message.Bind(wx.EVT_UPDATE_UI, self.MessageDown)
 		self.GoDown = False
 
 		if wx.Platform == "__WXMAC__":
@@ -286,6 +285,7 @@ class winUpdate(winUpdateBase, winBaseXRC):
 			self.Message.SetStyle(end-len(message)-1, end, wx.TextAttr(wx.RED))
 
 		self.UpdateWindowUI(wx.UPDATE_UI_RECURSE)
+		wx.CallAfter(self.MessageDown)
 
 	# Config Functions -----------------------------------------------------------------------------  
 	def ConfigDefault(self, config=None):
