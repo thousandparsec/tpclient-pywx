@@ -13,6 +13,7 @@ from extra.wxFloatCanvas.RelativePoint import RelativePoint, RelativePointSet
 from extra.wxFloatCanvas.PolygonStatic import PolygonArrow, PolygonShip
 
 # tp imports
+from tp.netlib.objects import constants
 from tp.netlib.objects                        import Object, OrderDescs
 from tp.netlib.objects.ObjectExtra.Universe   import Universe
 from tp.netlib.objects.ObjectExtra.Galaxy     import Galaxy
@@ -303,30 +304,39 @@ class Systems(SystemLevelOverlay, TrackerObjectOrder):
 		"""
 		self.menumap = {}
 
-		# MoveTo quick add
-		# FIXME: Horrible hack!
-		moveorder = None
+		orders = []
 		if not self.oid is None:
 			obj = self.cache.objects[self.oid]
 
 			for id in obj.order_types:
 				orderdesc = OrderDescs()[id]
 
-				if orderdesc._name in ("Move",) and moveorder is None:
+				if len(orderdesc.names) != 1:
+					continue
+
+				argument_name, subtype = orderdesc.names[0]
+				if subtype == constants.ARG_ABS_COORD:
 					def s(to, what=obj, how=orderdesc):
-						print "move order what: %r to: %r (%r) how: %r" % (what, to, to.pos, how)
+						print "order what: %r to: %r (%r) how: %r" % (what, to, to.pos, how)
 
 						neworder = how(0, what.id, -1, how.subtype, 0, [], to.pos)
 						neworder._dirty = True
 
 						self.InsertAfterOrder(neworder)
-
 					moveorder = s
 
-				if orderdesc._name in ("Move To", "Intercept"):
+				elif subtype == constants.ARG_OBJECT:
 					def s(to, what=obj, how=orderdesc):
-						print "move order what: %r to: %r how: %r" % (what, to, how)
+						print "order what: %r to: %r how: %r" % (what, to, how)
+						neworder = how(0, what.id, -1, how.subtype, 0, [], to.id)
+						neworder._dirty = True
+
+						self.InsertAfterOrder(neworder)
 					moveorder = s
+				else:
+					continue
+
+				orders.append((orderdesc._name, moveorder))
 
 		menu = wx.Menu()
 		for obj in icon:
@@ -342,19 +352,21 @@ class Systems(SystemLevelOverlay, TrackerObjectOrder):
 			else:
 				menu.Append(id, obj.name)
 
-		if not moveorder is None:
-			submenu = wx.Menu()
-			for obj in icon:
-				id = wx.NewId()
+		if len(orders) > 0:
+			for name, order in orders:
+				submenu = wx.Menu()
 
-				def s(evt, obj=obj, moveorder=moveorder):
-					moveorder(obj)
+				for obj in icon:
+					id = wx.NewId()
 
-				self.menumap[id] = s
-				submenu.Append(id, "to %s" % obj.name)
+					def s(evt, obj=obj, order=order):
+						order(obj)
 
-			menu.AppendSeparator()
-			menu.AppendMenu(wx.NewId(), "Move %s" % self.Selected.current.name, submenu)	
+					self.menumap[id] = s
+					submenu.Append(id, "to %s" % obj.name)
+
+				menu.AppendSeparator()
+				menu.AppendMenu(wx.NewId(), "%s %s" % (name ,self.Selected.current.name), submenu)	
 
 		self.parent.Bind(wx.EVT_MENU, 		self.OnContextMenu)
 		self.parent.Bind(wx.EVT_MENU_CLOSE, self.OnContextMenuClose)
