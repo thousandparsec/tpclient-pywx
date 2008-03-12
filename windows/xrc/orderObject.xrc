@@ -3,7 +3,7 @@
   <object class="wxPanel" name="orderObject">
     <object class="wxFlexGridSizer">
       <object class="sizeritem">
-        <object class="wxChoice" name="Value">
+        <object class="wxComboBox" name="Value">
           <font>
             <size>8</size>
             <style>normal</style>

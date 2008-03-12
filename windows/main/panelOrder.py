@@ -754,21 +754,40 @@ class TextArgumentPanel(ArgumentPanel, orderTextBase):
 from windows.xrc.orderObject import orderObjectBase
 class ObjectArgumentPanel(ArgumentPanel, orderObjectBase):
 
+	def __init__(self, parent, *args, **kw):
+		ArgumentPanel.__init__(self)
+		orderObjectBase.__init__(self, parent, *args, **kw)
+
+		self.Value.SetFont(wx.local.tinyFont)
+
 	# FIXME: This is broken	
 	def application(self, value):
-		self.Value.Freeze()
-		for oid, object in value.cache.objects.items():
-			self.Value.Append(object.name, oid)
-		self.Value.Thaw()
+		combobox = self.Value
+
+		combobox.Freeze()
+		combobox.Append(_("No object"), -1)
+
+		objects = value.cache.objects.values()
+		def objcmp(obja, objb):
+			return cmp(obja.name, objb.name)
+		objects.sort(objcmp)
+
+		for object in objects:
+			combobox.Append(object.name + " (%s)" % object.id, object.id)
+
+			#if hasattr(object, "parent"):
+			#	combobox.SetToolTipItem(combobox.GetCount()-1, _("At ") + cache.objects[object.parent].name)
+		combobox.Thaw()
 
 	def set_value(self, list):
 		print "ObjectArgumentPanel", list
 		self.__oid = list.pop(0)
 
-		# FIXME: This takes an extrodinally long time
-		for slot in xrange(0, self.Value.GetCount()):
-			if self.Value.GetClientData(slot) == self.__oid:
-				self.Value.SetSelection(self.__oid)
+		combobox = self.Value
+		combobox.SetSelection(0)
+		for slot in xrange(0, combobox.GetCount()):
+			if combobox.GetClientData(slot) == self.__oid:
+				combobox.SetSelection(slot)
 				break
 
 	def get_value(self):
