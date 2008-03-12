@@ -489,7 +489,7 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 			for name, subtype in orderdesc.names:
 				# Add there name..
 				name_text = wx.StaticText( self.ArgumentsPanel, -1, name.title().replace("_","") )
-				name_text.SetFont(wx.local.normalFont)
+				name_text.SetFont(wx.local.tinyFont)
 
 				# Add the arguments bit
 				namepos = wx.LEFT
@@ -507,7 +507,9 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 					subpanel = TimeArgumentPanel(self.ArgumentsPanel)
 					subpanel.set_value([getattr(order,name)])
 				elif subtype == constants.ARG_OBJECT:
-					pass
+					subpanel = ObjectArgumentPanel(self.ArgumentsPanel)
+					subpanel.application(self.application)
+					subpanel.set_value([getattr(order,name)])
 				else:
 					return
 
@@ -748,6 +750,30 @@ class TextArgumentPanel(ArgumentPanel, orderTextBase):
 
 	def get_value(self):
 		return [self.__max, unicode(self.Value.GetValue())]
+
+from windows.xrc.orderObject import orderObjectBase
+class ObjectArgumentPanel(ArgumentPanel, orderObjectBase):
+
+	# FIXME: This is broken	
+	def application(self, value):
+		self.Value.Freeze()
+		for oid, object in value.cache.objects.items():
+			self.Value.Append(object.name, oid)
+		self.Value.Thaw()
+
+	def set_value(self, list):
+		print "ObjectArgumentPanel", list
+		self.__oid = list.pop(0)
+
+		# FIXME: This takes an extrodinally long time
+		for slot in xrange(0, self.Value.GetCount()):
+			if self.Value.GetClientData(slot) == self.__oid:
+				self.Value.SetSelection(self.__oid)
+				break
+
+	def get_value(self):
+		self.__oid = long(self.Value.GetClientData(self.Value.GetSelection()))
+		return [self.__oid]
 
 
 from windows.xrc.orderRange import orderRangeBase
