@@ -767,6 +767,7 @@ class ObjectArgumentPanel(ArgumentPanel, orderObjectBase):
 		combobox.Freeze()
 		combobox.Append(_("No object"), -1)
 
+		# Sort the objects by name
 		objects = value.cache.objects.values()
 		def objcmp(obja, objb):
 			return cmp(obja.name, objb.name)
