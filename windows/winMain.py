@@ -18,6 +18,7 @@ from utils import *
 ID_MENU = 10042
 ID_OPEN = 10043
 ID_UNIV = 10044
+ID_TURN = 10045
 ID_EXIT = 10049
 ID_FILE = 10050
 
@@ -250,8 +251,9 @@ class winMain(winBase):
 
 		# File Menu
 		file = wx.Menu()
-		file.Append( ID_OPEN, _("C&onnect to Game\tCtrl-O"), _("Connect to a diffrent Game") )
+		file.Append( ID_OPEN, _("C&onnect to Game\tCtrl-O"),       _("Connect to a diffrent Game") )
 		file.Append( ID_UNIV, _("Download the &Universe\tCtrl-U"), _("Download the Universe") )
+		file.Append( ID_TURN, _("Request End of &Turn\tCtrl-T"),   _("Send a message to the server requesting the turn end soon.") )
 		file.AppendSeparator()
 		file.Append( wx.ID_PREFERENCES, _("&Preferences"), _("Configure the Client") )
 		file.AppendSeparator()
@@ -297,6 +299,7 @@ class winMain(winBase):
 
 		source.Bind(wx.EVT_MENU, self.OnConnect,     id=ID_OPEN)
 		source.Bind(wx.EVT_MENU, self.UpdateCache,   id=ID_UNIV)
+		source.Bind(wx.EVT_MENU, self.RequestEOT,    id=ID_TURN)
 		source.Bind(wx.EVT_MENU, self.OnConfig,      id=wx.ID_PREFERENCES)
 		source.Bind(wx.EVT_MENU, self.OnProgramExit, id=ID_EXIT)
 
@@ -334,6 +337,7 @@ class winMain(winBase):
 		if not config:
 			config = [True, 0]
 
+		# FIXME: We need some way to programmatically close the tips dialog
 		if config[0] or override != None:
 			self.tips = wx.CreateFileTipProvider(os.path.join(docdir, "tips.txt"), config[1])
 
@@ -344,6 +348,11 @@ class winMain(winBase):
 
 	def UpdateCache(self, evt=None):
 		self.application.network.Call(self.application.network.CacheUpdate)
+
+	def RequestEOT(self, evt):
+		"""\
+		"""
+		self.application.network.Call(self.application.network.RequestEOT)
 
 	def OnNetworkTimeRemaining(self, evt):
 		if evt.remaining == 0:
