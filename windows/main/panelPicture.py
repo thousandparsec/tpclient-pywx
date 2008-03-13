@@ -114,7 +114,7 @@ class panelPicture(panelPictureBase):
 
 		#print "winPicture.MediaDownloadProgress", evt.file
 
-		self.progress.append((time.time(), evt.amount))
+		self.progress.append((time.time(), evt.progress))
 		# Trim off the oldest samples
 		while len(self.progress) > 200:
 			self.progress.pop(0)
@@ -122,9 +122,14 @@ class panelPicture(panelPictureBase):
 		if len(self.progress) < 2:
 			return
 
+		average = []
+		time1, progress1 = self.progress[0]
+		for time2, progress2 in self.progress[1:]:
+			average.append((progress2-progress1)/(time2-time1))
+			time1, progress1 = time2, progress2
+
 		# Calculate an average
-		start, end = self.progress[0][0], self.progress[-1][0]
-		average = sum(zip(*self.progress)[1])/(end-start)
+		average = sum(average)/len(average)
 
 		self.Progress.SetRange(evt.size)
 		self.Progress.SetValue(evt.progress)
@@ -138,8 +143,7 @@ class panelPicture(panelPictureBase):
 
 		self.averages.append(average)
 
-		aaverage = reduce(float.__add__, self.averages)/len(self.averages)
-		
+		aaverage = (self.progress[-1][1]-self.progress[0][1])/(self.progress[-1][0]-self.progress[0][0])
 		eta = (evt.size - evt.progress)/aaverage
 		if eta > 60:
 			eta = (int(eta)//60, eta-int(eta)//60*60)
