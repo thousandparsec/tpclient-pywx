@@ -115,7 +115,14 @@ class Overlay(dict):
 		"""
 		# Remove all the objects.
 		self.CleanUp()
-		for oid in self.cache.objects.keys():
+
+		# Sort the objects by name
+		oids = self.cache.objects.keys()
+		def objcmp(oida, oidb):
+			return cmp(self.cache.objects[oida].name, self.cache.objects[oidb].name)
+		oids.sort(objcmp)
+
+		for oid in oids:
 			self.UpdateOne(oid)
 
 	def UpdateOne(self, oid):
@@ -181,7 +188,13 @@ class Holder(list):
 			if not isinstance(child, Object):
 				raise TypeError("Child %i must be an Object not %r" % (i, child)) 
 
+		# Sort the children by name
+		def childcmp(childa, childb):
+			return cmp(childa.name, childb.name)
+		children.sort(childcmp)
+
 		self.extend([primary] + children)
+
 		self.ResetLoop()
 
 	def __eq__(self, value):

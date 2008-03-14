@@ -489,7 +489,7 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 			for name, subtype in orderdesc.names:
 				# Add there name..
 				name_text = wx.StaticText( self.ArgumentsPanel, -1, name.title().replace("_","") )
-				name_text.SetFont(wx.local.normalFont)
+				name_text.SetFont(wx.local.tinyFont)
 
 				# Add the arguments bit
 				namepos = wx.LEFT
@@ -507,7 +507,9 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 					subpanel = TimeArgumentPanel(self.ArgumentsPanel)
 					subpanel.set_value([getattr(order,name)])
 				elif subtype == constants.ARG_OBJECT:
-					pass
+					subpanel = ObjectArgumentPanel(self.ArgumentsPanel)
+					subpanel.application(self.application)
+					subpanel.set_value([getattr(order,name)])
 				else:
 					return
 
@@ -749,6 +751,50 @@ class TextArgumentPanel(ArgumentPanel, orderTextBase):
 	def get_value(self):
 		return [self.__max, unicode(self.Value.GetValue())]
 
+from windows.xrc.orderObject import orderObjectBase
+class ObjectArgumentPanel(ArgumentPanel, orderObjectBase):
+
+	def __init__(self, parent, *args, **kw):
+		ArgumentPanel.__init__(self)
+		orderObjectBase.__init__(self, parent, *args, **kw)
+
+		self.Value.SetFont(wx.local.tinyFont)
+
+	# FIXME: This is broken	
+	def application(self, value):
+		combobox = self.Value
+
+		combobox.Freeze()
+		combobox.Append(_("No object"), -1)
+
+		# Sort the objects by name
+		objects = value.cache.objects.values()
+		def objcmp(obja, objb):
+			return cmp(obja.name, objb.name)
+		objects.sort(objcmp)
+
+		for object in objects:
+			combobox.Append(object.name + " (%s)" % object.id, object.id)
+
+			#if hasattr(object, "parent"):
+			#	combobox.SetToolTipItem(combobox.GetCount()-1, _("At ") + cache.objects[object.parent].name)
+		combobox.Thaw()
+
+	def set_value(self, list):
+		print "ObjectArgumentPanel", list
+		self.__oid = list.pop(0)
+
+		combobox = self.Value
+		combobox.SetSelection(0)
+		for slot in xrange(0, combobox.GetCount()):
+			if combobox.GetClientData(slot) == self.__oid:
+				combobox.SetSelection(slot)
+				break
+
+	def get_value(self):
+		self.__oid = long(self.Value.GetClientData(self.Value.GetSelection()))
+		return [self.__oid]
+
 
 from windows.xrc.orderRange import orderRangeBase
 class TimeArgumentPanel(ArgumentPanel, orderRangeBase):
@@ -970,6 +1016,9 @@ class ListArgumentPanel(ArgumentPanel, orderListBase):
 		wx.CallAfter(self.OnChoicesSelect, evt)
 
 	def OnChoicesSelect(self, evt):
+		if not hasattr(wx, 'core'):
+			return
+
 		choices = self.Choices.GetSelected()
 		if self.__choices == choices:
 			return

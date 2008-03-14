@@ -13,7 +13,8 @@ from extra.wxFloatCanvas.FloatCanvas   import Point, Group, Line
 from extra.StateTracker import TrackerObjectOrder
 
 # tp imports
-from tp.netlib.objects                        import Object
+from tp.netlib.objects import constants
+from tp.netlib.objects                        import Object, OrderDescs
 from tp.netlib.objects                        import Order
 from tp.netlib.objects.ObjectExtra.Universe   import Universe
 from tp.netlib.objects.ObjectExtra.Galaxy     import Galaxy
@@ -35,11 +36,16 @@ def FindPath(cache, obj):
 		order = node.CurrentOrder
 
 		# FIXME: Needs to be a better way to do this...
-		if order._name in ("Move", "Move To", "Intercept"):
-			if hasattr(order, "pos"):
-				locations.append((node, order.pos))
-			if hasattr(order, "to"):
-				locations.append((node, cache.objects[order.to].pos))
+		orderdesc = OrderDescs()[order._subtype]
+		if len(orderdesc.names) != 1:
+			continue
+
+		argument_name, subtype = orderdesc.names[0]
+		if subtype == constants.ARG_ABS_COORD:
+			locations.append((node, getattr(order, argument_name)))
+		elif subtype == constants.ARG_OBJECT:
+			locations.append((node, cache.objects[getattr(order, argument_name)].pos))
+
 	if len(locations) == 1:
 		return None
 	return locations
