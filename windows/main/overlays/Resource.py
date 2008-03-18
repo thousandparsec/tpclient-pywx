@@ -51,6 +51,7 @@ class ResourceSelectorControl(popupctrl.PopupControl):
 		self.cache = cache
 		self.resourceview = resourceview
 		self.selected=[]
+		self.SetValue("All")
 		self.win = ResourceSelect(self, cache)
 
 		bz = self.win.panel.GetBestSize()
@@ -66,9 +67,17 @@ class ResourceSelectorControl(popupctrl.PopupControl):
 	def PopDown(self):
 		popupctrl.PopupControl.PopDown(self)
 		self.selected=[]
+		self.SetValue("")
 		for i in range(0, self.win.resourcelist.GetCount()):
 			if self.win.resourcelist.IsChecked(i):
+				if (self.GetValue() != ""):
+					self.SetValue(self.GetValue() + ", " + self.win.resourcelist.GetString(i))
+				else:
+					self.SetValue(self.win.resourcelist.GetString(i))
 				self.selected.append(self.win.ResourceTypeList[self.win.resourcelist.GetString(i)])
+		
+		if self.selected == []:
+			self.SetValue("All")
 		
 		self.resourceview.CleanUp()
 		self.resourceview.UpdateAll()
@@ -80,7 +89,7 @@ class ResourceSelectorControl(popupctrl.PopupControl):
 	def FormatContent(self):
 		pass
 			
-class TestPanel(wx.Panel):
+class RsrcSelectorPanel(wx.Panel):
 	def __init__(self, resourceview, parent, cache):
 		wx.Panel.__init__(self, parent, -1)
 		self.selector = ResourceSelectorControl(resourceview, cache, self, -1, pos = (0,0), size = (100,22))
@@ -137,7 +146,7 @@ class Resource(Proportional):
 		#self.ResourceSelector.Bind(wx.EVT_CHOICE, self.OnResourceSelected)
 
 		sizer = wx.FlexGridSizer(len(self.ResourceTypeList))
-		self.selectpanel = TestPanel(self, panel, cache)
+		self.selectpanel = RsrcSelectorPanel(self, panel, cache)
 		sizer.Add(self.selectpanel, proportion=1, flag=wx.EXPAND)
 		# Populate the dropdown with information
 		#for name, resource in sorted(self.ResourceTypeList.items(), key=operator.itemgetter(1)):
