@@ -38,61 +38,66 @@ class ResourceSelect(ResourceSelectBase, wx.Frame):
 			self.ResourceTypeList[resource.name] = number
 		
 		self.resourcelist.InsertItems(self.ResourceTypeList.keys(), 0)
+		self.SetPosition(parent.GetScreenRect().GetBottomLeft())
+		print self.parent.GetScreenPosition()
 		self.panel.Layout()
 		self.Layout()
+		self.SetSize(self.GetBestSize())
+		self.Bind(wx.EVT_ACTIVATE, self.OnActivate)
 		self.Hide()
+	
+	def OnActivate(self, evt):
+		if evt.GetActive() == False:
+			self.Ondone(evt)
 	
 	def Ondone(self, evt):
 		self.parent.PopDown()
 
-class ResourceSelectorControl(popupctrl.PopupControl):
-	def __init__(self,resourceview,cache,*_args,**_kwargs):
-		apply(popupctrl.PopupControl.__init__,(self,) + _args,_kwargs)
+class RsrcSelectorControl(wx.Button):
+	def __init__(self, resourceview, cache, parent, id):
+		wx.Button.__init__(self, parent, id, "Resource Types")
+		self.Bind(wx.EVT_BUTTON, self.OnClick)
 		self.cache = cache
 		self.resourceview = resourceview
-		self.selected=[]
-		self.SetValue("All")
+		self.selected = []
+		self.popupopen = 0
+		#self.SetValue("All")
+		#self.popupwin = wx.Window(self)
 		self.win = ResourceSelect(self, cache)
-
-		bz = self.win.panel.GetBestSize()
-		self.win.SetSize(bz)
-
-		# This method is needed to set the contents that will be displayed
-		# in the popup
-		self.SetPopupContent(self.win)
-
-		# Event registration for selection finished
-		#self.rsrclist.Bind()
-
+	
+	def OnClick(self, evt):
+		if self.popupopen == 0:
+			self.win.Show()
+			self.win.SetFocus()
+			self.popupopen = 1
+		else:
+			self.PopDown()
+		
 	def PopDown(self):
-		popupctrl.PopupControl.PopDown(self)
 		self.selected=[]
-		self.SetValue("")
+		self.win.Hide()
+		self.popupopen = 0
+		#self.SetValue("")
 		for i in range(0, self.win.resourcelist.GetCount()):
 			if self.win.resourcelist.IsChecked(i):
-				if (self.GetValue() != ""):
-					self.SetValue(self.GetValue() + ", " + self.win.resourcelist.GetString(i))
-				else:
-					self.SetValue(self.win.resourcelist.GetString(i))
+				#if (self.GetValue() != ""):
+					#self.SetValue(self.GetValue() + ", " + self.win.resourcelist.GetString(i))
+				#else:
+					#self.SetValue(self.win.resourcelist.GetString(i))
 				self.selected.append(self.win.ResourceTypeList[self.win.resourcelist.GetString(i)])
 		
-		if self.selected == []:
-			self.SetValue("All")
+		#if self.selected == []:
+			#self.SetValue("All")
 		
 		self.resourceview.CleanUp()
 		self.resourceview.UpdateAll()
 		self.resourceview.canvas.Draw()
-		
-	# Method overridden from PopupControl
-	# This method is called just before the popup is displayed
-	# Use this method to format any controls in the popup
-	def FormatContent(self):
-		pass
-			
+
+
 class RsrcSelectorPanel(wx.Panel):
 	def __init__(self, resourceview, parent, cache):
 		wx.Panel.__init__(self, parent, -1)
-		self.selector = ResourceSelectorControl(resourceview, cache, self, -1, pos = (0,0), size = (100,22))
+		self.selector = RsrcSelectorControl(resourceview, cache, self, -1)
 
 class PieChartIcon(SystemIcon):
 	def copy(self):
