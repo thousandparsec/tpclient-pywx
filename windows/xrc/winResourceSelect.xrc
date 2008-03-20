@@ -5,16 +5,16 @@
       <object class="wxBoxSizer">
         <orient>wxVERTICAL</orient>
         <object class="sizeritem">
-          <object class="wxPanel" name="panel">
+          <object class="wxPanel" name="Panel">
             <object class="wxFlexGridSizer">
               <object class="sizeritem">
-                <object class="wxCheckListBox" name="resourcelist"/>
+                <object class="wxCheckListBox" name="ResourceList"/>
                 <option>1</option>
                 <flag>wxALL|wxEXPAND|wxALIGN_CENTRE</flag>
                 <minsize>150,200</minsize>
               </object>
               <object class="sizeritem">
-                <object class="wxButton" name="done">
+                <object class="wxButton" name="Done">
                   <label>Done</label>
                 </object>
                 <option>1</option>
@@ -34,6 +34,6 @@
         </object>
       </object>
     </object>
-    <style>wxSIMPLE_BORDER</style>
+    <style>wxSIMPLE_BORDER|wxFRAME_NO_TASKBAR|wxFRAME_FLOAT_ON_PARENT</style>
   </object>
 </resource>

@@ -54,11 +54,11 @@ This is so that a the same XRC can be used for both MDI and non-MDI frames.
 
 		# Define variables for the controls
 		self.RsrcSelectPanel = XRCCTRL(self, "RsrcSelectPanel")
-		self.panel = XRCCTRL(self, "panel")
-		self.resourcelist = XRCCTRL(self, "resourcelist")
-		self.done = XRCCTRL(self, "done")
-		if hasattr(self, "Ondone"):
-			self.Bind(wx.EVT_BUTTON, self.Ondone, self.done)
+		self.Panel = XRCCTRL(self, "Panel")
+		self.ResourceList = XRCCTRL(self, "ResourceList")
+		self.Done = XRCCTRL(self, "Done")
+		if hasattr(self, "OnDone"):
+			self.Bind(wx.EVT_BUTTON, self.OnDone, self.Done)
 
 
 

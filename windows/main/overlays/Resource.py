@@ -23,9 +23,6 @@ from Proportional import SystemIcon, FindChildren
 
 from Overlay import SystemLevelOverlay, Holder
 
-import  wx.lib.popupctl as popupctrl
-import  wx.calendar as calendar
-
 from windows.xrc.winResourceSelect import ResourceSelectBase
 class ResourceSelect(ResourceSelectBase, wx.Frame):
 	def __init__(self, parent, cache):
@@ -36,69 +33,57 @@ class ResourceSelect(ResourceSelectBase, wx.Frame):
 		
 		for number, resource in cache.resources.items():
 			self.ResourceTypeList[resource.name] = number
-		
-		self.resourcelist.InsertItems(self.ResourceTypeList.keys(), 0)
-		self.SetPosition(parent.GetScreenRect().GetBottomLeft())
-		print self.parent.GetScreenPosition()
-		self.panel.Layout()
-		self.Layout()
-		#self.SetSize((-1,0))
-		self.SetSize(self.GetBestSize())
+		self.ResourceList.InsertItems(self.ResourceTypeList.keys(), 0)
+
 		self.Bind(wx.EVT_ACTIVATE, self.OnActivate)
 		self.Hide()
 	
 	def OnActivate(self, evt):
 		if evt.GetActive() == False:
-			self.Ondone(evt)
-		else:
-			self.panel.Layout()
-			self.Layout()
-			#self.SetSize((-1,0))
-			self.SetSize(self.GetBestSize())
-	
-	def Ondone(self, evt):
+			self.OnDone(evt)
+
+	def Show(self, show=True):
+		self.Panel.Layout()
+
+		size = self.ResourceList.GetBestSize()
+		self.ResourceList.SetMinSize(size)
+
+		self.SetMinSize(size)
+		self.SetMaxSize(size)
+
+		wx.Frame.Show(self)
+
+	def OnDone(self, evt):
 		self.parent.PopDown()
 
 class RsrcSelectorControl(wx.Button):
 	def __init__(self, resourceview, cache, parent, id):
 		wx.Button.__init__(self, parent, id, "Resource Types")
+
 		self.Bind(wx.EVT_BUTTON, self.OnClick)
 		self.cache = cache
 		self.resourceview = resourceview
 		self.selected = []
-		self.popupopen = 0
-		#self.SetValue("All")
-		#self.popupwin = wx.Window(self)
 		self.win = ResourceSelect(self, cache)
 	
 	def OnClick(self, evt):
-		if self.popupopen == 0:
+		if not self.win.IsShown():
+			self.win.Move(self.GetScreenRect().GetBottomLeft())
 			self.win.Show()
-			self.win.SetFocus()
-			self.popupopen = 1
 		else:
 			self.PopDown()
 		
 	def PopDown(self):
 		self.selected=[]
 		self.win.Hide()
-		self.popupopen = 0
-		#self.SetValue("")
-		for i in range(0, self.win.resourcelist.GetCount()):
-			if self.win.resourcelist.IsChecked(i):
-				#if (self.GetValue() != ""):
-					#self.SetValue(self.GetValue() + ", " + self.win.resourcelist.GetString(i))
-				#else:
-					#self.SetValue(self.win.resourcelist.GetString(i))
-				self.selected.append(self.win.ResourceTypeList[self.win.resourcelist.GetString(i)])
-		
-		#if self.selected == []:
-			#self.SetValue("All")
+
+		for i in range(0, self.win.ResourceList.GetCount()):
+			if self.win.ResourceList.IsChecked(i):
+				self.selected.append(self.win.ResourceTypeList[self.win.ResourceList.GetString(i)])
 		
 		self.resourceview.CleanUp()
 		self.resourceview.UpdateAll()
 		self.resourceview.canvas.Draw()
-
 
 class RsrcSelectorPanel(wx.Panel):
 	def __init__(self, resourceview, parent, cache):
