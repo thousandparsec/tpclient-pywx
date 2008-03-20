@@ -2,12 +2,7 @@
 <resource version="2.3.0.1" xmlns="http://www.wxwidgets.org/wxxrc">
   <object class="wxPanel" name="panelSystem" subclass="Dialog">
     <size>400,300</size>
-    <object class="wxFlexGridSizer">
-      <cols>1</cols>
-      <rows>2</rows>
-      <vgap>0</vgap>
-      <hgap>0</hgap>
-      <growablecols>0</growablecols>
+    <object class="wxBoxSizer">
       <object class="sizeritem">
         <object class="wxOrderedTreeCtrl" name="Tree">
           <style>wxTR_DEFAULT_STYLE | wxTR_HAS_VARIABLE_ROW_HEIGHT</style>
@@ -19,19 +14,19 @@
           <orient>wxHORIZONTAL</orient>
           <object class="sizeritem">
             <object class="wxBitmapButton" name="PrevObject">
-              <bitmap stock_id="wxART_GO_BACK"></bitmap>
+              <bitmap stock_id="wxART_GO_BACK"/>
             </object>
             <option>1</option>
           </object>
           <object class="sizeritem">
             <object class="wxBitmapButton" name="NextObject">
-              <bitmap stock_id="wxART_GO_FORWARD"></bitmap>
+              <bitmap stock_id="wxART_GO_FORWARD"/>
             </object>
             <option>1</option>
           </object>
           <object class="sizeritem">
             <object class="wxBitmapButton" name="StepInto">
-              <bitmap stock_id="wxART_GO_DOWN"></bitmap>
+              <bitmap stock_id="wxART_GO_DOWN"/>
             </object>
             <option>1</option>
           </object>
@@ -45,7 +40,7 @@
         </object>
         <flag>wxEXPAND|wxGROW</flag>
       </object>
-      <growablerows>0</growablerows>
+      <orient>wxVERTICAL</orient>
     </object>
   </object>
 </resource>

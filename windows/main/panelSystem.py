@@ -61,7 +61,15 @@ class panelSystem(panelSystemBase, TrackerObject):
 		self.application.gui.Binder(self.application.CacheClass.CacheUpdateEvent, self.OnCacheUpdate)
 		self.application.gui.Binder(self.application.gui.SelectObjectEvent, self.OnSelectObject)
 		
+		self.Bind(wx.EVT_SIZE, self.OnResize)
+		self.Layout()
+
 		TrackerObject.__init__(self)
+
+	def OnResize(self, evt):
+		self.Tree.SetMinSize((-1,self.GetSize()[1]-self.Search.GetBestSize()[1]-self.StepInto.GetBestSize()[1]))
+		self.Layout()
+		evt.Skip()
 
 	def OnSearchCancel(self, evt):
 		self.Search.SetValue("")
