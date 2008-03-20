@@ -464,8 +464,9 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 			del self.ArgumentsPanel
 
 		# Show the details panel
-		self.DetailsPanel.Show()
-		self.ArgumentLine.Show()
+		DetailsPanelShow = True
+		self.DetailsPanel.Hide()
+		self.ArgumentLine.Hide()
 		self.Message.SetLabel("")
 		self.Message.Hide()
 
@@ -558,13 +559,17 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 			# Delete button should still be valid
 			self.Delete.Show()
 		else:
-			self.DetailsPanel.Hide()
+			DetailsPanelShow = False
 			self.ArgumentLine.Hide()
 
 			# Hide the Save/Revert/Delete buttons
 			self.Save.Hide()
 			self.Revert.Hide()
 			self.Delete.Hide()
+
+		if DetailsPanelShow:
+			self.DetailsPanel.Show()
+			self.ArgumentLine.Hide()
 
 		self.Orders.SetSize((-1,0))
 		self.Master.Layout()
