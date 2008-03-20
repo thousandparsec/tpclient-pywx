@@ -42,6 +42,7 @@ class ResourceSelect(ResourceSelectBase, wx.Frame):
 		print self.parent.GetScreenPosition()
 		self.panel.Layout()
 		self.Layout()
+		#self.SetSize((-1,0))
 		self.SetSize(self.GetBestSize())
 		self.Bind(wx.EVT_ACTIVATE, self.OnActivate)
 		self.Hide()
@@ -49,6 +50,11 @@ class ResourceSelect(ResourceSelectBase, wx.Frame):
 	def OnActivate(self, evt):
 		if evt.GetActive() == False:
 			self.Ondone(evt)
+		else:
+			self.panel.Layout()
+			self.Layout()
+			#self.SetSize((-1,0))
+			self.SetSize(self.GetBestSize())
 	
 	def Ondone(self, evt):
 		self.parent.PopDown()

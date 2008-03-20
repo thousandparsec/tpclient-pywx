@@ -11,14 +11,16 @@
                 <object class="wxCheckListBox" name="resourcelist"/>
                 <option>1</option>
                 <flag>wxALL|wxEXPAND|wxALIGN_CENTRE</flag>
+                <minsize>150,200</minsize>
               </object>
               <object class="sizeritem">
                 <object class="wxButton" name="done">
                   <label>Done</label>
                 </object>
                 <option>1</option>
-                <flag>wxALL|wxALIGN_CENTRE</flag>
+                <flag>wxALL|wxEXPAND|wxALIGN_CENTRE</flag>
                 <border>0</border>
+                <minsize>20,20</minsize>
               </object>
               <cols>1</cols>
               <rows>2</rows>
@@ -27,6 +29,8 @@
               <growablerows>1</growablerows>
             </object>
           </object>
+          <option>1</option>
+          <flag>wxALL|wxEXPAND|wxALIGN_CENTRE</flag>
         </object>
       </object>
     </object>
