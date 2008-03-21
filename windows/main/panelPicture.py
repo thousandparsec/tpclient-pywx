@@ -206,7 +206,6 @@ class panelPicture(panelPictureBase):
 			self.Static.SetBitmap(bitmap)
 
 		self.Layout()
-		self.Update(wx.UPDATE_UI_RECURSE)
 
 	def OnSelectObject(self, evt):
 		if evt.id == self.current:
