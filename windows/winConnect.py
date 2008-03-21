@@ -11,6 +11,8 @@ import re
 import wx
 import wx.gizmos
 
+from extra.decorators import freeze_wrapper
+
 # Local Imports
 from winBase import winBaseXRC
 from xrc.winConnect import winConnectBase
@@ -27,6 +29,7 @@ class usernameMixIn:
 		self.Username.Bind(wx.EVT_CHAR, self.OnUsernameChar)
 		self.Game.Bind(wx.EVT_CHAR, self.OnGameChar)
 
+	@freeze_wrapper
 	def OnGameShow(self, evt):
 		if self.GameShow.GetValue():
 			self.SetUsername(self.Username.GetValue())
