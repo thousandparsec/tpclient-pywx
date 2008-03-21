@@ -13,7 +13,6 @@
             <underlined>0</underlined>
             <family>swiss</family>
             <face>Sans</face>
-            <encoding>UTF-8</encoding>
           </font>
           <style>wxSUNKEN_BORDER|wxLC_REPORT|wxLC_EDIT_LABELS</style>
         </object>
@@ -37,7 +36,6 @@
                 <underlined>0</underlined>
                 <family>swiss</family>
                 <face>Sans</face>
-                <encoding>UTF-8</encoding>
               </font>
             </object>
             <option>1</option>
@@ -54,7 +52,6 @@
                 <underlined>0</underlined>
                 <family>swiss</family>
                 <face>Sans</face>
-                <encoding>UTF-8</encoding>
               </font>
               <tooltip>Number of things to add or remove.</tooltip>
             </object>
@@ -70,7 +67,6 @@
                 <underlined>0</underlined>
                 <family>swiss</family>
                 <face>Sans</face>
-                <encoding>UTF-8</encoding>
               </font>
               <tooltip>Add items.</tooltip>
               <style>wxBU_EXACTFIT</style>
@@ -87,7 +83,6 @@
                 <underlined>0</underlined>
                 <family>swiss</family>
                 <face>Sans</face>
-                <encoding>UTF-8</encoding>
               </font>
               <tooltip>Delete selected.</tooltip>
               <style>wxBU_EXACTFIT</style>

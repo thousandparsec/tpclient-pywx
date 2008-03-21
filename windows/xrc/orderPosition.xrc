@@ -14,7 +14,6 @@
             <underlined>0</underlined>
             <family>swiss</family>
             <face>Sans</face>
-            <encoding>UTF-8</encoding>
           </font>
         </object>
         <option>1</option>
@@ -30,7 +29,6 @@
             <underlined>0</underlined>
             <family>swiss</family>
             <face>Sans</face>
-            <encoding>UTF-8</encoding>
           </font>
         </object>
         <option>1</option>
@@ -46,7 +44,6 @@
             <underlined>0</underlined>
             <family>swiss</family>
             <face>Sans</face>
-            <encoding>UTF-8</encoding>
           </font>
         </object>
         <option>1</option>
@@ -62,7 +59,6 @@
             <underlined>0</underlined>
             <family>swiss</family>
             <face>Sans</face>
-            <encoding>UTF-8</encoding>
           </font>
           <style>wxBU_EXACTFIT</style>
         </object>
