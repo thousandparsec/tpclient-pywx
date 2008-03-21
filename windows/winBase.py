@@ -120,6 +120,9 @@ class winMixIn(object):
 
 		self.Bind(wx.EVT_CLOSE, self.OnClose)
 
+	def PreCreate(self, pre):
+		pre.SetTitle('TP: ' + self.title)
+
 	def __str__(self):
 		if hasattr(self, 'title'):
 			return "<win %s>" % self.title
@@ -164,12 +167,6 @@ class winBase(ConfigMixIn, winBaseMixIn, wx.Frame):
 				wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL)
 		winBaseMixIn.__init__(self, application)
 
-class winReport(ConfigMixIn, winMixIn, wx.Frame):
-	def __init__(self, application, parent):
-		wx.Frame.__init__(self, parent, -1, 'TP: ' + self.title, wx.DefaultPosition, wx.DefaultSize, \
-				wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL)
-		winMixIn.__init__(self, application, parent)
-
 class winBaseXRC(ConfigMixIn, winBaseMixIn, wx.Frame):
 	def __init__(self, application):
 		winBaseMixIn.__init__(self, application)
@@ -177,6 +174,7 @@ class winBaseXRC(ConfigMixIn, winBaseMixIn, wx.Frame):
 class winReportXRC(ConfigMixIn, winMixIn, wx.Frame):
 	def __init__(self, application, parent):
 		winMixIn.__init__(self, application, parent)
+
 """\
 There are 2 classes of windows in tpclient-pywx
 	- winMainBase, This is used for main windows, only one of these windows can be open at one time.

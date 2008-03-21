@@ -39,7 +39,7 @@ def comparebyid(a, b):
 
 
 # Show the universe
-class winDesign(winDesignBase, winReportXRC, ShiftMixIn):
+class winDesign(winReportXRC, winDesignBase, ShiftMixIn):
 	title = _("Design")
 	
 	def __init__(self, application, parent):
