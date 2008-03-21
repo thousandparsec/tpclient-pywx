@@ -50,6 +50,7 @@ def EmptyXmlResourceWithHandlers(*args, **kwargs):
 		res.InsertHandler(handler())
 	return res
 xrc.EmptyXmlResourceWithHandlers = EmptyXmlResourceWithHandlers
+xrc.EmptyXmlResource = EmptyXmlResourceWithHandlers
 
 import wx.gizmos
 from wx.gizmos import EditableListBox
@@ -271,7 +272,6 @@ class SearchCtrlXmlHandler(xrc.XmlResourceHandler):
 								"",
 								self.GetPosition(),
 								self.GetSize(),
-								self.GetStyle(),
 								name=self.GetName())
 
 		# These two things should be done in either case:
