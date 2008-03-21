@@ -131,7 +131,7 @@ class panelStarMap(panelStarMapBase, TrackerObjectOrder):
 		self.GUIWaypointEdit =     GUIWaypointEdit(self.Canvas)
 
 		# Initialize mouse-mode bitmaps
-		if sys.platform == "darwin":
+		if sys.platform == "darwin" or sys.platform == "win32":
 			self.GUISelect.Icon   = wx.Bitmap(os.path.join(graphicsdir, "mousemode-icon16.png"))
 			self.GUIMove.Icon     = wx.Bitmap(os.path.join(graphicsdir, "mousemove-icon16.png"))
 			self.GUIZoomIn.Icon   = wx.Bitmap(os.path.join(graphicsdir, "mousezoomin-icon16.png"))
