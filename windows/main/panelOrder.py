@@ -95,13 +95,13 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 
 	def ColourOrderPanel(self):
 		if len(self.nodes) != 1:
-			self.DetailsBorderPanel.SetBackgroundColour(wx.SystemSettings_GetColour(wx.SYS_COLOUR_BACKGROUND))
+			self.DetailsBorderPanel.SetBackgroundColour(wx.NullColour)
 		else:
 			node = self.nodes[0]
 
 			# Colour the background of the argument panel depending on the current state of the node
 			if node.LastState == "idle":
-				self.DetailsBorderPanel.SetBackgroundColour(wx.SystemSettings_GetColour(wx.SYS_COLOUR_BACKGROUND))
+				self.DetailsBorderPanel.SetBackgroundColour(wx.NullColour)
 			if node.LastState == "creating":
 				self.DetailsBorderPanel.SetBackgroundColour(CREATING)
 			if node.LastState == "removing":
