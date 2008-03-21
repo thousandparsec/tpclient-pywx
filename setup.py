@@ -192,7 +192,7 @@ if sys.platform == 'darwin':
 	print find_packages()
 
 	# Fix the version path
-	os.system('python version.py --fix > %s' % os.path.join(privatepath, 'version.py'))
+	os.system('python version.py --fix > %s' % 'version.py')
 
 	shutil.copy('tpclient-pywx', 'tpclient-pywx.py')
 
