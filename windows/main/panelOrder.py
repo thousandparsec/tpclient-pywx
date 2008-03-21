@@ -811,7 +811,7 @@ class TimeArgumentPanel(ArgumentPanel, orderRangeBase):
 		self.Value.SetValue(self.__text)
 
 	def get_value(self):
-		return [unicode(self.Value.GetValue()), self.__max]
+		return [long(self.Value.GetValue()), self.__max]
 		
 from windows.xrc.orderPosition import orderPositionBase
 class PositionArgumentPanel(ArgumentPanel, orderPositionBase):
