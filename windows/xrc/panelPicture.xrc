@@ -24,7 +24,6 @@
         <object class="wxPanel" name="Background">
           <size>128,128</size>
           <style>wxTAB_TRAVERSAL</style>
-          <bg>#000000</bg>
           <object class="wxBoxSizer">
             <orient>wxVERTICAL</orient>
             <object class="sizeritem">
@@ -40,7 +39,6 @@
               <object class="wxGIFAnimationCtrl" name="Animation">
                 <size>128,128</size>
                 <style>wxNO_BORDER</style>
-                <bg>#000000</bg>
               </object>
             </object>
           </object>

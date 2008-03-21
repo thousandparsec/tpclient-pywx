@@ -19,6 +19,8 @@ try:
 except ImportError:
 	from wx.animate import GIFAnimationCtrl
 
+from extra.decorators import freeze_wrapper
+
 # Network imports
 from tp.netlib.objects.ObjectExtra.Universe import Universe
 from tp.netlib.objects.ObjectExtra.Galaxy import Galaxy
@@ -174,9 +176,13 @@ class panelPicture(panelPictureBase):
 			# FIXME: Should load the image now...
 			self.DisplayImage(evt.localfile)
 
+	@freeze_wrapper
 	def DisplayImage(self, file, background=wx.BLACK):
 		print "Setting background color to ", background
 		self.Background.SetBackgroundColour(background)
+		self.Static.SetBackgroundColour(background)
+		self.Animation.SetBackgroundColour(background)
+
 		print "Displaying", file
 		if file.endswith(".gif"):
 			print "Animated image!"
@@ -200,7 +206,7 @@ class panelPicture(panelPictureBase):
 			self.Static.SetBitmap(bitmap)
 
 		self.Layout()
-		self.Update()
+		self.Update(wx.UPDATE_UI_RECURSE)
 
 	def OnSelectObject(self, evt):
 		if evt.id == self.current:
