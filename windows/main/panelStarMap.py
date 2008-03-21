@@ -95,6 +95,8 @@ class panelStarMap(panelStarMapBase, TrackerObjectOrder):
 		self.ZoomLevel.SetValidator(wx.SimpleValidator(wx.DIGIT_ONLY))
 		self.ZoomLevel.Bind(wx.EVT_SET_FOCUS, self.OnZoomLevelFocus)
 
+		self.ZoomLevel.SetWindowStyleFlag(self.ZoomLevel.GetWindowStyleFlag()|wx.TE_PROCESS_ENTER)
+
 		# Create the find popup
 		self.FindPopup = wx.PopupWindow(self)
 		pf = wx.Panel(self.FindPopup)
@@ -279,8 +281,8 @@ class panelStarMap(panelStarMapBase, TrackerObjectOrder):
 		self.Canvas.SetSize(self.FloatCanvas.GetClientSize())
 
 	def OnZoomLevelFocus(self, evt):
-		print "OnZoomLevelFocus", evt
 		self.ZoomLevel.SetMark(-1, -1)
+		evt.Skip()
 
 	def OnZoomLevel(self, evt):
 		"""
@@ -289,6 +291,7 @@ class panelStarMap(panelStarMapBase, TrackerObjectOrder):
 		# FIXME: When the ZoomLevel is changed in any there way, we should get called too...
 		if isinstance(evt, wx.Event):
 			to = evt.GetString().lower()
+			evt.Skip()
 		else:
 			to = unicode(evt).lower()
 
