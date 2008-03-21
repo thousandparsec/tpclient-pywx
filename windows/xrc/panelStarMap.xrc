@@ -10,7 +10,7 @@
         <object class="wxFlexGridSizer">
           <object class="sizeritem">
             <object class="wxBitmapButton" name="MouseMode">
-              <bitmap></bitmap>
+              <bitmap/>
             </object>
           </object>
           <object class="sizeritem">
@@ -36,12 +36,12 @@
           </object>
           <object class="sizeritem">
             <object class="wxBitmapButton" name="Home">
-              <bitmap stock_id="wxART_GO_HOME"></bitmap>
+              <bitmap stock_id="wxART_GO_HOME"/>
             </object>
           </object>
           <object class="sizeritem">
             <object class="wxBitmapButton" name="Find">
-              <bitmap stock_id="wxART_FIND"></bitmap>
+              <bitmap stock_id="wxART_FIND"/>
             </object>
           </object>
           <object class="sizeritem">
@@ -69,7 +69,6 @@
                 <growablerows>0</growablerows>
                 <growablecols>0</growablecols>
               </object>
-              <bg>#FF0000</bg>
             </object>
             <option>1</option>
             <flag>wxEXPAND</flag>
