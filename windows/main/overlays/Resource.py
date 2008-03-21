@@ -49,6 +49,7 @@ class ResourceSelect(ResourceSelectBase, wx.Frame):
 		self.ResourceList.SetMinSize(size)
 
 		self.SetMinSize(size)
+		self.SetSize(size)
 		self.SetMaxSize(size)
 
 		wx.Frame.Show(self)
