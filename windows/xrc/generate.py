@@ -93,6 +93,7 @@ class %(windowName)sBase(wx.Panel):
 
 IDmap = {
 	"wxID_CANCEL":		"Cancel",
+	"wxID_CLOSE":		"Close",
 	"wxID_SAVE":		"Save",
 	"wxID_SAVEAS":		"SaveAs",
 	"wxID_NEW":			"New",
