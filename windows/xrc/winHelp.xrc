@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource version="2.3.0.1" xmlns="http://www.wxwidgets.org/wxxrc">
+  <object class="wxFrame" name="winHelp">
+    <object class="wxPanel" name="">
+      <object class="wxFlexGridSizer">
+        <object class="sizeritem">
+          <object class="wxFlexGridSizer">
+            <object class="sizeritem">
+              <object class="wxStaticBitmap">
+                <size>48,48</size>
+                <bitmap stock_id="wxART_INFORMATION"/>
+              </object>
+              <option>1</option>
+              <flag>wxALL|wxEXPAND|wxGROW</flag>
+              <border>5</border>
+            </object>
+            <object class="sizeritem">
+              <object class="wxStaticText" name="Subject">
+                <label>Important Information....</label>
+                <font>
+                  <size>16</size>
+                  <style>normal</style>
+                  <weight>normal</weight>
+                  <underlined>0</underlined>
+                  <family>swiss</family>
+                  <face>Sans</face>
+                  <encoding>UTF-8</encoding>
+                </font>
+                <style>wxALIGN_CENTRE</style>
+              </object>
+              <option>1</option>
+              <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
+              <border>5</border>
+            </object>
+            <cols>2</cols>
+            <rows>1</rows>
+            <growablecols>1</growablecols>
+            <growablerows>0</growablerows>
+          </object>
+          <option>1</option>
+          <flag>wxALIGN_CENTRE_VERTICAL</flag>
+        </object>
+        <object class="sizeritem">
+          <object class="wxHtmlWindow" name="Message">
+            <size>300,200</size>
+          </object>
+          <option>1</option>
+          <flag>wxALL|wxEXPAND|wxGROW</flag>
+          <border>2</border>
+        </object>
+        <object class="sizeritem">
+          <object class="wxFlexGridSizer">
+            <object class="sizeritem">
+              <object class="wxCheckBox" name="ShowAgain">
+                <hidden>1</hidden>
+              </object>
+              <option>1</option>
+              <flag>wxEXPAND|wxGROW</flag>
+            </object>
+            <object class="sizeritem">
+              <object class="wxStaticText">
+                <label>Do not show this message again.</label>
+                <hidden>1</hidden>
+                <style>wxALIGN_LEFT</style>
+              </object>
+              <option>1</option>
+              <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
+            </object>
+            <object class="spacer">
+              <size>20,-1</size>
+              <flag>wxEXPAND|wxGROW</flag>
+            </object>
+            <object class="sizeritem">
+              <object class="wxButton" name="wxID_CLOSE">
+                <label>&amp;Close</label>
+              </object>
+            </object>
+            <cols>4</cols>
+            <rows>1</rows>
+            <growablecols>2</growablecols>
+            <growablerows>0</growablerows>
+          </object>
+          <option>1</option>
+          <flag>wxALL|wxEXPAND|wxGROW</flag>
+          <border>5</border>
+        </object>
+        <cols>1</cols>
+        <rows>3</rows>
+        <growablecols>0</growablecols>
+        <growablerows>1</growablerows>
+      </object>
+    </object>
+    <size>550,400</size>
+    <title>Help</title>
+  </object>
+</resource>
