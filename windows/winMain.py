@@ -6,6 +6,7 @@ This is the primary window for interacting with the game.
 import time
 import math
 import os.path
+import sys
 
 # wxPython imports
 import wx
@@ -410,8 +411,7 @@ join and start playing in a Thousand Parsec game."""),
 		info.WebSite = ("http://www.thousandparsec.net", "Thousand Parsec Website")
 		info.License = wordwrap(open(os.path.join(docdir, "COPYING"), 'r').read(), 600, wx.ClientDC(self))
 
-		icon = wx.Icon("About", wx.BITMAP_TYPE_XPM)
-		icon.LoadFile(os.path.join(graphicsdir, "tp-icon-80x80.png"), wx.BITMAP_TYPE_PNG)
+		icon = wx.Icon(os.path.join(graphicsdir, "tp-icon-80x80.png"), wx.BITMAP_TYPE_PNG)
 		info.Icon = icon
 
 		# Then we call wx.AboutBox giving it that info object
