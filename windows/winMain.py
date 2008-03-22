@@ -392,7 +392,7 @@ The turn has ended. Would you like to download all the new details?
 			self.statusbar.SetEndTime(evt.gotat + evt.remaining)
 
 	def OnHelp(self, evt):
-		url = "http://localhost/tp/documents/tpclient-pywx?version_str=%s" % version.version_str
+		url = "http://www.thousandparsec.net/tp/documents/tpclient-pywx?version_str=%s" % version.version_str
 		if hasattr(version, "version_git"):
 			url += "&version_git=%s" % version.version_git
 		from extra.Opener import open
