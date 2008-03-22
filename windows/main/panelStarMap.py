@@ -150,17 +150,21 @@ class panelStarMap(panelStarMapBase, TrackerObjectOrder):
 		
 		self.SetMode(self.GUISelect)
 
-		self.Bind(wx.EVT_ENTER_WINDOW, self.OnMouseEnter)
-		self.Bind(wx.EVT_LEAVE_WINDOW, self.OnMouseLeave)
+		self.Canvas.Bind(wx.EVT_ENTER_WINDOW, self.OnMouseEnter)
+		self.Canvas.Bind(wx.EVT_LEAVE_WINDOW, self.OnMouseLeave)
 
 		self.Bind(wx.EVT_KEY_UP, self.OnKeyUp)
 
 		TrackerObjectOrder.__init__(self)
 
+
+	def Show(self, show=True):
+		self.SetFocusIgnoringChildren()
+
 	def OnMouseEnter(self, evt):
-#		print "OnMouseEnter!", evt
+		print "OnMouseEnter!", evt
 		# FIXME: Should make sure we gain the keyboard focus
-		self.Canvas.SetFocus()
+		self.SetFocusIgnoringChildren()
 
 	def OnMouseLeave(self, evt):
 #		print "OnMouseLeave!", evt
@@ -446,4 +450,7 @@ class panelStarMap(panelStarMapBase, TrackerObjectOrder):
 				self.SetMode(self.GUIWaypoint)
 		else:
 			TrackerObjectOrder.OnKeyUp(self, evt)
+		
+		if sys.platform == "win32":
+			self.Canvas.ProcessEvent(evt)
 
