@@ -11,7 +11,6 @@ import os.path
 import wx
 from wx.lib.wordwrap import wordwrap
 
-from extra.Opener import open as opener
 
 # Local imports
 from requirements import docdir, graphicsdir
@@ -396,7 +395,8 @@ The turn has ended. Would you like to download all the new details?
 		url = "http://localhost/tp/documents/tpclient-pywx?version_str=%s" % version.version_str
 		if hasattr(version, "version_git"):
 			url += "&version_git=%s" % version.version_git
-		opener(url)
+		from extra.Opener import open
+		open(url)
 
 	def OnAbout(self, evt):
 		info = wx.AboutDialogInfo()
