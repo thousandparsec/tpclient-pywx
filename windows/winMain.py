@@ -9,11 +9,15 @@ import os.path
 
 # wxPython imports
 import wx
+from wx.lib.wordwrap import wordwrap
+
+from extra.Opener import open as opener
 
 # Local imports
-from requirements import docdir
+from requirements import docdir, graphicsdir
 from winBase import winBase
 from utils import *
+import version
 
 ID_MENU = 10042
 ID_OPEN = 10043
@@ -25,7 +29,9 @@ ID_FILE = 10050
 ID_WIN_TIPS	 = 11006
 ID_WIN_HELP = 1105
 
-ID_HELP = 10057
+ID_HELP   = 10057
+ID_ONLINE = 10058 
+ID_ABOUT  = 10059
 
 class StatusBar(wx.StatusBar):
 	TEXT_TIMER = 1
@@ -288,20 +294,24 @@ class winMain(winBase):
 
 		win.AppendSeparator()
 		win.Append(ID_WIN_TIPS, _("Show Tips"), _(""), True )
-		#win.Append(ID_WIN_HELP, _("Help"),      _(""), True)
 
 		help = wx.Menu()
+		help.Append( ID_ONLINE, _("Online Help"), _("Go to the online help page."))
+		help.Append( ID_ABOUT,  _("About"),  _("About the client you are running...") )
 
 		bar.Append( file, _("File") )
 		#bar.Append( stat, _("Statistics") )
 		bar.Append( win,  _("Windows") )
-		#bar.Append( help, _("&Help") )
+		bar.Append( help, _("&Help") )
 
 		source.Bind(wx.EVT_MENU, self.OnConnect,     id=ID_OPEN)
 		source.Bind(wx.EVT_MENU, self.UpdateCache,   id=ID_UNIV)
 		source.Bind(wx.EVT_MENU, self.RequestEOT,    id=ID_TURN)
 		source.Bind(wx.EVT_MENU, self.OnConfig,      id=wx.ID_PREFERENCES)
 		source.Bind(wx.EVT_MENU, self.OnProgramExit, id=ID_EXIT)
+
+		source.Bind(wx.EVT_MENU, self.OnHelp,        id=ID_ONLINE)
+		source.Bind(wx.EVT_MENU, self.OnAbout,       id=ID_ABOUT)
 
 		source.Bind(wx.EVT_MENU, self.ShowTips, id=ID_WIN_TIPS)
 		return bar
@@ -381,4 +391,30 @@ The turn has ended. Would you like to download all the new details?
 				self.updatepending = False
 		else:
 			self.statusbar.SetEndTime(evt.gotat + evt.remaining)
+
+	def OnHelp(self, evt):
+		url = "http://localhost/tp/documents/tpclient-pywx?version_str=%s" % version.version_str
+		if hasattr(version, "version_git"):
+			url += "&version_git=%s" % version.version_git
+		opener(url)
+
+	def OnAbout(self, evt):
+		info = wx.AboutDialogInfo()
+		info.Name = _("wxPython Client")
+		info.Version = version.version_str
+		info.Copyright = _("(C) 2001-2008 Thousand Parsec Developers")
+		info.Description = wordwrap(_("""\
+This Thousand Parsec client, written in python, is an easy way to \
+join and start playing in a Thousand Parsec game."""),
+			350, wx.ClientDC(self))
+		info.WebSite = ("http://www.thousandparsec.net", "Thousand Parsec Website")
+		info.License = wordwrap(open(os.path.join(docdir, "COPYING"), 'r').read(), 600, wx.ClientDC(self))
+
+		icon = wx.Icon("About", wx.BITMAP_TYPE_XPM)
+		icon.LoadFile(os.path.join(graphicsdir, "tp-icon-80x80.png"), wx.BITMAP_TYPE_PNG)
+		info.Icon = icon
+
+		# Then we call wx.AboutBox giving it that info object
+		wx.AboutBox(info)
+		
 
