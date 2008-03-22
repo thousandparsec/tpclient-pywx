@@ -187,13 +187,13 @@ class Resource(Proportional):
 				for child in o.contains:
 					if hasattr(c.objects[child], "resources"):
 						for resource in c.objects[child].resources:
-							if reduce(int.__add__, resource[1:]) != 0:
+							if sum(resource[1:]) != 0:
 								#if self.type == Resource.TOTAL or resource[0] == self.type:
 								if len(self.selectpanel.selector.selected) == 0 or resource[0] in self.selectpanel.selector.selected:
 									if self.valuesresources.has_key(resource[0]):
-										self.valuesresources[resource[0]] += reduce(int.__add__, resource[1:])
+										self.valuesresources[resource[0]] += sum(resource[1:])
 									else:
-										self.valuesresources[resource[0]] = reduce(int.__add__, resource[1:])
+										self.valuesresources[resource[0]] = sum(resource[1:])
 			
 			#print c.objects[oid].name, ":"
 			for resource, amount in self.valuesresources.items():
@@ -238,11 +238,11 @@ class Resource(Proportional):
 		if hasattr(o, "resources"):
 			if self.type == Resource.TOTAL:
 				for resource in o.resources:
-					amount += reduce(int.__add__, resource[1:])
+					amount += sum(resource[1:])
 			else:
 				for resource in o.resources:
 					if resource[0] == self.type:
-						amount += reduce(int.__add__, resource[1:])
+						amount += sum(resource[1:])
 			#	amount += resource[self.type]
 		
 		return amount
@@ -266,19 +266,19 @@ class Resource(Proportional):
 				returnstring += "\n " + child.name + ":"
 			if hasattr(child, "resources"):
 				for resource in child.resources:
-					if reduce(int.__add__, resource[1:]) > 0:
+					if sum(resource[1:]) > 0:
 						if len(self.selectpanel.selector.selected) == 0:
 							if valuesresources.has_key(resource[0]):
-								valuesresources[resource[0]] += reduce(int.__add__, resource[1:])
+								valuesresources[resource[0]] += sum(resource[1:])
 							else:
-								valuesresources[resource[0]] = reduce(int.__add__, resource[1:])
+								valuesresources[resource[0]] = sum(resource[1:])
 						else:
 							if resource[0] in self.selectpanel.selector.selected:
-								thisresourcetotal += reduce(int.__add__, resource[1:]) 
+								thisresourcetotal += sum(resource[1:]) 
 							 	returnstring += "\n  " + self.cache.resources[resource[0]].name \
-							 		+ ": %s " % reduce(int.__add__, resource[1:]) \
+							 		+ ": %s " % sum(resource[1:]) \
 							 		+ [self.cache.resources[resource[0]].unit_singular, self.cache.resources[resource[0]].unit_plural] \
-							 		[reduce(int.__add__, resource[1:]) > 1]
+							 		[sum(resource[1:]) > 1]
 	
 		if not self.type == Resource.TOTAL:
 			returnstring += "\n\nTotal " + self.cache.resources[self.type].name + " in system: %s" % thisresourcetotal
