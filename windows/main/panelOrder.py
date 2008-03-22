@@ -983,7 +983,7 @@ class ListArgumentPanel(ArgumentPanel, orderListBase):
 		self.UpdateNumber(type)
 	
 	def OnDelete(self, evt):
-		selected = self.Choices.GetSelection()
+		selected = self.Choices.GetSelected()
 		
 		for selection in selected:
 			type = self.Choices.GetItemPyData(selection)
