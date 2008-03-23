@@ -31,14 +31,14 @@
             <option>1</option>
           </object>
         </object>
-        <option>1</option>
+        <option>100</option>
         <flag>wxALL|wxALIGN_CENTRE</flag>
       </object>
       <object class="sizeritem">
         <object class="wxSearchCtrl" name="Search">
           <style>wxSEARCH_CANCEL_BTN|wxSEARCH_SEARCH_BTN|wxTE_PROCESS_ENTER</style>
         </object>
-        <option>1</option>
+        <option>70</option>
         <flag>wxEXPAND|wxGROW</flag>
       </object>
       <orient>wxVERTICAL</orient>
