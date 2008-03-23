@@ -10,8 +10,9 @@
         <object class="wxFlexGridSizer">
           <object class="sizeritem">
             <object class="wxBitmapButton" name="MouseMode">
-              <bitmap/>
+              <bitmap></bitmap>
             </object>
+            <flag>wxALIGN_CENTRE_VERTICAL|wxALIGN_CENTRE_HORIZONTAL</flag>
           </object>
           <object class="sizeritem">
             <object class="wxComboBox" name="ZoomLevel">
@@ -24,7 +25,7 @@
               </content>
               <style>wxCB_DROPDOWN</style>
             </object>
-            <flag>wxEXPAND</flag>
+            <flag>wxEXPAND|wxALIGN_CENTRE_VERTICAL|wxALIGN_CENTRE_HORIZONTAL</flag>
           </object>
           <object class="sizeritem">
             <object class="wxStaticLine">
@@ -36,13 +37,15 @@
           </object>
           <object class="sizeritem">
             <object class="wxBitmapButton" name="Home">
-              <bitmap stock_id="wxART_GO_HOME"/>
+              <bitmap stock_id="wxART_GO_HOME"></bitmap>
             </object>
+            <flag>wxALIGN_CENTRE_VERTICAL|wxALIGN_CENTRE_HORIZONTAL</flag>
           </object>
           <object class="sizeritem">
             <object class="wxBitmapButton" name="Find">
-              <bitmap stock_id="wxART_FIND"/>
+              <bitmap stock_id="wxART_FIND"></bitmap>
             </object>
+            <flag>wxALIGN_CENTRE_VERTICAL|wxALIGN_CENTRE_HORIZONTAL</flag>
           </object>
           <object class="sizeritem">
             <object class="wxStaticLine">
@@ -53,13 +56,33 @@
             <border>4</border>
           </object>
           <object class="sizeritem">
-            <object class="wxChoice" name="DisplayMode">
-              <content>
-                <item>System</item>
-                <item>Resources</item>
-              </content>
+            <object class="wxFlexGridSizer">
+              <cols>1</cols>
+              <rows>3</rows>
+              <object class="spacer">
+                <size>0,0</size>
+                <option>1</option>
+              </object>
+              <object class="sizeritem">
+                <object class="wxChoice" name="DisplayMode">
+                  <content>
+                    <item>System</item>
+                    <item>Resources</item>
+                  </content>
+                </object>
+                <option>1</option>
+                <flag>wxEXPAND|wxALIGN_CENTRE_VERTICAL|wxALIGN_CENTRE_HORIZONTAL</flag>
+              </object>
+              <object class="spacer">
+                <size>0,0</size>
+                <option>1</option>
+              </object>
+              <growablerows>0</growablerows>
+              <growablerows>2</growablerows>
+              <growablecols>1</growablecols>
             </object>
-            <flag>wxEXPAND</flag>
+            <option>1</option>
+            <flag>wxEXPAND|wxGROW</flag>
           </object>
           <object class="sizeritem">
             <object class="wxPanel" name="DisplayModeExtra">
