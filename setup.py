@@ -325,6 +325,9 @@ if sys.platform == 'darwin':
 	print "Creating dmg package"
 	os.system("cd doc/mac/; chmod a+x pkg-dmg make-diskimage; ./make-diskimage ../../%s  ../../dist tpclient-pywx -null- dstore background.jpg" % dmg)
 
+	# Restore the version.py back to the git version...
+	os.system('git checkout version.py')
+
 elif sys.platform == 'win32':
 	# Copy in the manifest file for that "Windows XP look"
 	shutil.copy("tpclient-pywx.exe.manifest", os.path.join("dist", "tpclient-pywx.exe.manifest"))
