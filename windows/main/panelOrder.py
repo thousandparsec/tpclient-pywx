@@ -570,11 +570,11 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 
 		if DetailsPanelShow:
 			self.DetailsPanel.Show()
-			self.DetailsPanel.Layout()
-			self.ArgumentLine.Hide()
+			self.ArgumentLine.Show()
 
 		self.Orders.SetSize((-1,0))
 		self.Master.Layout()
+		self.DetailsPanel.Layout()
 		self.Layout()
 		self.Orders._doResize()
 
