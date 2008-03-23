@@ -272,20 +272,50 @@ arguments.update(extra_arguments)
 setup(**arguments)
 if sys.platform == 'darwin':
 	if "py2app" in sys.argv:
+		basedir = os.path.join("dist", "tpclient-pywx.app", "Contents")
+
 		# Need to do some cleanup because the modulegraph is a bit brain dead
-		base = os.path.join("dist", "tpclient-pywx.app", "Contents", "Resources", "lib", "python2.5")
+		base = os.path.join(basedir, "Resources", "lib", "python2.5")
 		for i in (
 				"xrc", "main", "overlays", "wxFloatCanvas", "Utilities", # local excesses
-				"netlib", "objects", "ObjectExtra", "OrderExtra", "support", "discover", "pyZeroconf",  # tp.netlib
-				"client", "pyscheme", "discover", # tp.client
+				"netlib", "objects", "ObjectExtra", "OrderExtra", "support", "discover", "pyZeroconf", 
+				"client", "pyscheme", "discover", 
+				# Numpy, numpy, numpy
+				"numpy/oldnumeric", "numpy/numarray", "numpy/doc", "numpy/lib/tests", "numpy/distutils"
+				"numpy/core/tests",
 				):
 			p = os.path.join(base, i)
 			if os.path.exists(p):
 				print "Removing", p
 				shutil.rmtree(p)
 
+
+		# Remove the pyscheme tests
+		pyschemet = os.path.join(base, "tp", "client", "pyscheme", "t")
+		if os.path.exists(pyschemet):
+			shutil.rmtree(pyschemet)
+
 		# Need to clean up any .py$ files which got included for some unknown reason...
 		# Need to clean up any .pyc$ when a .pyo$ exists too
+		for line in os.popen('find %s -name \*.pyc' % basedir).xreadlines():
+			py = line.strip()[:-1]
+			pyc = py+'c'
+			pyo = py+'o'
+			if os.path.exists(py):
+				print "Removing %s as %s exists" % (py, pyo)
+				os.unlink(py)
+
+			if "numpy" in line:
+				continue
+
+			if os.path.exists(pyo):
+				print "Removing %s as %s exists" % (pyc, pyo)
+				os.unlink(pyc)
+
+
+		# Clean up any ~ which got wrongly copied in..
+		for line in os.popen('find %s -name \*~' % basedir).xreadlines():
+			os.unlink(line.strip())
 
 	# Create a package
 	dmg = "tpclient-pywx_%s.dmg" % version
@@ -294,6 +324,7 @@ if sys.platform == 'darwin':
 
 	print "Creating dmg package"
 	os.system("cd doc/mac/; chmod a+x pkg-dmg make-diskimage; ./make-diskimage ../../%s  ../../dist tpclient-pywx -null- dstore background.jpg" % dmg)
+
 elif sys.platform == 'win32':
 	# Copy in the manifest file for that "Windows XP look"
 	shutil.copy("tpclient-pywx.exe.manifest", os.path.join("dist", "tpclient-pywx.exe.manifest"))
