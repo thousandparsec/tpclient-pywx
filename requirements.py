@@ -7,13 +7,15 @@
 import sys
 sys.path.insert(0, '.')
 
+import time
 import os.path
 
 notfound    = []
 recommended = []
 
 if hasattr(sys, "frozen"):
-	f = open("log.txt", "a")
+	from utils import configpath
+	f = open(os.path.join(configpath(), "tpclient-pywx.log.%s" % int(time.time())), "w")
 	import sys
 	sys.stderr = f
 	sys.stdout = f
