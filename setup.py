@@ -209,7 +209,7 @@ if sys.platform == 'darwin':
 				"optimize"	: 2,
 				"packages"	: find_packages(),
 				"includes"	: [],
-				"excludes"	: ['Tkconstants', 'Tkinter', 'tcl', 'pydoc', 
+				"excludes"	: ['Tkconstants', 'Tkinter', 'tcl', 'pydoc', 'pyreadline',
 					'numpy.numarray', 'numpy.oldnumeric',
 					'numpy.distutils', 'numpy.doc', 'numpy.f2py', 'numpy.fft', 'numpy.lib.tests', 'numpy.testing'],
 				"resources"	: arguments['data_files'],
