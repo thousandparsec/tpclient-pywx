@@ -35,7 +35,7 @@ class TrackerObject(object):
 		"""
 		Called when something changes in the cache.
 		"""
-		assert self != evt.source, "Got event %s which I was the source of." % evt
+		assert not self is evt.source, "Got event %s which was sent by %s which is me (%s)!" % (evt, evt.source, self)
 
 		# If there was a whole cache update
 		if evt.what is None:
@@ -52,7 +52,7 @@ class TrackerObject(object):
 		"""
 		Called when something else selects an object.
 		"""
-		assert self != evt.source, "Got event %s which I was the source of." % evt
+		assert not self is evt.source, "Got event %s which was sent by %s which is me (%s)!" % (evt, evt.source, self)
 
 		# Check that if object is not already selected
 		if self.oid == evt.id:
@@ -65,7 +65,7 @@ class TrackerObject(object):
 		"""
 		Called when something else previews an object.
 		"""
-		assert self != evt.source, "Got event %s which I was the source of." % evt
+		assert not self is evt.source, "Got event %s which was sent by %s which is me (%s)!" % (evt, evt.source, self)
 
 		# Check that if object is not already selected
 		if self.oid == evt.id:
@@ -212,7 +212,7 @@ class TrackerObjectOrder(TrackerObject):
 	# Callbacks for various events
 	##########################################################################
 	def OnCacheUpdate(self, evt):
-		assert self != evt.source, "Got event %s which I was the source of." % evt
+		assert not self is evt.source, "Got event %s which was sent by %s which is me (%s)!" % (evt, evt.source, self)
 
 
 		# If there was a whole cache update
@@ -280,7 +280,7 @@ class TrackerObjectOrder(TrackerObject):
 				return
 
 	def OnSelectObject(self, evt):
-		assert self != evt.source, "Got event %s which I was the source of." % evt
+		assert not self is evt.source, "Got event %s which was sent by %s which is me (%s)!" % (evt, evt.source, self)
 
 		# Check that if object is not already selected
 		if self.oid == evt.id:
@@ -300,7 +300,7 @@ class TrackerObjectOrder(TrackerObject):
 		"""
 		Called when something else selects an order.
 		"""
-		assert self != evt.source, "Got event %s which I was the source of." % evt
+		assert not self is evt.source, "Got event %s which was sent by %s which is me (%s)!" % (evt, evt.source, self)
 
 		# Check this order is for the currently selected object
 		if self.oid != evt.id:
