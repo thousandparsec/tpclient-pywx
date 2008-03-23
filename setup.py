@@ -34,7 +34,7 @@ arguments = dict(
 		'extra.wxFloatCanvas.Utilities',
 		],
 	data_files=[(".",			("LICENSE", "README")),
-				("doc",			("doc/tips.txt","COPYING")),
+				("doc",			("doc/tips.txt","doc/COPYING")),
 				("windows/xrc",	glob.glob("windows/xrc/*.xrc")),
 				("graphics",	glob.glob("graphics/*.mpg")),
 				("graphics",	glob.glob("graphics/*.gif")),
@@ -85,7 +85,7 @@ if sys.platform.startswith('linux') and "install" in sys.argv:
 	print 'docpath', docpath, "(copying to %s)" % docpath_temp
 
 	makedirs(docpath_temp)
-	docfiles = ['AUTHORS', 'COPYING', 'LICENSE', 'doc/tips.txt']
+	docfiles = ['AUTHORS', 'doc/COPYING', 'LICENSE', 'doc/tips.txt']
 	for file in docfiles:
 		shutil.copy2(file, docpath_temp)
 
