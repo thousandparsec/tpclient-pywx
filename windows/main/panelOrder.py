@@ -5,6 +5,7 @@ The order window.
 # Python Imports
 import time
 import copy
+import sys
 
 from extra.decorators import *
 
@@ -866,6 +867,9 @@ class ListArgumentPanel(ArgumentPanel, orderListBase):
 
 		self.OnChoicesDeselect(None)
 		self.OnType(None)
+
+		if sys.platform == "darwin":
+			self.Number.SetSize((-1, self.Type.GetSize()[1]))
 
 	def set_value(self, list):
 		print "ListArgumentPanel", list
