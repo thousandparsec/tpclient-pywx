@@ -30,13 +30,10 @@ else:
 
 def location():
 	if hasattr(sys, "frozen") and sys.frozen == "windows_exe":
-		print "Frozen on window!"
 	        return os.path.dirname(unicode(sys.executable, sys.getfilesystemencoding( )))
 	elif hasattr(sys, "frozen") and sys.platform == "darwin":
-		print "Frozen on darwin!"
 		return unicode('/'+'/'.join(__file__.split('/')[:-4]), sys.getfilesystemencoding( ))
 	else:
-		print "Non frozen!"
 		return os.path.dirname(unicode(__file__, sys.getfilesystemencoding( )))
 
 from types import StringTypes
