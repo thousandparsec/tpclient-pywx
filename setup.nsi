@@ -20,7 +20,7 @@ WriteINIStr "${FILENAME}.url" "InternetShortcut" "IconIndex" "${ICONINDEX}"
   CRCCheck On 
  
   ;Output File Name 
-  OutFile "tpclient-pywx-0.3.0-setup.exe" 
+  OutFile "tpclient-pywx-0.3.1-setup.exe" 
  
   ;The Default Installation Directory 
   InstallDir "$PROGRAMFILES\Thousand Parsec\tpclient-pywx" 
@@ -45,7 +45,7 @@ WriteINIStr "${FILENAME}.url" "InternetShortcut" "IconIndex" "${ICONINDEX}"
 ;Pages
 
   !insertmacro MUI_PAGE_WELCOME
-  !insertmacro MUI_PAGE_LICENSE ".\COPYING"
+  !insertmacro MUI_PAGE_LICENSE ".\doc\COPYING"
   !insertmacro MUI_PAGE_DIRECTORY
 
   ;Start Menu Folder Page Configuration
@@ -120,7 +120,7 @@ Section "Files" Files
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\tpclient-pywx" \
                  "DisplayIcon" "$INSTDIR\tpclient-pywx.exe"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\tpclient-pywx" \
-                 "DisplayVersion" "0.3.0"
+                 "DisplayVersion" "0.3.1"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\tpclient-pywx" \
                  "URLInfoAbout" "http://www.thousandparsec.net/tp/"
   WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\tpclient-pywx" \
@@ -130,7 +130,7 @@ Section "Files" Files
   WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\tpclient-pywx" \
                  "VersionMajor" 3
   WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\tpclient-pywx" \
-                 "VersionMinor" 0
+                 "VersionMinor" 1
 
   ;Create uninstaller
   WriteUninstaller "$INSTDIR\Uninstall.exe"
