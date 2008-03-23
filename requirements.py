@@ -13,15 +13,34 @@ import os.path
 notfound    = []
 recommended = []
 
+class FileOutput(object):
+	def __init__(self, stdout=None):
+		self.o = stdout
+
+		from utils import configpath
+		self.f = open(os.path.join(configpath(), "tpclient-pywx.log"), "w")
+		if not self.o is None:
+			self.o.write("Output going to %s\n" % self.f.name)
+
+	def write(self, s):
+		if not self.o is None:
+			self.o.write(s)
+		self.f.write(s)
+	
+	def __del__(self):
+		if not self.o is None:
+			import os
+			os.unlink(self.f.name)
+
 if hasattr(sys, "frozen"):
-	from utils import configpath
-	f = open(os.path.join(configpath(), "tpclient-pywx.log.%s" % int(time.time())), "w")
-	import sys
-	sys.stderr = f
-	sys.stdout = f
+	sys.stdout = FileOutput()
+	sys.stderr = sys.stdout
 
 	system = "unknown"
 else:
+	sys.stdout = FileOutput(sys.stdout)
+	sys.stderr = sys.stdout
+
 	# Try and figure out what type of system this computer is running.
 	import os
 	result = os.system('apt-get --version > /dev/null 2>&1') 
