@@ -192,6 +192,7 @@ if sys.platform == 'darwin':
 	print find_packages()
 
 	# Fix the version path
+	os.system('git checkout version.py')
 	os.system('python version.py --fix > %s' % 'version.py.tmp')
 	os.unlink('version.py')
 	os.rename('version.py.tmp', 'version.py')
