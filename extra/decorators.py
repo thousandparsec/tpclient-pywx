@@ -6,19 +6,17 @@ def freeze_wrapper(func, self, *args, **kw):
 	"""
 	This decorator calls Freeze before calling the function, and then thaw after.
 	"""
+	frozen = False
 	try:
-		try:
+		if hasattr(self, "Freeze"):
+			frozen = True
 			self.Freeze()
-		except AttributeError:
-			raise Warning("FreezeWrapper on %r but no Freeze method! (%s)" % (self, e))
 	
 		return func(self, *args, **kw)
 
 	finally:
-		try:
+		if frozen:
 			self.Thaw()
-		except AttributeError, e:
-			raise Warning("FreezeWrapper on %r but no Thaw method! (%s)" % (self, e))
 
 import wx
 
