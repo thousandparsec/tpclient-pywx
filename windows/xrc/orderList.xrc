@@ -25,23 +25,43 @@
           <cols>4</cols>
           <rows>1</rows>
           <object class="sizeritem">
-            <object class="wxChoice" name="Type">
-              <content>
-                <item>Choice 1</item>
-                <item>Choice 2</item>
-              </content>
-              <font>
-                <size>8</size>
-                <style>normal</style>
-                <weight>normal</weight>
-                <underlined>0</underlined>
-                <family>swiss</family>
-                <face>Sans</face>
-              </font>
+            <object class="wxFlexGridSizer">
+              <cols>1</cols>
+              <rows>3</rows>
+              <object class="spacer">
+                <size>0,0</size>
+                <option>1</option>
+                <flag>wxEXPAND|wxGROW</flag>
+              </object>
+              <object class="sizeritem">
+                <object class="wxChoice" name="Type">
+                  <content>
+                    <item>Choice 1</item>
+                    <item>Choice 2</item>
+                  </content>
+                  <font>
+                    <size>8</size>
+                    <family>swiss</family>
+                    <style>normal</style>
+                    <weight>normal</weight>
+                    <underlined>0</underlined>
+                    <face>Sans</face>
+                  </font>
+                </object>
+                <option>1</option>
+                <flag>wxEXPAND|wxGROW</flag>
+              </object>
+              <object class="spacer">
+                <size>0,0</size>
+                <option>1</option>
+                <flag>wxEXPAND|wxGROW</flag>
+              </object>
+              <growablecols>0</growablecols>
+              <growablerows>0</growablerows>
+              <growablerows>2</growablerows>
             </object>
             <option>1</option>
             <flag>wxEXPAND|wxGROW</flag>
-            <border>0</border>
           </object>
           <object class="sizeritem">
             <object class="wxSpinCtrl" name="Number">
@@ -57,7 +77,7 @@
               <tooltip>Number of things to add or remove.</tooltip>
             </object>
             <option>1</option>
-            <flag>wxEXPAND|wxGROW</flag>
+            <flag>wxEXPAND|wxGROW|wxALIGN_CENTRE_VERTICAL</flag>
             <border>0</border>
           </object>
           <object class="sizeritem">
@@ -75,7 +95,7 @@
               <style>wxBU_EXACTFIT</style>
             </object>
             <option>1</option>
-            <flag>wxEXPAND|wxGROW</flag>
+            <flag>wxALIGN_CENTRE_VERTICAL</flag>
             <border>0</border>
           </object>
           <object class="sizeritem">
@@ -93,7 +113,7 @@
               <style>wxBU_EXACTFIT</style>
             </object>
             <option>1</option>
-            <flag>wxEXPAND|wxGROW</flag>
+            <flag>wxALIGN_CENTRE_VERTICAL</flag>
             <border>0</border>
           </object>
           <growablecols>0</growablecols>
