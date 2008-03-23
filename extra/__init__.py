@@ -1,5 +1,6 @@
 
 import string
+import sys
 import wx
 import wx.gizmos
 import wx.lib.mixins.listctrl
@@ -525,6 +526,12 @@ class wxListCtrl(wx.ListCtrlOrig, mlc.ListCtrlAutoWidthMixin, mlc.ColumnSorterMi
 				pass
 		else:
 			wx.lib.mixins.listctrl.ListCtrlAutoWidthMixin._doResize(self)
+
+		if sys.platform == "darwin":
+			column = self.GetColumnCount()-1
+			if column > 0:
+				self.SetColumnWidth(column, self.GetColumnWidth(column)-4)
+
 
 	#############################################################################
 	# This stuff makes working with selected items much easier
