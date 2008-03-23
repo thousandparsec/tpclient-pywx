@@ -14,19 +14,19 @@
           <orient>wxHORIZONTAL</orient>
           <object class="sizeritem">
             <object class="wxBitmapButton" name="PrevObject">
-              <bitmap stock_id="wxART_GO_BACK"/>
+              <bitmap stock_id="wxART_GO_BACK"></bitmap>
             </object>
             <option>1</option>
           </object>
           <object class="sizeritem">
             <object class="wxBitmapButton" name="NextObject">
-              <bitmap stock_id="wxART_GO_FORWARD"/>
+              <bitmap stock_id="wxART_GO_FORWARD"></bitmap>
             </object>
             <option>1</option>
           </object>
           <object class="sizeritem">
             <object class="wxBitmapButton" name="StepInto">
-              <bitmap stock_id="wxART_GO_DOWN"/>
+              <bitmap stock_id="wxART_GO_DOWN"></bitmap>
             </object>
             <option>1</option>
           </object>
@@ -38,6 +38,7 @@
         <object class="wxSearchCtrl" name="Search">
           <style>wxSEARCH_CANCEL_BTN|wxSEARCH_SEARCH_BTN|wxTE_PROCESS_ENTER</style>
         </object>
+        <option>1</option>
         <flag>wxEXPAND|wxGROW</flag>
       </object>
       <orient>wxVERTICAL</orient>

@@ -6,6 +6,7 @@ at this current location and "quick" details about them.
 # Python imports
 import random
 import os.path
+import sys
 
 # wxPython imports
 import wx
@@ -67,7 +68,10 @@ class panelSystem(panelSystemBase, TrackerObject):
 		TrackerObject.__init__(self)
 
 	def OnResize(self, evt):
-		self.Tree.SetMinSize((-1,self.GetSize()[1]-self.Search.GetBestSize()[1]-self.StepInto.GetBestSize()[1]))
+		if sys.platform == "darwin":
+			self.Tree.SetMinSize((-1,self.GetSize()[1]-self.Search.GetBestSize()[1]-self.StepInto.GetBestSize()[1]-10))
+		else:
+			self.Tree.SetMinSize((-1,self.GetSize()[1]-self.Search.GetBestSize()[1]-self.StepInto.GetBestSize()[1]))
 		self.Layout()
 		evt.Skip()
 
