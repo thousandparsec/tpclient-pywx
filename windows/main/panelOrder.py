@@ -868,9 +868,6 @@ class ListArgumentPanel(ArgumentPanel, orderListBase):
 		self.OnChoicesDeselect(None)
 		self.OnType(None)
 
-		if sys.platform == "darwin":
-			self.Number.SetSize((-1, self.Type.GetSize()[1]))
-
 	def set_value(self, list):
 		print "ListArgumentPanel", list
 
@@ -1002,6 +999,9 @@ class ListArgumentPanel(ArgumentPanel, orderListBase):
 		else:
 			self.Number.SetRange(1, self.__options[type][self.MAX])
 
+		if self.Number.GetValue() == 0:
+			self.Number.SetValue(1)
+
 	def OnType(self, evt):
 		type = self.Type.GetSelection()
 		if type == wx.NOT_FOUND:
@@ -1026,9 +1026,6 @@ class ListArgumentPanel(ArgumentPanel, orderListBase):
 		wx.CallAfter(self.OnChoicesSelect, evt)
 
 	def OnChoicesSelect(self, evt):
-		if not hasattr(wx, 'core'):
-			return
-
 		choices = self.Choices.GetSelected()
 		if self.__choices == choices:
 			return
