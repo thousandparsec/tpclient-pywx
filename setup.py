@@ -323,7 +323,7 @@ if sys.platform == 'darwin':
 		os.unlink(dmg)
 
 	print "Creating dmg package"
-	os.system("cd doc/mac/; chmod a+x pkg-dmg make-diskimage; ./make-diskimage ../../%s  ../../dist tpclient-pywx -null- dstore background.jpg" % dmg)
+	os.system("cd doc/mac/; chmod a+x pkg-dmg make-diskimage; ./make-diskimage ../../%s  ../../dist tpclient-pywx -null- dstore background.jpg ../../graphics/tp.icns" % dmg)
 
 	# Restore the version.py back to the git version...
 	os.system('git checkout version.py')

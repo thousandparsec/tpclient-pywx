@@ -47,6 +47,7 @@
 #                       <eula_resource_file>
 #                       <.dsstore_file>
 #                       <background_image_file>
+#                       <icns file>
 #
 # tip: use '-null-' for <eula-resource-file> if you only want to
 # provide <.dsstore_file> and <background_image_file>
@@ -59,8 +60,9 @@ VOLUME_NAME=$3
 EULA_RSRC=$4
 DMG_DSSTORE=$5
 DMG_BKGND_IMG=$6
+DMG_ICNS=$7
 
-EXTRA_ARGS=
+EXTRA_ARGS="--format UDBZ"
 
 if test -n "$EULA_RSRC" && test "$EULA_RSRC" != "-null-" ; then
   EXTRA_ARGS="--resource $EULA_RSRC"
@@ -74,7 +76,11 @@ if test -n "$DMG_BKGND_IMG" ; then
   EXTRA_ARGS="$EXTRA_ARGS --mkdir /.background --copy $DMG_BKGND_IMG:/.background"
 fi
 
-echo `dirname $0`/pkg-dmg --target "$DMG_PATH" --source "$SRC_FOLDER" \
+if test -n "$DMG_ICNS" ; then
+  EXTRA_ARGS="$EXTRA_ARGS --icon $DMG_ICNS"
+fi
+
+echo `dirname $0`/pkg-dmg --source "$SRC_FOLDER" --target "$DMG_PATH" \
  --volname "$VOLUME_NAME" $EXTRA_ARGS
 
 `dirname $0`/pkg-dmg --target "$DMG_PATH" --source "$SRC_FOLDER" \
