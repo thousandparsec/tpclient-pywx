@@ -6,7 +6,6 @@ See also - https://sourceforge.net/tracker/?group_id=132078&atid=829724
 
 Short Term
 	* Remove all the print states - make debug output go to the debug window
-	* Convert Order Argument panel types to XRC
 	* Put up screenshots on www.thousandparsec.net
 	* Better default positioning of windows 
 	* Allow starting tips to be disabled in the config
