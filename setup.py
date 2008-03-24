@@ -332,8 +332,15 @@ elif sys.platform == 'win32':
 	# Copy in the manifest file for that "Windows XP look"
 	shutil.copy("tpclient-pywx.exe.manifest", os.path.join("dist", "tpclient-pywx.exe.manifest"))
 
-	# Check that gdi.dll exists, some windows need it
 	import wx
+
+	# Check that msvcp71.dll
+	msvcpsrc = os.path.join(os.path.dirname(wx.__file__), "msvcp71.dll")
+	if not os.path.exists(msvcpsrc):
+		raise IOError("msvcp71.dll doesn't exist! Copy it to dist!")
+	shutil.copy(msvcpsrc, os.path.join("dist", "msvcp71.dll"))
+
+	# Check that gdi.dll exists, some windows need it
 	gdisrc = os.path.join(os.path.dirname(wx.__file__), "gdiplus.dll")
 	if not os.path.exists(gdisrc):
 		raise IOError("gdiplus.dll doesn't exist! Copy it to dist!")
