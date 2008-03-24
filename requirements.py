@@ -220,7 +220,7 @@ except ImportError, e:
 		recommended.append(("Pygame library", reason))
 
 
-netlib_version = (0, 2, 1)
+netlib_version = (0, 2, 4)
 try:
 	import tp.netlib
 
@@ -243,7 +243,7 @@ except (ImportError, KeyError, AttributeError), e:
 	print e
 	notfound.append("tp.netlib > " + tostr(netlib_version))
 
-client_version = (0, 2, 99)
+client_version = (0, 3, 1)
 try:
 	import tp.client
 
