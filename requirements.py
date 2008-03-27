@@ -18,11 +18,14 @@ class FileOutput(object):
 		self.o = stdout
 
 		from utils import configpath
-		self.f = open(os.path.join(configpath(), "tpclient-pywx.log"), "w")
+		self.f = open(os.path.join(configpath(), "tpclient-pywx.log"), "wb")
 		if not self.o is None:
 			self.o.write("Output going to %s\n" % self.f.name)
 
 	def write(self, s):
+		if isinstance(s, unicode):
+			s = s.encode('utf-8')
+
 		if not self.o is None:
 			self.o.write(s)
 		self.f.write(s)
