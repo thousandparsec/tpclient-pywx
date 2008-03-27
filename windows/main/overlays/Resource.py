@@ -139,20 +139,11 @@ class Resource(Proportional):
 		self.type	 = type
 		
 		# Create a drop-down on the panel for resource selection
-		#self.ResourceSelector = wx.Choice(panel)
-		#self.ResourceSelector.Bind(wx.EVT_CHOICE, self.OnResourceSelected)
-
 		sizer = wx.FlexGridSizer(len(self.ResourceTypeList))
 		self.selectpanel = RsrcSelectorPanel(self, panel, cache)
 		sizer.Add(self.selectpanel, proportion=1, flag=wx.EXPAND)
-		# Populate the dropdown with information
-		#for name, resource in sorted(self.ResourceTypeList.items(), key=operator.itemgetter(1)):
-			#nametext = wx.StaticText(panel, -1, name)
-			#sizer.Add(nametext, proportion=1, flag=wx.EXPAND)
-		#self.ResourceSelector.SetSelection(0)
 		
 		sizer.AddGrowableRow(0)
-		#sizer.Add(self.ResourceSelector, proportion=1, flag=wx.EXPAND)
 		panel.SetSizer(sizer)
 		
 		self.UpdateAll()
@@ -175,10 +166,8 @@ class Resource(Proportional):
 			
 	def Icon(self, obj):
 		proportional = Proportional.Proportion(self, obj.id)
-		#self.valuesforchart = ()
 		c = self.cache 
 		o = obj
-		#self[oid] = PieChart.PieChart((0, 0), 0.0000001, (1, 1))
 		self.valuesforchart = ()
 		self.valuesresources = {}
 		
@@ -188,17 +177,14 @@ class Resource(Proportional):
 					if hasattr(c.objects[child], "resources"):
 						for resource in c.objects[child].resources:
 							if sum(resource[1:]) != 0:
-								#if self.type == Resource.TOTAL or resource[0] == self.type:
 								if len(self.selectpanel.selector.selected) == 0 or resource[0] in self.selectpanel.selector.selected:
 									if self.valuesresources.has_key(resource[0]):
 										self.valuesresources[resource[0]] += sum(resource[1:])
 									else:
 										self.valuesresources[resource[0]] = sum(resource[1:])
 			
-			#print c.objects[oid].name, ":"
 			for resource, amount in self.valuesresources.items():
 				if amount < (self.Amount(obj.id) * .10):
-					#print amount, self.Amount(oid)
 					if self.valuesresources.has_key(100000):
 						self.valuesresources[100000] += amount
 					else:
@@ -215,7 +201,6 @@ class Resource(Proportional):
 			if proportional*self.scale > 0:
 				pass
 				return PieChartIcon(self.cache, obj, proportional, self.scale, self.valuesforchart)
-				#self[oid] = PieChart.PieChart(c.objects[oid].pos[0:2], proportional*self.scale, self.valuesforchart, Scaled=False, LineColor="Black")
 			else:
 				pass
 				return PieChartIcon(self.cache, obj, 0.001, 1, (1,1))
@@ -243,7 +228,6 @@ class Resource(Proportional):
 				for resource in o.resources:
 					if resource[0] == self.type:
 						amount += sum(resource[1:])
-			#	amount += resource[self.type]
 		
 		return amount
 	
