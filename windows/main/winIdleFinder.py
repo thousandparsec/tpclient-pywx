@@ -23,9 +23,16 @@ from tp.netlib.objects.ObjectExtra.Planet     import Planet
 from tp.netlib.objects.ObjectExtra.Fleet      import Fleet
 
 class winIdleFinder(winReportXRC, IdleFinderBase, TrackerObject):
+	"""\
+	This window shows a list of objects the player owns that do not have any orders.
+	"""
+	
 	title = _("Objects Without Orders")
 	
 	def __init__(self, application, parent):
+		"""\
+		Create the IdleFinder window and initialize the columns and event bindings.
+		"""
 		IdleFinderBase.__init__(self, parent)
 		winReportXRC.__init__(self, application, parent)
 		
@@ -45,7 +52,7 @@ class winIdleFinder(winReportXRC, IdleFinderBase, TrackerObject):
 
 	def OnShow(self, evt):
 		"""\
-		Runs when the window is shown.
+		Runs when the window is shown. Finds idle objects and adds them to the list.
 		"""
 		self.idlelist.DeleteAllItems()
 		numinlist = 0
@@ -88,6 +95,9 @@ class winIdleFinder(winReportXRC, IdleFinderBase, TrackerObject):
 					numinlist = numinlist + 1
 		
 	def Sort(self, d1, d2):
+		"""\
+		Simple sorting routine. Compares two objects and returns a value indicating which should be first, based on the current ascending or descending sort order.
+		"""
 		data1 = self.GetColData(d1, self.col)
 		data2 = self.GetColData(d2, self.col)
 		if data1 == data2:
@@ -98,6 +108,9 @@ class winIdleFinder(winReportXRC, IdleFinderBase, TrackerObject):
 			return self.ascending*-1
 				
 	def GetColData(self, obj, col):
+		"""\
+		Finds the data held in a specific column of a specific row of the Idle Objects list.
+		"""
 		if col == 0:
 			return obj
 		elif col == 1:
@@ -106,7 +119,9 @@ class winIdleFinder(winReportXRC, IdleFinderBase, TrackerObject):
 			return self.application.cache.objects[obj].subtype
 	
 	def OnColClick(self, event):
-		# Reverse sort order, then re-sort, when list column heading is clicked.
+		"""\
+		Reverse sort order, then re-sort, when list column heading is clicked.
+		"""
 		self.col = event.GetColumn()
 		self.ascending *= -1
 		self.idlelist.SortItems(self.Sort)
