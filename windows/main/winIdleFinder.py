@@ -24,7 +24,15 @@ from tp.netlib.objects.ObjectExtra.Fleet      import Fleet
 
 class winIdleFinder(winReportXRC, IdleFinderBase, TrackerObject):
 	"""\
-	This window shows a list of objects the player owns that do not have any orders.
+	This window shows a list of objects you own that do not have any orders.
+	
+	You can use the window to quickly find fleets and planets that are idle,
+	and you can double-click on any of these objects to select them.
+	
+	Clicking on a column heading will sort the list by the data in that column,
+	and clicking again on the heading will reverse the sort order.
+	
+	To refresh the data, close the window and reopen it.
 	"""
 	
 	title = _("Objects Without Orders")
