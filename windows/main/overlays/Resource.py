@@ -25,7 +25,13 @@ from Overlay import SystemLevelOverlay, Holder
 
 from windows.xrc.winResourceSelect import ResourceSelectBase
 class ResourceSelect(ResourceSelectBase, wx.Frame):
+	"""\
+	This class is a popup window with a checklist of resources.
+	"""
 	def __init__(self, parent, cache):
+		"""\
+		Initialize the window, loading data from XRC, and add the resources.
+		"""
 		ResourceSelectBase.__init__(self, parent)
 		self.parent = parent
 		
@@ -39,10 +45,16 @@ class ResourceSelect(ResourceSelectBase, wx.Frame):
 		self.Hide()
 	
 	def OnActivate(self, evt):
+		"""\
+		Called when the window becomes active or inactive.
+		"""
 		if evt.GetActive() == False:
 			self.OnDone(evt)
 
 	def Show(self, show=True):
+		"""\
+		Called when the window is shown.
+		"""
 		self.Panel.Layout()
 
 		size = self.ResourceList.GetBestSize()
@@ -55,10 +67,21 @@ class ResourceSelect(ResourceSelectBase, wx.Frame):
 		wx.Frame.Show(self)
 
 	def OnDone(self, evt):
+		"""\
+		Called when the "Done" button is pressed.
+		"""
 		self.parent.PopDown()
 
 class RsrcSelectorControl(wx.Button):
+	"""\
+	This class is a button that can be clicked to open a checklist of resources,
+	and which takes the data from that window to create a list of the checked
+	resources.
+	"""
 	def __init__(self, resourceview, cache, parent, id):
+		"""\
+		Called to create the button and the popup window.
+		"""
 		wx.Button.__init__(self, parent, id, "Resource Types")
 
 		self.Bind(wx.EVT_BUTTON, self.OnClick)
@@ -68,6 +91,9 @@ class RsrcSelectorControl(wx.Button):
 		self.win = ResourceSelect(self, cache)
 	
 	def OnClick(self, evt):
+		"""\
+		Called when the button is clicked.
+		"""
 		if not self.win.IsShown():
 			self.win.Move(self.GetScreenRect().GetBottomLeft())
 			self.win.Show()
@@ -75,6 +101,9 @@ class RsrcSelectorControl(wx.Button):
 			self.PopDown()
 		
 	def PopDown(self):
+		"""\
+		Closes the popup window and collects the data.
+		"""
 		self.selected=[]
 		self.win.Hide()
 
@@ -87,15 +116,32 @@ class RsrcSelectorControl(wx.Button):
 		self.resourceview.canvas.Draw()
 
 class RsrcSelectorPanel(wx.Panel):
+	"""\
+	A simple panel containing a button that can be clicked to bring up a list of
+	resources. This is for use with the Resource overlay.
+	"""
 	def __init__(self, resourceview, parent, cache):
+		"""\
+		Creates the panel and its contents.
+		"""
 		wx.Panel.__init__(self, parent, -1)
 		self.selector = RsrcSelectorControl(resourceview, cache, self, -1)
 
 class PieChartIcon(SystemIcon):
+	"""\
+	This class represents a pie chart, which holds a list of slices and their
+	proportions, as well as an overall scale.
+	"""
 	def copy(self):
+		"""\
+		Copies the pie chart.
+		"""
 		return PieChartIcon(self.cache, self.primary, self.proportional, self.scale, self.valuesforchart)
 
 	def __init__(self, cache, system, proportional, scale, valuesforchart):
+		"""\
+		Creates a new pie chart, initializing the slices.
+		"""
 		self.cache = cache
 		self.proportional = proportional
 		self.scale = scale
@@ -118,7 +164,11 @@ from Proportional import Proportional
 
 class Resource(Proportional):
 	"""\
-	Draws proportional circles for the relative number of resources.
+	This overlay draws proportional pie charts representing the relative
+	resource totals in different star systems. The chart shows all resources by
+	default, but the user can select specific resources to be displayed as well.
+	When the user hovers over a pie chart, a tooltip will be displayed showing
+	exact totals for each resource.
 	"""
 	name = "Resources"
 
@@ -128,6 +178,9 @@ class Resource(Proportional):
 	INACCESSABLE =  3	
 
 	def __init__(self, parent, canvas, panel, cache, resource=None, type=-1):
+		"""\
+		Initializes the overlay and its resource selection panel.
+		"""
 		Proportional.__init__(self, parent, canvas, panel, cache)
 		
 		self.ResourceTypeList = {"All":Resource.TOTAL}
@@ -149,68 +202,82 @@ class Resource(Proportional):
 		self.UpdateAll()
 		self.canvas.Draw()
 		
-	def OnResourceSelected(self, evt):
-		self.type = self.ResourceSelector.GetClientData(self.ResourceSelector.GetSelection())
-		
-		if not evt is None:
-			self.CleanUp()
-			self.UpdateAll()
-			self.canvas.Draw()
-		
 	def UpdateAll(self):
+		"""\
+		Updates all of the pie charts.
+		"""
 		Proportional.UpdateAll(self)
 		
 	def UpdateOne(self, oid, value=None):
-		#print self.type
+		"""\
+		Updates a specific pie chart.
+		"""
 		proportional = Proportional.UpdateOne(self, oid, value)
 			
 	def Icon(self, obj):
+		"""\
+		Creates a pie chart icon that shows the resources that are currently
+		selected, for a specific system.
+		"""
 		proportional = Proportional.Proportion(self, obj.id)
 		c = self.cache 
 		o = obj
 		self.valuesforchart = ()
 		self.valuesresources = {}
 		
-		if (o.subtype == 2):
-			if hasattr(o, "contains"):
-				for child in o.contains:
-					if hasattr(c.objects[child], "resources"):
-						for resource in c.objects[child].resources:
-							if sum(resource[1:]) != 0:
-								if len(self.selectpanel.selector.selected) == 0 or resource[0] in self.selectpanel.selector.selected:
-									if self.valuesresources.has_key(resource[0]):
-										self.valuesresources[resource[0]] += sum(resource[1:])
-									else:
-										self.valuesresources[resource[0]] = sum(resource[1:])
+		if (o.subtype != 2):
+			pass
+			return PieChartIcon(self.cache, obj, 0.001, 1, (1,1))
+		
+		if not hasattr(o, "contains"):
+			pass
+			return PieChartIcon(self.cache, obj, 0.001, 1, (1,1))
 			
-			for resource, amount in self.valuesresources.items():
-				if amount < (self.Amount(obj.id) * .10):
-					if self.valuesresources.has_key(100000):
-						self.valuesresources[100000] += amount
-					else:
-						self.valuesresources[100000] = amount
-					del self.valuesresources[resource]
-						
-			for resource, amount in sorted(self.valuesresources.iteritems(), key=operator.itemgetter(1), reverse=True):
-				if (resource != 100000):
-					self.valuesforchart += (amount,)
-			
-			if (self.valuesresources.has_key(100000)):
-				self.valuesforchart += (self.valuesresources[100000],)
+		for child in o.contains:
+			if not hasattr(c.objects[child], "resources"):
+				continue
 				
-			if proportional*self.scale > 0:
-				pass
-				return PieChartIcon(self.cache, obj, proportional, self.scale, self.valuesforchart)
+			for resource in c.objects[child].resources:
+				if sum(resource[1:]) == 0:
+					continue
+					
+				if len(self.selectpanel.selector.selected) != 0 and not resource[0] in self.selectpanel.selector.selected:
+					continue
+					
+				if self.valuesresources.has_key(resource[0]):
+					self.valuesresources[resource[0]] += sum(resource[1:])
+				else:
+					self.valuesresources[resource[0]] = sum(resource[1:])
+		
+		for resource, amount in self.valuesresources.items():
+			if amount > (self.Amount(obj.id) * .10):
+				continue
+				
+			if self.valuesresources.has_key(100000):
+				self.valuesresources[100000] += amount
 			else:
-				pass
-				return PieChartIcon(self.cache, obj, 0.001, 1, (1,1))
+				self.valuesresources[100000] = amount
+			del self.valuesresources[resource]
+					
+		for resource, amount in sorted(self.valuesresources.iteritems(), key=operator.itemgetter(1), reverse=True):
+			if (resource == 100000):
+				continue
+				
+			self.valuesforchart += (amount,)
+		
+		if (self.valuesresources.has_key(100000)):
+			self.valuesforchart += (self.valuesresources[100000],)
+			
+		if proportional*self.scale > 0:
+			pass
+			return PieChartIcon(self.cache, obj, proportional, self.scale, self.valuesforchart)
 		else:
 			pass
 			return PieChartIcon(self.cache, obj, 0.001, 1, (1,1))
 
 	def Amount(self, oid):
 		"""\
-		The amount of this resource on this object.
+		The amount of a specific resource in a specific object.
 		"""
 		c = self.cache 
 		o = c.objects[oid]
@@ -232,6 +299,9 @@ class Resource(Proportional):
 		return amount
 	
 	def ObjectPopupText(self, icon):
+		"""\
+		Creates the text for the tooltip on a pie chart.
+		"""
 		returnstring = "<font size='%s' color='White'>" % wx.local.normalFont.GetPointSize()
 		system = icon.primary
 		returnstring += system.name
@@ -246,23 +316,31 @@ class Resource(Proportional):
 		
 		for c in system.contains:
 			child = self.cache.objects[c]
+			
+			if not hasattr(child, "resources"):
+				continue
+			
 			if len(self.selectpanel.selector.selected) != 0:
 				returnstring += "\n " + child.name + ":"
-			if hasattr(child, "resources"):
-				for resource in child.resources:
-					if sum(resource[1:]) > 0:
-						if len(self.selectpanel.selector.selected) == 0:
-							if valuesresources.has_key(resource[0]):
-								valuesresources[resource[0]] += sum(resource[1:])
-							else:
-								valuesresources[resource[0]] = sum(resource[1:])
-						else:
-							if resource[0] in self.selectpanel.selector.selected:
-								thisresourcetotal += sum(resource[1:]) 
-							 	returnstring += "\n  " + self.cache.resources[resource[0]].name \
-							 		+ ": %s " % sum(resource[1:]) \
-							 		+ [self.cache.resources[resource[0]].unit_singular, self.cache.resources[resource[0]].unit_plural] \
-							 		[sum(resource[1:]) > 1]
+				
+			for resource in child.resources:
+				if sum(resource[1:]) <= 0:
+					continue
+					
+				if len(self.selectpanel.selector.selected) == 0:
+					if valuesresources.has_key(resource[0]):
+						valuesresources[resource[0]] += sum(resource[1:])
+					else:
+						valuesresources[resource[0]] = sum(resource[1:])
+				else:
+					if not resource[0] in self.selectpanel.selector.selected:
+						continue
+						
+					thisresourcetotal += sum(resource[1:]) 
+				 	returnstring += "\n  " + self.cache.resources[resource[0]].name \
+				 		+ ": %s " % sum(resource[1:]) \
+				 		+ [self.cache.resources[resource[0]].unit_singular, self.cache.resources[resource[0]].unit_plural] \
+				 		[sum(resource[1:]) > 1]
 	
 		if not self.type == Resource.TOTAL:
 			returnstring += "\n\nTotal " + self.cache.resources[self.type].name + " in system: %s" % thisresourcetotal
