@@ -1026,7 +1026,11 @@ class ListArgumentPanel(ArgumentPanel, orderListBase):
 		wx.CallAfter(self.OnChoicesSelect, evt)
 
 	def OnChoicesSelect(self, evt):
-		choices = self.Choices.GetSelected()
+		try:
+			choices = self.Choices.GetSelected()
+		except:
+			return
+
 		if self.__choices == choices:
 			return
 		else:
