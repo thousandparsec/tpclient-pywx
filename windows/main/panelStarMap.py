@@ -393,7 +393,7 @@ class panelStarMap(panelStarMapBase, TrackerObjectOrder):
 					if not resources[0] == homeresource:
 						continue
 
-					if reduce(int.__add__, resources[1:]) == 0:
+					if sum(resources[1:]) == 0:
 						continue
 
 					foundhomeworld = oid
