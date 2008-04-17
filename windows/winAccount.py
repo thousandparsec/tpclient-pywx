@@ -172,6 +172,7 @@ class winAccount(winAccountBase, winBaseXRC, usernameMixIn):
 	@onlyshown
 	@onlyenabled("Check")	
 	def OnCheck(self, evt):
+		self.application.StartNetwork()
 		self.State("connecting")
 		self.application.network.Call(self.application.network.Connect, self.Server.GetValue(), 
 				debug=self.application.gui.connectto.config['debug'])
