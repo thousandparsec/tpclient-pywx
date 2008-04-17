@@ -230,6 +230,8 @@ class winConnect(winConnectBase, winBaseXRC, usernameMixIn):
 		return winBaseXRC.Show(self)
 
 	def OnOkay(self, evt):
+		self.application.StartNetwork()
+
 		server = self.Server.GetValue()
 		username = self.GetUsername()
 
