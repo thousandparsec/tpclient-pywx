@@ -20,6 +20,122 @@ from windows.winBase import ShiftMixIn
 
 # Protocol Imports
 from tp.netlib import GenericRS
+from tp.client.ChangeList import ChangeList, ChangeNode
+
+from windows.xrc.winFilterManager import FilterManagerBase
+class FilterManager(FilterManagerBase, wx.Frame):
+	"""\
+	This class is a popup window with a checklist of filters.
+	"""
+	def __init__(self, parent, cache):
+		"""\
+		Initialize the window, loading data from XRC, and add the resources.
+		"""
+		FilterManagerBase.__init__(self, parent)
+		self.parent = parent
+		
+		self.FilterOptions = {}
+
+		self.Bind(wx.EVT_ACTIVATE, self.OnActivate)
+		self.Hide()
+
+	def SetOptions(self, filteroptions):
+		"""\
+		Called to set the filter options, takes a list of strings.
+		"""
+		self.FilterList.Clear()
+		self.FilterList.InsertItems(filteroptions, 0)
+	
+	def OnActivate(self, evt):
+		"""\
+		Called when the window becomes active or inactive.
+		"""
+		if evt.GetActive() == False:
+			self.OnDone(evt)
+
+	def Show(self, show=True):
+		"""\
+		Called when the window is shown.
+		"""
+		self.Panel.Layout()
+
+		size = self.FilterList.GetBestSize()
+		self.FilterList.SetMinSize(size+(30,30))
+
+		self.SetMinSize(self.Panel.GetBestSize()+(30,30))
+		self.SetSize(self.Panel.GetBestSize()+(30,30))
+		#self.SetMaxSize(size)
+
+		wx.Frame.Show(self)
+
+	def OnDone(self, evt):
+		"""\
+		Called when the "Done" button is pressed.
+		"""
+		self.parent.PopDown()
+
+class FilterManagerControl(wx.Button):
+	"""\
+	This class is a button that can be clicked to open a checklist of filters,
+	and which takes the data from that window to create a list of the checked
+	filters.
+	"""
+	def __init__(self, cache, parent, id):
+		"""\
+		Called to create the button and the popup window.
+		"""
+		wx.Button.__init__(self, parent, id, "Filter Options")
+
+		self.Bind(wx.EVT_BUTTON, self.OnClick)
+		self.cache = cache
+		self.parent = parent
+		self.selected = []
+		self.win = FilterManager(self, cache)
+	
+	def OnClick(self, evt):
+		"""\
+		Called when the button is clicked.
+		"""
+		if not self.win.IsShown():
+			self.win.Move(self.GetScreenRect().GetBottomLeft())
+			self.win.Show()
+		else:
+			self.PopDown()
+		
+	def PopDown(self):
+		"""\
+		Closes the popup window and collects the data.
+		"""
+		i = 0
+		while i < self.win.CurrentFilters.GetCount():
+			if not self.win.CurrentFilters.IsChecked(i*1):
+				i = i+1
+				continue
+			appendstring = self.win.CurrentFilters.GetString(i)
+			self.win.CurrentFilters.Delete(i)
+			i = i-1
+			try:
+				self.selected.remove(appendstring)
+			except ValueError:
+				i = i+1
+				continue
+			i = i+1
+
+		for i in range(0, self.win.FilterList.GetCount()):
+			if not self.win.FilterList.IsChecked(i):
+				continue
+			appendstring = self.win.FilterList.GetString(i).split("'")[1]
+			try:
+				self.selected.index(appendstring)
+			except ValueError:
+				self.selected.append(appendstring)
+			self.win.FilterList.Check(i, 0)
+			if (self.win.CurrentFilters.FindString(appendstring) != -1):
+				continue
+			self.win.CurrentFilters.Append(self.win.FilterList.GetString(i).split("'")[1])
+		
+		self.parent.RebuildMessageList()
+		self.win.Hide()
 
 from windows.xrc.panelMessage import panelMessageBase
 class panelMessage(panelMessageBase, ShiftMixIn):
@@ -31,6 +147,8 @@ class panelMessage(panelMessageBase, ShiftMixIn):
 
 		self.application = application
 		self.Message.Bind(wx.html.EVT_HTML_LINK_CLICKED, self.OnLinkEvent)
+		
+		self.Filter = FilterManagerControl(self.application.cache, self, -1)
 
 		# The current message slot
 		self.node = None
@@ -183,18 +301,35 @@ class panelMessage(panelMessageBase, ShiftMixIn):
 		"""\
 		Returns all the messages for the current board.
 		"""
-		if self.application.cache.messages.has_key(self.bid):
-			return self.application.cache.messages[self.bid]
-		else:
+		if not self.application.cache.messages.has_key(self.bid):
 			return []
+		
+		return self.messagelist
+		#return self.application.cache.messages[self.bid]
+	
+	def RebuildMessageList(self):
+		self.messagelist=ChangeList()
+		for node in self.application.cache.messages[self.bid]:
+			message = node.CurrentOrder
+			messagefiltered = False
+			for reference, id in message.references:
+				id = message.references.GetReferenceValue(reference, id)
+				for filtertype in self.Filter.selected:
+					if ("%s" % GenericRS.Types[reference] == "%s" % filtertype or GenericRS.Types[reference] + ": %s" % id == "%s" % filtertype):
+						messagefiltered = True
+			if not messagefiltered:
+				self.messagelist.append(ChangeNode(message))
+								
+			if not self.messages.first is None:
+				self.MessageSet(node=self.messages.first)
 
 	def BoardSet(self, id, node=None):
 		"""\
 		Set the currently displayed board to id.
 		"""
 		self.bid = id
-		if not self.messages.first is None:
-			self.MessageSet(node=self.messages.first)
+		
+		self.RebuildMessageList()
 	
 	def MessageSet(self, direction=None, node=None):
 		"""\
@@ -221,7 +356,6 @@ class panelMessage(panelMessageBase, ShiftMixIn):
 
 			elif not node is None:
 				assert node in self.messages
-
 				self.node = node
 			else:
 				raise SystemError("Need to give a direction or node")
@@ -229,6 +363,13 @@ class panelMessage(panelMessageBase, ShiftMixIn):
 			message_subject = self.message.subject
 			message_body = self.html_message % self.message.__dict__
 			
+			self.filteroptions = []
+			for reference, id in self.message.references:
+				id = self.message.references.GetReferenceValue(reference, id)
+				self.filteroptions.append("All '" + GenericRS.Types[reference] + "' messages")
+				self.filteroptions.append("All '" + GenericRS.Types[reference] + ": %s' messages" % id)
+			self.Filter.win.SetOptions(self.filteroptions)
+						
 			message_filter = False
 			message_buttons = [
 				not self.node.left.left is None, 
@@ -254,6 +395,9 @@ class panelMessage(panelMessageBase, ShiftMixIn):
 
 	def OnNext(self, evt=None):
 		self.MessageSet(1)
+	
+	def OnFilter(self, evt=None):
+		self.MessageFilter()
 	
 	def OnLast(self, evt=None):
 		self.MessageSet(node=self.messages.last)
@@ -302,4 +446,4 @@ class panelMessage(panelMessageBase, ShiftMixIn):
 		pass
 	
 	def MessageFilter(self):
-		pass
+		self.RebuildMessageList()
