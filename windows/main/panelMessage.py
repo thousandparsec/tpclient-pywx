@@ -91,6 +91,7 @@ class FilterManagerControl(wx.Button):
 		self.parent = parent
 		self.selected = []
 		self.win = FilterManager(self, cache)
+		self.showfiltered = False
 	
 	def OnClick(self, evt):
 		"""\
@@ -133,6 +134,8 @@ class FilterManagerControl(wx.Button):
 			if (self.win.CurrentFilters.FindString(appendstring) != -1):
 				continue
 			self.win.CurrentFilters.Append(self.win.FilterList.GetString(i).split("'")[1])
+		
+		self.showfiltered = self.win.ShowFiltered.IsChecked()
 		
 		self.parent.RebuildMessageList()
 		self.win.Hide()
@@ -317,7 +320,11 @@ class panelMessage(panelMessageBase, ShiftMixIn):
 				for filtertype in self.Filter.selected:
 					if ("%s" % GenericRS.Types[reference] == "%s" % filtertype or GenericRS.Types[reference] + ": %s" % id == "%s" % filtertype):
 						messagefiltered = True
-			if not messagefiltered:
+			if messagefiltered:
+				if self.Filter.showfiltered:
+					message.set_types("filtered")
+					self.messagelist.append(ChangeNode(message))
+			else:
 				self.messagelist.append(ChangeNode(message))
 								
 			if not self.messages.first is None:
@@ -361,7 +368,11 @@ class panelMessage(panelMessageBase, ShiftMixIn):
 				raise SystemError("Need to give a direction or node")
 
 			message_subject = self.message.subject
-			message_body = self.html_message % self.message.__dict__
+			message_filter = (self.message.types == "filtered")
+			if message_filter:
+				message_body = self.html_filtered % self.message.__dict__
+			else:
+				message_body = self.html_message % self.message.__dict__
 			
 			self.filteroptions = []
 			for reference, id in self.message.references:
@@ -370,7 +381,6 @@ class panelMessage(panelMessageBase, ShiftMixIn):
 				self.filteroptions.append("All '" + GenericRS.Types[reference] + ": %s' messages" % id)
 			self.Filter.win.SetOptions(self.filteroptions)
 						
-			message_filter = False
 			message_buttons = [
 				not self.node.left.left is None, 
 				GenericRS.Types["Object"] in self.message.references.types,
