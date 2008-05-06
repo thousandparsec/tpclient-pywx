@@ -85,7 +85,7 @@ class FilterManagerControl(wx.Button):
 		Called to create the button and the popup window.
 		"""
 		wx.Button.__init__(self, parent, id, "Filter Options")
-
+		
 		self.Bind(wx.EVT_BUTTON, self.OnClick)
 		self.cache = cache
 		self.parent = parent
@@ -152,6 +152,7 @@ class panelMessage(panelMessageBase, ShiftMixIn):
 		self.Message.Bind(wx.html.EVT_HTML_LINK_CLICKED, self.OnLinkEvent)
 		
 		self.Filter = FilterManagerControl(self.application.cache, self, -1)
+		self.Filter.SetFont(wx.Font(8, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL))
 
 		# The current message slot
 		self.node = None
