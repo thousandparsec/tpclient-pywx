@@ -22,7 +22,6 @@
                 <family>swiss</family>
                 <face>Sans</face>
               </font>
-              <hidden>1</hidden>
               <style>wxBU_EXACTFIT</style>
             </object>
             <border>1</border>

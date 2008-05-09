@@ -27,12 +27,13 @@ class FilterManager(FilterManagerBase, wx.Frame):
 	"""\
 	This class is a popup window with a checklist of filters.
 	"""
-	def __init__(self, parent, cache):
+	def __init__(self, control, parent, cache):
 		"""\
 		Initialize the window, loading data from XRC, and add the resources.
 		"""
 		FilterManagerBase.__init__(self, parent)
 		self.parent = parent
+		self.control = control
 		
 		self.FilterOptions = {}
 
@@ -72,25 +73,25 @@ class FilterManager(FilterManagerBase, wx.Frame):
 		"""\
 		Called when the "Done" button is pressed.
 		"""
-		self.parent.PopDown()
+		self.control.PopDown()
 
-class FilterManagerControl(wx.Button):
+class FilterManagerControl():
 	"""\
 	This class is a button that can be clicked to open a checklist of filters,
 	and which takes the data from that window to create a list of the checked
 	filters.
 	"""
-	def __init__(self, cache, parent, id):
+	def __init__(self, cache, parent, id, button):
 		"""\
 		Called to create the button and the popup window.
 		"""
-		wx.Button.__init__(self, parent, id, "Filter Options")
 		
-		self.Bind(wx.EVT_BUTTON, self.OnClick)
+		self.button = button
+		self.button.Bind(wx.EVT_BUTTON, self.OnClick)
 		self.cache = cache
 		self.parent = parent
 		self.selected = []
-		self.win = FilterManager(self, cache)
+		self.win = FilterManager(self, self.button, cache)
 		self.showfiltered = False
 	
 	def OnClick(self, evt):
@@ -98,7 +99,7 @@ class FilterManagerControl(wx.Button):
 		Called when the button is clicked.
 		"""
 		if not self.win.IsShown():
-			self.win.Move(self.GetScreenRect().GetBottomLeft())
+			self.win.Move(self.button.GetScreenRect().GetBottomLeft())
 			self.win.Show()
 		else:
 			self.PopDown()
@@ -151,13 +152,13 @@ class panelMessage(panelMessageBase, ShiftMixIn):
 		self.application = application
 		self.Message.Bind(wx.html.EVT_HTML_LINK_CLICKED, self.OnLinkEvent)
 		
-		self.Filter = FilterManagerControl(self.application.cache, self, -1)
-		self.Filter.SetFont(wx.Font(8, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL))
+		self.FilterManager = FilterManagerControl(self.application.cache, self, -1, self.Filter)
 
 		# The current message slot
 		self.node = None
 
 		self.application.gui.Binder(self.application.CacheClass.CacheUpdateEvent, self.OnCacheUpdate)
+		self.Layout()
 
 	def OnLinkEvent(self, evt):
 		link = evt.GetLinkInfo().GetHref()
@@ -318,11 +319,11 @@ class panelMessage(panelMessageBase, ShiftMixIn):
 			messagefiltered = False
 			for reference, id in message.references:
 				id = message.references.GetReferenceValue(reference, id)
-				for filtertype in self.Filter.selected:
+				for filtertype in self.FilterManager.selected:
 					if ("%s" % GenericRS.Types[reference] == "%s" % filtertype or GenericRS.Types[reference] + ": %s" % id == "%s" % filtertype):
 						messagefiltered = True
 			if messagefiltered:
-				if self.Filter.showfiltered:
+				if self.FilterManager.showfiltered:
 					message.set_types("filtered")
 					self.messagelist.append(ChangeNode(message))
 			else:
@@ -380,7 +381,7 @@ class panelMessage(panelMessageBase, ShiftMixIn):
 				id = self.message.references.GetReferenceValue(reference, id)
 				self.filteroptions.append("All '" + GenericRS.Types[reference] + "' messages")
 				self.filteroptions.append("All '" + GenericRS.Types[reference] + ": %s' messages" % id)
-			self.Filter.win.SetOptions(self.filteroptions)
+			self.FilterManager.win.SetOptions(self.filteroptions)
 						
 			message_buttons = [
 				not self.node.left.left is None, 
