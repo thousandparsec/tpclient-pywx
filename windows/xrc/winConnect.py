@@ -12,6 +12,14 @@ from wx.xrc import XRCCTRL, XmlResourceWithHandlers
 from requirements import location
 
 class winConnectBase:
+	"""\
+Unlike a normal XRC generated class, this is a not a full class but a MixIn.
+Any class which uses this as a base must also inherit from a proper wx object
+such as the wx.Frame class.
+
+This is so that a the same XRC can be used for both MDI and non-MDI frames.
+"""
+
 	xrc = os.path.join(location(), "windows", "xrc", 'winConnect.xrc')
 
 	def PreCreate(self, pre):
@@ -77,6 +85,10 @@ class winConnectBase:
 		if hasattr(self, "OnConfig"):
 			self.Bind(wx.EVT_BUTTON, self.OnConfig, self.Config)
 
+		self.SinglePlayer = XRCCTRL(self, "SinglePlayer")
+		if hasattr(self, "OnSinglePlayer"):
+			self.Bind(wx.EVT_BUTTON, self.OnSinglePlayer, self.SinglePlayer)
+
 
 
 def strings():
@@ -96,3 +108,4 @@ def strings():
 	_("&OK");
 	_("&Cancel");
 	_("&Preferences");
+	_("&Single Player");

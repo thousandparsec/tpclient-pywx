@@ -286,6 +286,9 @@ information with the new password?
 	def OnConfig(self, evt):
 		self.application.ConfigDisplay()
 
+	def OnSinglePlayer(self, evt):
+		pass
+
 	def OnFind(self, evt):
 		self.application.gui.Show(self.application.gui.servers)
 
