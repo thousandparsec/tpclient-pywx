@@ -10,6 +10,7 @@ import re
 # wxPython Imports
 import wx
 import wx.gizmos
+import wx.wizard as wiz
 
 from extra.decorators import freeze_wrapper
 
@@ -17,9 +18,11 @@ from extra.decorators import freeze_wrapper
 from winBase import winBaseXRC
 from xrc.winConnect import winConnectBase
 from xrc.configConnect import configConnectBase
+from xrc.SinglePlayerWizard import SinglePlayerWizardBase
 from utils import *
 
 from tp.netlib.client import url2bits
+from tp.client.SinglePlayer import SinglePlayerGame
 
 # FIXME: The game really isn't part of the username, it's part of the server information
 # You could be playing multiple different games on the same server!
@@ -155,6 +158,9 @@ class configConnect(configConnectBase, usernameMixIn):
 		self.Password.SetValue("")
 		self.AutoConnect.Disable()
 
+class SinglePlayerWizard(SinglePlayerWizardBase):
+	pass
+
 USERNAME=0
 PASSWORD=1
 AUTOCONNECT=2
@@ -287,7 +293,10 @@ information with the new password?
 		self.application.ConfigDisplay()
 
 	def OnSinglePlayer(self, evt):
-		pass
+		wizard = SinglePlayerWizard(self, -1, "Single Player Wizard", None)
+		wp1 = wizard.RulesetPage
+		if wizard.RunWizard(wp1):
+			pass
 
 	def OnFind(self, evt):
 		self.application.gui.Show(self.application.gui.servers)

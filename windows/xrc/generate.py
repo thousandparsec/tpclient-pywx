@@ -91,6 +91,30 @@ class %(windowName)sBase(wx.Panel):
 
 		# Define variables for the controls"""
 
+wizardTemplate = """\
+class %(windowName)sBase(wx.wizard.Wizard):
+	xrc = os.path.join(location(), "windows", "xrc", '%(fileName)s')
+
+	def PreCreate(self, pre):
+		\"\"\" This function is called during the class's initialization.
+		
+		Override it for custom setup before the window is created usually to
+		set additional window styles using SetWindowStyle() and SetExtraStyle().\"\"\"
+		pass
+
+	def __init__(self, parent, *args, **kw):
+		\"\"\" Pass an initialized wx.xrc.XmlResource into res \"\"\"
+		f = os.path.join(os.path.dirname(__file__), self.xrc)
+		res = XmlResourceWithHandlers(f)		
+
+		# Two stage creation (see http://wiki.wxpython.org/index.cgi/TwoStageCreation)
+		pre = wx.wizard.PreWizard()
+		res.LoadOnObject(pre, parent, 'SinglePlayerWizard', 'wxWizard')
+		self.PreCreate(pre)
+		self.PostCreate(pre)
+
+		# Define variables for the controls"""
+
 IDmap = {
 	"wxID_CANCEL":		"Cancel",
 	"wxID_CLOSE":		"Close",
@@ -218,8 +242,47 @@ def Generate_wxPanel(xrcFile, topWindow, outFile):
 	print >> outFile
 	print >> outFile, "\n".join(eventFunctions)
 
+def Generate_wxWizard(xrcFile, topWindow, outFile):
+	fileName = os.path.basename(xrcFile.name)
 
-#Generate_wxWizard = Generate_wxDialog
+	windowClass = topWindow.getAttribute("subclass")
+	if len(windowClass) == 0:
+		windowClass = topWindow.getAttribute("class")
+	windowClass = re.sub("^wx", "wx.", windowClass)
+
+	windowName = topWindow.getAttribute("name")
+	print "'%s' is a '%s'"% (windowName, windowClass)
+	print >> outFile, wizardTemplate % locals()
+	
+	eventFunctions = [] # a list to store the code for the event functions
+
+	# Generate a variable for each control, and standard event handlers
+	# for standard controls.
+	for control in topWindow.getElementsByTagName("object"):
+		controlClass = control.getAttribute("class")
+		controlClass = re.sub("^wx", "wx.", controlClass)
+		controlName = control.getAttribute("name")
+		# Ignore anything which is still got a wx name...
+		if controlName in IDmap:
+			controlID = controlName
+			controlName = IDmap[controlName]
+		else:
+			controlID = controlName
+
+		if "wx" in controlName:
+			continue
+		if controlName != "" and controlClass != "":
+			print '\t', controlName, (3-(len(controlName)+1)/8)*'\t', "is a", controlClass
+			try:
+				template = globals()["Template_%s" % controlClass.replace('wx.', '')]
+			except KeyError:
+				template = globals()["Template_Default"]
+
+			print >> outFile, template % locals()
+
+	print >> outFile
+	print >> outFile, "\n".join(eventFunctions)
+
 
 # ------------------------- GeneratePythonForXRC ----------------------------
 def GeneratePython(xrcFile, outFile):
