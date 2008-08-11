@@ -2,8 +2,7 @@
 <resource version="2.3.0.1" xmlns="http://www.wxwidgets.org/wxxrc">
   <object class="wxWizard" name="SinglePlayerWizard">
     <title>TP: Single Player Game</title>
-	<!-- <object class="wxWizardPage" name="RulesetPage" subclass="wpRulesetPage"> -->
-	<object class="wxWizardPageSimple" name="RulesetPage">
+	<object class="wxWizardPage" name="RulesetPage">
 	  <object class="wxFlexGridSizer">
 	    <cols>1</cols>
 		<rows>4</rows>

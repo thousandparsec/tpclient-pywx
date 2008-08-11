@@ -28,9 +28,32 @@ class SinglePlayerWizardBase(wx.wizard.Wizard):
 
 		# Two stage creation (see http://wiki.wxpython.org/index.cgi/TwoStageCreation)
 		pre = wx.wizard.PreWizard()
-		res.LoadOnObject(pre, parent, 'SinglePlayerWizard', 'wxWizard')
+		res.LoadOnObject(pre, parent, "SinglePlayerWizard", 'wxWizard')
 		self.PreCreate(pre)
 		self.PostCreate(pre)
+
+class RulesetPageBase(wx.wizard.PyWizardPage):
+	xrc = os.path.join(location(), "windows", "xrc", 'SinglePlayerWizard.xrc')
+
+	def PreCreate(self, pre):
+		""" This function is called during the class's initialization.
+		
+		Override it for custom setup before the window is created usually to
+		set additional window styles using SetWindowStyle() and SetExtraStyle()."""
+		pass
+
+	def __init__(self, parent, *args, **kw):
+		""" Pass an initialized wx.xrc.XmlResource into res """
+		f = os.path.join(os.path.dirname(__file__), self.xrc)
+		res = XmlResourceWithHandlers(f)		
+
+		# Two stage creation (see http://wiki.wxpython.org/index.cgi/TwoStageCreation)
+		pre = wx.wizard.PrePyWizardPage()
+		res.LoadOnObject(pre, parent, "RulesetPage", 'wxWizardPage')
+		self.PreCreate(pre)
+		self.PostCreate(pre)
+
+		self.next = self.prev = None
 
 		# Define variables for the controls
 		self.RulesetPage = XRCCTRL(self, "RulesetPage")

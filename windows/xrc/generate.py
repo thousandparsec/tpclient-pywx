@@ -109,9 +109,33 @@ class %(windowName)sBase(wx.wizard.Wizard):
 
 		# Two stage creation (see http://wiki.wxpython.org/index.cgi/TwoStageCreation)
 		pre = wx.wizard.PreWizard()
-		res.LoadOnObject(pre, parent, 'SinglePlayerWizard', 'wxWizard')
+		res.LoadOnObject(pre, parent, "%(windowName)s", 'wxWizard')
+		self.PreCreate(pre)
+		self.PostCreate(pre)"""
+
+wizardPageTemplate = """\
+class %(windowName)sBase(wx.wizard.PyWizardPage):
+	xrc = os.path.join(location(), "windows", "xrc", '%(fileName)s')
+
+	def PreCreate(self, pre):
+		\"\"\" This function is called during the class's initialization.
+		
+		Override it for custom setup before the window is created usually to
+		set additional window styles using SetWindowStyle() and SetExtraStyle().\"\"\"
+		pass
+
+	def __init__(self, parent, *args, **kw):
+		\"\"\" Pass an initialized wx.xrc.XmlResource into res \"\"\"
+		f = os.path.join(os.path.dirname(__file__), self.xrc)
+		res = XmlResourceWithHandlers(f)		
+
+		# Two stage creation (see http://wiki.wxpython.org/index.cgi/TwoStageCreation)
+		pre = wx.wizard.PrePyWizardPage()
+		res.LoadOnObject(pre, parent, "%(windowName)s", 'wxWizardPage')
 		self.PreCreate(pre)
 		self.PostCreate(pre)
+
+		self.next = self.prev = None
 
 		# Define variables for the controls"""
 
@@ -254,35 +278,49 @@ def Generate_wxWizard(xrcFile, topWindow, outFile):
 	print "'%s' is a '%s'"% (windowName, windowClass)
 	print >> outFile, wizardTemplate % locals()
 	
-	eventFunctions = [] # a list to store the code for the event functions
-
-	# Generate a variable for each control, and standard event handlers
-	# for standard controls.
-	for control in topWindow.getElementsByTagName("object"):
-		controlClass = control.getAttribute("class")
-		controlClass = re.sub("^wx", "wx.", controlClass)
-		controlName = control.getAttribute("name")
-		# Ignore anything which is still got a wx name...
-		if controlName in IDmap:
-			controlID = controlName
-			controlName = IDmap[controlName]
-		else:
-			controlID = controlName
-
-		if "wx" in controlName:
-			continue
-		if controlName != "" and controlClass != "":
-			print '\t', controlName, (3-(len(controlName)+1)/8)*'\t', "is a", controlClass
-			try:
-				template = globals()["Template_%s" % controlClass.replace('wx.', '')]
-			except KeyError:
-				template = globals()["Template_Default"]
-
-			print >> outFile, template % locals()
-
 	print >> outFile
-	print >> outFile, "\n".join(eventFunctions)
 
+	pages = [e for e in topWindow.childNodes
+			 if e.nodeType == e.ELEMENT_NODE and e.tagName == "object" and e.getAttribute("class") == "wxWizardPage"]
+	
+	for page in pages:
+		windowClass = page.getAttribute("subclass")
+		if len(windowClass) == 0:
+			windowClass = page.getAttribute("class")
+		windowClass = re.sub("^wx", "wx.", windowClass)
+	
+		windowName = page.getAttribute("name")
+		print "'%s' is a '%s'"% (windowName, windowClass)
+		print >> outFile, wizardPageTemplate % locals()
+	
+		eventFunctions = [] # a list to store the code for the event functions
+
+		# Generate a variable for each control, and standard event handlers
+		# for standard controls.
+		for control in topWindow.getElementsByTagName("object"):
+			controlClass = control.getAttribute("class")
+			controlClass = re.sub("^wx", "wx.", controlClass)
+			controlName = control.getAttribute("name")
+			# Ignore anything which is still got a wx name...
+			if controlName in IDmap:
+				controlID = controlName
+				controlName = IDmap[controlName]
+			else:
+				controlID = controlName
+	
+			if "wx" in controlName:
+				continue
+			if controlName != "" and controlClass != "":
+				print '\t', controlName, (3-(len(controlName)+1)/8)*'\t', "is a", controlClass
+				try:
+					template = globals()["Template_%s" % controlClass.replace('wx.', '')]
+				except KeyError:
+					template = globals()["Template_Default"]
+	
+				print >> outFile, template % locals()
+	
+		print >> outFile
+		print >> outFile, "\n".join(eventFunctions)
 
 # ------------------------- GeneratePythonForXRC ----------------------------
 def GeneratePython(xrcFile, outFile):

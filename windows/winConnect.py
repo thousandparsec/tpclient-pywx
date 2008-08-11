@@ -18,7 +18,7 @@ from extra.decorators import freeze_wrapper
 from winBase import winBaseXRC
 from xrc.winConnect import winConnectBase
 from xrc.configConnect import configConnectBase
-from xrc.SinglePlayerWizard import SinglePlayerWizardBase
+from xrc.SinglePlayerWizard import *
 from utils import *
 
 from tp.netlib.client import url2bits
@@ -161,6 +161,12 @@ class configConnect(configConnectBase, usernameMixIn):
 class SinglePlayerWizard(SinglePlayerWizardBase):
 	pass
 
+class RulesetPage(RulesetPageBase):
+	def GetNext(self):
+		return self.next
+	def GetPrev(self):
+		return self.prev
+
 USERNAME=0
 PASSWORD=1
 AUTOCONNECT=2
@@ -294,8 +300,8 @@ information with the new password?
 
 	def OnSinglePlayer(self, evt):
 		wizard = SinglePlayerWizard(self, -1, "Single Player Wizard", None)
-		wp1 = wizard.RulesetPage
-		if wizard.RunWizard(wp1):
+		wizard.RulesetPage = RulesetPage(wizard)
+		if wizard.RunWizard(wizard.RulesetPage):
 			pass
 
 	def OnFind(self, evt):
