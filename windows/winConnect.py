@@ -299,10 +299,12 @@ information with the new password?
 		self.application.ConfigDisplay()
 
 	def OnSinglePlayer(self, evt):
-		wizard = SinglePlayerWizard(self, -1, "Single Player Wizard", None)
+		wizard = SinglePlayerWizard(self)
 		wizard.RulesetPage = RulesetPage(wizard)
+		wizard.GetPageAreaSizer().Add(wizard.RulesetPage)
 		if wizard.RunWizard(wizard.RulesetPage):
 			pass
+		wizard.Destroy()
 
 	def OnFind(self, evt):
 		self.application.gui.Show(self.application.gui.servers)

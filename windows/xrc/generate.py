@@ -124,6 +124,21 @@ class %(windowName)sBase(wx.wizard.PyWizardPage):
 		set additional window styles using SetWindowStyle() and SetExtraStyle().\"\"\"
 		pass
 
+	def SetNext(self, next):
+		self.next = next
+	
+	def SetPrev(self, prev):
+		self.prev = prev
+
+	def GetNext(self):
+		return self.next
+
+	def GetPrev(self):
+		return self.prev
+
+	def validate(self):
+		return True
+
 	def __init__(self, parent, *args, **kw):
 		\"\"\" Pass an initialized wx.xrc.XmlResource into res \"\"\"
 		f = os.path.join(os.path.dirname(__file__), self.xrc)
@@ -131,10 +146,11 @@ class %(windowName)sBase(wx.wizard.PyWizardPage):
 
 		# Two stage creation (see http://wiki.wxpython.org/index.cgi/TwoStageCreation)
 		pre = wx.wizard.PrePyWizardPage()
-		res.LoadOnObject(pre, parent, "%(windowName)s", 'wxWizardPage')
+		res.LoadOnPanel(pre, parent, "%(windowName)s")
 		self.PreCreate(pre)
 		self.PostCreate(pre)
 
+		self.parent = parent
 		self.next = self.prev = None
 
 		# Define variables for the controls"""
@@ -235,7 +251,10 @@ def Generate_wxPanel(xrcFile, topWindow, outFile):
 
 	windowName = topWindow.getAttribute("name")
 	print "'%s' is a '%s'"% (windowName, windowClass)
-	print >> outFile, panelTemplate % locals()
+	if windowClass == 'wx.WizardPage':
+		print >> outFile, wizardPageTemplate % locals()
+	else:
+		print >> outFile, panelTemplate % locals()
 	
 	eventFunctions = [] # a list to store the code for the event functions
 
@@ -278,50 +297,6 @@ def Generate_wxWizard(xrcFile, topWindow, outFile):
 	print "'%s' is a '%s'"% (windowName, windowClass)
 	print >> outFile, wizardTemplate % locals()
 	
-	print >> outFile
-
-	pages = [e for e in topWindow.childNodes
-			 if e.nodeType == e.ELEMENT_NODE and e.tagName == "object" and e.getAttribute("class") == "wxWizardPage"]
-	
-	for page in pages:
-		windowClass = page.getAttribute("subclass")
-		if len(windowClass) == 0:
-			windowClass = page.getAttribute("class")
-		windowClass = re.sub("^wx", "wx.", windowClass)
-	
-		windowName = page.getAttribute("name")
-		print "'%s' is a '%s'"% (windowName, windowClass)
-		print >> outFile, wizardPageTemplate % locals()
-	
-		eventFunctions = [] # a list to store the code for the event functions
-
-		# Generate a variable for each control, and standard event handlers
-		# for standard controls.
-		for control in page.getElementsByTagName("object"):
-			controlClass = control.getAttribute("class")
-			controlClass = re.sub("^wx", "wx.", controlClass)
-			controlName = control.getAttribute("name")
-			# Ignore anything which is still got a wx name...
-			if controlName in IDmap:
-				controlID = controlName
-				controlName = IDmap[controlName]
-			else:
-				controlID = controlName
-	
-			if "wx" in controlName:
-				continue
-			if controlName != "" and controlClass != "":
-				print '\t', controlName, (3-(len(controlName)+1)/8)*'\t', "is a", controlClass
-				try:
-					template = globals()["Template_%s" % controlClass.replace('wx.', '')]
-				except KeyError:
-					template = globals()["Template_Default"]
-	
-				print >> outFile, template % locals()
-	
-		print >> outFile
-		print >> outFile, "\n".join(eventFunctions)
-
 # ------------------------- GeneratePythonForXRC ----------------------------
 def GeneratePython(xrcFile, outFile):
 	xmldoc = minidom.parse(xrcFile)
