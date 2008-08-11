@@ -56,7 +56,6 @@ class RulesetPageBase(wx.wizard.PyWizardPage):
 		self.next = self.prev = None
 
 		# Define variables for the controls
-		self.RulesetPage = XRCCTRL(self, "RulesetPage")
 		self.Ruleset = XRCCTRL(self, "Ruleset")
 		if hasattr(self, "OnRuleset"):
 			self.Bind(wx.EVT_COMBOBOX, self.OnRuleset, self.Ruleset)

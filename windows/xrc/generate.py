@@ -297,7 +297,7 @@ def Generate_wxWizard(xrcFile, topWindow, outFile):
 
 		# Generate a variable for each control, and standard event handlers
 		# for standard controls.
-		for control in topWindow.getElementsByTagName("object"):
+		for control in page.getElementsByTagName("object"):
 			controlClass = control.getAttribute("class")
 			controlClass = re.sub("^wx", "wx.", controlClass)
 			controlName = control.getAttribute("name")
