@@ -388,8 +388,10 @@ information with the new password?
 	def OnSinglePlayer(self, evt):
 		wizard = SinglePlayerWizard(self)
 		if wizard.Run():
-			pass
-		wizard.Destroy()
+			port = wizard.game.start()
+			if port:
+				self.Server.SetValue("tp://localhost:" + str(port))
+				self.OnOkay(None)
 
 	def OnFind(self, evt):
 		self.application.gui.Show(self.application.gui.servers)
