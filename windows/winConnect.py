@@ -181,40 +181,124 @@ class RulesetPage(RulesetPageBase):
 		for ruleset in parent.game.rulesets:
 			rs = parent.game.ruleset_info(ruleset)['longname']
 			self.Ruleset.Insert(rs, self.Ruleset.GetCount())
-		self.Ruleset.SetSelection(0)
-		self.OnRuleset(None)
 
 	def GetNext(self):
-		# skip server selection if only 1 server supports selected ruleset
-		if len(self.parent.game.list_servers_with_ruleset()) == 1:
-			self.parent.game.sname = self.parent.game.list_servers_with_ruleset()[0]
-			self.next.next.SetPrev(self)
-			return self.next.next
-		# otherwise, populate the server selection list
-		else:
-			self.next.servers = self.parent.game.list_servers_with_ruleset()
-			self.next.Server.SetItems([])
-			for server in self.next.servers:
-				ss = self.parent.game.serverlist[server]['longname']
-				self.next.Server.Insert(ss, self.next.Server.GetCount())
-			self.next.Server.SetSelection(0)
-			self.next.OnServer(None)
-			self.next.next.SetPrev(self.next)
-			return self.next
+		next = self.next
+		while next.skip:
+			next = next.next
+		return next
 
 	def OnRuleset(self, event):
 		self.parent.game.rname = self.parent.game.rulesets[self.Ruleset.GetSelection()]
 		self.RulesetDesc.SetLabel(self.parent.game.ruleset_info(self.parent.game.rname)['description'])
 		self.RulesetDesc.Wrap(400)
+		self.parent.game.sname = self.parent.game.list_servers_with_ruleset()[0]
+		# populate server selection page
+		self.next.servers = self.parent.game.list_servers_with_ruleset()
+		if len(self.next.servers) == 1:
+			self.next.skip = True
+		else:
+			self.next.skip = False
+		self.next.Server.SetItems([])
+		for server in self.next.servers:
+			ss = self.parent.game.serverlist[server]['longname']
+			self.next.Server.Insert(ss, self.next.Server.GetCount())
+		self.next.Server.SetSelection(0)
+		self.next.OnServer(None)
+		# populate ruleset parameter page
+		if len(self.parent.game.list_rparams()) == 0:
+			self.next.next.skip = True
+		else:
+			self.next.next.skip = False
+		self.next.next.Refresh()
 
 class ServerPage(ServerPageBase):
+	def GetNext(self):
+		next = self.next
+		while next.skip:
+			next = next.next
+		return next
+
 	def OnServer(self, event):
 		self.parent.game.sname = self.parent.game.serverlist.keys()[self.Server.GetSelection()]
 		self.ServerDesc.SetLabel(self.parent.game.serverlist[self.parent.game.sname]['description'])
 		self.ServerDesc.Wrap(400)
+		rinfo = self.parent.game.serverlist[self.parent.game.sname]['rulesets'][self.parent.game.rname]
+		self.ServerRulesetDesc.SetLabel("Implements " + rinfo['longname'] + " version " + rinfo['version'] + ".")
+		self.ServerRulesetDesc.Wrap(400)
+		# populate server parameter page
+		if len(self.parent.game.list_sparams()) == 0:
+			self.next.next.skip = True
+		else:
+			self.next.next.skip = False
+		self.next.next.Refresh()
+
+class RulesetOptsPage(RulesetOptsPageBase):
+	def __init__(self, parent, *args, **kw):
+		RulesetOptsPageBase.__init__(self, parent, *args, **kw)
+		self.RulesetOptSizer = self.SizerRef.GetContainingSizer()
+
+	def GetNext(self):
+		next = self.next
+		while next.skip:
+			next = next.next
+		return next
+
+	def GetPrev(self):
+		prev = self.prev
+		while prev.skip:
+			prev = prev.prev
+		return prev
+
+	def Refresh(self):
+		self.RulesetOptSizer.Clear(deleteWindows = True)
+		self.Params = {}
+		paramlist = self.parent.game.list_rparams()
+		for opt in paramlist.keys():
+			self.RulesetOptSizer.Add(wx.StaticText(self, -1, paramlist[opt]['longname']))
+			if paramlist[opt]['default'] is None:
+				default = ''
+			else:
+				default = str(paramlist[opt]['default'])
+			self.Params[opt] = wx.TextCtrl(self, -1, default, size = (200, -1))
+			self.RulesetOptSizer.Add(self.Params[opt])
+
+class ServerOptsPage(ServerOptsPageBase):
+	def __init__(self, parent, *args, **kw):
+		ServerOptsPageBase.__init__(self, parent, *args, **kw)
+		self.ServerOptSizer = self.SizerRef.GetContainingSizer()
+
+	def GetNext(self):
+		next = self.next
+		while next.skip:
+			next = next.next
+		return next
+
+	def GetPrev(self):
+		prev = self.prev
+		while prev.skip:
+			prev = prev.prev
+		return prev
+
+	def Refresh(self):
+		self.ServerOptSizer.Clear(deleteWindows = True)
+		self.Params = {}
+		paramlist = self.parent.game.list_sparams()
+		for opt in paramlist.keys():
+			self.ServerOptSizer.Add(wx.StaticText(self, -1, paramlist[opt]['longname']))
+			if paramlist[opt]['default'] is None:
+				default = ''
+			else:
+				default = str(paramlist[opt]['default'])
+			self.Params[opt] = wx.TextCtrl(self, -1, default, size = (200, -1))
+			self.ServerOptSizer.Add(self.Params[opt])
 
 class EndPage(EndPageBase):
-	pass
+	def GetPrev(self):
+		prev = self.prev
+		while prev.skip:
+			prev = prev.prev
+		return prev
 
 class SinglePlayerWizard(SinglePlayerWizardBase):
 	def __init__(self, parent, *args, **kw):
@@ -227,6 +311,8 @@ class SinglePlayerWizard(SinglePlayerWizardBase):
 		self.AddPage(StartPage(self))
 		self.AddPage(RulesetPage(self))
 		self.AddPage(ServerPage(self))
+		self.AddPage(RulesetOptsPage(self))
+		self.AddPage(ServerOptsPage(self))
 		self.AddPage(EndPage(self))
 
 		self.Bind(wx.wizard.EVT_WIZARD_PAGE_CHANGED, self.OnPageChanged)
@@ -249,7 +335,23 @@ class SinglePlayerWizard(SinglePlayerWizardBase):
 		pass
 
 	def OnPageChanging(self, event):
-		pass
+		if not(event.GetPage().validate()):
+			event.Veto()
+			return
+
+		if isinstance(event.GetPage(), StartPage) and self.game.sname == '':
+			event.GetPage().next.Ruleset.SetSelection(0)
+			event.GetPage().next.OnRuleset(None)
+
+		if isinstance(event.GetPage(), RulesetOptsPage):
+			self.game.rparams = {}
+			for opt in self.game.list_rparams().keys():
+				self.game.rparams[opt] = str(event.GetPage().Params[opt].GetValue())
+	
+		if isinstance(event.GetPage(), ServerOptsPage):
+			self.game.sparams = {}
+			for opt in self.game.list_sparams().keys():
+				self.game.sparams[opt] = str(event.GetPage().Params[opt].GetValue())
 	
 	def OnCancelWizard(self, event):
 		pass
@@ -277,6 +379,8 @@ class winConnect(winConnectBase, winBaseXRC, usernameMixIn):
 
 		self.Bind(wx.EVT_CLOSE, self.OnExit)
 		self.Bind(wx.EVT_COMBOBOX, self.OnChangeServer, self.Server)
+
+		self.singleplayer = False
 
 	def OnChangeServer(self, evt):
 		server = self.Server.GetValue()
@@ -345,7 +449,7 @@ class winConnect(winConnectBase, winBaseXRC, usernameMixIn):
 		else:
 			(oldusername, oldpassword, oldautoconnect) = (username, password, False)
 
-		if server not in self.config['servers'] or username != username:
+		if (server not in self.config['servers'] or username != username) and not self.singleplayer:
 			# Popup a dialog asking if we want to add the account
 			msg = _("""\
 It appears you havn't access this account before.
@@ -390,6 +494,7 @@ information with the new password?
 		if wizard.Run():
 			port = wizard.game.start()
 			if port:
+				self.singleplayer = True
 				self.Server.SetValue("tp://localhost:" + str(port))
 				self.OnOkay(None)
 

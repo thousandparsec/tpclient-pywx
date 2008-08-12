@@ -118,6 +118,89 @@
         </object>
         <cellpos>3,0</cellpos>
       </object>
+      <object class="sizeritem">
+        <object class="wxStaticText" name="ServerRulesetDesc">
+          <style>wxALIGN_LEFT</style>
+          <label/>
+        </object>
+        <cellpos>4,0</cellpos>
+      </object>
+    </object>
+  </object>
+  <object class="wxPanel" name="RulesetOptsPage" subclass="wxWizardPage">
+    <object class="wxGridBagSizer">
+      <vgap>5</vgap>
+      <growablecols>1</growablecols>
+      <object class="sizeritem">
+        <object class="wxStaticText" name="wxID_STATIC">
+          <font>
+            <size>14</size>
+            <family>swiss</family>
+            <weight>bold</weight>
+            <face>Sans</face>
+          </font>
+          <style>wxALIGN_CENTRE</style>
+          <label>Ruleset Options</label>
+        </object>
+        <cellpos>0,0</cellpos>
+      </object>
+      <object class="sizeritem">
+        <object class="wxStaticText" name="wxID_STATIC">
+          <style>wxALIGN_LEFT</style>
+          <label>Configure options for this ruleset (leave blank to use \ndefault):</label>
+        </object>
+        <cellpos>1,0</cellpos>
+      </object>
+      <object class="sizeritem">
+        <object class="wxGridSizer">
+		  <cols>2</cols>
+          <vgap>5</vgap>
+		  <object class="sizeritem">
+		    <object class="wxStaticText" name="SizerRef">
+			  <label />
+			</object>
+	      </object>
+        </object>
+        <cellpos>2,0</cellpos>
+      </object>
+    </object>
+  </object>
+  <object class="wxPanel" name="ServerOptsPage" subclass="wxWizardPage">
+    <object class="wxGridBagSizer">
+      <vgap>5</vgap>
+      <growablecols>1</growablecols>
+      <object class="sizeritem">
+        <object class="wxStaticText" name="wxID_STATIC">
+          <font>
+            <size>14</size>
+            <family>swiss</family>
+            <weight>bold</weight>
+            <face>Sans</face>
+          </font>
+          <style>wxALIGN_CENTRE</style>
+          <label>Server Options</label>
+        </object>
+        <cellpos>0,0</cellpos>
+      </object>
+      <object class="sizeritem">
+        <object class="wxStaticText" name="wxID_STATIC">
+          <style>wxALIGN_LEFT</style>
+          <label>Configure options for this server (leave blank to use \ndefault):</label>
+        </object>
+        <cellpos>1,0</cellpos>
+      </object>
+      <object class="sizeritem">
+        <object class="wxGridSizer">
+		  <cols>2</cols>
+          <vgap>5</vgap>
+		  <object class="sizeritem">
+		    <object class="wxStaticText" name="SizerRef">
+			  <label />
+			</object>
+	      </object>
+        </object>
+        <cellpos>2,0</cellpos>
+      </object>
     </object>
   </object>
   <object class="wxPanel" name="EndPage" subclass="wxWizardPage">

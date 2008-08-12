@@ -152,6 +152,7 @@ class %(windowName)sBase(wx.wizard.PyWizardPage):
 
 		self.parent = parent
 		self.next = self.prev = None
+		self.skip = False
 
 		self.SetAutoLayout(True)
 		self.Fit()
