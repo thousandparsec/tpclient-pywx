@@ -158,14 +158,101 @@ class configConnect(configConnectBase, usernameMixIn):
 		self.Password.SetValue("")
 		self.AutoConnect.Disable()
 
-class SinglePlayerWizard(SinglePlayerWizardBase):
-	pass
+class StartPage(StartPageBase):
+	def __init__(self, parent, *args, **kw):
+		StartPageBase.__init__(self, parent, *args, **kw)
+		if len(parent.game.rulesets) > 0:
+			self.ProceedDesc.SetLabel("You appear to have at least one server with rulesets installed on your system.")
+			self.ProceedDesc.Wrap(400)
+			self.proceed = True
+		else:
+			self.ProceedDesc.SetLabel("No servers or rulesets were found on your system.")
+			self.ProceedDesc.Wrap(400)
+			self.proceed = False
+	def GetNext(self):
+		if self.proceed:
+			return self.next
+		else:
+			return None
 
 class RulesetPage(RulesetPageBase):
+	def __init__(self, parent, *args, **kw):
+		RulesetPageBase.__init__(self, parent, *args, **kw)
+		for ruleset in parent.game.rulesets:
+			rs = parent.game.ruleset_info(ruleset)['longname']
+			self.Ruleset.Insert(rs, self.Ruleset.GetCount())
+		self.Ruleset.SetSelection(0)
+		self.OnRuleset(None)
+
 	def GetNext(self):
-		return self.next
-	def GetPrev(self):
-		return self.prev
+		# skip server selection if only 1 server supports selected ruleset
+		if len(self.parent.game.list_servers_with_ruleset()) == 1:
+			self.parent.game.sname = self.parent.game.list_servers_with_ruleset()[0]
+			self.next.next.SetPrev(self)
+			return self.next.next
+		# otherwise, populate the server selection list
+		else:
+			self.next.servers = self.parent.game.list_servers_with_ruleset()
+			self.next.Server.SetItems([])
+			for server in self.next.servers:
+				ss = self.parent.game.serverlist[server]['longname']
+				self.next.Server.Insert(ss, self.next.Server.GetCount())
+			self.next.Server.SetSelection(0)
+			self.next.OnServer(None)
+			self.next.next.SetPrev(self.next)
+			return self.next
+
+	def OnRuleset(self, event):
+		self.parent.game.rname = self.parent.game.rulesets[self.Ruleset.GetSelection()]
+		self.RulesetDesc.SetLabel(self.parent.game.ruleset_info(self.parent.game.rname)['description'])
+		self.RulesetDesc.Wrap(400)
+
+class ServerPage(ServerPageBase):
+	def OnServer(self, event):
+		self.parent.game.sname = self.parent.game.serverlist.keys()[self.Server.GetSelection()]
+		self.ServerDesc.SetLabel(self.parent.game.serverlist[self.parent.game.sname]['description'])
+		self.ServerDesc.Wrap(400)
+
+class EndPage(EndPageBase):
+	pass
+
+class SinglePlayerWizard(SinglePlayerWizardBase):
+	def __init__(self, parent, *args, **kw):
+		SinglePlayerWizardBase.__init__(self, parent, *args, **kw)
+
+		self.game = SinglePlayerGame()
+
+		self.pages = []
+
+		self.AddPage(StartPage(self))
+		self.AddPage(RulesetPage(self))
+		self.AddPage(ServerPage(self))
+		self.AddPage(EndPage(self))
+
+		self.Bind(wx.wizard.EVT_WIZARD_PAGE_CHANGED, self.OnPageChanged)
+		self.Bind(wx.wizard.EVT_WIZARD_PAGE_CHANGING, self.OnPageChanging)
+		self.Bind(wx.wizard.EVT_WIZARD_CANCEL, self.OnCancelWizard)
+
+	def AddPage(self, page):
+		i = len(self.pages)
+		self.pages.append(page)
+		if i > 0:
+			self.pages[i].SetPrev(self.pages[i - 1])
+			self.pages[i - 1].SetNext(self.pages[i])
+		self.GetPageAreaSizer().Add(self.pages[i])
+
+
+	def Run(self):
+		return self.RunWizard(self.pages[0])
+
+	def OnPageChanged(self, event):
+		pass
+
+	def OnPageChanging(self, event):
+		pass
+	
+	def OnCancelWizard(self, event):
+		pass
 
 USERNAME=0
 PASSWORD=1
@@ -300,9 +387,7 @@ information with the new password?
 
 	def OnSinglePlayer(self, evt):
 		wizard = SinglePlayerWizard(self)
-		wizard.RulesetPage = RulesetPage(wizard)
-		wizard.GetPageAreaSizer().Add(wizard.RulesetPage)
-		if wizard.RunWizard(wizard.RulesetPage):
+		if wizard.Run():
 			pass
 		wizard.Destroy()
 

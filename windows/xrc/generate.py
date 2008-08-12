@@ -153,6 +153,10 @@ class %(windowName)sBase(wx.wizard.PyWizardPage):
 		self.parent = parent
 		self.next = self.prev = None
 
+		self.SetAutoLayout(True)
+		self.Fit()
+		self.Hide()
+
 		# Define variables for the controls"""
 
 IDmap = {
@@ -296,6 +300,7 @@ def Generate_wxWizard(xrcFile, topWindow, outFile):
 	windowName = topWindow.getAttribute("name")
 	print "'%s' is a '%s'"% (windowName, windowClass)
 	print >> outFile, wizardTemplate % locals()
+	print >> outFile
 	
 # ------------------------- GeneratePythonForXRC ----------------------------
 def GeneratePython(xrcFile, outFile):

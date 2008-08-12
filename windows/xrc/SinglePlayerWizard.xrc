@@ -3,18 +3,44 @@
   <object class="wxWizard" name="SinglePlayerWizard">
     <title>TP: Single Player Game</title>
   </object>
-  <object class="wxPanel" name="RulesetPage" subclass="wxWizardPage">
-    <object class="wxFlexGridSizer">
-      <cols>1</cols>
-      <rows>4</rows>
-      <vgap>0</vgap>
-      <hgap>0</hgap>
-      <growablecols>0</growablecols>
-      <growablerows>0</growablerows>
+  <object class="wxPanel" name="StartPage" subclass="wxWizardPage">
+    <object class="wxGridBagSizer">
+      <vgap>5</vgap>
+      <growablecols>1</growablecols>
       <object class="sizeritem">
-        <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL</flag>
-        <border>5</border>
-        <option>1</option>
+        <object class="wxStaticText" name="wxID_STATIC">
+          <font>
+            <size>14</size>
+            <family>swiss</family>
+            <weight>bold</weight>
+            <face>Sans</face>
+          </font>
+          <style>wxALIGN_CENTRE</style>
+          <label>Single Player Game</label>
+        </object>
+        <cellpos>0,0</cellpos>
+      </object>
+      <object class="sizeritem">
+        <object class="wxStaticText" name="wxID_STATIC">
+          <style>wxALIGN_LEFT</style>
+          <label>This wizard sets up a single player Thousand Parsec \ngame using the servers, rulesets, and AI clients \ninstalled locally on your system.</label>
+        </object>
+        <cellpos>1,0</cellpos>
+      </object>
+      <object class="sizeritem">
+        <object class="wxStaticText" name="ProceedDesc">
+          <style>wxALIGN_LEFT</style>
+          <label/>
+        </object>
+        <cellpos>2,0</cellpos>
+      </object>
+    </object>
+  </object>
+  <object class="wxPanel" name="RulesetPage" subclass="wxWizardPage">
+    <object class="wxGridBagSizer">
+      <vgap>5</vgap>
+      <growablecols>1</growablecols>
+      <object class="sizeritem">
         <object class="wxStaticText" name="wxID_STATIC">
           <font>
             <size>14</size>
@@ -25,29 +51,98 @@
           <style>wxALIGN_CENTRE</style>
           <label>Select Ruleset</label>
         </object>
+        <cellpos>0,0</cellpos>
       </object>
       <object class="sizeritem">
-        <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL</flag>
-        <border>5</border>
-        <option>1</option>
         <object class="wxStaticText" name="wxID_STATIC">
           <style>wxALIGN_LEFT</style>
-          <label>Choose the ruleset for your game from the options below.</label>
+          <label>Choose a ruleset for your game:</label>
         </object>
+        <cellpos>1,0</cellpos>
       </object>
       <object class="sizeritem">
         <object class="wxComboBox" name="Ruleset">
           <tooltip>The ruleset to use.</tooltip>
           <content/>
           <size>400,-1</size>
-          <style>wxCB_DROPDOWN</style>
+          <style>wxCB_READONLY</style>
         </object>
+        <cellpos>2,0</cellpos>
       </object>
       <object class="sizeritem">
         <object class="wxStaticText" name="RulesetDesc">
           <style>wxALIGN_LEFT</style>
           <label/>
         </object>
+        <cellpos>3,0</cellpos>
+      </object>
+    </object>
+  </object>
+  <object class="wxPanel" name="ServerPage" subclass="wxWizardPage">
+    <object class="wxGridBagSizer">
+      <vgap>5</vgap>
+      <growablecols>1</growablecols>
+      <object class="sizeritem">
+        <object class="wxStaticText" name="wxID_STATIC">
+          <font>
+            <size>14</size>
+            <family>swiss</family>
+            <weight>bold</weight>
+            <face>Sans</face>
+          </font>
+          <style>wxALIGN_CENTRE</style>
+          <label>Select Server</label>
+        </object>
+        <cellpos>0,0</cellpos>
+      </object>
+      <object class="sizeritem">
+        <object class="wxStaticText" name="wxID_STATIC">
+          <style>wxALIGN_LEFT</style>
+          <label>Multiple servers implement the ruleset you selected. \nPlease select a server to use:</label>
+        </object>
+        <cellpos>1,0</cellpos>
+      </object>
+      <object class="sizeritem">
+        <object class="wxComboBox" name="Server">
+          <tooltip>The server to use.</tooltip>
+          <content/>
+          <size>400,-1</size>
+          <style>wxCB_READONLY</style>
+        </object>
+        <cellpos>2,0</cellpos>
+      </object>
+      <object class="sizeritem">
+        <object class="wxStaticText" name="ServerDesc">
+          <style>wxALIGN_LEFT</style>
+          <label/>
+        </object>
+        <cellpos>3,0</cellpos>
+      </object>
+    </object>
+  </object>
+  <object class="wxPanel" name="EndPage" subclass="wxWizardPage">
+    <object class="wxGridBagSizer">
+      <vgap>5</vgap>
+      <growablecols>1</growablecols>
+      <object class="sizeritem">
+        <object class="wxStaticText" name="wxID_STATIC">
+          <font>
+            <size>14</size>
+            <family>swiss</family>
+            <weight>bold</weight>
+            <face>Sans</face>
+          </font>
+          <style>wxALIGN_CENTRE</style>
+          <label>Setup Complete</label>
+        </object>
+        <cellpos>0,0</cellpos>
+      </object>
+      <object class="sizeritem">
+        <object class="wxStaticText" name="wxID_STATIC">
+          <style>wxALIGN_LEFT</style>
+          <label>The Thousand Parsec client will now connect to your \nlocal single player game.</label>
+        </object>
+        <cellpos>1,0</cellpos>
       </object>
     </object>
   </object>
