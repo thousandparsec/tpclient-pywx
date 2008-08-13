@@ -287,6 +287,65 @@ class ServerOptsPageBase(wx.wizard.PyWizardPage):
 		self.SizerRef = XRCCTRL(self, "SizerRef")
 
 
+class OpponentPageBase(wx.wizard.PyWizardPage):
+	xrc = os.path.join(location(), "windows", "xrc", 'SinglePlayerWizard.xrc')
+
+	def PreCreate(self, pre):
+		""" This function is called during the class's initialization.
+		
+		Override it for custom setup before the window is created usually to
+		set additional window styles using SetWindowStyle() and SetExtraStyle()."""
+		pass
+
+	def SetNext(self, next):
+		self.next = next
+	
+	def SetPrev(self, prev):
+		self.prev = prev
+
+	def GetNext(self):
+		return self.next
+
+	def GetPrev(self):
+		return self.prev
+
+	def validate(self):
+		return True
+
+	def __init__(self, parent, *args, **kw):
+		""" Pass an initialized wx.xrc.XmlResource into res """
+		f = os.path.join(os.path.dirname(__file__), self.xrc)
+		res = XmlResourceWithHandlers(f)		
+
+		# Two stage creation (see http://wiki.wxpython.org/index.cgi/TwoStageCreation)
+		pre = wx.wizard.PrePyWizardPage()
+		res.LoadOnPanel(pre, parent, "OpponentPage")
+		self.PreCreate(pre)
+		self.PostCreate(pre)
+
+		self.parent = parent
+		self.next = self.prev = None
+		self.skip = False
+
+		self.SetAutoLayout(True)
+		self.Fit()
+		self.Hide()
+
+		# Define variables for the controls
+		self.AIListLabel = XRCCTRL(self, "AIListLabel")
+		self.AIUser = XRCCTRL(self, "AIUser")
+		self.AIClient = XRCCTRL(self, "AIClient")
+		if hasattr(self, "OnAIClient"):
+			self.Bind(wx.EVT_COMBOBOX, self.OnAIClient, self.AIClient)
+			self.Bind(wx.EVT_TEXT_ENTER, self.OnAIClient, self.AIClient)
+		if hasattr(self, "OnDirtyAIClient"):
+			self.Bind(wx.EVT_TEXT, self.OnAIClient, self.AIClient)
+
+		self.AIClientDesc = XRCCTRL(self, "AIClientDesc")
+		self.SizerRef = XRCCTRL(self, "SizerRef")
+		self.AddChoice = XRCCTRL(self, "AddChoice")
+
+
 class EndPageBase(wx.wizard.PyWizardPage):
 	xrc = os.path.join(location(), "windows", "xrc", 'SinglePlayerWizard.xrc')
 
@@ -349,5 +408,12 @@ def strings():
 	_("Configure options for this ruleset (leave blank to use \ndefault):");
 	_("Server Options");
 	_("Configure options for this server (leave blank to use \ndefault):");
+	_("Add Opponent");
+	_("Add an AI opponent to your game:");
+	_("Name");
+	_("The AI client to use.");
+	_("Action");
+	_("Add Opponent");
+	_("Finish");
 	_("Setup Complete");
 	_("The Thousand Parsec client will now connect to your \nlocal single player game.");

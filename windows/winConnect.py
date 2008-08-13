@@ -210,7 +210,18 @@ class RulesetPage(RulesetPageBase):
 			self.next.next.skip = True
 		else:
 			self.next.next.skip = False
-		self.next.next.Refresh()
+		self.next.next.RefreshOpts()
+		# populate opponent page
+		op = self.next.next.next.next
+		op.aiclients = self.parent.game.list_aiclients_with_ruleset()
+		if len(op.aiclients) == 0:
+			op.skip = True
+		else:
+			op.skip = False
+		op.AIClient.SetItems([])
+		for aiclient in op.aiclients:
+			os = self.parent.game.ailist[aiclient]['longname']
+			op.AIClient.Insert(os, op.AIClient.GetCount())
 
 class ServerPage(ServerPageBase):
 	def GetNext(self):
@@ -231,7 +242,7 @@ class ServerPage(ServerPageBase):
 			self.next.next.skip = True
 		else:
 			self.next.next.skip = False
-		self.next.next.Refresh()
+		self.next.next.RefreshOpts()
 
 class RulesetOptsPage(RulesetOptsPageBase):
 	def __init__(self, parent, *args, **kw):
@@ -250,7 +261,7 @@ class RulesetOptsPage(RulesetOptsPageBase):
 			prev = prev.prev
 		return prev
 
-	def Refresh(self):
+	def RefreshOpts(self):
 		self.RulesetOptSizer.Clear(deleteWindows = True)
 		self.Params = {}
 		paramlist = self.parent.game.list_rparams()
@@ -280,7 +291,7 @@ class ServerOptsPage(ServerOptsPageBase):
 			prev = prev.prev
 		return prev
 
-	def Refresh(self):
+	def RefreshOpts(self):
 		self.ServerOptSizer.Clear(deleteWindows = True)
 		self.Params = {}
 		paramlist = self.parent.game.list_sparams()
@@ -293,6 +304,81 @@ class ServerOptsPage(ServerOptsPageBase):
 			self.Params[opt] = wx.TextCtrl(self, -1, default, size = (200, -1))
 			self.ServerOptSizer.Add(self.Params[opt])
 
+class OpponentPage(OpponentPageBase):
+	def __init__(self, parent, *args, **kw):
+		OpponentPageBase.__init__(self, parent, *args, **kw)
+		self.AIOptSizer = self.SizerRef.GetContainingSizer()
+		self.AIOptSizer.SetMinSize((400,200))
+
+	def GetPrev(self):
+		prev = self.prev
+		while prev.skip:
+			prev = prev.prev
+		return prev
+	
+	def OnAIClient(self, event):
+		self.AIClientDesc.SetLabel(self.parent.game.ailist[self.parent.game.ailist.keys()[self.AIClient.GetSelection()]]['description'])
+		self.AIClientDesc.Wrap(400)
+		self.RefreshOpts(self.parent.game.ailist.keys()[self.AIClient.GetSelection()])
+	
+	def RefreshOpts(self, ainame):
+		self.AIOptSizer.Clear(deleteWindows = True)
+		self.Params = {}
+		paramlist = self.parent.game.ailist[ainame]['parameters']
+		for opt in paramlist.keys():
+			self.AIOptSizer.Add(wx.StaticText(self, -1, paramlist[opt]['longname']))
+			if paramlist[opt]['default'] is None:
+				default = ''
+			else:
+				default = str(paramlist[opt]['default'])
+			self.Params[opt] = wx.TextCtrl(self, -1, default, size = (200, -1))
+			self.AIOptSizer.Add(self.Params[opt])
+		self.AIOptSizer.Layout()
+
+	def Populate(self, opponent):
+		# populate username
+		self.AIUser.SetValue(opponent['user'])
+		# determine which AI client selection this is
+		i = 0
+		for ainame in self.parent.game.ailist.keys():
+			if opponent['name'] == ainame:
+				break
+			i += 1
+		self.AIClient.SetSelection(i)
+		# show and populate options
+		self.RefreshOpts(opponent['name'])
+		for opt in opponent['parameters'].keys():
+			self.Params[opt].SetValue(opponent['parameters'][opt])
+		# write opponent list
+		self.WriteOpponentList()
+
+	def Reset(self):
+		# clear name and client selection
+		self.AIUser.SetValue('')
+		self.AIClient.SetSelection(0)
+		self.OnAIClient(None)
+		# clear AI client parameters
+		self.AIOptSizer.Clear(deleteWindows = True)
+		self.Params = {}
+		# write opponent list
+		self.WriteOpponentList()
+
+	def WriteOpponentList(self):
+		label = "Add an AI opponent to your game ("
+		# check for opponents and list them
+		opponents = self.parent.game.opponents
+		if len(opponents) > 0:
+			label += "current opponents are "
+			for opponent in opponents:
+				label += opponent['user'] + ", "
+			label = label.rstrip(", ")
+		else:
+			label += "no opponents added yet"
+		label += "):"
+		# set the label and wrap
+		self.AIListLabel.SetLabel(label)
+		self.AIListLabel.Wrap(400)
+	
 class EndPage(EndPageBase):
 	def GetPrev(self):
 		prev = self.prev
@@ -313,6 +399,7 @@ class SinglePlayerWizard(SinglePlayerWizardBase):
 		self.AddPage(ServerPage(self))
 		self.AddPage(RulesetOptsPage(self))
 		self.AddPage(ServerOptsPage(self))
+		self.AddPage(OpponentPage(self))
 		self.AddPage(EndPage(self))
 
 		self.Bind(wx.wizard.EVT_WIZARD_PAGE_CHANGED, self.OnPageChanged)
@@ -342,16 +429,58 @@ class SinglePlayerWizard(SinglePlayerWizardBase):
 		if isinstance(event.GetPage(), StartPage) and self.game.sname == '':
 			event.GetPage().next.Ruleset.SetSelection(0)
 			event.GetPage().next.OnRuleset(None)
+			return
 
 		if isinstance(event.GetPage(), RulesetOptsPage):
 			self.game.rparams = {}
 			for opt in self.game.list_rparams().keys():
 				self.game.rparams[opt] = str(event.GetPage().Params[opt].GetValue())
+			return
 	
 		if isinstance(event.GetPage(), ServerOptsPage):
 			self.game.sparams = {}
 			for opt in self.game.list_sparams().keys():
 				self.game.sparams[opt] = str(event.GetPage().Params[opt].GetValue())
+			if not event.GetPage().next.skip:
+				event.GetPage().next.Reset()
+			return
+
+		if isinstance(event.GetPage(), OpponentPage):
+			if event.GetDirection():
+				# forward
+				if event.GetPage().AddChoice.GetSelection() == 0:
+					event.Veto()
+					if event.GetPage().AIUser.GetValue() != '':
+						# add the opponent
+						ainame = self.game.ailist.keys()[event.GetPage().AIClient.GetSelection()]
+						aiparams = {}
+						for opt in self.game.ailist[ainame]['parameters'].keys():
+							aiparams[opt] = str(event.GetPage().Params[opt].GetValue())
+						self.game.add_opponent(ainame, str(event.GetPage().AIUser.GetValue()), aiparams)
+						# clear the form for the next opponent
+						event.GetPage().Reset()
+			else:
+				# backward
+				if len(self.game.opponents) > 0:
+					event.Veto()
+					i = len(self.game.opponents) - 1
+					# populate page with last added opponent info
+					event.GetPage().Populate(self.game.opponents[i])
+					# remove the last added opponent
+					del self.game.opponents[i]
+					# rewrite the oppoennt list
+					event.GetPage().WriteOpponentList()
+			return
+
+		if isinstance(event.GetPage(), EndPage):
+			if not event.GetDirection() and not event.GetPage().prev.skip and len(self.game.opponents) > 0:
+				i = len(self.game.opponents) - 1
+				# populate page with last added opponent info
+				event.GetPage().prev.Populate(self.game.opponents[i])
+				# remove the last added opponent
+				del self.game.opponents[i]
+			return
+
 	
 	def OnCancelWizard(self, event):
 		pass
