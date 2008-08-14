@@ -158,9 +158,12 @@ class configConnect(configConnectBase, usernameMixIn):
 		self.Password.SetValue("")
 		self.AutoConnect.Disable()
 
+# wizard and wizard page classes
+
 class StartPage(StartPageBase):
 	def __init__(self, parent, *args, **kw):
 		StartPageBase.__init__(self, parent, *args, **kw)
+		# ensure there are some servers/rulesets installed
 		if len(parent.game.rulesets) > 0:
 			self.ProceedDesc.SetLabel("You appear to have at least one server with rulesets installed on your system.")
 			self.ProceedDesc.Wrap(400)
@@ -178,6 +181,7 @@ class StartPage(StartPageBase):
 class RulesetPage(RulesetPageBase):
 	def __init__(self, parent, *args, **kw):
 		RulesetPageBase.__init__(self, parent, *args, **kw)
+		# populate ruleset list
 		for ruleset in parent.game.rulesets:
 			rs = parent.game.ruleset_info(ruleset)['longname']
 			self.Ruleset.Insert(rs, self.Ruleset.GetCount())
@@ -189,9 +193,11 @@ class RulesetPage(RulesetPageBase):
 		return next
 
 	def OnRuleset(self, event):
+		# show ruleset description
 		self.parent.game.rname = self.parent.game.rulesets[self.Ruleset.GetSelection()]
 		self.RulesetDesc.SetLabel(self.parent.game.ruleset_info(self.parent.game.rname)['description'])
 		self.RulesetDesc.Wrap(400)
+		# set current game server to first supported (will be chosen on next page)
 		self.parent.game.sname = self.parent.game.list_servers_with_ruleset()[0]
 		# populate server selection page
 		self.next.servers = self.parent.game.list_servers_with_ruleset()
@@ -231,10 +237,12 @@ class ServerPage(ServerPageBase):
 		return next
 
 	def OnServer(self, event):
+		# show server description
 		self.parent.game.sname = self.parent.game.serverlist.keys()[self.Server.GetSelection()]
 		self.ServerDesc.SetLabel(self.parent.game.serverlist[self.parent.game.sname]['description'])
 		self.ServerDesc.Wrap(400)
-		rinfo = self.parent.game.serverlist[self.parent.game.sname]['rulesets'][self.parent.game.rname]
+		# show info about ruleset implementation
+		rinfo = self.parent.game.ruleset_info()
 		self.ServerRulesetDesc.SetLabel("Implements " + rinfo['longname'] + " version " + rinfo['version'] + ".")
 		self.ServerRulesetDesc.Wrap(400)
 		# populate server parameter page
@@ -262,6 +270,7 @@ class RulesetOptsPage(RulesetOptsPageBase):
 		return prev
 
 	def RefreshOpts(self):
+		# clear and repopulate parameter fields
 		self.RulesetOptSizer.Clear(deleteWindows = True)
 		self.Params = {}
 		paramlist = self.parent.game.list_rparams()
@@ -292,6 +301,7 @@ class ServerOptsPage(ServerOptsPageBase):
 		return prev
 
 	def RefreshOpts(self):
+		# clear and repopulate parameter fields
 		self.ServerOptSizer.Clear(deleteWindows = True)
 		self.Params = {}
 		paramlist = self.parent.game.list_sparams()
@@ -317,11 +327,13 @@ class OpponentPage(OpponentPageBase):
 		return prev
 	
 	def OnAIClient(self, event):
+		# show AI client description
 		self.AIClientDesc.SetLabel(self.parent.game.ailist[self.parent.game.ailist.keys()[self.AIClient.GetSelection()]]['description'])
 		self.AIClientDesc.Wrap(400)
 		self.RefreshOpts(self.parent.game.ailist.keys()[self.AIClient.GetSelection()])
 	
 	def RefreshOpts(self, ainame):
+		# dynamically clear and repopulate AI client parameter fields
 		self.AIOptSizer.Clear(deleteWindows = True)
 		self.Params = {}
 		paramlist = self.parent.game.ailist[ainame]['parameters']
@@ -333,6 +345,7 @@ class OpponentPage(OpponentPageBase):
 				default = str(paramlist[opt]['default'])
 			self.Params[opt] = wx.TextCtrl(self, -1, default, size = (200, -1))
 			self.AIOptSizer.Add(self.Params[opt])
+		# refresh the parameter control layout
 		self.AIOptSizer.Layout()
 
 	def Populate(self, opponent):
@@ -427,20 +440,24 @@ class SinglePlayerWizard(SinglePlayerWizardBase):
 			return
 
 		if isinstance(event.GetPage(), StartPage) and self.game.sname == '':
+			# initialize ruleset selection
 			event.GetPage().next.Ruleset.SetSelection(0)
 			event.GetPage().next.OnRuleset(None)
 			return
 
 		if isinstance(event.GetPage(), RulesetOptsPage):
+			# store ruleset parameters
 			self.game.rparams = {}
 			for opt in self.game.list_rparams().keys():
 				self.game.rparams[opt] = str(event.GetPage().Params[opt].GetValue())
 			return
 	
 		if isinstance(event.GetPage(), ServerOptsPage):
+			# store server parameters
 			self.game.sparams = {}
 			for opt in self.game.list_sparams().keys():
 				self.game.sparams[opt] = str(event.GetPage().Params[opt].GetValue())
+			# clear AI client page
 			if not event.GetPage().next.skip:
 				event.GetPage().next.Reset()
 			return
@@ -473,6 +490,7 @@ class SinglePlayerWizard(SinglePlayerWizardBase):
 			return
 
 		if isinstance(event.GetPage(), EndPage):
+			# similar to opponent page backward, but no page change veto required
 			if not event.GetDirection() and not event.GetPage().prev.skip and len(self.game.opponents) > 0:
 				i = len(self.game.opponents) - 1
 				# populate page with last added opponent info
