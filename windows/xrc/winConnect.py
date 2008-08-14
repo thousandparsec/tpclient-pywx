@@ -12,6 +12,14 @@ from wx.xrc import XRCCTRL, XmlResourceWithHandlers
 from requirements import location
 
 class winConnectBase:
+	"""\
+Unlike a normal XRC generated class, this is a not a full class but a MixIn.
+Any class which uses this as a base must also inherit from a proper wx object
+such as the wx.Frame class.
+
+This is so that a the same XRC can be used for both MDI and non-MDI frames.
+"""
+
 	xrc = os.path.join(location(), "windows", "xrc", 'winConnect.xrc')
 
 	def PreCreate(self, pre):
@@ -40,7 +48,8 @@ class winConnectBase:
 		
 		# Two stage creation (see http://wiki.wxpython.org/index.cgi/TwoStageCreation)
 		pre = getattr(wx, "Pre%s" % base.__name__)()
-		res.LoadOnFrame(pre, parent, "winConnect")
+		if not res.LoadOnFrame(pre, parent, "winConnect"):
+			raise IOError("Did not find the winConnect in the XRC file")
 		self.PreCreate(pre)
 		self.PostCreate(pre)
 
