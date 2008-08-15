@@ -39,7 +39,8 @@ class panelSystem(panelSystemBase, TrackerObject):
 		self.icons['StarSystem'] = wx.Image(os.path.join(graphicsdir, "system-icon.png")).ConvertToBitmap()
 		self.icons['Fleet']      = wx.Image(os.path.join(graphicsdir, "ship-icon.png")).ConvertToBitmap()
 		self.icons['Planet']     = wx.Image(os.path.join(graphicsdir, "planet-icon.png")).ConvertToBitmap()
-		self.icons['Unknown']    = wx.Image(os.path.join(graphicsdir, "starbase-icon.png")).ConvertToBitmap()
+		self.icons['Wormhole']   = wx.Image(os.path.join(graphicsdir, "link-icon.png")).ConvertToBitmap()
+		self.icons['Unknown']    = wx.Image(os.path.join(graphicsdir, "blank-icon.png")).ConvertToBitmap()
 
 		self.il = wx.ImageList(16, 16)
 		self.il.Add(wx.Image(os.path.join(graphicsdir, "blank.png")).ConvertToBitmap())

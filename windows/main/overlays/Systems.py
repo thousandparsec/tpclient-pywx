@@ -20,6 +20,7 @@ from tp.netlib.objects.ObjectExtra.Galaxy     import Galaxy
 from tp.netlib.objects.ObjectExtra.StarSystem import StarSystem
 from tp.netlib.objects.ObjectExtra.Planet     import Planet
 from tp.netlib.objects.ObjectExtra.Fleet      import Fleet
+from tp.netlib.objects.ObjectExtra.Wormhole   import Wormhole
 
 from Overlay   import SystemLevelOverlay, Holder
 from Colorizer import *
@@ -162,6 +163,39 @@ class FleetIcon(Group, Holder, IconMixIn):
 
 		Group.__init__(self, ObjectList, False)
 
+class WormholeIcon(Group, Holder, IconMixIn):
+	"""
+	Display a little arrow shape thing.
+	"""
+	def copy(self):
+		# FIXME: Very expensive
+		return WormholeIcon(self.cache, self.primary, self.Colorizer)
+
+	def XY(self):
+		return self.ObjectList[0].Points[0]+(self.ObjectList[0].Points[1]-self.ObjectList[0].Points[0])/2
+	XY = property(XY)
+
+	def __init__(self, cache, wormhole, colorizer=None):
+		if not isinstance(wormhole, Wormhole):
+			raise TypeError('WormholeIcon must be given a Wormhole, %r' % system)
+
+		if len(FindChildren(cache, wormhole)) > 0:
+			raise TypeError('The wormhole has children! WTF?')
+
+		Holder.__init__(self, wormhole, [])
+
+		# Get the colors of the object
+		IconMixIn.__init__(self, cache, colorizer)
+		type, childtype = self.GetColors()
+
+		# Create a list of the objects
+		ObjectList = []
+
+		# The little ship icon
+		ObjectList.append(Line((wormhole.start[0:2], wormhole.end[0:2]), type))
+
+		Group.__init__(self, ObjectList, False)
+
 from extra.StateTracker import TrackerObjectOrder
 class Systems(SystemLevelOverlay, TrackerObjectOrder):
 	name     = "Systems"
@@ -217,6 +251,8 @@ class Systems(SystemLevelOverlay, TrackerObjectOrder):
 	def Icon(self, obj):
 		if isinstance(obj, Fleet):
 			return FleetIcon(self.cache, obj, self.Colorizer)
+		elif isinstance(obj, Wormhole):
+			return WormholeIcon(self.cache, obj, self.Colorizer)
 		else:
 			return SystemIcon(self.cache, obj, self.Colorizer)
 

@@ -61,7 +61,8 @@ This is so that a the same XRC can be used for both MDI and non-MDI frames.
 		
 		# Two stage creation (see http://wiki.wxpython.org/index.cgi/TwoStageCreation)
 		pre = getattr(wx, "Pre%%s" %% base.__name__)()
-		res.LoadOnFrame(pre, parent, "%(windowName)s")
+		if not res.LoadOnFrame(pre, parent, "%(windowName)s"):
+			raise IOError("Did not find the %(windowName)s in the XRC file")
 		self.PreCreate(pre)
 		self.PostCreate(pre)
 
@@ -85,7 +86,8 @@ class %(windowName)sBase(wx.Panel):
 
 		# Two stage creation (see http://wiki.wxpython.org/index.cgi/TwoStageCreation)
 		pre = wx.PrePanel()
-		res.LoadOnPanel(pre, parent, "%(windowName)s")
+		if not res.LoadOnFrame(pre, parent, "%(windowName)s"):
+			raise IOError("Did not find the %(windowName)s in the XRC file")
 		self.PreCreate(pre)
 		self.PostCreate(pre)
 

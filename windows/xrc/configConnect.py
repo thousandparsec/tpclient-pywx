@@ -28,7 +28,8 @@ class configConnectBase(wx.Panel):
 
 		# Two stage creation (see http://wiki.wxpython.org/index.cgi/TwoStageCreation)
 		pre = wx.PrePanel()
-		res.LoadOnPanel(pre, parent, "configConnect")
+		if not res.LoadOnFrame(pre, parent, "configConnect"):
+			raise IOError("Did not find the configConnect in the XRC file")
 		self.PreCreate(pre)
 		self.PostCreate(pre)
 

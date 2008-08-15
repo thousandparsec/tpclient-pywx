@@ -28,7 +28,8 @@ class orderTextBase(wx.Panel):
 
 		# Two stage creation (see http://wiki.wxpython.org/index.cgi/TwoStageCreation)
 		pre = wx.PrePanel()
-		res.LoadOnPanel(pre, parent, "orderText")
+		if not res.LoadOnFrame(pre, parent, "orderText"):
+			raise IOError("Did not find the orderText in the XRC file")
 		self.PreCreate(pre)
 		self.PostCreate(pre)
 
