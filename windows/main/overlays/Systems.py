@@ -15,12 +15,12 @@ from extra.wxFloatCanvas.PolygonStatic import PolygonArrow, PolygonShip
 # tp imports
 from tp.netlib.objects import constants
 from tp.netlib.objects                        import Object, OrderDescs
-from tp.netlib.objects.ObjectExtra.Universe   import Universe
-from tp.netlib.objects.ObjectExtra.Galaxy     import Galaxy
-from tp.netlib.objects.ObjectExtra.StarSystem import StarSystem
-from tp.netlib.objects.ObjectExtra.Planet     import Planet
-from tp.netlib.objects.ObjectExtra.Fleet      import Fleet
-from tp.netlib.objects.ObjectExtra.Wormhole   import Wormhole
+#from tp.netlib.objects.ObjectExtra.Universe   import Universe
+#from tp.netlib.objects.ObjectExtra.Galaxy     import Galaxy
+#from tp.netlib.objects.ObjectExtra.StarSystem import StarSystem
+#from tp.netlib.objects.ObjectExtra.Planet     import Planet
+#from tp.netlib.objects.ObjectExtra.Fleet      import Fleet
+#from tp.netlib.objects.ObjectExtra.Wormhole   import Wormhole
 
 from Overlay   import SystemLevelOverlay, Holder
 from Colorizer import *
@@ -199,7 +199,7 @@ class WormholeIcon(Group, Holder, IconMixIn):
 from extra.StateTracker import TrackerObjectOrder
 class Systems(SystemLevelOverlay, TrackerObjectOrder):
 	name     = "Systems"
-	toplevel = Galaxy, Universe
+	toplevel = [] #Galaxy, Universe
 
 	Colorizers = [ColorVerses, ColorEach]
 

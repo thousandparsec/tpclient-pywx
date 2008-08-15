@@ -19,11 +19,11 @@ except ImportError:
 	from wx.animate import GIFAnimationCtrl
 
 # Network imports
-from tp.netlib.objects.ObjectExtra.Universe import Universe
-from tp.netlib.objects.ObjectExtra.Galaxy import Galaxy
-from tp.netlib.objects.ObjectExtra.StarSystem import StarSystem
-from tp.netlib.objects.ObjectExtra.Planet import Planet
-from tp.netlib.objects.ObjectExtra.Fleet import Fleet
+#from tp.netlib.objects.ObjectExtra.Universe import Universe
+#from tp.netlib.objects.ObjectExtra.Galaxy import Galaxy
+#from tp.netlib.objects.ObjectExtra.StarSystem import StarSystem
+#from tp.netlib.objects.ObjectExtra.Planet import Planet
+#from tp.netlib.objects.ObjectExtra.Fleet import Fleet
 
 from windows.xrc.panelInformation import panelInformationBase
 class panelInformation(panelInformationBase):

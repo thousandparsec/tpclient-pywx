@@ -231,13 +231,13 @@ class Holder(list):
 		return self.__current
 
 from extra.StateTracker import TrackerObject
-from tp.netlib.objects.ObjectExtra.Universe   import Universe
-from tp.netlib.objects.ObjectExtra.Galaxy     import Galaxy
+#from tp.netlib.objects.ObjectExtra.Universe   import Universe
+#from tp.netlib.objects.ObjectExtra.Galaxy     import Galaxy
 class SystemLevelOverlay(Overlay, TrackerObject):
 	"""
 	A SystemLevelOverlay groups objects together at the Systems level.
 	"""
-	TopLevel = Galaxy, Universe
+	TopLevel = [] #Galaxy, Universe
 
 	HoverTimeOutFirst = 2000
 	HoverTimeOut      = 2000

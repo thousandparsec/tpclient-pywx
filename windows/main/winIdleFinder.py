@@ -15,12 +15,12 @@ from windows.xrc.winIdleFinder import IdleFinderBase
 from extra.StateTracker import TrackerObject
 
 # tp imports
-from tp.netlib.objects                        import Object, OrderDescs
-from tp.netlib.objects.ObjectExtra.Universe   import Universe
-from tp.netlib.objects.ObjectExtra.Galaxy     import Galaxy
-from tp.netlib.objects.ObjectExtra.StarSystem import StarSystem
-from tp.netlib.objects.ObjectExtra.Planet     import Planet
-from tp.netlib.objects.ObjectExtra.Fleet      import Fleet
+#from tp.netlib.objects                        import Object, OrderDescs
+#from tp.netlib.objects.ObjectExtra.Universe   import Universe
+#from tp.netlib.objects.ObjectExtra.Galaxy     import Galaxy
+#from tp.netlib.objects.ObjectExtra.StarSystem import StarSystem
+#from tp.netlib.objects.ObjectExtra.Planet     import Planet
+#from tp.netlib.objects.ObjectExtra.Fleet      import Fleet
 
 class winIdleFinder(winReportXRC, IdleFinderBase, TrackerObject):
 	"""\

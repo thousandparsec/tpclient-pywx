@@ -16,8 +16,8 @@ from extra.StateTracker import TrackerObjectOrder
 from tp.netlib.objects import constants
 from tp.netlib.objects                        import Object, OrderDescs
 from tp.netlib.objects                        import Order
-from tp.netlib.objects.ObjectExtra.Universe   import Universe
-from tp.netlib.objects.ObjectExtra.Galaxy     import Galaxy
+#from tp.netlib.objects.ObjectExtra.Universe   import Universe
+#from tp.netlib.objects.ObjectExtra.Galaxy     import Galaxy
 
 from Overlay   import Overlay
 
@@ -170,7 +170,7 @@ class Paths(Overlay, TrackerObjectOrder):
 	Draws a path of ships and similar objects.
 	"""
 	name     = "Paths"
-	toplevel = Galaxy, Universe
+	toplevel = [] #Galaxy, Universe
 
 	layer = -1
 
