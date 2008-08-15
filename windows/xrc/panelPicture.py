@@ -28,7 +28,7 @@ class panelPictureBase(wx.Panel):
 
 		# Two stage creation (see http://wiki.wxpython.org/index.cgi/TwoStageCreation)
 		pre = wx.PrePanel()
-		if not res.LoadOnFrame(pre, parent, "panelPicture"):
+		if not res.LoadOnPanel(pre, parent, "panelPicture"):
 			raise IOError("Did not find the panelPicture in the XRC file")
 		self.PreCreate(pre)
 		self.PostCreate(pre)

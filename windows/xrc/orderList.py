@@ -28,7 +28,7 @@ class orderListBase(wx.Panel):
 
 		# Two stage creation (see http://wiki.wxpython.org/index.cgi/TwoStageCreation)
 		pre = wx.PrePanel()
-		if not res.LoadOnFrame(pre, parent, "orderList"):
+		if not res.LoadOnPanel(pre, parent, "orderList"):
 			raise IOError("Did not find the orderList in the XRC file")
 		self.PreCreate(pre)
 		self.PostCreate(pre)

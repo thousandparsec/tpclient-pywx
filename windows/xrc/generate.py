@@ -86,7 +86,7 @@ class %(windowName)sBase(wx.Panel):
 
 		# Two stage creation (see http://wiki.wxpython.org/index.cgi/TwoStageCreation)
 		pre = wx.PrePanel()
-		if not res.LoadOnFrame(pre, parent, "%(windowName)s"):
+		if not res.LoadOnPanel(pre, parent, "%(windowName)s"):
 			raise IOError("Did not find the %(windowName)s in the XRC file")
 		self.PreCreate(pre)
 		self.PostCreate(pre)
