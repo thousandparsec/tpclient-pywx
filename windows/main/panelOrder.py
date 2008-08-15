@@ -27,17 +27,6 @@ CREATING = wx.Color(0, 0, 150)
 UPDATING = wx.Color(150, 150, 0)
 REMOVING = wx.Color(150, 0, 0)
 
-# FIXME: This is quite annoying..
-defaults = {
-	constants.ARG_ABS_COORD: [0,0,0],
-	constants.ARG_TIME: [0, 0],
-	constants.ARG_OBJECT: [0],
-	constants.ARG_PLAYER: [0,0],
-	constants.ARG_STRING: [0, ""],
-	constants.ARG_LIST: [[], []],
-	constants.ARG_RANGE: [-1, -1, -1, -1],
-}
-
 from extra.StateTracker import TrackerObjectOrder
 from windows.xrc.panelOrder import panelOrderBase
 class panelOrder(panelOrderBase, TrackerObjectOrder):
