@@ -1,5 +1,5 @@
 
-version = (0, 3, 1)
+version = (0, 3, 99)
 
 # Add the git version if in a git tree...
 import os, os.path
