@@ -172,7 +172,6 @@ class StartPage(StartPageBase):
 			self.ProceedDesc.SetLabel("No servers or rulesets were found on your system.")
 			self.ProceedDesc.Wrap(400)
 			self.proceed = False
-		print self.parent.parent.application
 	def GetNext(self):
 		if self.proceed:
 			return self.next
@@ -271,7 +270,9 @@ class RulesetOptsPage(RulesetOptsPageBase):
 		return prev
 
 	def RefreshOpts(self):
-		# clear and repopulate parameter fields
+		"""\
+		Clear and repopulate the parameter fields.
+		"""
 		self.RulesetOptSizer.Clear(deleteWindows = True)
 		self.Params = {}
 		paramlist = self.parent.game.list_rparams()
@@ -302,7 +303,9 @@ class ServerOptsPage(ServerOptsPageBase):
 		return prev
 
 	def RefreshOpts(self):
-		# clear and repopulate parameter fields
+		"""\
+		Clear and repopulate the parameter fields.
+		"""
 		self.ServerOptSizer.Clear(deleteWindows = True)
 		self.Params = {}
 		paramlist = self.parent.game.list_sparams()
@@ -328,13 +331,19 @@ class OpponentPage(OpponentPageBase):
 		return prev
 	
 	def OnAIClient(self, event):
-		# show AI client description
+		"""\
+		Show AI client description.
+		"""
 		self.AIClientDesc.SetLabel(self.parent.game.ailist[self.parent.game.ailist.keys()[self.AIClient.GetSelection()]]['description'])
 		self.AIClientDesc.Wrap(400)
 		self.RefreshOpts(self.parent.game.ailist.keys()[self.AIClient.GetSelection()])
 	
 	def RefreshOpts(self, ainame):
-		# dynamically clear and repopulate AI client parameter fields
+		"""\
+		Dynamically clear and repopulate parameter fields.
+
+		@param ainame The name of the selected AI client.
+		"""
 		self.AIOptSizer.Clear(deleteWindows = True)
 		self.Params = {}
 		paramlist = self.parent.game.ailist[ainame]['parameters']
@@ -350,6 +359,11 @@ class OpponentPage(OpponentPageBase):
 		self.AIOptSizer.Layout()
 
 	def Populate(self, opponent):
+		"""\
+		Populates the page with details about an opponent.
+
+		@param opponent The opponent dict object (can be popped off the opponent list).
+		"""
 		# populate username
 		self.AIUser.SetValue(opponent['user'])
 		# determine which AI client selection this is
@@ -367,6 +381,9 @@ class OpponentPage(OpponentPageBase):
 		self.WriteOpponentList()
 
 	def Reset(self):
+		"""\
+		Resets the page.
+		"""
 		# clear name and client selection
 		self.AIUser.SetValue('')
 		self.AIClient.SetSelection(0)
@@ -378,6 +395,9 @@ class OpponentPage(OpponentPageBase):
 		self.WriteOpponentList()
 
 	def WriteOpponentList(self):
+		"""\
+		Writes a list of current opponents into the page description text.
+		"""
 		label = "Add an AI opponent to your game ("
 		# check for opponents and list them
 		opponents = self.parent.game.opponents
@@ -424,6 +444,11 @@ class SinglePlayerWizard(SinglePlayerWizardBase):
 		self.Bind(wx.wizard.EVT_WIZARD_CANCEL, self.OnCancelWizard)
 
 	def AddPage(self, page):
+		"""\
+		Adds a page to the wizard and chains it.
+
+		@param page The wxWizardPage object to add.
+		"""
 		i = len(self.pages)
 		self.pages.append(page)
 		if i > 0:
@@ -433,6 +458,9 @@ class SinglePlayerWizard(SinglePlayerWizardBase):
 
 
 	def Run(self):
+		"""\
+		Runs the wizard.
+		"""
 		return self.RunWizard(self.pages[0])
 
 	def OnPageChanged(self, event):
