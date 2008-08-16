@@ -28,7 +28,8 @@ class panelOrderBase(wx.Panel):
 
 		# Two stage creation (see http://wiki.wxpython.org/index.cgi/TwoStageCreation)
 		pre = wx.PrePanel()
-		res.LoadOnPanel(pre, parent, "panelOrder")
+		if not res.LoadOnPanel(pre, parent, "panelOrder"):
+			raise IOError("Did not find the panelOrder in the XRC file")
 		self.PreCreate(pre)
 		self.PostCreate(pre)
 

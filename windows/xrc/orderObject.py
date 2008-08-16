@@ -28,14 +28,18 @@ class orderObjectBase(wx.Panel):
 
 		# Two stage creation (see http://wiki.wxpython.org/index.cgi/TwoStageCreation)
 		pre = wx.PrePanel()
-		res.LoadOnPanel(pre, parent, "orderObject")
+		if not res.LoadOnPanel(pre, parent, "orderObject"):
+			raise IOError("Did not find the orderObject in the XRC file")
 		self.PreCreate(pre)
 		self.PostCreate(pre)
 
 		# Define variables for the controls
 		self.Value = XRCCTRL(self, "Value")
 		if hasattr(self, "OnValue"):
-			self.Value.Bind(wx.EVT_CHOICE, self.OnValue)
+			self.Bind(wx.EVT_COMBOBOX, self.OnValue, self.Value)
+			self.Bind(wx.EVT_TEXT_ENTER, self.OnValue, self.Value)
+		if hasattr(self, "OnDirtyValue"):
+			self.Bind(wx.EVT_TEXT, self.OnValue, self.Value)
 
 
 

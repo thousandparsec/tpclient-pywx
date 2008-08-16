@@ -48,7 +48,8 @@ This is so that a the same XRC can be used for both MDI and non-MDI frames.
 		
 		# Two stage creation (see http://wiki.wxpython.org/index.cgi/TwoStageCreation)
 		pre = getattr(wx, "Pre%s" % base.__name__)()
-		res.LoadOnFrame(pre, parent, "winHelp")
+		if not res.LoadOnFrame(pre, parent, "winHelp"):
+			raise IOError("Did not find the winHelp in the XRC file")
 		self.PreCreate(pre)
 		self.PostCreate(pre)
 

@@ -28,7 +28,8 @@ class panelSystemBase(wx.Panel):
 
 		# Two stage creation (see http://wiki.wxpython.org/index.cgi/TwoStageCreation)
 		pre = wx.PrePanel()
-		res.LoadOnPanel(pre, parent, "panelSystem")
+		if not res.LoadOnPanel(pre, parent, "panelSystem"):
+			raise IOError("Did not find the panelSystem in the XRC file")
 		self.PreCreate(pre)
 		self.PostCreate(pre)
 

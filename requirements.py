@@ -224,6 +224,7 @@ except ImportError, e:
 
 
 netlib_version = (0, 2, 4)
+netlib_version_less = (0, 2, 99)
 try:
 	import tp.netlib
 
@@ -241,12 +242,15 @@ try:
 
 	if not cmp(netlib_version, tp.netlib.__version__):
 		raise ImportError("Thousand Parsec Network Library (libtpproto-py) is to old")
+	if cmp(netlib_version_less, tp.netlib.__version__) > 0:
+		raise ImportError("Thousand Parsec Network Library (libtpproto-py) is too new!")
 
 except (ImportError, KeyError, AttributeError), e:
 	print e
-	notfound.append("tp.netlib > " + tostr(netlib_version))
+	notfound.append("tp.netlib newer then %s and older then %s" % (tostr(netlib_version), tostr(netlib_version_less)))
 
 client_version = (0, 3, 1)
+client_version_less = (0, 3, 99)
 try:
 	import tp.client
 
@@ -263,10 +267,12 @@ try:
 		print
 
 	if not cmp(client_version, tp.client.__version__):
-		raise ImportError("Thousand Parsec Client Library (libtpclient-py) is to old")
+		raise ImportError("Thousand Parsec Client Library (libtpclient-py) is too old")
+	if cmp(client_version_less, tp.client.__version__) > 0:
+		raise ImportError("Thousand Parsec Client Library (libtpclient-py) is too new!")
 except (ImportError, KeyError, AttributeError), e:
 	print e
-	notfound.append("tp.client > " + tostr(client_version))
+	notfound.append("tp.client newer then %s and older then %s" % (tostr(client_version), tostr(client_version_less)))
 
 if len(notfound) == 0:
 	import sys

@@ -28,7 +28,8 @@ class orderPositionBase(wx.Panel):
 
 		# Two stage creation (see http://wiki.wxpython.org/index.cgi/TwoStageCreation)
 		pre = wx.PrePanel()
-		res.LoadOnPanel(pre, parent, "orderPosition")
+		if not res.LoadOnPanel(pre, parent, "orderPosition"):
+			raise IOError("Did not find the orderPosition in the XRC file")
 		self.PreCreate(pre)
 		self.PostCreate(pre)
 
