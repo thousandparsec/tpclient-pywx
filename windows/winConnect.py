@@ -172,6 +172,7 @@ class StartPage(StartPageBase):
 			self.ProceedDesc.SetLabel("No servers or rulesets were found on your system.")
 			self.ProceedDesc.Wrap(400)
 			self.proceed = False
+		print self.parent.parent.application
 	def GetNext(self):
 		if self.proceed:
 			return self.next
@@ -403,7 +404,10 @@ class SinglePlayerWizard(SinglePlayerWizardBase):
 	def __init__(self, parent, *args, **kw):
 		SinglePlayerWizardBase.__init__(self, parent, *args, **kw)
 
-		self.game = SinglePlayerGame()
+		self.parent = parent
+
+		self.parent.application.game = SinglePlayerGame()
+		self.game = self.parent.application.game
 
 		self.pages = []
 
@@ -644,6 +648,7 @@ information with the new password?
 				self.singleplayer = True
 				self.Server.SetValue("tp://localhost:" + str(port))
 				self.OnOkay(None)
+		wizard.Destroy()
 
 	def OnFind(self, evt):
 		self.application.gui.Show(self.application.gui.servers)

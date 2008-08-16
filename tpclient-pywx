@@ -295,6 +295,10 @@ class GUI(wx.App):
 			window.Close()
 		while self.application.network.isAlive() or self.application.media.isAlive():
 			time.sleep(0.1)
+		try:
+			self.application.game.stop()
+		except:
+			pass
 		sys.exit()
 
 	# Config Functions ------------------------------------------------
