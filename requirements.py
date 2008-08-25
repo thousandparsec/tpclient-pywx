@@ -14,6 +14,12 @@ if os.path.exists("libtpclient-py"):
 if os.path.exists("schemepy"):
 	sys.path.append("schemepy")
 
+if os.path.exists("libtpproto-py") and not os.path.exists(os.path.join("libtpproto-py", "tp")) or \
+   os.path.exists("libtpclient-py") and not os.path.exists(os.path.join("libtpclient-py", "tp")):
+	print "It appears this is a fresh git checkout, trying to get dependencies"
+	os.system("git submodule init")
+	os.system("git submodule update")
+
 import time
 
 notfound    = []
