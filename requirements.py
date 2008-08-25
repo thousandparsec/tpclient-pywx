@@ -6,9 +6,15 @@
 # Preference the local directory first...
 import sys
 sys.path.insert(0, '.')
+import os.path
+if os.path.exists("libtpproto-py"):
+	sys.path.append("libtpproto-py")
+if os.path.exists("libtpclient-py"):
+	sys.path.append("libtpclient-py")
+if os.path.exists("schemepy"):
+	sys.path.append("schemepy")
 
 import time
-import os.path
 
 notfound    = []
 recommended = []
@@ -226,6 +232,7 @@ except ImportError, e:
 netlib_version = (0, 2, 4)
 netlib_version_less = (0, 2, 99)
 try:
+
 	import tp.netlib
 
 	print "Thousand Parsec Protocol Library Version", tp.netlib.__version__ 
@@ -252,6 +259,7 @@ except (ImportError, KeyError, AttributeError), e:
 client_version = (0, 3, 1)
 client_version_less = (0, 3, 99)
 try:
+
 	import tp.client
 
 	print "Thousand Parsec Client Library Version", tp.client.__version__
