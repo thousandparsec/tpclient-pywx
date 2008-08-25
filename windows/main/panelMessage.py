@@ -310,7 +310,6 @@ class panelMessage(panelMessageBase, ShiftMixIn):
 			return []
 		
 		return self.messagelist
-		#return self.application.cache.messages[self.bid]
 	
 	def RebuildMessageList(self):
 		self.messagelist=ChangeList()
@@ -418,8 +417,9 @@ class panelMessage(panelMessageBase, ShiftMixIn):
 		self.MessageSet(-1)
 		
 	def OnDelete(self, evt=None):
+		node = self.application.cache.messages[self.bid].find(self.node._what)
 		# Tell everyone about the change
-		self.application.Post(self.application.cache.apply("messages", "remove", self.bid, self.node, None), source=self)
+		self.application.Post(self.application.cache.apply("messages", "remove", self.bid, node, None), source=self)
 
 	def OnGoto(self, slot):
 		# Select the object this message references

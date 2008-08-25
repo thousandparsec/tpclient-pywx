@@ -6,9 +6,21 @@
 # Preference the local directory first...
 import sys
 sys.path.insert(0, '.')
+import os.path
+if os.path.exists("libtpproto-py"):
+	sys.path.append("libtpproto-py")
+if os.path.exists("libtpclient-py"):
+	sys.path.append("libtpclient-py")
+if os.path.exists("schemepy"):
+	sys.path.append("schemepy")
+
+if os.path.exists("libtpproto-py") and not os.path.exists(os.path.join("libtpproto-py", "tp")) or \
+   os.path.exists("libtpclient-py") and not os.path.exists(os.path.join("libtpclient-py", "tp")):
+	print "It appears this is a fresh git checkout, trying to get dependencies"
+	os.system("git submodule init")
+	os.system("git submodule update")
 
 import time
-import os.path
 
 notfound    = []
 recommended = []
@@ -224,7 +236,9 @@ except ImportError, e:
 
 
 netlib_version = (0, 2, 99)
+netlib_version_less = (0, 3, 99)
 try:
+
 	import tp.netlib
 
 	print "Thousand Parsec Protocol Library Version", tp.netlib.__version__ 
@@ -241,13 +255,17 @@ try:
 
 	if not cmp(netlib_version, tp.netlib.__version__):
 		raise ImportError("Thousand Parsec Network Library (libtpproto-py) is to old")
+	if cmp(netlib_version_less, tp.netlib.__version__) > 0:
+		raise ImportError("Thousand Parsec Network Library (libtpproto-py) is too new!")
 
 except (ImportError, KeyError, AttributeError), e:
 	print e
-	notfound.append("tp.netlib > " + tostr(netlib_version))
+	notfound.append("tp.netlib newer then %s and older then %s" % (tostr(netlib_version), tostr(netlib_version_less)))
 
 client_version = (0, 3, 99)
+client_version_less = (0, 4, 99)
 try:
+
 	import tp.client
 
 	print "Thousand Parsec Client Library Version", tp.client.__version__
@@ -263,10 +281,12 @@ try:
 		print
 
 	if not cmp(client_version, tp.client.__version__):
-		raise ImportError("Thousand Parsec Client Library (libtpclient-py) is to old")
+		raise ImportError("Thousand Parsec Client Library (libtpclient-py) is too old")
+	if cmp(client_version_less, tp.client.__version__) > 0:
+		raise ImportError("Thousand Parsec Client Library (libtpclient-py) is too new!")
 except (ImportError, KeyError, AttributeError), e:
 	print e
-	notfound.append("tp.client > " + tostr(client_version))
+	notfound.append("tp.client newer then %s and older then %s" % (tostr(client_version), tostr(client_version_less)))
 
 if len(notfound) == 0:
 	import sys
