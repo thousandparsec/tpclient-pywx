@@ -386,5 +386,68 @@ if len(notfound) > 0:
 	import sys
 	sys.exit(1)
 
+print
+print 'Configuring Schemepy:'
+print '---------------------------------------------------------------'
+import os
+import os.path
+import re
+import sys
+if sys.platform.startswith('linux'):
+        print ' * Checking mzscheme'
+        cont = os.popen('mzscheme --version 2>/dev/null').read()
+        if cont == '':
+                print '    recommended package mzscheme not installed'
+                print '    installing mzscheme can make the scheme part runs faster'
+                if system == 'debian-based':
+                        print '    use "apt-get install plt-scheme" to install'
+        else:
+                mz_version = re.search(r'(MzScheme [^]]*\])', cont)
+                if mz_version is None:
+                        print '    unknown mzscheme version: %s' % cont
+                else:
+                        mz_version = mz_version.group(1)
+                        res = re.search(r'MzScheme v4.\d+.\d+ \[3m\]', mz_version)
+                        if res is None:
+                                print '    mzscheme >= v4 [3m] is needed, but got:'
+                                print '      %s' % mz_version
+                        else:
+                                print '    %s is installed' % mz_version
+                                if not os.path.exists('schemepy/schemepy/mzscheme/_mzhelper.so'):
+                                        print '      mzhelper is not built, it is highly recommended to build it'
+                                        print '      goto schemepy/schemepy/mzscheme and type "make" to build'
+                                else:
+                                        print '      mzehlper is built, mzscheme backend should be available'
+        print ' * Checking guile'
+        cont = os.popen('guile --version 2>/dev/null').read()
+        if cont == '':
+                print '    recommended package guile not installed'
+                print '    installing guile can make the scheme part runs faster'
+                if system == 'debian-based':
+                        print '    use "apt-get install guile-1.8 guile-1.8-dev" to install'
+        else:
+                guile_version = re.search(r'(Guile (\d+).(\d+).\d+)', cont)
+                if guile_version is None:
+                        print '    unknown guile version: %s' % cont
+                else:
+                        gv_major, gv_minor = guile_version.group(2), guile_version.group(3)
+                        gv_major, gv_minor = int(gv_major), int(gv_minor)
+                        if gv_major >= 1 and gv_minor >= 6:
+                                print '      %s is installed' % guile_version.group(1)
+                                if not os.path.exists('schemepy/schemepy/guile/_guilehelper.so'):
+                                        print '      guilehelper is not built, it is highly recommended to build it'
+                                        print '      goto schemepy/schemepy/guile and type "make" to build'
+                                else:
+                                        print '      guilehelper is built, guile backend should be available'
+                        else:
+                                print '      guile >= 1.6 is required, but got %s' % guile_version.group(1)
+
+
+else:
+        print ' * Unknown OS, skip auto-checking'
+print ' * Configuring load path for schemepy'
+sys.path.append(os.path.abspath('./schemepy'))
+print ' Done.'
+
 ## FIXME: This is here to extra is imported very early on.
 #import extra
