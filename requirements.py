@@ -7,18 +7,21 @@
 import sys
 sys.path.insert(0, '.')
 import os.path
-if os.path.exists("libtpproto-py"):
-	sys.path.append("libtpproto-py")
-if os.path.exists("libtpclient-py"):
-	sys.path.append("libtpclient-py")
-if os.path.exists("schemepy"):
-	sys.path.append("schemepy")
 
-if os.path.exists("libtpproto-py") and not os.path.exists(os.path.join("libtpproto-py", "tp")) or \
-   os.path.exists("libtpclient-py") and not os.path.exists(os.path.join("libtpclient-py", "tp")):
-	print "It appears this is a fresh git checkout, trying to get dependencies"
-	os.system("git submodule init")
-	os.system("git submodule update")
+if os.path.exists("libtpproto-py"):
+	sys.path.insert(0, "libtpproto-py")
+if os.path.exists("libtpclient-py"):
+	sys.path.insert(0, "libtpclient-py")
+if os.path.exists("schemepy"):
+	sys.path.insert(0, "schemepy")
+
+import version
+if hasattr(version, "version_git"):
+	if os.path.exists("libtpproto-py") and not os.path.exists(os.path.join("libtpproto-py", "tp")) or \
+	   os.path.exists("libtpclient-py") and not os.path.exists(os.path.join("libtpclient-py", "tp")):
+		print "It appears this is a fresh git checkout, trying to get dependencies"
+		os.system("git submodule init")
+		os.system("git submodule update")
 
 import time
 
@@ -103,7 +106,6 @@ def tostr(ver1):
 
 print "My information:"
 print "---------------------------------------------------------------"
-import version
 try:
 	print "My version", version.version_str+'+'+version.version_target_str, "(git %s)" % version.version_git
 except AttributeError:
@@ -251,7 +253,7 @@ try:
 		from tp.netlib.version import version_git
 		print "    (git %s)" % version_git
 	except ImportError:
-		print
+		pass
 
 	if not cmp(netlib_version, tp.netlib.__version__):
 		raise ImportError("Thousand Parsec Network Library (libtpproto-py) is to old")
@@ -260,7 +262,16 @@ try:
 
 except (ImportError, KeyError, AttributeError), e:
 	print e
-	notfound.append("tp.netlib newer then %s and older then %s" % (tostr(netlib_version), tostr(netlib_version_less)))
+	notfound.append("Network Library newer then %s and older then %s" % (tostr(netlib_version), tostr(netlib_version_less)))
+
+try:
+	if hasattr(version, "version_git") and not hasattr(tp.netlib.version, "version_git"):
+		raise ImportError("Thousand Parsec Network Library (libtpproto-py) not a development version!")
+except ImportError, e:
+	print e
+	notfound.append("Client is development version, but Network Library (libtpproto-py) was not")
+
+print
 
 client_version = (0, 3, 1)
 client_version_less = (0, 3, 99)
@@ -278,7 +289,7 @@ try:
 		from tp.client.version import version_git
 		print "    (git %s)" % version_git
 	except ImportError:
-		print
+		pass
 
 	if not cmp(client_version, tp.client.__version__):
 		raise ImportError("Thousand Parsec Client Library (libtpclient-py) is too old")
@@ -286,7 +297,16 @@ try:
 		raise ImportError("Thousand Parsec Client Library (libtpclient-py) is too new!")
 except (ImportError, KeyError, AttributeError), e:
 	print e
-	notfound.append("tp.client newer then %s and older then %s" % (tostr(client_version), tostr(client_version_less)))
+	notfound.append("Client Library newer then %s and older then %s" % (tostr(client_version), tostr(client_version_less)))
+
+try:
+	if hasattr(version, "version_git") and not hasattr(tp.client.version, "version_git"):
+		raise ImportError("Thousand Parsec Client Library (libtpclient-py) not a development version!")
+except ImportError, e:
+	print e
+	notfound.append("Client is development version, but Client Library (libtpclient-py) was not")
+
+print
 
 if len(notfound) == 0:
 	import sys
