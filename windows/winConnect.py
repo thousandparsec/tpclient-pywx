@@ -163,6 +163,8 @@ class configConnect(configConnectBase, usernameMixIn):
 class StartPage(StartPageBase):
 	def __init__(self, parent, *args, **kw):
 		StartPageBase.__init__(self, parent, *args, **kw)
+		self.PageDesc.SetLabel("This wizard sets up a single player Thousand Parsec game using the servers, rulesets, and AI clients installed locally on your system.")
+		self.PageDesc.Wrap(400)
 		# ensure there are some servers/rulesets installed
 		if len(parent.game.rulesets) > 0:
 			self.ProceedDesc.SetLabel("You appear to have at least one server with rulesets installed on your system.")
@@ -230,6 +232,11 @@ class RulesetPage(RulesetPageBase):
 			op.AIClient.Insert(os, op.AIClient.GetCount())
 
 class ServerPage(ServerPageBase):
+	def __init__(self, parent, *args, **kw):
+		ServerPageBase.__init__(self, parent, *args, **kw)
+		self.PageDesc.SetLabel("Multiple servers implement the ruleset you selected. Please select a server to use:")
+		self.PageDesc.Wrap(400)
+
 	def GetNext(self):
 		next = self.next
 		while next.skip:
@@ -255,6 +262,8 @@ class ServerPage(ServerPageBase):
 class RulesetOptsPage(RulesetOptsPageBase):
 	def __init__(self, parent, *args, **kw):
 		RulesetOptsPageBase.__init__(self, parent, *args, **kw)
+		self.PageDesc.SetLabel("Configure options for this ruleset (leave blank to use default):")
+		self.PageDesc.Wrap(400)
 		self.RulesetOptSizer = self.SizerRef.GetContainingSizer()
 
 	def GetNext(self):
@@ -288,6 +297,8 @@ class RulesetOptsPage(RulesetOptsPageBase):
 class ServerOptsPage(ServerOptsPageBase):
 	def __init__(self, parent, *args, **kw):
 		ServerOptsPageBase.__init__(self, parent, *args, **kw)
+		self.PageDesc.SetLabel("Configure options for this server (leave blank to use default):")
+		self.PageDesc.Wrap(400)
 		self.ServerOptSizer = self.SizerRef.GetContainingSizer()
 
 	def GetNext(self):
@@ -414,6 +425,11 @@ class OpponentPage(OpponentPageBase):
 		self.AIListLabel.Wrap(400)
 	
 class EndPage(EndPageBase):
+	def __init__(self, parent, *args, **kw):
+		EndPageBase.__init__(self, parent, *args, **kw)
+		self.PageDesc.SetLabel("The Thousand Parsec client will now connect to your local single player game.")
+		self.PageDesc.Wrap(400)
+
 	def GetPrev(self):
 		prev = self.prev
 		while prev.skip:

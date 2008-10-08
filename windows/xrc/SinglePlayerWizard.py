@@ -77,6 +77,7 @@ class StartPageBase(wx.wizard.PyWizardPage):
 		self.Hide()
 
 		# Define variables for the controls
+		self.PageDesc = XRCCTRL(self, "PageDesc")
 		self.ProceedDesc = XRCCTRL(self, "ProceedDesc")
 
 
@@ -180,6 +181,7 @@ class ServerPageBase(wx.wizard.PyWizardPage):
 		self.Hide()
 
 		# Define variables for the controls
+		self.PageDesc = XRCCTRL(self, "PageDesc")
 		self.Server = XRCCTRL(self, "Server")
 		if hasattr(self, "OnServer"):
 			self.Bind(wx.EVT_COMBOBOX, self.OnServer, self.Server)
@@ -236,6 +238,7 @@ class RulesetOptsPageBase(wx.wizard.PyWizardPage):
 		self.Hide()
 
 		# Define variables for the controls
+		self.PageDesc = XRCCTRL(self, "PageDesc")
 		self.SizerRef = XRCCTRL(self, "SizerRef")
 
 
@@ -284,6 +287,7 @@ class ServerOptsPageBase(wx.wizard.PyWizardPage):
 		self.Hide()
 
 		# Define variables for the controls
+		self.PageDesc = XRCCTRL(self, "PageDesc")
 		self.SizerRef = XRCCTRL(self, "SizerRef")
 
 
@@ -391,29 +395,25 @@ class EndPageBase(wx.wizard.PyWizardPage):
 		self.Hide()
 
 		# Define variables for the controls
+		self.PageDesc = XRCCTRL(self, "PageDesc")
 
 
 def strings():
 	pass
 	_("TP: Single Player Game");
 	_("Single Player Game");
-	_("This wizard sets up a single player Thousand Parsec \ngame using the servers, rulesets, and AI clients \ninstalled locally on your system.");
 	_("Select Ruleset");
 	_("Choose a ruleset for your game:");
 	_("The ruleset to use.");
 	_("Select Server");
-	_("Multiple servers implement the ruleset you selected. \nPlease select a server to use:");
 	_("The server to use.");
 	_("Ruleset Options");
-	_("Configure options for this ruleset (leave blank to use \ndefault):");
 	_("Server Options");
-	_("Configure options for this server (leave blank to use \ndefault):");
 	_("Add Opponent");
-	_("Add an AI opponent to your game:");
+	_("Add an AI opponent to your game (no opponents added yet):");
 	_("Name");
 	_("The AI client to use.");
 	_("Action");
 	_("Add Opponent");
 	_("Finish");
 	_("Setup Complete");
-	_("The Thousand Parsec client will now connect to your \nlocal single player game.");

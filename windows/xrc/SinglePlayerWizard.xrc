@@ -21,16 +21,16 @@
         <cellpos>0,0</cellpos>
       </object>
       <object class="sizeritem">
-        <object class="wxStaticText" name="wxID_STATIC">
+        <object class="wxStaticText" name="PageDesc">
           <style>wxALIGN_LEFT</style>
-          <label>This wizard sets up a single player Thousand Parsec \ngame using the servers, rulesets, and AI clients \ninstalled locally on your system.</label>
+		  <label />
         </object>
         <cellpos>1,0</cellpos>
       </object>
       <object class="sizeritem">
         <object class="wxStaticText" name="ProceedDesc">
           <style>wxALIGN_LEFT</style>
-          <label/>
+          <label />
         </object>
         <cellpos>2,0</cellpos>
       </object>
@@ -96,9 +96,9 @@
         <cellpos>0,0</cellpos>
       </object>
       <object class="sizeritem">
-        <object class="wxStaticText" name="wxID_STATIC">
+        <object class="wxStaticText" name="PageDesc">
           <style>wxALIGN_LEFT</style>
-          <label>Multiple servers implement the ruleset you selected. \nPlease select a server to use:</label>
+		  <label />
         </object>
         <cellpos>1,0</cellpos>
       </object>
@@ -121,7 +121,7 @@
       <object class="sizeritem">
         <object class="wxStaticText" name="ServerRulesetDesc">
           <style>wxALIGN_LEFT</style>
-          <label/>
+          <label />
         </object>
         <cellpos>4,0</cellpos>
       </object>
@@ -145,9 +145,9 @@
         <cellpos>0,0</cellpos>
       </object>
       <object class="sizeritem">
-        <object class="wxStaticText" name="wxID_STATIC">
+        <object class="wxStaticText" name="PageDesc">
           <style>wxALIGN_LEFT</style>
-          <label>Configure options for this ruleset (leave blank to use \ndefault):</label>
+          <label/>
         </object>
         <cellpos>1,0</cellpos>
       </object>
@@ -183,9 +183,9 @@
         <cellpos>0,0</cellpos>
       </object>
       <object class="sizeritem">
-        <object class="wxStaticText" name="wxID_STATIC">
+        <object class="wxStaticText" name="PageDesc">
           <style>wxALIGN_LEFT</style>
-          <label>Configure options for this server (leave blank to use \ndefault):</label>
+		  <label />
         </object>
         <cellpos>1,0</cellpos>
       </object>
@@ -223,7 +223,7 @@
       <object class="sizeritem">
         <object class="wxStaticText" name="AIListLabel">
           <style>wxALIGN_LEFT</style>
-          <label>Add an AI opponent to your game (no opponents \nadded yet):</label>
+          <label>Add an AI opponent to your game (no opponents added yet):</label>
         </object>
         <cellpos>1,0</cellpos>
       </object>
@@ -302,9 +302,9 @@
         <cellpos>0,0</cellpos>
       </object>
       <object class="sizeritem">
-        <object class="wxStaticText" name="wxID_STATIC">
+        <object class="wxStaticText" name="PageDesc">
           <style>wxALIGN_LEFT</style>
-          <label>The Thousand Parsec client will now connect to your \nlocal single player game.</label>
+		  <label />
         </object>
         <cellpos>1,0</cellpos>
       </object>
