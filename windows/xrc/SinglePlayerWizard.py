@@ -79,6 +79,7 @@ class StartPageBase(wx.wizard.PyWizardPage):
 		# Define variables for the controls
 		self.PageDesc = XRCCTRL(self, "PageDesc")
 		self.ProceedDesc = XRCCTRL(self, "ProceedDesc")
+		self.DownloadLink = XRCCTRL(self, "DownloadLink")
 
 
 class RulesetPageBase(wx.wizard.PyWizardPage):
@@ -134,6 +135,8 @@ class RulesetPageBase(wx.wizard.PyWizardPage):
 			self.Bind(wx.EVT_TEXT, self.OnRuleset, self.Ruleset)
 
 		self.RulesetDesc = XRCCTRL(self, "RulesetDesc")
+		self.DownloadDesc = XRCCTRL(self, "DownloadDesc")
+		self.DownloadLink = XRCCTRL(self, "DownloadLink")
 
 
 class ServerPageBase(wx.wizard.PyWizardPage):
@@ -402,9 +405,11 @@ def strings():
 	pass
 	_("TP: Single Player Game");
 	_("Single Player Game");
+	_("Download Servers");
 	_("Select Ruleset");
 	_("Choose a ruleset for your game:");
 	_("The ruleset to use.");
+	_("Download Additional Servers/Rulesets");
 	_("Select Server");
 	_("The server to use.");
 	_("Ruleset Options");

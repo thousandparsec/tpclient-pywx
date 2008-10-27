@@ -22,7 +22,7 @@ from xrc.SinglePlayerWizard import *
 from utils import *
 
 from tp.netlib.client import url2bits
-from tp.client.SinglePlayer import SinglePlayerGame
+from tp.client.SinglePlayer import DownloadList, SinglePlayerGame
 
 # FIXME: The game really isn't part of the username, it's part of the server information
 # You could be playing multiple different games on the same server!
@@ -158,7 +158,8 @@ class configConnect(configConnectBase, usernameMixIn):
 		self.Password.SetValue("")
 		self.AutoConnect.Disable()
 
-# wizard and wizard page classes
+
+# single player wizard
 
 class StartPage(StartPageBase):
 	def __init__(self, parent, *args, **kw):
@@ -167,12 +168,14 @@ class StartPage(StartPageBase):
 		self.PageDesc.Wrap(400)
 		# ensure there are some servers/rulesets installed
 		if len(parent.game.rulesets) > 0:
-			self.ProceedDesc.SetLabel("You appear to have at least one server with rulesets installed on your system.")
+			self.ProceedDesc.SetLabel("You appear to have at least one server installed on your system.")
 			self.ProceedDesc.Wrap(400)
+			self.DownloadLink.Hide()
 			self.proceed = True
 		else:
-			self.ProceedDesc.SetLabel("No servers or rulesets were found on your system.")
+			self.ProceedDesc.SetLabel("No servers were found on your system. You need a server to play a single player game. Click the link below for a list and installation instructions.")
 			self.ProceedDesc.Wrap(400)
+			self.DownloadLink.SetURL(parent.dllist.linkurl('server'))
 			self.proceed = False
 	def GetNext(self):
 		if self.proceed:
@@ -199,6 +202,14 @@ class RulesetPage(RulesetPageBase):
 		self.parent.game.rname = self.parent.game.rulesets[self.Ruleset.GetSelection()]
 		self.RulesetDesc.SetLabel(self.parent.game.ruleset_info(self.parent.game.rname)['description'])
 		self.RulesetDesc.Wrap(400)
+		# show additional downloads
+		if len(self.parent.dllist.rulesets) > len(self.parent.game.rulesets):
+			self.DownloadDesc.SetLabel("Additional rulesets are available by installing other servers. Click the link below for a list and installation instructions.")
+			self.DownloadDesc.Wrap(400)
+			self.DownloadLink.SetURL(self.parent.dllist.linkurl('server'))
+		else:
+			self.DownloadDesc.Hide()
+			self.DownloadLink.Hide()
 		# set current game server to first supported (will be chosen on next page)
 		self.parent.game.sname = self.parent.game.list_servers_with_ruleset()[0]
 		# populate server selection page
@@ -443,6 +454,7 @@ class SinglePlayerWizard(SinglePlayerWizardBase):
 		self.parent = parent
 
 		self.parent.application.game = SinglePlayerGame()
+		self.dllist = DownloadList(urlxml = 'http://glorfindel.mavrinac.com/~aaron/tp/downloads.xml')
 		self.game = self.parent.application.game
 
 		self.pages = []

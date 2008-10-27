@@ -34,6 +34,12 @@
         </object>
         <cellpos>2,0</cellpos>
       </object>
+      <object class="sizeritem">
+        <object class="wxHyperlinkCtrl" name="DownloadLink">
+          <label>Download Servers</label>
+        </object>
+        <cellpos>3,0</cellpos>
+      </object>
     </object>
   </object>
   <object class="wxPanel" name="RulesetPage" subclass="wxWizardPage">
@@ -75,6 +81,19 @@
           <label/>
         </object>
         <cellpos>3,0</cellpos>
+      </object>
+      <object class="sizeritem">
+        <object class="wxStaticText" name="DownloadDesc">
+          <style>wxALIGN_LEFT</style>
+          <label/>
+        </object>
+        <cellpos>4,0</cellpos>
+      </object>
+      <object class="sizeritem">
+        <object class="wxHyperlinkCtrl" name="DownloadLink">
+          <label>Download Additional Servers/Rulesets</label>
+        </object>
+        <cellpos>5,0</cellpos>
       </object>
     </object>
   </object>
