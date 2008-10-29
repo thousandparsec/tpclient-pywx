@@ -13,6 +13,7 @@ import wx.gizmos
 import wx.wizard as wiz
 
 from extra.decorators import freeze_wrapper
+from extra.Opener import open
 
 # Local Imports
 from winBase import winBaseXRC
@@ -470,6 +471,7 @@ class SinglePlayerWizard(SinglePlayerWizardBase):
 		self.Bind(wx.wizard.EVT_WIZARD_PAGE_CHANGED, self.OnPageChanged)
 		self.Bind(wx.wizard.EVT_WIZARD_PAGE_CHANGING, self.OnPageChanging)
 		self.Bind(wx.wizard.EVT_WIZARD_CANCEL, self.OnCancelWizard)
+		self.Bind(wx.EVT_HYPERLINK, self.OnLink)
 
 	def AddPage(self, page):
 		"""\
@@ -562,6 +564,9 @@ class SinglePlayerWizard(SinglePlayerWizardBase):
 	
 	def OnCancelWizard(self, event):
 		pass
+
+	def OnLink(self, event):
+		open(event.GetURL())
 
 USERNAME=0
 PASSWORD=1
