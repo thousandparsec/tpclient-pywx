@@ -230,14 +230,20 @@ class RulesetPage(RulesetPageBase):
 			self.next.next.skip = True
 		else:
 			self.next.next.skip = False
-		self.next.next.RefreshOpts()
+			self.next.next.PageDesc.SetLabel("Configure options for the " + self.parent.game.ruleset_info(self.parent.game.rname)['longname'] + " ruleset (leave blank to use default):")
+			self.next.next.PageDesc.Wrap(400)
+			self.next.next.RefreshOpts()
 		# populate opponent page
 		op = self.next.next.next.next
 		op.aiclients = self.parent.game.list_aiclients_with_ruleset()
 		if len(op.aiclients) == 0:
 			op.skip = True
+			op.next.skip = False
+			op.next.PageDesc.SetLabel("You do not appear to have any AI clients installed which support the " + self.parent.game.ruleset_info(self.parent.game.rname)['longname'] + " ruleset. If you proceed, you will have no opponents in the game. Click the link below for a list and installation instructions.")
+			op.next.PageDesc.Wrap(400)
 		else:
 			op.skip = False
+			op.next.skip = True
 		op.AIClient.SetItems([])
 		for aiclient in op.aiclients:
 			os = self.parent.game.ailist[aiclient]['longname']
@@ -274,8 +280,6 @@ class ServerPage(ServerPageBase):
 class RulesetOptsPage(RulesetOptsPageBase):
 	def __init__(self, parent, *args, **kw):
 		RulesetOptsPageBase.__init__(self, parent, *args, **kw)
-		self.PageDesc.SetLabel("Configure options for this ruleset (leave blank to use default):")
-		self.PageDesc.Wrap(400)
 		self.RulesetOptSizer = self.SizerRef.GetContainingSizer()
 
 	def GetNext(self):
@@ -346,6 +350,12 @@ class OpponentPage(OpponentPageBase):
 		OpponentPageBase.__init__(self, parent, *args, **kw)
 		self.AIOptSizer = self.SizerRef.GetContainingSizer()
 		self.AIOptSizer.SetMinSize((400,200))
+
+	def GetNext(self):
+		next = self.next
+		while next.skip:
+			next = next.next
+		return next
 
 	def GetPrev(self):
 		prev = self.prev
@@ -436,6 +446,17 @@ class OpponentPage(OpponentPageBase):
 		self.AIListLabel.SetLabel(label)
 		self.AIListLabel.Wrap(400)
 	
+class NoOpponentPage(NoOpponentPageBase):
+	def __init__(self, parent, *args, **kw):
+		NoOpponentPageBase.__init__(self, parent, *args, **kw)
+		self.DownloadLink.SetURL(parent.dllist.linkurl('ai'))
+
+	def GetPrev(self):
+		prev = self.prev
+		while prev.skip:
+			prev = prev.prev
+		return prev
+
 class EndPage(EndPageBase):
 	def __init__(self, parent, *args, **kw):
 		EndPageBase.__init__(self, parent, *args, **kw)
@@ -455,7 +476,7 @@ class SinglePlayerWizard(SinglePlayerWizardBase):
 		self.parent = parent
 
 		self.parent.application.game = SinglePlayerGame()
-		self.dllist = DownloadList(urlxml = 'http://glorfindel.mavrinac.com/~aaron/tp/downloads.xml')
+		self.dllist = DownloadList()
 		self.game = self.parent.application.game
 
 		self.pages = []
@@ -466,6 +487,7 @@ class SinglePlayerWizard(SinglePlayerWizardBase):
 		self.AddPage(RulesetOptsPage(self))
 		self.AddPage(ServerOptsPage(self))
 		self.AddPage(OpponentPage(self))
+		self.AddPage(NoOpponentPage(self))
 		self.AddPage(EndPage(self))
 
 		self.Bind(wx.wizard.EVT_WIZARD_PAGE_CHANGED, self.OnPageChanged)

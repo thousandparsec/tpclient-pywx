@@ -303,6 +303,38 @@
       </object>
     </object>
   </object>
+  <object class="wxPanel" name="NoOpponentPage" subclass="wxWizardPage">
+    <object class="wxGridBagSizer">
+      <vgap>5</vgap>
+      <growablecols>1</growablecols>
+      <object class="sizeritem">
+        <object class="wxStaticText" name="wxID_STATIC">
+          <font>
+            <size>14</size>
+            <family>swiss</family>
+            <weight>bold</weight>
+            <face>Sans</face>
+          </font>
+          <style>wxALIGN_CENTRE</style>
+          <label>No Opponents Found</label>
+        </object>
+        <cellpos>0,0</cellpos>
+      </object>
+      <object class="sizeritem">
+        <object class="wxStaticText" name="PageDesc">
+          <style>wxALIGN_LEFT</style>
+		  <label />
+        </object>
+        <cellpos>1,0</cellpos>
+      </object>
+      <object class="sizeritem">
+        <object class="wxHyperlinkCtrl" name="DownloadLink">
+          <label>Download AI Clients</label>
+        </object>
+        <cellpos>2,0</cellpos>
+      </object>
+    </object>
+  </object>
   <object class="wxPanel" name="EndPage" subclass="wxWizardPage">
     <object class="wxGridBagSizer">
       <vgap>5</vgap>
