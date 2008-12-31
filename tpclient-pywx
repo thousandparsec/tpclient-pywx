@@ -390,6 +390,8 @@ class GUI(wx.App):
 			dlg.ShowModal()
 			dlg.Destroy()
 
+	OnNetworkFailureUser = OnNetworkFailure
+
 from tp.client.threads import NetworkThread
 class Network(NetworkThread):
 	def ConnectTo(self, host, username, password, debug=False):
