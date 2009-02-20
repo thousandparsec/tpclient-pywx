@@ -179,7 +179,7 @@ class winAccount(winAccountBase, winBaseXRC, usernameMixIn):
 
 	@onlyshown
 	def OnNetworkConnect(self, evt):
-		if features.FEATURE_ACCOUNT_REGISTER in evt.args[0]:
+		if features.FEATURE_ACCOUNT_REGISTER in evt.features:
 			self.State("details")
 		else:
 			self.OnNetworkFailure(_("This server does not support account creation."))
