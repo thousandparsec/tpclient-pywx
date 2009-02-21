@@ -349,7 +349,7 @@ class OpponentPage(OpponentPageBase):
 	def __init__(self, parent, *args, **kw):
 		OpponentPageBase.__init__(self, parent, *args, **kw)
 		self.AIOptSizer = self.SizerRef.GetContainingSizer()
-		self.AIOptSizer.SetMinSize((400,200))
+		self.AIOptSizer.SetMinSize((400,-1))
 
 	def GetNext(self):
 		next = self.next
