@@ -221,7 +221,7 @@ class RulesetPage(RulesetPageBase):
 			self.next.skip = False
 		self.next.Server.SetItems([])
 		for server in self.next.servers:
-			ss = self.parent.game.serverlist[server]['longname']
+			ss = self.parent.game.locallist['server'][server]['longname']
 			self.next.Server.Insert(ss, self.next.Server.GetCount())
 		self.next.Server.SetSelection(0)
 		self.next.OnServer(None)
@@ -246,7 +246,7 @@ class RulesetPage(RulesetPageBase):
 			op.next.skip = True
 		op.AIClient.SetItems([])
 		for aiclient in op.aiclients:
-			os = self.parent.game.ailist[aiclient]['longname']
+			os = self.parent.game.locallist['aiclient'][aiclient]['longname']
 			op.AIClient.Insert(os, op.AIClient.GetCount())
 
 class ServerPage(ServerPageBase):
@@ -263,8 +263,8 @@ class ServerPage(ServerPageBase):
 
 	def OnServer(self, event):
 		# show server description
-		self.parent.game.sname = self.parent.game.serverlist.keys()[self.Server.GetSelection()]
-		self.ServerDesc.SetLabel(self.parent.game.serverlist[self.parent.game.sname]['description'])
+		self.parent.game.sname = self.parent.game.locallist['server'].keys()[self.Server.GetSelection()]
+		self.ServerDesc.SetLabel(self.parent.game.locallist['server'][self.parent.game.sname]['description'])
 		self.ServerDesc.Wrap(400)
 		# show info about ruleset implementation
 		rinfo = self.parent.game.ruleset_info()
@@ -367,9 +367,9 @@ class OpponentPage(OpponentPageBase):
 		"""\
 		Show AI client description.
 		"""
-		self.AIClientDesc.SetLabel(self.parent.game.ailist[self.parent.game.ailist.keys()[self.AIClient.GetSelection()]]['description'])
+		self.AIClientDesc.SetLabel(self.parent.game.locallist['aiclient'][self.parent.game.locallist['aiclient'].keys()[self.AIClient.GetSelection()]]['description'])
 		self.AIClientDesc.Wrap(400)
-		self.RefreshOpts(self.parent.game.ailist.keys()[self.AIClient.GetSelection()])
+		self.RefreshOpts(self.parent.game.locallist['aiclient'].keys()[self.AIClient.GetSelection()])
 	
 	def RefreshOpts(self, ainame):
 		"""\
@@ -379,7 +379,7 @@ class OpponentPage(OpponentPageBase):
 		"""
 		self.AIOptSizer.Clear(deleteWindows = True)
 		self.Params = {}
-		paramlist = self.parent.game.ailist[ainame]['parameters']
+		paramlist = self.parent.game.locallist['aiclient'][ainame]['parameter']
 		for opt in paramlist.keys():
 			self.AIOptSizer.Add(wx.StaticText(self, -1, paramlist[opt]['longname']))
 			if paramlist[opt]['default'] is None:
@@ -401,7 +401,7 @@ class OpponentPage(OpponentPageBase):
 		self.AIUser.SetValue(opponent['user'])
 		# determine which AI client selection this is
 		i = 0
-		for ainame in self.parent.game.ailist.keys():
+		for ainame in self.parent.game.locallist['aiclient'].keys():
 			if opponent['name'] == ainame:
 				break
 			i += 1
@@ -553,9 +553,9 @@ class SinglePlayerWizard(SinglePlayerWizardBase):
 					event.Veto()
 					if event.GetPage().AIUser.GetValue() != '':
 						# add the opponent
-						ainame = self.game.ailist.keys()[event.GetPage().AIClient.GetSelection()]
+						ainame = self.game.locallist['aiclient'].keys()[event.GetPage().AIClient.GetSelection()]
 						aiparams = {}
-						for opt in self.game.ailist[ainame]['parameters'].keys():
+						for opt in self.game.locallist['aiclient'][ainame]['parameter'].keys():
 							aiparams[opt] = str(event.GetPage().Params[opt].GetValue())
 						self.game.add_opponent(ainame, str(event.GetPage().AIUser.GetValue()), aiparams)
 						# clear the form for the next opponent
