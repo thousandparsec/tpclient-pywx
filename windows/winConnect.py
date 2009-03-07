@@ -5,6 +5,7 @@ person enter the server/username/password.
 
 # Python imports
 import string
+import pprint
 import re
 
 # wxPython Imports
@@ -165,24 +166,31 @@ class configConnect(configConnectBase, usernameMixIn):
 class StartPage(StartPageBase):
 	def __init__(self, parent, *args, **kw):
 		StartPageBase.__init__(self, parent, *args, **kw)
-		self.PageDesc.SetLabel("This wizard sets up a single player Thousand Parsec game using the servers, rulesets, and AI clients installed locally on your system.")
+		self.PageDesc.SetLabel(_("""\
+This wizard sets up a single player Thousand Parsec game using the servers, \
+rulesets, and AI clients installed locally on your system."""))
 		self.PageDesc.Wrap(400)
+
 		# ensure there are some servers/rulesets installed
 		if len(parent.game.rulesets) > 0:
-			self.ProceedDesc.SetLabel("You appear to have at least one server installed on your system.")
+			self.ProceedDesc.SetLabel(_("""\
+You have at least one server installed on your system. Click the link below \
+to install more."""))
 			self.ProceedDesc.Wrap(400)
-			self.DownloadLink.Hide()
 			self.proceed = True
 		else:
-			self.ProceedDesc.SetLabel("No servers were found on your system. You need a server to play a single player game. Click the link below for a list and installation instructions.")
+			self.ProceedDesc.SetLabel("""\
+No servers were found on your system. You need a server to play a single \
+player game. Click the link below for a list and installation instructions.""")
 			self.ProceedDesc.Wrap(400)
-			self.DownloadLink.SetURL(parent.dllist.linkurl('server'))
 			self.proceed = False
+
+		self.DownloadLink.SetURL(parent.dllist.linkurl('server'))
+
 	def GetNext(self):
 		if self.proceed:
 			return self.next
-		else:
-			return None
+		return None
 
 class RulesetPage(RulesetPageBase):
 	def __init__(self, parent, *args, **kw):
@@ -203,48 +211,63 @@ class RulesetPage(RulesetPageBase):
 		self.parent.game.rname = self.parent.game.rulesets[self.Ruleset.GetSelection()]
 		self.RulesetDesc.SetLabel(self.parent.game.ruleset_info(self.parent.game.rname)['description'])
 		self.RulesetDesc.Wrap(400)
+
 		# show additional downloads
 		if len(self.parent.dllist.rulesets) > len(self.parent.game.rulesets):
-			self.DownloadDesc.SetLabel("Additional rulesets are available by installing other servers. Click the link below for a list and installation instructions.")
+			self.DownloadDesc.SetLabel("""\
+Additional rulesets are available by installing other servers. Click the link \
+below for a list and installation instructions.""") 
 			self.DownloadDesc.Wrap(400)
 			self.DownloadLink.SetURL(self.parent.dllist.linkurl('server'))
 		else:
 			self.DownloadDesc.Hide()
 			self.DownloadLink.Hide()
-		# set current game server to first supported (will be chosen on next page)
+
+		# Set current game server to first supported.
 		self.parent.game.sname = self.parent.game.list_servers_with_ruleset()[0]
-		# populate server selection page
+
+		# If multiple servers provide a ruleset, let the player select which
+		# server to use.
 		self.next.servers = self.parent.game.list_servers_with_ruleset()
 		if len(self.next.servers) == 1:
 			self.next.skip = True
 		else:
 			self.next.skip = False
+
 		self.next.Server.SetItems([])
 		for server in self.next.servers:
 			ss = self.parent.game.locallist['server'][server]['longname']
 			self.next.Server.Insert(ss, self.next.Server.GetCount())
 		self.next.Server.SetSelection(0)
 		self.next.OnServer(None)
+
 		# populate ruleset parameter page
 		if len(self.parent.game.list_rparams()) == 0:
 			self.next.next.skip = True
 		else:
 			self.next.next.skip = False
-			self.next.next.PageDesc.SetLabel("Configure options for the " + self.parent.game.ruleset_info(self.parent.game.rname)['longname'] + " ruleset (leave blank to use default):")
+			self.next.next.PageDesc.SetLabel(_("""\
+Configure options for the %(longname)s ruleset (leave blank to use default):""") % self.parent.game.ruleset_info(self.parent.game.rname)['longname'])
 			self.next.next.PageDesc.Wrap(400)
 			self.next.next.RefreshOpts()
+
 		# populate opponent page
 		op = self.next.next.next.next
 		op.aiclients = self.parent.game.list_aiclients_with_ruleset()
 		if len(op.aiclients) == 0:
 			op.skip = True
 			op.next.skip = False
-			op.next.PageDesc.SetLabel("You do not appear to have any AI clients installed which support the " + self.parent.game.ruleset_info(self.parent.game.rname)['longname'] + " ruleset. If you proceed, you will have no opponents in the game. Click the link below for a list and installation instructions.")
+			op.next.PageDesc.SetLabel(_("""\
+You do not appear to have any AI clients installed which support the \
+%(longname)s ruleset. If you proceed, you will have no opponents in the game. \
+Click the link below for a list and installation instructions.""") % self.parent.game.ruleset_info(self.parent.game.rname))
 			op.next.PageDesc.Wrap(400)
 		else:
 			op.skip = False
 			op.next.skip = True
+
 		op.AIClient.SetItems([])
+
 		for aiclient in op.aiclients:
 			os = self.parent.game.locallist['aiclient'][aiclient]['longname']
 			op.AIClient.Insert(os, op.AIClient.GetCount())
@@ -252,7 +275,7 @@ class RulesetPage(RulesetPageBase):
 class ServerPage(ServerPageBase):
 	def __init__(self, parent, *args, **kw):
 		ServerPageBase.__init__(self, parent, *args, **kw)
-		self.PageDesc.SetLabel("Multiple servers implement the ruleset you selected. Please select a server to use:")
+		self.PageDesc.SetLabel(_("Multiple servers implement the ruleset you selected. Please select a server to use:"))
 		self.PageDesc.Wrap(400)
 
 	def GetNext(self):
@@ -266,15 +289,18 @@ class ServerPage(ServerPageBase):
 		self.parent.game.sname = self.parent.game.locallist['server'].keys()[self.Server.GetSelection()]
 		self.ServerDesc.SetLabel(self.parent.game.locallist['server'][self.parent.game.sname]['description'])
 		self.ServerDesc.Wrap(400)
+
 		# show info about ruleset implementation
 		rinfo = self.parent.game.ruleset_info()
-		self.ServerRulesetDesc.SetLabel("Implements " + rinfo['longname'] + " version " + rinfo['version'] + ".")
+		self.ServerRulesetDesc.SetLabel(_("Implements %(longname)s version %(version)s.") % rinfo)
 		self.ServerRulesetDesc.Wrap(400)
+
 		# populate server parameter page
 		if len(self.parent.game.list_sparams()) == 0:
 			self.next.next.skip = True
 		else:
 			self.next.next.skip = False
+
 		self.next.next.RefreshOpts()
 
 class RulesetOptsPage(RulesetOptsPageBase):
@@ -523,7 +549,7 @@ class SinglePlayerWizard(SinglePlayerWizardBase):
 			event.Veto()
 			return
 
-		if isinstance(event.GetPage(), StartPage) and self.game.sname == '':
+		if isinstance(event.GetPage(), StartPage) and self.game.sname != '':
 			# initialize ruleset selection
 			event.GetPage().next.Ruleset.SetSelection(0)
 			event.GetPage().next.OnRuleset(None)
