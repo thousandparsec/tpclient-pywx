@@ -554,8 +554,9 @@ class SinglePlayerWizard(SinglePlayerWizardBase):
 
 		if isinstance(event.GetPage(), StartPage) and self.game.sname == '':
 			# initialize ruleset selection
-			event.GetPage().next.Ruleset.SetSelection(0)
-			event.GetPage().next.OnRuleset(None)
+			if len(self.game.rulesets) > 0:
+				event.GetPage().next.Ruleset.SetSelection(0)
+				event.GetPage().next.OnRuleset(None)
 			return
 
 		if isinstance(event.GetPage(), RulesetOptsPage):
