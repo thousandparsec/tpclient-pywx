@@ -172,6 +172,7 @@ IDmap = {
 	"wxID_FIND":		"Find",
 	"wxID_REFRESH":		"Refresh",
 	"wxID_PREFERENCES":	"Config",
+	"wxID_DELETE":		"Delete",
 }
 
 Template_Default = """\

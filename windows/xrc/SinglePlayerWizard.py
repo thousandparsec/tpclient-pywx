@@ -354,10 +354,19 @@ class OpponentPageBase(wx.wizard.PyWizardPage):
 		self.AIUser = XRCCTRL(self, "AIUser")
 		self.AIOptionsLabel = XRCCTRL(self, "AIOptionsLabel")
 		self.SizerRef = XRCCTRL(self, "SizerRef")
-		self.Add = XRCCTRL(self, "Add")
-		if hasattr(self, "OnAdd"):
-			self.Bind(wx.EVT_BUTTON, self.OnAdd, self.Add)
+		self.New = XRCCTRL(self, "wxID_NEW")
+		if hasattr(self, "OnNew"):
+			self.Bind(wx.EVT_BUTTON, self.OnNew, self.New)
 
+		self.Save = XRCCTRL(self, "wxID_SAVE")
+		if hasattr(self, "OnSave"):
+			self.Bind(wx.EVT_BUTTON, self.OnSave, self.Save)
+
+		self.Delete = XRCCTRL(self, "wxID_DELETE")
+		if hasattr(self, "OnDelete"):
+			self.Bind(wx.EVT_BUTTON, self.OnDelete, self.Delete)
+
+		self.BoxRef = XRCCTRL(self, "BoxRef")
 
 
 class NoOpponentPageBase(wx.wizard.PyWizardPage):
@@ -478,6 +487,8 @@ def strings():
 	_("Name");
 	_("Options");
 	_("Add");
+	_("&Save");
+	_("&Delete");
 	_("New Opponent");
 	_("No Opponents Found");
 	_("Download AI Clients");

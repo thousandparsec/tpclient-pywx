@@ -163,17 +163,25 @@ class configConnect(configConnectBase, usernameMixIn):
 
 # single player wizard
 
-def PopulateOpts(paramlist, page, sizer):
+def PopulateOpts(paramlist, page, sizer, label=None):
 	sizer.Clear(deleteWindows = True)
 	page.Params = {}
-	for opt in paramlist.keys():
-		sizer.Add(wx.StaticText(page, -1, paramlist[opt]['longname']))
-		if paramlist[opt]['default'] is None:
-			default = ''
-		else:
-			default = str(paramlist[opt]['default'])
-		page.Params[opt] = wx.TextCtrl(page, -1, default, size = (200, -1))
-		sizer.Add(page.Params[opt])
+	if len(paramlist) > 0:
+		if label is not None:
+			label.Show()
+		sizer.Show(True)
+		for opt in paramlist.keys():
+			sizer.Add(wx.StaticText(page, -1, paramlist[opt]['longname']))
+			if paramlist[opt]['default'] is None:
+				default = ''
+			else:
+				default = str(paramlist[opt]['default'])
+			page.Params[opt] = wx.TextCtrl(page, -1, default, size = (200, -1))
+			sizer.Add(page.Params[opt])
+	else:
+		if label is not None:
+			label.Hide()
+		sizer.Hide(True)
 	sizer.Layout()
 	
 
@@ -375,14 +383,10 @@ class OpponentPage(OpponentPageBase):
 		OpponentPageBase.__init__(self, parent, *args, **kw)
 
 		self.AIOptSizer = self.SizerRef.GetContainingSizer()
+		self.Box = self.BoxRef.GetContainingSizer().GetStaticBox()
 
-		self.Opponents.ClearAll()
-		# Add the columns
-		for i, name in enumerate(self.Columns):
-			self.Opponents.InsertColumn(i, name)
-		# Set the column widths
-		for i, name in enumerate(self.Columns):
-			self.Opponents.SetColumnWidth(i, self.Columns_Sizes[i])
+		self.Opponents.Bind(wx.EVT_LIST_ITEM_SELECTED, self.OnOpponentsSelect)
+
 
 	def GetNext(self):
 		next = self.next
@@ -404,11 +408,62 @@ class OpponentPage(OpponentPageBase):
 		self.AIClientDesc.Wrap(400)
 		self.RefreshOpts(self.parent.game.locallist['aiclient'].keys()[self.AIClient.GetSelection()])
 
-	def OnAdd(self, event):
+	def OnOpponentsSelect(self, event):
+		opponent = self.Opponents.GetItemPyData(event.GetIndex())
+		self.Populate(opponent)
+
+		self.New.Hide()
+
+		self.Save.Show()
+		self.Delete.Show()
+
+		self.Box.SetLabel("Edit Opponent")
+
+		self.Layout()
+
+	def OnDelete(self, event):
+		self.Opponents.DeleteItem(self.Opponents.GetSelected()[0])
+
+		self.ResetAdd()
+
+	def OnSave(self, event):
+		self.AddOpponent(self.Opponents.GetSelected()[0])
+		self.ResetAdd()
+
+	def OnNew(self, event):
 		"""\
 		Called when the AI is added...
 		"""
+		self.AddOpponent(-1)
+		self.ResetAdd()
+
+	def AddOpponent(self, i):
+		name = self.parent.game.locallist['aiclient'].keys()[self.AIClient.GetSelection()]
+		user = self.AIUser.GetValue()
+		if len(user) == 0:
+			# FIXME: Add a pop-up telling them to add a username.
+			return
+
+		# FIXME: Check that the username is not already used
+
 		# Check the input values
+		opponent = {
+			'name': name,
+			'user': user,
+			'parameters': {}}
+
+		# Get the optional parameters
+		parameters = {}
+		for opt in self.parent.game.locallist['aiclient'][name]['parameter'].keys():
+			opponent['parameters'][opt] = str(self.Params[opt].GetValue())
+
+		if i == -1:
+			i = self.Opponents.GetItemCount()
+			self.Opponents.InsertStringItem(i, "")
+		self.Opponents.SetStringItem(i, self.Columns.index(_("Name")), user)
+		self.Opponents.SetStringItem(i, self.Columns.index(_("Type")), 
+			self.parent.game.locallist['aiclient'][name]['longname'])
+		self.Opponents.SetItemPyData(i, opponent)
 	
 	def RefreshOpts(self, ainame):
 		"""\
@@ -416,7 +471,7 @@ class OpponentPage(OpponentPageBase):
 
 		@param ainame The name of the selected AI client.
 		"""
-		PopulateOpts(self.parent.game.locallist['aiclient'][ainame]['parameter'], self, self.AIOptSizer)
+		PopulateOpts(self.parent.game.locallist['aiclient'][ainame]['parameter'], self, self.AIOptSizer, self.AIOptionsLabel)
 
 	def Populate(self, opponent):
 		"""\
@@ -428,12 +483,9 @@ class OpponentPage(OpponentPageBase):
 		self.AIUser.SetValue(opponent['user'])
 
 		# determine which AI client selection this is
-		i = 0
-		for ainame in self.parent.game.locallist['aiclient'].keys():
+		for i, ainame in enumerate(self.parent.game.locallist['aiclient'].keys()):
 			if opponent['name'] == ainame:
 				break
-			i += 1
-
 		self.AIClient.SetSelection(i)
 
 		# show and populate options
@@ -441,13 +493,9 @@ class OpponentPage(OpponentPageBase):
 		for opt in opponent['parameters'].keys():
 			self.Params[opt].SetValue(opponent['parameters'][opt])
 
-		# write opponent list
-		self.WriteOpponentList()
+	def ResetAdd(self):
+		self.Opponents.SetSelected([])
 
-	def Reset(self):
-		"""\
-		Resets the page.
-		"""
 		# clear name and client selection
 		self.AIUser.SetValue('')
 		self.AIClient.SetSelection(0)
@@ -457,6 +505,19 @@ class OpponentPage(OpponentPageBase):
 		self.AIOptSizer.Clear(deleteWindows = True)
 		self.Params = {}
 
+		self.New.Show()
+		self.Save.Hide()
+		self.Delete.Hide()
+		self.Box.SetLabel("New Opponent")
+
+		self.Layout()
+
+	def Reset(self):
+		"""\
+		Resets the page.
+		"""
+		self.ResetAdd()
+
 		# write opponent list
 		self.WriteOpponentList()
 
@@ -464,11 +525,20 @@ class OpponentPage(OpponentPageBase):
 		"""\
 		Writes a list of current opponents into the page description text.
 		"""
+		self.Opponents.ClearAll()
+		# Add the columns
+		for i, name in enumerate(self.Columns):
+			self.Opponents.InsertColumn(i, name)
+		# Set the column widths
+		for i, name in enumerate(self.Columns):
+			self.Opponents.SetColumnWidth(i, self.Columns_Sizes[i])
+
 		for i, opponent in enumerate(self.parent.game.opponents):
 			self.Opponents.InsertStringItem(i, "")
 			self.Opponents.SetStringItem(i, self.Columns.index(_("Name")), opponent['user'])
-			self.Opponents.SetStringItem(i, self.Columns.index(_("Type")), "")
-			self.Opponents.SetItemPyData(opponent)
+			self.Opponents.SetStringItem(i, self.Columns.index(_("Type")),
+				self.parent.game.locallist['aiclient'][opponent['name']]['longname'])
+			self.Opponents.SetItemPyData(i, opponent)
 
 	
 class NoOpponentPage(NoOpponentPageBase):
@@ -575,9 +645,9 @@ class SinglePlayerWizard(SinglePlayerWizardBase):
 
 		if isinstance(event.GetPage(), OpponentPage):
 			self.game.opponents = []
-			for i in range(0, ctrl.GetItemCount()):
+			for i in range(0, event.GetPage().Opponents.GetItemCount()):
 				opponent = event.GetPage().Opponents.GetItemPyData(i)
-				self.game.add_opponent(*opponent)
+				self.game.add_opponent(**opponent)
 			return
 
 		if isinstance(event.GetPage(), EndPage):
