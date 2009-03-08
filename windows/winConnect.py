@@ -163,6 +163,19 @@ class configConnect(configConnectBase, usernameMixIn):
 
 # single player wizard
 
+def PopulateOpts(paramlist, page, sizer):
+	sizer.Clear(deleteWindows = True)
+	page.Params = {}
+	for opt in paramlist.keys():
+		sizer.Add(wx.StaticText(page, -1, paramlist[opt]['longname']))
+		if paramlist[opt]['default'] is None:
+			default = ''
+		else:
+			default = str(paramlist[opt]['default'])
+		page.Params[opt] = wx.TextCtrl(page, -1, default, size = (200, -1))
+		sizer.Add(page.Params[opt])
+	
+
 class StartPage(StartPageBase):
 	def __init__(self, parent, *args, **kw):
 		StartPageBase.__init__(self, parent, *args, **kw)
@@ -326,17 +339,7 @@ class RulesetOptsPage(RulesetOptsPageBase):
 		"""\
 		Clear and repopulate the parameter fields.
 		"""
-		self.RulesetOptSizer.Clear(deleteWindows = True)
-		self.Params = {}
-		paramlist = self.parent.game.list_rparams()
-		for opt in paramlist.keys():
-			self.RulesetOptSizer.Add(wx.StaticText(self, -1, paramlist[opt]['longname']))
-			if paramlist[opt]['default'] is None:
-				default = ''
-			else:
-				default = str(paramlist[opt]['default'])
-			self.Params[opt] = wx.TextCtrl(self, -1, default, size = (200, -1))
-			self.RulesetOptSizer.Add(self.Params[opt])
+		PopulateOpts(self.parent.game.list_rparams(), self, self.RulesetOptSizer)
 
 class ServerOptsPage(ServerOptsPageBase):
 	def __init__(self, parent, *args, **kw):
@@ -361,17 +364,7 @@ class ServerOptsPage(ServerOptsPageBase):
 		"""\
 		Clear and repopulate the parameter fields.
 		"""
-		self.ServerOptSizer.Clear(deleteWindows = True)
-		self.Params = {}
-		paramlist = self.parent.game.list_sparams()
-		for opt in paramlist.keys():
-			self.ServerOptSizer.Add(wx.StaticText(self, -1, paramlist[opt]['longname']))
-			if paramlist[opt]['default'] is None:
-				default = ''
-			else:
-				default = str(paramlist[opt]['default'])
-			self.Params[opt] = wx.TextCtrl(self, -1, default, size = (200, -1))
-			self.ServerOptSizer.Add(self.Params[opt])
+		PopulateOpts(self.parent.game.list_sparams(), self, self.ServerOptSizer)
 
 class OpponentPage(OpponentPageBase):
 	def __init__(self, parent, *args, **kw):
@@ -405,17 +398,7 @@ class OpponentPage(OpponentPageBase):
 
 		@param ainame The name of the selected AI client.
 		"""
-		self.AIOptSizer.Clear(deleteWindows = True)
-		self.Params = {}
-		paramlist = self.parent.game.locallist['aiclient'][ainame]['parameter']
-		for opt in paramlist.keys():
-			self.AIOptSizer.Add(wx.StaticText(self, -1, paramlist[opt]['longname']))
-			if paramlist[opt]['default'] is None:
-				default = ''
-			else:
-				default = str(paramlist[opt]['default'])
-			self.Params[opt] = wx.TextCtrl(self, -1, default, size = (200, -1))
-			self.AIOptSizer.Add(self.Params[opt])
+		PopulateOpts(self.parent.game.locallist['aiclient'][ainame]['parameter'], self, self.AIOptSizer)
 		# refresh the parameter control layout
 		self.AIOptSizer.Layout()
 
