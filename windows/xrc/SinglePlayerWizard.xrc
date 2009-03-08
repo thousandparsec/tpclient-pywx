@@ -23,14 +23,14 @@
       <object class="sizeritem">
         <object class="wxStaticText" name="PageDesc">
           <style>wxALIGN_LEFT</style>
-		  <label />
+          <label/>
         </object>
         <cellpos>1,0</cellpos>
       </object>
       <object class="sizeritem">
         <object class="wxStaticText" name="ProceedDesc">
           <style>wxALIGN_LEFT</style>
-          <label />
+          <label/>
         </object>
         <cellpos>2,0</cellpos>
       </object>
@@ -117,7 +117,7 @@
       <object class="sizeritem">
         <object class="wxStaticText" name="PageDesc">
           <style>wxALIGN_LEFT</style>
-		  <label />
+          <label/>
         </object>
         <cellpos>1,0</cellpos>
       </object>
@@ -140,7 +140,7 @@
       <object class="sizeritem">
         <object class="wxStaticText" name="ServerRulesetDesc">
           <style>wxALIGN_LEFT</style>
-          <label />
+          <label/>
         </object>
         <cellpos>4,0</cellpos>
       </object>
@@ -172,13 +172,13 @@
       </object>
       <object class="sizeritem">
         <object class="wxGridSizer">
-		  <cols>2</cols>
+          <cols>2</cols>
           <vgap>5</vgap>
-		  <object class="sizeritem">
-		    <object class="wxStaticText" name="SizerRef">
-			  <label />
-			</object>
-	      </object>
+          <object class="sizeritem">
+            <object class="wxStaticText" name="SizerRef">
+              <label/>
+            </object>
+          </object>
         </object>
         <cellpos>2,0</cellpos>
       </object>
@@ -204,104 +204,152 @@
       <object class="sizeritem">
         <object class="wxStaticText" name="PageDesc">
           <style>wxALIGN_LEFT</style>
-		  <label />
-        </object>
-        <cellpos>1,0</cellpos>
-      </object>
-      <object class="sizeritem">
-        <object class="wxGridSizer">
-		  <cols>2</cols>
-          <vgap>5</vgap>
-		  <object class="sizeritem">
-		    <object class="wxStaticText" name="SizerRef">
-			  <label />
-			</object>
-	      </object>
-        </object>
-        <cellpos>2,0</cellpos>
-      </object>
-    </object>
-  </object>
-  <object class="wxPanel" name="OpponentPage" subclass="wxWizardPage">
-    <object class="wxGridBagSizer">
-      <vgap>5</vgap>
-      <growablecols>1</growablecols>
-      <object class="sizeritem">
-        <object class="wxStaticText" name="wxID_STATIC">
-          <font>
-            <size>14</size>
-            <family>swiss</family>
-            <weight>bold</weight>
-            <face>Sans</face>
-          </font>
-          <style>wxALIGN_CENTRE</style>
-          <label>Add Opponent</label>
-        </object>
-        <cellpos>0,0</cellpos>
-      </object>
-      <object class="sizeritem">
-        <object class="wxStaticText" name="AIListLabel">
-          <style>wxALIGN_LEFT</style>
-          <label>Add an AI opponent to your game (no opponents added yet):</label>
+          <label/>
         </object>
         <cellpos>1,0</cellpos>
       </object>
       <object class="sizeritem">
         <object class="wxGridSizer">
           <cols>2</cols>
+          <vgap>5</vgap>
           <object class="sizeritem">
-            <object class="wxStaticText" name="wxID_STATIC">
-              <style>wxALIGN_LEFT</style>
-              <label>Name</label>
-            </object>
-          </object>
-          <object class="sizeritem">
-            <object class="wxTextCtrl" name="AIUser">
-              <size>200,-1</size>
+            <object class="wxStaticText" name="SizerRef">
+              <label/>
             </object>
           </object>
         </object>
         <cellpos>2,0</cellpos>
       </object>
-      <object class="sizeritem">
-        <object class="wxComboBox" name="AIClient">
-          <tooltip>The AI client to use.</tooltip>
-          <content/>
-          <size>400,-1</size>
-          <style>wxCB_READONLY</style>
-        </object>
-        <cellpos>3,0</cellpos>
-      </object>
-      <object class="sizeritem">
-        <object class="wxStaticText" name="AIClientDesc">
-          <style>wxALIGN_LEFT</style>
-          <label/>
-        </object>
-        <cellpos>4,0</cellpos>
-      </object>
-      <object class="sizeritem">
-        <object class="wxGridSizer">
-		  <cols>2</cols>
-          <vgap>5</vgap>
-		  <object class="sizeritem">
-		    <object class="wxStaticText" name="SizerRef">
-			  <label />
-			</object>
-	      </object>
-        </object>
-        <cellpos>5,0</cellpos>
-      </object>
-      <object class="sizeritem">
-        <object class="wxRadioBox" name="AddChoice">
-          <label>Action</label>
-          <content>
-            <item>Add Opponent</item>
-            <item>Finish</item>
-          </content>
-        </object>
-        <cellpos>6,0</cellpos>
-      </object>
     </object>
+  </object>
+  <object class="wxPanel" name="OpponentPage" subclass="wxWizardPage">
+    <object class="wxFlexGridSizer">
+      <object class="sizeritem">
+        <object class="wxStaticText" name="wxID_STATIC">
+          <label>Opponents</label>
+          <font>
+            <size>14</size>
+            <weight>bold</weight>
+            <family>swiss</family>
+            <face>Sans</face>
+          </font>
+          <style>wxALIGN_CENTRE</style>
+        </object>
+        <option>1</option>
+        <flag>wxEXPAND|wxGROW</flag>
+      </object>
+      <object class="sizeritem">
+        <object class="wxStaticText" name="AIListLabel">
+          <label>This page lets you add AI opponents to your game.</label>
+          <style>wxALIGN_LEFT</style>
+        </object>
+        <option>1</option>
+        <flag>wxEXPAND|wxGROW</flag>
+      </object>
+      <object class="sizeritem">
+        <object class="wxFlexGridSizer">
+          <object class="sizeritem">
+            <object class="wxListCtrl" name="Opponents">
+              <size>100,100</size>
+              <style>wxLC_REPORT</style>
+            </object>
+            <option>1</option>
+            <flag>wxEXPAND|wxGROW</flag>
+            <ratio>1</ratio>
+          </object>
+          <cols>1</cols>
+          <rows>1</rows>
+          <growablecols>0</growablecols>
+          <growablerows>0</growablerows>
+        </object>
+        <option>1</option>
+        <flag>wxEXPAND|wxGROW</flag>
+      </object>
+      <object class="sizeritem">
+        <object class="wxStaticBoxSizer">
+          <object class="sizeritem">
+            <object class="wxFlexGridSizer">
+              <object class="sizeritem">
+                <object class="wxStaticText" name="AIClientLabel">
+                  <size>200,-1</size>
+                  <label>Type</label>
+                </object>
+              </object>
+              <object class="sizeritem">
+                <object class="wxComboBox" name="AIClient">
+                  <tooltip>The AI client to use.</tooltip>
+                  <content/>
+                  <size>400,-1</size>
+                  <style>wxCB_READONLY</style>
+                </object>
+              </object>
+              <object class="spacer"/>
+              <object class="sizeritem">
+                <object class="wxStaticText" name="AIClientDesc">
+                  <label>The AI description will go here.</label>
+                  <style>wxALIGN_LEFT</style>
+                </object>
+                <option>1</option>
+                <flag>wxALL|wxEXPAND</flag>
+                <border>4</border>
+              </object>
+              <object class="sizeritem">
+                <object class="wxStaticText" name="AIUserLabel">
+                  <label>Name</label>
+                  <style>wxALIGN_LEFT</style>
+                </object>
+              </object>
+              <object class="sizeritem">
+                <object class="wxTextCtrl" name="AIUser"/>
+                <option>1</option>
+                <flag>wxEXPAND|wxGROW</flag>
+              </object>
+              <object class="sizeritem">
+                <object class="wxStaticText" name="AIOptionsLabel">
+                  <label>Options</label>
+                </object>
+              </object>
+              <object class="sizeritem">
+                <object class="wxGridBagSizer">
+                  <object class="sizeritem">
+                    <object class="wxTextCtrl" name="SizerRef"/>
+                  </object>
+                </object>
+              </object>
+              <object class="spacer"/>
+              <object class="sizeritem">
+                <object class="wxFlexGridSizer">
+                  <object class="spacer"/>
+                  <object class="sizeritem">
+                    <object class="wxButton" name="Add">
+                      <label>Add</label>
+                    </object>
+                  </object>
+                  <cols>2</cols>
+                  <rows>2</rows>
+                  <growablecols>0</growablecols>
+                  <growablerows>1,3</growablerows>
+                </object>
+                <option>1</option>
+                <flag>wxEXPAND|wxGROW</flag>
+              </object>
+              <cols>2</cols>
+              <vgap>1</vgap>
+              <growablecols>1</growablecols>
+            </object>
+          </object>
+          <label>New Opponent</label>
+          <orient>wxHORIZONTAL</orient>
+        </object>
+        <option>1</option>
+        <flag>wxEXPAND|wxGROW</flag>
+      </object>
+      <cols>1</cols>
+      <vgap>5</vgap>
+      <growablecols>0</growablecols>
+      <growablerows>2,3</growablerows>
+    </object>
+    <size>400,0</size>
   </object>
   <object class="wxPanel" name="NoOpponentPage" subclass="wxWizardPage">
     <object class="wxGridBagSizer">
@@ -323,7 +371,7 @@
       <object class="sizeritem">
         <object class="wxStaticText" name="PageDesc">
           <style>wxALIGN_LEFT</style>
-		  <label />
+          <label/>
         </object>
         <cellpos>1,0</cellpos>
       </object>
@@ -355,7 +403,7 @@
       <object class="sizeritem">
         <object class="wxStaticText" name="PageDesc">
           <style>wxALIGN_LEFT</style>
-		  <label />
+          <label/>
         </object>
         <cellpos>1,0</cellpos>
       </object>

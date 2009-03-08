@@ -340,7 +340,8 @@ class OpponentPageBase(wx.wizard.PyWizardPage):
 
 		# Define variables for the controls
 		self.AIListLabel = XRCCTRL(self, "AIListLabel")
-		self.AIUser = XRCCTRL(self, "AIUser")
+		self.Opponents = XRCCTRL(self, "Opponents")
+		self.AIClientLabel = XRCCTRL(self, "AIClientLabel")
 		self.AIClient = XRCCTRL(self, "AIClient")
 		if hasattr(self, "OnAIClient"):
 			self.Bind(wx.EVT_COMBOBOX, self.OnAIClient, self.AIClient)
@@ -349,8 +350,14 @@ class OpponentPageBase(wx.wizard.PyWizardPage):
 			self.Bind(wx.EVT_TEXT, self.OnAIClient, self.AIClient)
 
 		self.AIClientDesc = XRCCTRL(self, "AIClientDesc")
+		self.AIUserLabel = XRCCTRL(self, "AIUserLabel")
+		self.AIUser = XRCCTRL(self, "AIUser")
+		self.AIOptionsLabel = XRCCTRL(self, "AIOptionsLabel")
 		self.SizerRef = XRCCTRL(self, "SizerRef")
-		self.AddChoice = XRCCTRL(self, "AddChoice")
+		self.Add = XRCCTRL(self, "Add")
+		if hasattr(self, "OnAdd"):
+			self.Bind(wx.EVT_BUTTON, self.OnAdd, self.Add)
+
 
 
 class NoOpponentPageBase(wx.wizard.PyWizardPage):
@@ -463,13 +470,15 @@ def strings():
 	_("The server to use.");
 	_("Ruleset Options");
 	_("Server Options");
-	_("Add Opponent");
-	_("Add an AI opponent to your game (no opponents added yet):");
-	_("Name");
+	_("Opponents");
+	_("This page lets you add AI opponents to your game.");
+	_("Type");
 	_("The AI client to use.");
-	_("Action");
-	_("Add Opponent");
-	_("Finish");
+	_("The AI description will go here.");
+	_("Name");
+	_("Options");
+	_("Add");
+	_("New Opponent");
 	_("No Opponents Found");
 	_("Download AI Clients");
 	_("Setup Complete");
