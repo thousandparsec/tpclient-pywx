@@ -207,9 +207,14 @@ class RulesetPage(RulesetPageBase):
 		return next
 
 	def OnRuleset(self, event):
-		# show ruleset description
+		# set ruleset
 		self.parent.game.rname = self.parent.game.rulesets[self.Ruleset.GetSelection()]
-		self.RulesetDesc.SetLabel(self.parent.game.ruleset_info(self.parent.game.rname)['description'])
+
+		# set current game server to first supported.
+		self.parent.game.sname = self.parent.game.list_servers_with_ruleset()[0]
+
+		# show ruleset description
+		self.RulesetDesc.SetLabel(self.parent.game.ruleset_info()['description'])
 		self.RulesetDesc.Wrap(400)
 
 		# show additional downloads
@@ -222,9 +227,6 @@ below for a list and installation instructions.""")
 		else:
 			self.DownloadDesc.Hide()
 			self.DownloadLink.Hide()
-
-		# Set current game server to first supported.
-		self.parent.game.sname = self.parent.game.list_servers_with_ruleset()[0]
 
 		# If multiple servers provide a ruleset, let the player select which
 		# server to use.
@@ -247,7 +249,7 @@ below for a list and installation instructions.""")
 		else:
 			self.next.next.skip = False
 			self.next.next.PageDesc.SetLabel(_("""\
-Configure options for the %(longname)s ruleset (leave blank to use default):""") % self.parent.game.ruleset_info(self.parent.game.rname)['longname'])
+Configure options for the %(longname)s ruleset (leave blank to use default):""") % self.parent.game.ruleset_info())
 			self.next.next.PageDesc.Wrap(400)
 			self.next.next.RefreshOpts()
 
@@ -286,7 +288,7 @@ class ServerPage(ServerPageBase):
 
 	def OnServer(self, event):
 		# show server description
-		self.parent.game.sname = self.parent.game.locallist['server'].keys()[self.Server.GetSelection()]
+		self.parent.game.sname = self.servers[self.Server.GetSelection()]
 		self.ServerDesc.SetLabel(self.parent.game.locallist['server'][self.parent.game.sname]['description'])
 		self.ServerDesc.Wrap(400)
 
@@ -539,7 +541,8 @@ class SinglePlayerWizard(SinglePlayerWizardBase):
 		"""\
 		Runs the wizard.
 		"""
-		return self.RunWizard(self.pages[0])
+		if self.RunWizard(self.pages[0]):
+			return self.game.sname != '' and self.game.rname != ''
 
 	def OnPageChanged(self, event):
 		pass
@@ -549,7 +552,7 @@ class SinglePlayerWizard(SinglePlayerWizardBase):
 			event.Veto()
 			return
 
-		if isinstance(event.GetPage(), StartPage) and self.game.sname != '':
+		if isinstance(event.GetPage(), StartPage) and self.game.sname == '':
 			# initialize ruleset selection
 			event.GetPage().next.Ruleset.SetSelection(0)
 			event.GetPage().next.OnRuleset(None)
