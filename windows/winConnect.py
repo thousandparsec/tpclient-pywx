@@ -260,7 +260,7 @@ below for a list and installation instructions.""")
 
 		self.next.Server.SetItems([])
 		for server in self.next.servers:
-			ss = self.parent.game.locallist['server'][server]['longname']
+			ss = self.parent.game.server_info(server)['longname']
 			self.next.Server.Insert(ss, self.next.Server.GetCount())
 		self.next.Server.SetSelection(0)
 		self.next.OnServer(None)
@@ -293,7 +293,7 @@ Click the link below for a list and installation instructions.""") % self.parent
 		op.AIClient.SetItems([])
 
 		for aiclient in op.aiclients:
-			os = self.parent.game.locallist['aiclient'][aiclient]['longname']
+			os = self.parent.game.aiclient_info(aiclient)['longname']
 			op.AIClient.Insert(os, op.AIClient.GetCount())
 
 class ServerPage(ServerPageBase):
@@ -311,7 +311,7 @@ class ServerPage(ServerPageBase):
 	def OnServer(self, event):
 		# show server description
 		self.parent.game.sname = self.servers[self.Server.GetSelection()]
-		self.ServerDesc.SetLabel(self.parent.game.locallist['server'][self.parent.game.sname]['description'])
+		self.ServerDesc.SetLabel(self.parent.game.server_info()['description'])
 		self.ServerDesc.Wrap(400)
 
 		# show info about ruleset implementation
@@ -404,9 +404,9 @@ class OpponentPage(OpponentPageBase):
 		"""\
 		Show AI client description.
 		"""
-		self.AIClientDesc.SetLabel(self.parent.game.locallist['aiclient'][self.parent.game.locallist['aiclient'].keys()[self.AIClient.GetSelection()]]['description'])
+		self.AIClientDesc.SetLabel(self.parent.game.aiclient_info(self.parent.game.aiclients[self.AIClient.GetSelection()])['description'])
 		self.AIClientDesc.Wrap(400)
-		self.RefreshOpts(self.parent.game.locallist['aiclient'].keys()[self.AIClient.GetSelection()])
+		self.RefreshOpts(self.parent.game.aiclients[self.AIClient.GetSelection()])
 
 	def OnOpponentsSelect(self, event):
 		opponent = self.Opponents.GetItemPyData(event.GetIndex())
@@ -438,7 +438,7 @@ class OpponentPage(OpponentPageBase):
 		self.ResetAdd()
 
 	def AddOpponent(self, i):
-		name = self.parent.game.locallist['aiclient'].keys()[self.AIClient.GetSelection()]
+		name = self.parent.game.aiclients[self.AIClient.GetSelection()]
 		user = self.AIUser.GetValue()
 		if len(user) == 0:
 			# FIXME: Add a pop-up telling them to add a username.
@@ -454,7 +454,7 @@ class OpponentPage(OpponentPageBase):
 
 		# Get the optional parameters
 		parameters = {}
-		for opt in self.parent.game.locallist['aiclient'][name]['parameter'].keys():
+		for opt in self.parent.game.list_aiparams(name).keys():
 			opponent['parameters'][opt] = str(self.Params[opt].GetValue())
 
 		if i == -1:
@@ -462,7 +462,7 @@ class OpponentPage(OpponentPageBase):
 			self.Opponents.InsertStringItem(i, "")
 		self.Opponents.SetStringItem(i, self.Columns.index(_("Name")), user)
 		self.Opponents.SetStringItem(i, self.Columns.index(_("Type")), 
-			self.parent.game.locallist['aiclient'][name]['longname'])
+			self.parent.game.aiclient_info(name)['longname'])
 		self.Opponents.SetItemPyData(i, opponent)
 	
 	def RefreshOpts(self, ainame):
@@ -471,7 +471,7 @@ class OpponentPage(OpponentPageBase):
 
 		@param ainame The name of the selected AI client.
 		"""
-		PopulateOpts(self.parent.game.locallist['aiclient'][ainame]['parameter'], self, self.AIOptSizer, self.AIOptionsLabel)
+		PopulateOpts(self.parent.game.list_aiparams(ainame), self, self.AIOptSizer, self.AIOptionsLabel)
 
 	def Populate(self, opponent):
 		"""\
@@ -483,7 +483,7 @@ class OpponentPage(OpponentPageBase):
 		self.AIUser.SetValue(opponent['user'])
 
 		# determine which AI client selection this is
-		for i, ainame in enumerate(self.parent.game.locallist['aiclient'].keys()):
+		for i, ainame in enumerate(self.parent.game.aiclients):
 			if opponent['name'] == ainame:
 				break
 		self.AIClient.SetSelection(i)
@@ -537,7 +537,7 @@ class OpponentPage(OpponentPageBase):
 			self.Opponents.InsertStringItem(i, "")
 			self.Opponents.SetStringItem(i, self.Columns.index(_("Name")), opponent['user'])
 			self.Opponents.SetStringItem(i, self.Columns.index(_("Type")),
-				self.parent.game.locallist['aiclient'][opponent['name']]['longname'])
+				self.parent.game.aiclient_info(opponent['name'])['longname'])
 			self.Opponents.SetItemPyData(i, opponent)
 
 	
