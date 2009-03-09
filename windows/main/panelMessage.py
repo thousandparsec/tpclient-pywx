@@ -313,6 +313,25 @@ class panelMessage(panelMessageBase, ShiftMixIn):
 	
 	def RebuildMessageList(self):
 		self.messagelist=ChangeList()
+		
+		if len(self.messages) == 0:
+			message_subject = _("No messages")
+			message_counter = _("")
+			message_body = self.html_nomessage
+			message_filter = False
+			message_buttons = [False, False, False, False]
+			
+			self.Title.SetLabel(message_subject)
+			self.Counter.SetLabel(message_counter)
+			self.Message.SetPage(message_body)
+
+			self.Prev.Enable(message_buttons[0])
+			self.First.Enable(message_buttons[0])
+			self.Goto.Enable(message_buttons[1])
+			self.Last.Enable(message_buttons[2])
+			self.Next.Enable(message_buttons[2])
+			self.Delete.Enable(message_buttons[3])
+		
 		for node in self.application.cache.messages[self.bid]:
 			message = node.CurrentOrder
 			messagefiltered = False
@@ -417,7 +436,16 @@ class panelMessage(panelMessageBase, ShiftMixIn):
 		self.MessageSet(-1)
 		
 	def OnDelete(self, evt=None):
+		if len(self.messages) == 0:
+			print "OnDelete: No messages to delete."
+			return
+			
 		node = self.application.cache.messages[self.bid].find(self.node._what)
+		
+		if node == None:
+			print "OnDelete: Failed to find message to remove."
+			return
+			
 		# Tell everyone about the change
 		self.application.Post(self.application.cache.apply("messages", "remove", self.bid, node, None), source=self)
 
