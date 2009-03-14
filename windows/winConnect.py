@@ -12,6 +12,8 @@ import re
 import wx
 import wx.gizmos
 import wx.wizard as wiz
+import wx.lib.filebrowsebutton as filebrowse
+import types
 
 from extra.decorators import freeze_wrapper
 from extra.Opener import open
@@ -164,6 +166,73 @@ class configConnect(configConnectBase, usernameMixIn):
 
 # single player wizard
 
+class OptValidator(wx.PyValidator):
+	def __init__(self, type = None, pyVar = None):
+		wx.PyValidator.__init__(self)
+		self.type = type
+		self.Bind(wx.EVT_CHAR, self.OnChar)
+
+		self.allowed = { 'I' : string.digits,
+						 'S' : string.digits + string.letters + '-_',
+			}
+	
+	def Clone(self):
+		return OptValidator(self.type)
+	
+	def Validate(self, win):
+		tc = self.GetWindow()
+		val = tc.GetValue()
+		for x in val:
+			if x not in self.allowed[self.type]:
+				return False
+		return True
+	
+	def OnChar(self, event):
+		key = event.GetKeyCode()
+		if key < wx.WXK_SPACE or key == wx.WXK_DELETE or key > 255:
+			event.Skip()
+			return
+		if chr(key) in self.allowed[self.type]:
+			event.Skip()
+			return
+		return
+	
+	def TransferToWindow(self):
+		return True
+
+	def TransferFromWindow(self):
+		return True
+
+class OptFileBrowseButton(filebrowse.FileBrowseButton):
+	def __init__ (self, parent, id = -1,
+				  pos = wx.DefaultPosition,
+				  size = wx.DefaultSize,
+				  style = wx.TAB_TRAVERSAL,
+				  name = 'fileBrowseButton',
+		):
+		filebrowse.FileBrowseButton.__init__(self, parent, id, pos, size, style,
+			"", "Browse", "Type filename or click browse to choose.",
+			"Choose a File", ".", "", "*.*", wx.OPEN, lambda x:x, 0, name)
+	
+	def createDialog(self, parent, id, pos, size, style, name):
+		wx.Panel.__init__(self, parent, id, pos, size, style, name)
+		self.SetMinSize(size)
+		box = wx.BoxSizer(wx.HORIZONTAL)
+		self.textControl = self.createTextControl()
+		box.Add( self.textControl, 1, wx.CENTER, 0)
+		self.browseButton = self.createBrowseButton()
+		box.Add(self.browseButton, 0, wx.LEFT|wx.CENTER, 5)
+		outsidebox = wx.BoxSizer(wx.VERTICAL)
+		outsidebox.Add(box, 1, wx.EXPAND|wx.ALL, 0)
+		outsidebox.Fit(self)
+		self.SetAutoLayout(True)
+		self.SetSizer(outsidebox)
+		self.Layout()
+		if type(size) == types.TupleType:
+			size = apply(wx.Size, size)
+		self.SetDimensions(-1, -1, size.width, size.height, wx.SIZE_USE_EXISTING)
+
+
 def PopulateOpts(paramlist, page, sizer, label=None):
 	sizer.Clear(deleteWindows = True)
 	page.Params = {}
@@ -177,14 +246,19 @@ def PopulateOpts(paramlist, page, sizer, label=None):
 				default = ''
 			else:
 				default = str(paramlist[opt]['default'])
-			page.Params[opt] = wx.TextCtrl(page, -1, default)
+			if paramlist[opt]['type'] == 'I' or paramlist[opt]['type'] == 'S':
+				page.Params[opt] = wx.TextCtrl(page, -1, default,
+											   validator = OptValidator(paramlist[opt]['type']))
+			elif paramlist[opt]['type'] == 'F':
+				page.Params[opt] = OptFileBrowseButton(page, -1)
+			elif paramlist[opt]['type'] == 'B':
+				page.Params[opt] = wx.CheckBox(page, -1, default)
 			sizer.Add(page.Params[opt], wx.EXPAND)
 	else:
 		if label is not None:
 			label.Hide()
 		sizer.Hide(True)
 	sizer.Layout()
-	
 
 class StartPage(StartPageBase):
 	def __init__(self, parent, *args, **kw):
@@ -260,7 +334,7 @@ below for a list and installation instructions.""")
 
 		self.next.Server.SetItems([])
 		for server in self.next.servers:
-			ss = self.parent.game.locallist['server'][server]['longname']
+			ss = self.parent.game.server_info(server)['longname']
 			self.next.Server.Insert(ss, self.next.Server.GetCount())
 		self.next.Server.SetSelection(0)
 		self.next.OnServer(None)
@@ -292,7 +366,7 @@ Click the link below for a list and installation instructions.""") % self.parent
 		op.AIClient.SetItems([])
 
 		for aiclient in op.aiclients:
-			os = self.parent.game.locallist['aiclient'][aiclient]['longname']
+			os = self.parent.game.aiclient_info(aiclient)['longname']
 			op.AIClient.Insert(os, op.AIClient.GetCount())
 
 class ServerPage(ServerPageBase):
@@ -309,7 +383,8 @@ class ServerPage(ServerPageBase):
 	def OnServer(self, event):
 		# show server description
 		self.parent.game.sname = self.servers[self.Server.GetSelection()]
-		self.ServerDesc.SetLabel(self.parent.game.locallist['server'][self.parent.game.sname]['description'])
+		self.ServerDesc.SetLabel(self.parent.game.server_info()['description'])
+		self.ServerDesc.Wrap(self.ServerDesc.GetSize()[0])
 
 		# show info about ruleset implementation
 		rinfo = self.parent.game.ruleset_info()
@@ -401,8 +476,9 @@ class OpponentPage(OpponentPageBase):
 		"""\
 		Show AI client description.
 		"""
-		self.AIClientDesc.SetLabel(self.parent.game.locallist['aiclient'][self.parent.game.locallist['aiclient'].keys()[self.AIClient.GetSelection()]]['description'])
-		self.RefreshOpts(self.parent.game.locallist['aiclient'].keys()[self.AIClient.GetSelection()])
+		self.AIClientDesc.SetLabel(self.parent.game.aiclient_info(self.parent.game.aiclients[self.AIClient.GetSelection()])['description'])
+		self.AIClientDesc.Wrap(self.AIClientDesc.GetSize()[0])
+		self.RefreshOpts(self.parent.game.aiclients[self.AIClient.GetSelection()])
 
 	def OnOpponentsSelect(self, event):
 		opponent = self.Opponents.GetItemPyData(event.GetIndex())
@@ -434,7 +510,7 @@ class OpponentPage(OpponentPageBase):
 		self.ResetAdd()
 
 	def AddOpponent(self, i):
-		name = self.parent.game.locallist['aiclient'].keys()[self.AIClient.GetSelection()]
+		name = self.parent.game.aiclients[self.AIClient.GetSelection()]
 		user = self.AIUser.GetValue()
 		if len(user) == 0:
 			# FIXME: Add a pop-up telling them to add a username.
@@ -450,7 +526,7 @@ class OpponentPage(OpponentPageBase):
 
 		# Get the optional parameters
 		parameters = {}
-		for opt in self.parent.game.locallist['aiclient'][name]['parameter'].keys():
+		for opt in self.parent.game.list_aiparams(name).keys():
 			opponent['parameters'][opt] = str(self.Params[opt].GetValue())
 
 		if i == -1:
@@ -458,7 +534,7 @@ class OpponentPage(OpponentPageBase):
 			self.Opponents.InsertStringItem(i, "")
 		self.Opponents.SetStringItem(i, self.Columns.index(_("Name")), user)
 		self.Opponents.SetStringItem(i, self.Columns.index(_("Type")), 
-			self.parent.game.locallist['aiclient'][name]['longname'])
+			self.parent.game.aiclient_info(name)['longname'])
 		self.Opponents.SetItemPyData(i, opponent)
 	
 	def RefreshOpts(self, ainame):
@@ -467,7 +543,7 @@ class OpponentPage(OpponentPageBase):
 
 		@param ainame The name of the selected AI client.
 		"""
-		PopulateOpts(self.parent.game.locallist['aiclient'][ainame]['parameter'], self, self.AIOptSizer, self.AIOptionsLabel)
+		PopulateOpts(self.parent.game.list_aiparams(ainame), self, self.AIOptSizer, self.AIOptionsLabel)
 
 	def Populate(self, opponent):
 		"""\
@@ -479,7 +555,7 @@ class OpponentPage(OpponentPageBase):
 		self.AIUser.SetValue(opponent['user'])
 
 		# determine which AI client selection this is
-		for i, ainame in enumerate(self.parent.game.locallist['aiclient'].keys()):
+		for i, ainame in enumerate(self.parent.game.aiclients):
 			if opponent['name'] == ainame:
 				break
 		self.AIClient.SetSelection(i)
@@ -533,7 +609,7 @@ class OpponentPage(OpponentPageBase):
 			self.Opponents.InsertStringItem(i, "")
 			self.Opponents.SetStringItem(i, self.Columns.index(_("Name")), opponent['user'])
 			self.Opponents.SetStringItem(i, self.Columns.index(_("Type")),
-				self.parent.game.locallist['aiclient'][opponent['name']]['longname'])
+				self.parent.game.aiclient_info(opponent['name'])['longname'])
 			self.Opponents.SetItemPyData(i, opponent)
 
 	
