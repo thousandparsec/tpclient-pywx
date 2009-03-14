@@ -143,6 +143,7 @@ class configConnect(configConnectBase, usernameMixIn):
 
 	def EnableDetails(self, label):
 		self.ServerDetails.SetLabel(_("Login for %s") % (label,))
+		self.ServerDetails.Wrap(self.ServerDetails.GetSize()[0])
 		self.Username.Enable()
 		self.Game.Enable()
 		self.GameShow.Enable()
@@ -171,13 +172,13 @@ def PopulateOpts(paramlist, page, sizer, label=None):
 			label.Show()
 		sizer.Show(True)
 		for opt in paramlist.keys():
-			sizer.Add(wx.StaticText(page, -1, paramlist[opt]['longname']))
+			sizer.Add(wx.StaticText(page, -1, paramlist[opt]['longname']), wx.ALIGN_RIGHT|wx.ALIGN_CENTRE_VERTICAL)
 			if paramlist[opt]['default'] is None:
 				default = ''
 			else:
 				default = str(paramlist[opt]['default'])
-			page.Params[opt] = wx.TextCtrl(page, -1, default, size = (200, -1))
-			sizer.Add(page.Params[opt])
+			page.Params[opt] = wx.TextCtrl(page, -1, default)
+			sizer.Add(page.Params[opt], wx.EXPAND)
 	else:
 		if label is not None:
 			label.Hide()
@@ -191,20 +192,20 @@ class StartPage(StartPageBase):
 		self.PageDesc.SetLabel(_("""\
 This wizard sets up a single player Thousand Parsec game using the servers, \
 rulesets, and AI clients installed locally on your system."""))
-		self.PageDesc.Wrap(400)
+		self.PageDesc.Wrap(self.PageDesc.GetSize()[0])
 
 		# ensure there are some servers/rulesets installed
 		if len(parent.game.rulesets) > 0:
 			self.ProceedDesc.SetLabel(_("""\
 You have at least one server installed on your system. Click the link below \
 to install more."""))
-			self.ProceedDesc.Wrap(400)
+			self.ProceedDesc.Wrap(self.ProceedDesc.GetSize()[0])
 			self.proceed = True
 		else:
 			self.ProceedDesc.SetLabel("""\
 No servers were found on your system. You need a server to play a single \
 player game. Click the link below for a list and installation instructions.""")
-			self.ProceedDesc.Wrap(400)
+			self.ProceedDesc.Wrap(self.ProceedDesc.GetSize()[0])
 			self.proceed = False
 
 		self.DownloadLink.SetURL(parent.dllist.linkurl('server'))
@@ -217,7 +218,6 @@ player game. Click the link below for a list and installation instructions.""")
 class RulesetPage(RulesetPageBase):
 	def __init__(self, parent, *args, **kw):
 		RulesetPageBase.__init__(self, parent, *args, **kw)
-		# populate ruleset list
 		for ruleset in parent.game.rulesets:
 			rs = parent.game.ruleset_info(ruleset)['longname']
 			self.Ruleset.Insert(rs, self.Ruleset.GetCount())
@@ -237,14 +237,14 @@ class RulesetPage(RulesetPageBase):
 
 		# show ruleset description
 		self.RulesetDesc.SetLabel(self.parent.game.ruleset_info()['description'])
-		self.RulesetDesc.Wrap(400)
+		self.RulesetDesc.Wrap(self.RulesetDesc.GetSize()[0])
 
 		# show additional downloads
 		if len(self.parent.dllist.rulesets) > len(self.parent.game.rulesets):
 			self.DownloadDesc.SetLabel("""\
 Additional rulesets are available by installing other servers. Click the link \
 below for a list and installation instructions.""") 
-			self.DownloadDesc.Wrap(400)
+			self.DownloadDesc.Wrap(self.DownloadDesc.GetSize()[0])
 			self.DownloadLink.SetURL(self.parent.dllist.linkurl('server'))
 		else:
 			self.DownloadDesc.Hide()
@@ -272,7 +272,7 @@ below for a list and installation instructions.""")
 			self.next.next.skip = False
 			self.next.next.PageDesc.SetLabel(_("""\
 Configure options for the %(longname)s ruleset (leave blank to use default):""") % self.parent.game.ruleset_info())
-			self.next.next.PageDesc.Wrap(400)
+			self.next.next.PageDesc.Wrap(self.next.next.PageDesc.GetSize()[0])
 			self.next.next.RefreshOpts()
 
 		# populate opponent page
@@ -285,7 +285,6 @@ Configure options for the %(longname)s ruleset (leave blank to use default):""")
 You do not appear to have any AI clients installed which support the \
 %(longname)s ruleset. If you proceed, you will have no opponents in the game. \
 Click the link below for a list and installation instructions.""") % self.parent.game.ruleset_info(self.parent.game.rname))
-			op.next.PageDesc.Wrap(400)
 		else:
 			op.skip = False
 			op.next.skip = True
@@ -300,7 +299,6 @@ class ServerPage(ServerPageBase):
 	def __init__(self, parent, *args, **kw):
 		ServerPageBase.__init__(self, parent, *args, **kw)
 		self.PageDesc.SetLabel(_("Multiple servers implement the ruleset you selected. Please select a server to use:"))
-		self.PageDesc.Wrap(400)
 
 	def GetNext(self):
 		next = self.next
@@ -312,12 +310,11 @@ class ServerPage(ServerPageBase):
 		# show server description
 		self.parent.game.sname = self.servers[self.Server.GetSelection()]
 		self.ServerDesc.SetLabel(self.parent.game.locallist['server'][self.parent.game.sname]['description'])
-		self.ServerDesc.Wrap(400)
 
 		# show info about ruleset implementation
 		rinfo = self.parent.game.ruleset_info()
 		self.ServerRulesetDesc.SetLabel(_("Implements %(longname)s version %(version)s.") % rinfo)
-		self.ServerRulesetDesc.Wrap(400)
+		self.ServerDesc.Wrap(self.ServerDesc.GetSize()[0])
 
 		# populate server parameter page
 		if len(self.parent.game.list_sparams()) == 0:
@@ -354,7 +351,7 @@ class ServerOptsPage(ServerOptsPageBase):
 	def __init__(self, parent, *args, **kw):
 		ServerOptsPageBase.__init__(self, parent, *args, **kw)
 		self.PageDesc.SetLabel("Configure options for this server (leave blank to use default):")
-		self.PageDesc.Wrap(400)
+		self.PageDesc.Wrap(self.PageDesc.GetSize()[0])
 		self.ServerOptSizer = self.SizerRef.GetContainingSizer()
 
 	def GetNext(self):
@@ -405,7 +402,6 @@ class OpponentPage(OpponentPageBase):
 		Show AI client description.
 		"""
 		self.AIClientDesc.SetLabel(self.parent.game.locallist['aiclient'][self.parent.game.locallist['aiclient'].keys()[self.AIClient.GetSelection()]]['description'])
-		self.AIClientDesc.Wrap(400)
 		self.RefreshOpts(self.parent.game.locallist['aiclient'].keys()[self.AIClient.GetSelection()])
 
 	def OnOpponentsSelect(self, event):
@@ -556,7 +552,7 @@ class EndPage(EndPageBase):
 	def __init__(self, parent, *args, **kw):
 		EndPageBase.__init__(self, parent, *args, **kw)
 		self.PageDesc.SetLabel("The Thousand Parsec client will now connect to your local single player game.")
-		self.PageDesc.Wrap(400)
+		self.PageDesc.Wrap(self.PageDesc.GetSize()[0])
 
 	def GetPrev(self):
 		prev = self.prev
