@@ -876,6 +876,7 @@ information with the new password?
 	def OnSinglePlayer(self, evt):
 		wizard = SinglePlayerWizard(self)
 		if wizard.Run():
+			# FIXME: This is a blocking call and will cause the UI to freeze!
 			port = wizard.game.start()
 			if port:
 				self.singleplayer = True
