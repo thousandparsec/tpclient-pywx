@@ -209,8 +209,8 @@ class OptFileBrowseButton(filebrowse.FileBrowseButton):
 				  name = 'fileBrowseButton',
 		):
 		filebrowse.FileBrowseButton.__init__(self, parent, id, pos, size, style,
-			"", "Browse", "Type filename or click browse to choose.",
-			"Choose a File", ".", "", "*.*", wx.OPEN, lambda x:x, 0, name)
+			"", _("Browse"), _("Type filename or click browse to choose."),
+			_("Choose a File"), ".", "", "*.*", wx.OPEN, lambda x:x, 0, name)
 	
 	def createDialog(self, parent, id, pos, size, style, name):
 		wx.Panel.__init__(self, parent, id, pos, size, style, name)
@@ -314,9 +314,9 @@ class RulesetPage(RulesetPageBase):
 
 		# show additional downloads
 		if len(self.parent.dllist.rulesets) > len(self.parent.game.rulesets):
-			self.DownloadDesc.SetLabel("""\
+			self.DownloadDesc.SetLabel(_("""\
 Additional rulesets are available by installing other servers. Click the link \
-below for a list and installation instructions.""") 
+below for a list and installation instructions.""")) 
 			self.DownloadDesc.Wrap(self.DownloadDesc.GetSize()[0])
 			self.DownloadLink.SetURL(self.parent.dllist.linkurl('server'))
 		else:
@@ -424,7 +424,7 @@ class RulesetOptsPage(RulesetOptsPageBase):
 class ServerOptsPage(ServerOptsPageBase):
 	def __init__(self, parent, *args, **kw):
 		ServerOptsPageBase.__init__(self, parent, *args, **kw)
-		self.PageDesc.SetLabel("Configure options for this server (leave blank to use default):")
+		self.PageDesc.SetLabel(_("Configure options for this server (leave blank to use default):"))
 		self.PageDesc.Wrap(self.PageDesc.GetSize()[0])
 		self.ServerOptSizer = self.SizerRef.GetContainingSizer()
 
@@ -488,7 +488,7 @@ class OpponentPage(OpponentPageBase):
 		self.Save.Show()
 		self.Delete.Show()
 
-		self.Box.SetLabel("Edit Opponent")
+		self.Box.SetLabel(_("Edit Opponent"))
 
 		self.Layout()
 
@@ -579,7 +579,7 @@ class OpponentPage(OpponentPageBase):
 		self.New.Show()
 		self.Save.Hide()
 		self.Delete.Hide()
-		self.Box.SetLabel("New Opponent")
+		self.Box.SetLabel(_("New Opponent"))
 
 		self.Layout()
 
@@ -626,7 +626,7 @@ class NoOpponentPage(NoOpponentPageBase):
 class EndPage(EndPageBase):
 	def __init__(self, parent, *args, **kw):
 		EndPageBase.__init__(self, parent, *args, **kw)
-		self.PageDesc.SetLabel("The Thousand Parsec client will now connect to your local single player game.")
+		self.PageDesc.SetLabel(_("The Thousand Parsec client will now connect to your local single player game."))
 		self.PageDesc.Wrap(self.PageDesc.GetSize()[0])
 
 	def GetPrev(self):

@@ -470,6 +470,7 @@ def strings():
 	pass
 	_("TP: Single Player Game");
 	_("Single Player Game");
+	_("This wizard sets up a single player Thousand Parsec game using the servers, rulesets, and AI clients installed locally on your system.");
 	_("Download Servers");
 	_("Select Ruleset");
 	_("Choose a ruleset for your game:");
@@ -486,7 +487,7 @@ def strings():
 	_("The AI description will go here.");
 	_("Name");
 	_("Options");
-	_("Add");
+	_("&New");
 	_("&Save");
 	_("&Delete");
 	_("New Opponent");
