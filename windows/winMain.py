@@ -126,8 +126,13 @@ class winMain(winBase):
 	def __init__(self, application):
 		winBase.__init__(self, application)
 
-		# Setup the status bar
+		self.Maximize()
+		self.Layout()
+
+		# Have to manipulate the ClientSize to stop flickering from the AUI manager.
 		self.statusbar = StatusBar(application, self)
+		self.SetClientSize((self.GetClientSize()[0], self.GetClientSize()[1]-self.statusbar.GetSize()[1]))
+
 		self.SetStatusBar(self.statusbar)
 
 		# Actual windows
@@ -157,7 +162,7 @@ class winMain(winBase):
 
 			instance = panel(application, self)
 
-			self.mgr.AddPane(instance, instance.GetPaneInfo().Caption(title)) 
+			self.mgr.AddPane(instance, instance.GetPaneInfo())
 			self.panels[title] = instance
 
 		self.mgr.Update()
@@ -166,44 +171,16 @@ class winMain(winBase):
 		self.SetMenuBar(self.Menu(self))
 
 		self.updatepending = False
-		
 		self.application.gui.Binder(self.application.NetworkClass.NetworkTimeRemainingEvent, self.OnNetworkTimeRemaining)
 
 	def Show(self, show=True):
-		# Show this window and it's children - also fixes menus for MacOS
 		if not show:
 			return self.Hide()
 
-		for window in self.children.values():
-			try:
-				if hasattr(window, 'config'):
-					if not window.config.has_key('show') or not window.config['show']:
-						continue
-				window.Show()
-			except Exception, e:
-				print "Showing children error", window, e
-
 		winBase.Show(self)
-
-		# FIXME: Hack until perspective loading is done..
-		self.Maximize()
-
-		# Make the windows all reposition themselves...
-		wx.CallAfter(self.mgr.Update)
 
 		# Show the tips..
 		wx.CallAfter(self.ShowTips)
-
-	def Hide(self, show=True):
-		if not show:
-			return self.Show()
-
-		#if hasattr(self, "tips"):
-		#	self.tips.Close()
-
-		for window in self.children.values():
-			window.Hide()
-		super(self.__class__, self).Hide()
 
 	# Config Functions -----------------------------------------------------------------------------
 	def ConfigDefault(self, config=None):
