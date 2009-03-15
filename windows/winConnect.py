@@ -881,6 +881,12 @@ information with the new password?
 				self.singleplayer = True
 				self.Server.SetValue("tp://localhost:" + str(port))
 				self.OnOkay(None)
+			else:
+				msg = _("""\
+Could not start single player game. Please check the console log for more information. \
+""")
+				dlg = wx.MessageDialog(self, msg, _("Single Player Error"), wx.OK|wx.ICON_ERROR)
+				dlg.ShowModal()
 		wizard.Destroy()
 
 	def OnFind(self, evt):
