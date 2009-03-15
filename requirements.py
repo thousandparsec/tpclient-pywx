@@ -21,7 +21,7 @@ if hasattr(version, "version_git"):
 	   os.path.exists("libtpclient-py") and not os.path.exists(os.path.join("libtpclient-py", "tp")):
 		print "It appears this is a fresh git checkout, trying to get dependencies"
 		os.system("git submodule init")
-		os.system("git submodule update")
+	os.system("git submodule update")
 
 import time
 
