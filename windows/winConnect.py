@@ -25,6 +25,8 @@ from xrc.configConnect import configConnectBase
 from xrc.SinglePlayerWizard import *
 from utils import *
 
+from requirements import graphicsdir
+
 from tp.netlib.client import url2bits
 from tp.client.SinglePlayer import DownloadList, SinglePlayerGame
 
@@ -145,7 +147,6 @@ class configConnect(configConnectBase, usernameMixIn):
 
 	def EnableDetails(self, label):
 		self.ServerDetails.SetLabel(_("Login for %s") % (label,))
-		self.ServerDetails.Wrap(self.ServerDetails.GetSize()[0])
 		self.Username.Enable()
 		self.Game.Enable()
 		self.GameShow.Enable()
@@ -241,7 +242,7 @@ def PopulateOpts(paramlist, page, sizer, label=None):
 			label.Show()
 		sizer.Show(True)
 		for opt in paramlist.keys():
-			sizer.Add(wx.StaticText(page, -1, paramlist[opt]['longname']), wx.ALIGN_RIGHT|wx.ALIGN_CENTRE_VERTICAL)
+			sizer.Add(wx.StaticText(page, -1, paramlist[opt]['longname']), 1, flag=wx.ALIGN_RIGHT|wx.ALIGN_CENTRE_VERTICAL)
 			if paramlist[opt]['default'] is None:
 				default = ''
 			else:
@@ -253,7 +254,7 @@ def PopulateOpts(paramlist, page, sizer, label=None):
 				page.Params[opt] = OptFileBrowseButton(page, -1)
 			elif paramlist[opt]['type'] == 'B':
 				page.Params[opt] = wx.CheckBox(page, -1, default)
-			sizer.Add(page.Params[opt], wx.EXPAND)
+			sizer.Add(page.Params[opt], 1, flag=wx.EXPAND)
 	else:
 		if label is not None:
 			label.Hide()
@@ -638,6 +639,7 @@ class EndPage(EndPageBase):
 
 class SinglePlayerWizard(SinglePlayerWizardBase):
 	def __init__(self, parent, *args, **kw):
+		kw['bitmap'] = wx.Image(os.path.join(graphicsdir, "sidebar.bmp")).ConvertToBitmap()
 		SinglePlayerWizardBase.__init__(self, parent, *args, **kw)
 
 		self.parent = parent
@@ -738,6 +740,7 @@ class SinglePlayerWizard(SinglePlayerWizardBase):
 
 	def OnLink(self, event):
 		open(event.GetURL())
+
 
 USERNAME=0
 PASSWORD=1
