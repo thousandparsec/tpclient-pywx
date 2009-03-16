@@ -347,7 +347,7 @@ class panelMessage(panelMessageBase, ShiftMixIn):
 		# Are there any messages?
 		if len(self.messages) == 0:
 			message_subject = _("No messages")
-			message_counter = _("")
+			message_counter = ""
 			message_body = self.html_nomessage
 			message_filter = False
 			message_buttons = [False, False, False, False]
@@ -389,7 +389,7 @@ class panelMessage(panelMessageBase, ShiftMixIn):
 				not self.node.right is None,
 				True
 			]
-			message_counter = _("%i of %i") % (self.messages.index(self.node)+1, len(self.messages))
+			message_counter = _("%(msgnum)i of %(allmsgs)i") % {'msgnum': self.messages.index(self.node)+1, 'allmsgs': len(self.messages)}
 
 		self.Title.SetLabel(message_subject)
 		self.Counter.SetLabel(message_counter)

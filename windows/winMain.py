@@ -263,14 +263,14 @@ class winMain(winBase):
 			source.menu_ids[id] = title
 
 			# Add the menu item
-			win.Append(id, _("Show " + title), _(""), True )
+			win.Append(id, _("Show " + title), "", True )
 
 			# Bind the events
 			source.Bind(wx.EVT_MENU, source.OnMenuWindowItem, id=id)
 			app.Bind(wx.EVT_UPDATE_UI, source.OnMenuWindowUpdate, id=id)
 
 		win.AppendSeparator()
-		win.Append(ID_WIN_TIPS, _("Show Tips"), _(""), True )
+		win.Append(ID_WIN_TIPS, _("Show Tips"), "", True )
 
 		help = wx.Menu()
 		help.Append( ID_ONLINE, _("Online Help"), _("Go to the online help page."))

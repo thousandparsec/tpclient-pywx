@@ -275,9 +275,9 @@ to install more."""))
 			self.ProceedDesc.Wrap(self.ProceedDesc.GetSize()[0])
 			self.proceed = True
 		else:
-			self.ProceedDesc.SetLabel("""\
+			self.ProceedDesc.SetLabel(_("""\
 No servers were found on your system. You need a server to play a single \
-player game. Click the link below for a list and installation instructions.""")
+player game. Click the link below for a list and installation instructions."""))
 			self.ProceedDesc.Wrap(self.ProceedDesc.GetSize()[0])
 			self.proceed = False
 
@@ -1053,10 +1053,10 @@ Could not start single player game. Please check the console log for more inform
 				if not details[2]: 
 					continue
 				msg = _("""
-The client is already set to autoconnect to %s.
+The client is already set to autoconnect to %(key)s.
 
-Would you instead like to autoconnect to %s.
-""") % (key, server)
+Would you instead like to autoconnect to %(server)s.
+""") % {'key': key, 'server': server}
 				dlg = wx.MessageDialog(self.ConfigPanel, msg, _("Autoconnect to?"), wx.OK|wx.CANCEL|wx.ICON_INFORMATION)
 				if dlg.ShowModal() == wx.ID_OK:
 					details[2] = False
