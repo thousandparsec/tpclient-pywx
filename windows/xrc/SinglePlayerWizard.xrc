@@ -2,230 +2,288 @@
 <resource version="2.3.0.1" xmlns="http://www.wxwidgets.org/wxxrc">
   <object class="wxWizard" name="SinglePlayerWizard">
     <title>TP: Single Player Game</title>
+    <bitmap>graphics/sidebar.bmp</bitmap>
   </object>
   <object class="wxPanel" name="StartPage" subclass="wxWizardPage">
-    <object class="wxGridBagSizer">
-      <vgap>5</vgap>
-      <growablecols>1</growablecols>
+    <pos>0,0</pos>
+    <size>400,299</size>
+    <object class="wxFlexGridSizer">
       <object class="sizeritem">
         <object class="wxStaticText" name="wxID_STATIC">
+          <label>Single Player Game</label>
           <font>
             <size>14</size>
-            <family>swiss</family>
             <weight>bold</weight>
+            <family>swiss</family>
             <face>Sans</face>
           </font>
           <style>wxALIGN_CENTRE</style>
-          <label>Single Player Game</label>
         </object>
-        <cellpos>0,0</cellpos>
+      </object>
+      <object class="sizeritem">
+        <object class="wxStaticLine">
+          <size>300,1</size>
+        </object>
       </object>
       <object class="sizeritem">
         <object class="wxStaticText" name="PageDesc">
-          <style>wxALIGN_LEFT</style>
-          <label/>
+          <size>400,-1</size>
+          <label>This wizard sets up a single player Thousand Parsec game using the servers, rulesets, and AI clients installed locally on your system.</label>
+          <wrap>400</wrap>
+          <style>wxNO_BORDER|wxALIGN_LEFT|wxST_NO_AUTORESIZE</style>
         </object>
-        <cellpos>1,0</cellpos>
+        <flag>wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
       </object>
       <object class="sizeritem">
         <object class="wxStaticText" name="ProceedDesc">
-          <style>wxALIGN_LEFT</style>
-          <label/>
+          <size>400,-1</size>
+          <wrap>400</wrap>
+          <style>wxNO_BORDER|wxALIGN_LEFT|wxST_NO_AUTORESIZE</style>
         </object>
-        <cellpos>2,0</cellpos>
+        <flag>wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
       </object>
+      <cols>1</cols>
       <object class="sizeritem">
         <object class="wxHyperlinkCtrl" name="DownloadLink">
           <label>Download Servers</label>
+          <style>wxNO_BORDER|wxHL_ALIGN_LEFT</style>
         </object>
-        <cellpos>3,0</cellpos>
+        <flag>wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
       </object>
+      <vgap>5</vgap>
+      <growablecols>1</growablecols>
+      <growablerows></growablerows>
     </object>
   </object>
   <object class="wxPanel" name="RulesetPage" subclass="wxWizardPage">
-    <object class="wxGridBagSizer">
-      <vgap>5</vgap>
-      <growablecols>1</growablecols>
+    <object class="wxFlexGridSizer">
       <object class="sizeritem">
         <object class="wxStaticText" name="wxID_STATIC">
+          <size>400,-1</size>
+          <label>Select Ruleset</label>
+          <wrap>400</wrap>
           <font>
             <size>14</size>
-            <family>swiss</family>
             <weight>bold</weight>
+            <family>swiss</family>
             <face>Sans</face>
           </font>
           <style>wxALIGN_CENTRE</style>
-          <label>Select Ruleset</label>
         </object>
-        <cellpos>0,0</cellpos>
+      </object>
+      <object class="sizeritem">
+        <object class="wxStaticLine">
+          <size>300,1</size>
+        </object>
       </object>
       <object class="sizeritem">
         <object class="wxStaticText" name="wxID_STATIC">
-          <style>wxALIGN_LEFT</style>
+          <size>400,-1</size>
           <label>Choose a ruleset for your game:</label>
+          <wrap>400</wrap>
+          <style>wxALIGN_LEFT</style>
         </object>
-        <cellpos>1,0</cellpos>
       </object>
       <object class="sizeritem">
         <object class="wxComboBox" name="Ruleset">
           <tooltip>The ruleset to use.</tooltip>
-          <content/>
-          <size>400,-1</size>
           <style>wxCB_READONLY</style>
         </object>
-        <cellpos>2,0</cellpos>
+        <flag>wxEXPAND</flag>
       </object>
       <object class="sizeritem">
         <object class="wxStaticText" name="RulesetDesc">
-          <style>wxALIGN_LEFT</style>
-          <label/>
+          <size>400,-1</size>
+          <wrap>400</wrap>
+          <style>wxNO_BORDER|wxALIGN_LEFT|wxST_NO_AUTORESIZE</style>
         </object>
-        <cellpos>3,0</cellpos>
+        <flag>wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
       </object>
       <object class="sizeritem">
         <object class="wxStaticText" name="DownloadDesc">
-          <style>wxALIGN_LEFT</style>
-          <label/>
+          <size>400,-1</size>
+          <wrap>400</wrap>
+          <style>wxNO_BORDER|wxALIGN_LEFT|wxST_NO_AUTORESIZE</style>
         </object>
-        <cellpos>4,0</cellpos>
+        <flag>wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
       </object>
       <object class="sizeritem">
         <object class="wxHyperlinkCtrl" name="DownloadLink">
           <label>Download Additional Servers/Rulesets</label>
+          <style>wxNO_BORDER|wxHL_ALIGN_LEFT</style>
         </object>
-        <cellpos>5,0</cellpos>
+        <flag>wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
       </object>
-    </object>
-  </object>
-  <object class="wxPanel" name="ServerPage" subclass="wxWizardPage">
-    <object class="wxGridBagSizer">
+      <cols>1</cols>
       <vgap>5</vgap>
       <growablecols>1</growablecols>
+    </object>
+    <pos>0,0</pos>
+    <size>400,299</size>
+  </object>
+  <object class="wxPanel" name="ServerPage" subclass="wxWizardPage">
+    <object class="wxFlexGridSizer">
       <object class="sizeritem">
         <object class="wxStaticText" name="wxID_STATIC">
+          <size>400,-1</size>
+          <label>Select Server</label>
           <font>
             <size>14</size>
-            <family>swiss</family>
             <weight>bold</weight>
+            <family>swiss</family>
             <face>Sans</face>
           </font>
           <style>wxALIGN_CENTRE</style>
-          <label>Select Server</label>
         </object>
-        <cellpos>0,0</cellpos>
+      </object>
+      <object class="sizeritem">
+        <object class="wxStaticLine">
+          <size>300,1</size>
+        </object>
       </object>
       <object class="sizeritem">
         <object class="wxStaticText" name="PageDesc">
-          <style>wxALIGN_LEFT</style>
-          <label/>
+          <size>400,-1</size>
+          <wrap>400</wrap>
+          <style>wxNO_BORDER|wxALIGN_LEFT|wxST_NO_AUTORESIZE</style>
         </object>
-        <cellpos>1,0</cellpos>
+        <flag>wxEXPAND</flag>
       </object>
       <object class="sizeritem">
         <object class="wxComboBox" name="Server">
-          <tooltip>The server to use.</tooltip>
-          <content/>
           <size>400,-1</size>
+          <tooltip>The server to use.</tooltip>
           <style>wxCB_READONLY</style>
         </object>
-        <cellpos>2,0</cellpos>
+        <flag>wxEXPAND</flag>
       </object>
       <object class="sizeritem">
         <object class="wxStaticText" name="ServerDesc">
-          <style>wxALIGN_LEFT</style>
-          <label/>
+          <size>400,-1</size>
+          <wrap>400</wrap>
+          <style>wxNO_BORDER|wxALIGN_LEFT|wxST_NO_AUTORESIZE</style>
         </object>
-        <cellpos>3,0</cellpos>
+        <flag>wxEXPAND</flag>
       </object>
       <object class="sizeritem">
         <object class="wxStaticText" name="ServerRulesetDesc">
-          <style>wxALIGN_LEFT</style>
-          <label/>
+          <size>400,-1</size>
+          <wrap>400</wrap>
+          <style>wxNO_BORDER|wxALIGN_LEFT|wxST_NO_AUTORESIZE</style>
         </object>
-        <cellpos>4,0</cellpos>
+        <flag>wxEXPAND</flag>
       </object>
+      <cols>1</cols>
+      <vgap>5</vgap>
+      <growablecols>1</growablecols>
     </object>
+    <pos>0,0</pos>
+    <size>400,299</size>
   </object>
   <object class="wxPanel" name="RulesetOptsPage" subclass="wxWizardPage">
-    <object class="wxGridBagSizer">
-      <vgap>5</vgap>
-      <growablecols>1</growablecols>
+    <object class="wxFlexGridSizer">
       <object class="sizeritem">
         <object class="wxStaticText" name="wxID_STATIC">
+          <size>400,-1</size>
+          <label>Ruleset Options</label>
           <font>
             <size>14</size>
-            <family>swiss</family>
             <weight>bold</weight>
+            <family>swiss</family>
             <face>Sans</face>
           </font>
           <style>wxALIGN_CENTRE</style>
-          <label>Ruleset Options</label>
         </object>
-        <cellpos>0,0</cellpos>
+      </object>
+      <object class="sizeritem">
+        <object class="wxStaticLine">
+          <size>300,1</size>
+        </object>
       </object>
       <object class="sizeritem">
         <object class="wxStaticText" name="PageDesc">
-          <style>wxALIGN_LEFT</style>
-          <label/>
+          <size>400,-1</size>
+          <wrap>400</wrap>
+          <style>wxNO_BORDER|wxALIGN_LEFT|wxST_NO_AUTORESIZE</style>
         </object>
-        <cellpos>1,0</cellpos>
+        <flag>wxEXPAND</flag>
       </object>
       <object class="sizeritem">
-        <object class="wxGridSizer">
-          <cols>2</cols>
-          <vgap>5</vgap>
+        <object class="wxFlexGridSizer">
           <object class="sizeritem">
             <object class="wxStaticText" name="SizerRef">
               <label/>
             </object>
           </object>
+          <cols>2</cols>
+          <vgap>5</vgap>
+          <hgap>5</hgap>
+          <growablecols>1</growablecols>
         </object>
-        <cellpos>2,0</cellpos>
+        <option>1</option>
+        <flag>wxEXPAND</flag>
       </object>
+      <cols>1</cols>
+      <vgap>5</vgap>
+      <growablecols>1</growablecols>
     </object>
+    <pos>0,0</pos>
+    <size>400,299</size>
   </object>
   <object class="wxPanel" name="ServerOptsPage" subclass="wxWizardPage">
-    <object class="wxGridBagSizer">
-      <vgap>5</vgap>
-      <growablecols>1</growablecols>
+    <object class="wxFlexGridSizer">
       <object class="sizeritem">
         <object class="wxStaticText" name="wxID_STATIC">
+          <size>400,-1</size>
+          <label>Server Options</label>
           <font>
             <size>14</size>
-            <family>swiss</family>
             <weight>bold</weight>
+            <family>swiss</family>
             <face>Sans</face>
           </font>
           <style>wxALIGN_CENTRE</style>
-          <label>Server Options</label>
         </object>
-        <cellpos>0,0</cellpos>
+      </object>
+      <object class="sizeritem">
+        <object class="wxStaticLine">
+          <size>300,1</size>
+        </object>
       </object>
       <object class="sizeritem">
         <object class="wxStaticText" name="PageDesc">
+          <size>400,-1</size>
+          <wrap>400</wrap>
           <style>wxALIGN_LEFT</style>
-          <label/>
         </object>
-        <cellpos>1,0</cellpos>
       </object>
       <object class="sizeritem">
-        <object class="wxGridSizer">
-          <cols>2</cols>
-          <vgap>5</vgap>
+        <object class="wxFlexGridSizer">
           <object class="sizeritem">
             <object class="wxStaticText" name="SizerRef">
               <label/>
             </object>
           </object>
+          <cols>2</cols>
+          <vgap>5</vgap>
+          <hgap>5</hgap>
+          <growablecols>1</growablecols>
         </object>
-        <cellpos>2,0</cellpos>
+        <option>1</option>
+        <flag>wxEXPAND</flag>
       </object>
+      <cols>1</cols>
+      <vgap>5</vgap>
+      <growablecols>1</growablecols>
     </object>
+    <pos>0,0</pos>
+    <size>400,299</size>
   </object>
   <object class="wxPanel" name="OpponentPage" subclass="wxWizardPage">
     <object class="wxFlexGridSizer">
       <object class="sizeritem">
         <object class="wxStaticText" name="wxID_STATIC">
+          <size>400,-1</size>
           <label>Opponents</label>
           <font>
             <size>14</size>
@@ -239,8 +297,15 @@
         <flag>wxEXPAND|wxGROW</flag>
       </object>
       <object class="sizeritem">
+        <object class="wxStaticLine">
+          <size>300,1</size>
+        </object>
+      </object>
+      <object class="sizeritem">
         <object class="wxStaticText" name="AIListLabel">
+          <size>400,-1</size>
           <label>This page lets you add AI opponents to your game.</label>
+          <wrap>400</wrap>
           <style>wxALIGN_LEFT</style>
         </object>
         <option>1</option>
@@ -250,7 +315,7 @@
         <object class="wxFlexGridSizer">
           <object class="sizeritem">
             <object class="wxListCtrl" name="Opponents">
-              <size>100,100</size>
+              <size>400,-1</size>
               <style>wxLC_REPORT</style>
             </object>
             <option>1</option>
@@ -271,20 +336,18 @@
             <object class="wxFlexGridSizer">
               <object class="sizeritem">
                 <object class="wxStaticText" name="AIClientLabel">
-                  <size>200,-1</size>
                   <label>Type</label>
-                  <style>wxALIGN_RIGHT|wxST_NO_AUTORESIZE</style>
+                  <style>wxALIGN_RIGHT</style>
                 </object>
                 <option>1</option>
-                <flag>wxEXPAND|wxGROW</flag>
+                <flag>wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
               </object>
               <object class="sizeritem">
                 <object class="wxComboBox" name="AIClient">
                   <tooltip>The AI client to use.</tooltip>
-                  <content/>
-                  <size>400,-1</size>
                   <style>wxCB_READONLY</style>
                 </object>
+                <flag>wxEXPAND</flag>
               </object>
               <object class="spacer"/>
               <object class="sizeritem">
@@ -299,10 +362,10 @@
               <object class="sizeritem">
                 <object class="wxStaticText" name="AIUserLabel">
                   <label>Name</label>
-                  <style>wxALIGN_RIGHT|wxST_NO_AUTORESIZE</style>
+                  <style>wxALIGN_RIGHT</style>
                 </object>
                 <option>1</option>
-                <flag>wxEXPAND|wxGROW</flag>
+                <flag>wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
               </object>
               <object class="sizeritem">
                 <object class="wxTextCtrl" name="AIUser"/>
@@ -315,14 +378,21 @@
                   <style>wxALIGN_RIGHT|wxST_NO_AUTORESIZE</style>
                 </object>
                 <option>1</option>
-                <flag>wxEXPAND|wxGROW</flag>
+                <flag>wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
               </object>
               <object class="sizeritem">
-                <object class="wxGridBagSizer">
+                <object class="wxFlexGridSizer">
                   <object class="sizeritem">
-                    <object class="wxTextCtrl" name="SizerRef"/>
+                    <object class="wxPanel" name="SizerRef"/>
+                    <flag>wxEXPAND|wxGROW</flag>
                   </object>
+                  <cols>2</cols>
+                  <vgap>5</vgap>
+                  <hgap>5</hgap>
+                  <growablecols>1</growablecols>
                 </object>
+                <option>1</option>
+                <flag>wxEXPAND</flag>
               </object>
               <object class="spacer"/>
               <object class="sizeritem">
@@ -353,8 +423,11 @@
               </object>
               <cols>2</cols>
               <vgap>1</vgap>
+              <hgap>5</hgap>
               <growablecols>1</growablecols>
             </object>
+            <option>1</option>
+            <flag>wxEXPAND</flag>
           </object>
           <label>New Opponent</label>
           <orient>wxHORIZONTAL</orient>
@@ -372,64 +445,84 @@
       <growablecols>0</growablecols>
       <growablerows>2,3</growablerows>
     </object>
-    <size>400,0</size>
+    <pos>0,0</pos>
+    <size>400,299</size>
   </object>
   <object class="wxPanel" name="NoOpponentPage" subclass="wxWizardPage">
-    <object class="wxGridBagSizer">
-      <vgap>5</vgap>
-      <growablecols>1</growablecols>
+    <object class="wxFlexGridSizer">
       <object class="sizeritem">
         <object class="wxStaticText" name="wxID_STATIC">
+          <size>400,-1</size>
+          <label>No Opponents Found</label>
+          <wrap>400</wrap>
           <font>
             <size>14</size>
-            <family>swiss</family>
             <weight>bold</weight>
+            <family>swiss</family>
             <face>Sans</face>
           </font>
           <style>wxALIGN_CENTRE</style>
-          <label>No Opponents Found</label>
         </object>
-        <cellpos>0,0</cellpos>
+      </object>
+      <object class="sizeritem">
+        <object class="wxStaticLine">
+          <size>300,1</size>
+        </object>
       </object>
       <object class="sizeritem">
         <object class="wxStaticText" name="PageDesc">
-          <style>wxALIGN_LEFT</style>
-          <label/>
+          <size>400,-1</size>
+          <wrap>400</wrap>
+          <style>wxNO_BORDER|wxALIGN_LEFT|wxST_NO_AUTORESIZE</style>
         </object>
-        <cellpos>1,0</cellpos>
+        <flag>wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
       </object>
       <object class="sizeritem">
         <object class="wxHyperlinkCtrl" name="DownloadLink">
           <label>Download AI Clients</label>
         </object>
-        <cellpos>2,0</cellpos>
       </object>
-    </object>
-  </object>
-  <object class="wxPanel" name="EndPage" subclass="wxWizardPage">
-    <object class="wxGridBagSizer">
+      <cols>1</cols>
       <vgap>5</vgap>
       <growablecols>1</growablecols>
+    </object>
+    <pos>0,0</pos>
+    <size>400,299</size>
+  </object>
+  <object class="wxPanel" name="EndPage" subclass="wxWizardPage">
+    <object class="wxFlexGridSizer">
       <object class="sizeritem">
         <object class="wxStaticText" name="wxID_STATIC">
+          <size>400,-1</size>
+          <label>Setup Complete</label>
+          <wrap>400</wrap>
           <font>
             <size>14</size>
-            <family>swiss</family>
             <weight>bold</weight>
+            <family>swiss</family>
             <face>Sans</face>
           </font>
           <style>wxALIGN_CENTRE</style>
-          <label>Setup Complete</label>
         </object>
-        <cellpos>0,0</cellpos>
+      </object>
+      <object class="sizeritem">
+        <object class="wxStaticLine">
+          <size>300,1</size>
+        </object>
       </object>
       <object class="sizeritem">
         <object class="wxStaticText" name="PageDesc">
-          <style>wxALIGN_LEFT</style>
-          <label/>
+          <size>400,-1</size>
+          <wrap>400</wrap>
+          <style>wxNO_BORDER|wxALIGN_LEFT|wxST_NO_AUTORESIZE</style>
         </object>
-        <cellpos>1,0</cellpos>
+        <flag>wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
       </object>
+      <cols>1</cols>
+      <vgap>5</vgap>
+      <growablecols>1</growablecols>
     </object>
+    <pos>0,0</pos>
+    <size>400,299</size>
   </object>
 </resource>

@@ -25,6 +25,7 @@ class panelSystem(panelSystemBase, TrackerObject):
 
 	def __init__(self, application, parent):
 		panelSystemBase.__init__(self, parent)
+		self.parent = parent
 
 		# Setup to recieve game events
 		self.application = application
@@ -83,7 +84,9 @@ class panelSystem(panelSystemBase, TrackerObject):
 	def GetPaneInfo(self):
 		info = wx.aui.AuiPaneInfo()
 
-		info.MinSize(wx.Size(200,-1))
+		s = wx.Size(self.parent.GetSize()[0]/5, -1)
+		info.MinSize(s)
+		info.BestSize(s)
 
 		info.Right()
 		info.Layer(1)

@@ -285,6 +285,7 @@ class GUI(wx.App):
 
 		except:
 			utils.do_traceback()
+
 		self.Call(self.Show, self.connectto)
 
 	def __str__(self):
@@ -299,6 +300,7 @@ class GUI(wx.App):
 			self.application.game.stop()
 		except:
 			pass
+
 		sys.exit()
 
 	# Config Functions ------------------------------------------------

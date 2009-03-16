@@ -257,7 +257,7 @@ class Systems(SystemLevelOverlay, TrackerObjectOrder):
 			return SystemIcon(self.cache, obj, self.Colorizer)
 
 	def ArrowTo(self, arrow, icon, object):
-		arrow.SetPoint(icon.primary.pos[0:2])
+		arrow.SetPoint(icon.XY)
 		arrow.SetOffset((0,0))
 
 		i = icon.index(object)

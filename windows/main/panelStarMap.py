@@ -274,6 +274,7 @@ class panelStarMap(panelStarMapBase, TrackerObjectOrder):
 		wx.aui method for getting the initial position and settings of this panel.
 		"""
 		info = wx.aui.AuiPaneInfo()
+		info.DefaultPane()
 		info.Center()
 		info.PinButton(True)
 		info.MaximizeButton(True)

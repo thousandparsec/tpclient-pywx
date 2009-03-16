@@ -163,7 +163,8 @@ class winBaseMixIn(winMixIn):
 # These give a non-MDI interface under other operating systems
 class winBase(ConfigMixIn, winBaseMixIn, wx.Frame):
 	def __init__(self, application):
-		wx.Frame.__init__(self, None, -1, 'TP: ' + self.title, wx.DefaultPosition, wx.DefaultSize, \
+		x, y, width, height = wx.GetClientDisplayRect()
+		wx.Frame.__init__(self, None, -1, 'TP: ' + self.title, (x, y), (width, height), \
 				wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL)
 		winBaseMixIn.__init__(self, application)
 

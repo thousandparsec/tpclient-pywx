@@ -8,20 +8,19 @@ import sys
 sys.path.insert(0, '.')
 import os.path
 
-if os.path.exists("libtpproto-py"):
-	sys.path.insert(0, "libtpproto-py")
-if os.path.exists("libtpclient-py"):
-	sys.path.insert(0, "libtpclient-py")
-if os.path.exists("schemepy"):
-	sys.path.insert(0, "schemepy")
+modules = ["libtpproto-py", "libtpclient-py", "schemepy"]
+for module in modules:
+	if os.path.exists(module):
+		sys.path.insert(0, module)
 
 import version
 if hasattr(version, "version_git"):
-	if os.path.exists("libtpproto-py") and not os.path.exists(os.path.join("libtpproto-py", "tp")) or \
-	   os.path.exists("libtpclient-py") and not os.path.exists(os.path.join("libtpclient-py", "tp")):
-		print "It appears this is a fresh git checkout, trying to get dependencies"
+	for module in modules:
+		if os.path.exists(module) and not os.path.exists(os.path.join(module, ".git")):
+			break
+	else:
 		os.system("git submodule init")
-		os.system("git submodule update")
+	os.system("git submodule update")
 
 import time
 
