@@ -250,7 +250,7 @@ class winUpdate(winUpdateBase, winBaseXRC):
 					self.ProgressGauge.SetRange(todownload)
 
 				# Update the text
-				self.ProgressText.SetLabel(_("%s of %s") % (0, todownload))
+				self.ProgressText.SetLabel(_("%(value)s of %(range)s") % {'value': 0, 'range': todownload})
 
 			elif state == "progress":
 				# Nothing to do...
@@ -261,8 +261,8 @@ class winUpdate(winUpdateBase, winBaseXRC):
 				self.ProgressGauge.SetValue(self.ProgressGauge.GetValue()+amount)
 
 				# Update the text
-				self.ProgressText.SetLabel(_("%s of %s") % \
-					(self.ProgressGauge.GetValue(), self.ProgressGauge.GetRange()))
+				self.ProgressText.SetLabel(_("%(value)s of %(range)s") % \
+					{'value': self.ProgressGauge.GetValue(), 'range': self.ProgressGauge.GetRange()})
 				
 			elif state == "finished":
 				# Change to the tick
