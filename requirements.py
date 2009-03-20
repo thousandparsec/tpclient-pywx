@@ -17,9 +17,7 @@ import version
 if hasattr(version, "version_git"):
 	for module in modules:
 		if os.path.exists(module) and not os.path.exists(os.path.join(module, ".git")):
-			break
-	else:
-		os.system("git submodule init")
+			os.system("git submodule init")
 	os.system("git submodule update")
 
 import time
@@ -264,6 +262,9 @@ except (ImportError, KeyError, AttributeError), e:
 	notfound.append("Network Library newer then %s and older then %s" % (tostr(netlib_version), tostr(netlib_version_less)))
 
 try:
+
+	import tp.netlib
+
 	if hasattr(version, "version_git") and not hasattr(tp.netlib.version, "version_git"):
 		raise ImportError("Thousand Parsec Network Library (libtpproto-py) not a development version!")
 except ImportError, e:
@@ -299,6 +300,9 @@ except (ImportError, KeyError, AttributeError), e:
 	notfound.append("Client Library newer then %s and older then %s" % (tostr(client_version), tostr(client_version_less)))
 
 try:
+
+	import tp.client
+
 	if hasattr(version, "version_git") and not hasattr(tp.client.version, "version_git"):
 		raise ImportError("Thousand Parsec Client Library (libtpclient-py) not a development version!")
 except ImportError, e:
