@@ -237,7 +237,6 @@ def PopulateOpts(paramlist, page, sizer, label=None):
 	if len(paramlist) > 0:
 		if label is not None:
 			label.Show()
-		sizer.Show(True)
 		for opt in paramlist.keys():
 			sizer.Add(wx.StaticText(page, -1, paramlist[opt]['longname']), 1, flag=wx.ALIGN_RIGHT|wx.ALIGN_CENTRE_VERTICAL)
 			if paramlist[opt]['default'] is None:
@@ -256,7 +255,6 @@ def PopulateOpts(paramlist, page, sizer, label=None):
 	else:
 		if label is not None:
 			label.Hide()
-		sizer.Hide(True)
 	sizer.Layout()
 
 class StartPage(StartPageBase):
