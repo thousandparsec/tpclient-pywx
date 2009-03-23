@@ -75,7 +75,7 @@ class FilterManager(FilterManagerBase, wx.Frame):
 		"""
 		self.control.PopDown()
 
-class FilterManagerControl():
+class FilterManagerControl(object):
 	"""\
 	This class is a button that can be clicked to open a checklist of filters,
 	and which takes the data from that window to create a list of the checked
