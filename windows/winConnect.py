@@ -168,20 +168,23 @@ class configConnect(configConnectBase, usernameMixIn):
 # single player wizard
 
 class OptValidator(wx.PyValidator):
-	def __init__(self):
+	def __init__(self, type = None, pyVar = None):
 		wx.PyValidator.__init__(self)
 		self.type = type
 		self.Bind(wx.EVT_CHAR, self.OnChar)
-		self.allowed = string.digits + string.letters + '-_'
+
+		self.allowed = { 'I' : string.digits,
+						 'S' : string.digits + string.letters + '-_',
+			}
 	
 	def Clone(self):
-		return OptValidator()
+		return OptValidator(self.type)
 	
 	def Validate(self, win):
 		tc = self.GetWindow()
 		val = tc.GetValue()
 		for x in val:
-			if x not in self.allowed:
+			if x not in self.allowed[self.type]:
 				return False
 		return True
 	
@@ -190,7 +193,7 @@ class OptValidator(wx.PyValidator):
 		if key < wx.WXK_SPACE or key == wx.WXK_DELETE or key > 255:
 			event.Skip()
 			return
-		if chr(key) in self.allowed:
+		if chr(key) in self.allowed[self.type]:
 			event.Skip()
 			return
 		return
@@ -243,10 +246,9 @@ def PopulateOpts(paramlist, page, sizer, label=None):
 				default = ''
 			else:
 				default = str(paramlist[opt]['default'])
-			if paramlist[opt]['type'] == 'I':
-				page.Params[opt] = wx.SpinCtrl(page, -1, default, size = (200, -1), min = 0, max = 1000000)
-			elif paramlist[opt]['type'] == 'S':
-				page.Params[opt] = wx.TextCtrl(page, -1, default, validator = OptValidator())
+			if paramlist[opt]['type'] == 'I' or paramlist[opt]['type'] == 'S':
+				page.Params[opt] = wx.TextCtrl(page, -1, default,
+											   validator = OptValidator(paramlist[opt]['type']))
 			elif paramlist[opt]['type'] == 'F':
 				page.Params[opt] = OptFileBrowseButton(page, -1)
 			elif paramlist[opt]['type'] == 'B':
