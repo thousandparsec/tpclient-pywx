@@ -39,6 +39,7 @@ arguments = dict(
 				("graphics",	glob.glob("graphics/*.mpg")),
 				("graphics",	glob.glob("graphics/*.gif")),
 				("graphics",	glob.glob("graphics/*.png")),
+                                ("graphics",	glob.glob("graphics/*.bmp")),
 				("graphics",	glob.glob("graphics/*.ico"))],
 )
 
@@ -333,6 +334,9 @@ if sys.platform == 'darwin':
 	os.system('git checkout version.py')
 
 elif sys.platform == 'win32':
+        shutil.copytree(os.path.join("prebuilt", "daneel-ai"), os.path.join("dist", "daneel-ai"))
+        shutil.copytree(os.path.join("prebuilt", "tpserver-cpp"), os.path.join("dist", "tpserver-cpp"))
+
 	# Copy in the manifest file for that "Windows XP look"
 	shutil.copy("tpclient-pywx.exe.manifest", os.path.join("dist", "tpclient-pywx.exe.manifest"))
 
