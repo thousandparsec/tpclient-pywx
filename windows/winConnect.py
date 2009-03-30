@@ -213,9 +213,9 @@ class OptFileBrowseButton(filebrowse.FileBrowseButton):
 		):
 		filebrowse.FileBrowseButton.__init__(self, parent, id, pos, size, style,
 			"", _("Browse"), _("Type filename or click browse to choose."),
-			_("Choose a File"), ".", "", "*.*", wx.OPEN, lambda x:x, 0, name)
+			_("Choose a File"), ".", "", "*.*", wx.OPEN, lambda x:x, 0)
 	
-	def createDialog(self, parent, id, pos, size, style, name):
+	def createDialog(self, parent, id, pos, size, style, name=""):
 		wx.Panel.__init__(self, parent, id, pos, size, style, name)
 		self.SetMinSize(size)
 		box = wx.BoxSizer(wx.HORIZONTAL)
@@ -880,7 +880,7 @@ information with the new password?
 			port = wizard.game.start()
 			if port:
 				self.singleplayer = True
-				self.Server.SetValue("tp://localhost:" + str(port))
+				self.Server.SetValue("tp://player:player@localhost:" + str(port))
 				self.OnOkay(None)
 			else:
 				msg = _("""\
