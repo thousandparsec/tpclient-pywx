@@ -880,7 +880,7 @@ information with the new password?
 			port = wizard.game.start()
 			if port:
 				self.singleplayer = True
-				self.Server.SetValue("tp://localhost:" + str(port))
+				self.ShowURL("tp://player:player@localhost:" + str(port))
 				self.OnOkay(None)
 			else:
 				msg = _("""\
