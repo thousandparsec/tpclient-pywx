@@ -234,7 +234,7 @@ except ImportError, e:
 		recommended.append(("Pygame library", reason))
 
 
-netlib_version = (0, 2, 4)
+netlib_version = (0, 2, 5)
 netlib_version_less = (0, 2, 99)
 try:
 
@@ -273,7 +273,7 @@ except ImportError, e:
 
 print
 
-client_version = (0, 3, 1)
+client_version = (0, 3, 2)
 client_version_less = (0, 3, 99)
 try:
 
