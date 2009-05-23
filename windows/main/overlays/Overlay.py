@@ -115,15 +115,24 @@ class Overlay(dict):
 		"""
 		# Remove all the objects.
 		self.CleanUp()
+	
+		# FIXME: Horrible hack to make things draw in type order, and then by name.
+		# Various overlays probably want to be able to override this..
+		types = {}
+		for i in self.cache.objects.keys():
+			t = self.cache.objects[i].__class__.__name__
+			if t not in types:
+				types[t] = []
+			types[t].append(i)
 
-		# Sort the objects by name
-		oids = self.cache.objects.keys()
 		def objcmp(oida, oidb):
 			return cmp(self.cache.objects[oida].name, self.cache.objects[oidb].name)
-		oids.sort(objcmp)
 
-		for oid in oids:
-			self.UpdateOne(oid)
+		for name, value in types.items():
+			value.sort(objcmp)
+
+			for oid in value:
+				self.UpdateOne(oid)
 
 	def UpdateOne(self, oid):
 		"""\

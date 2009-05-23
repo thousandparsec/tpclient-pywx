@@ -39,6 +39,7 @@ arguments = dict(
 				("graphics",	glob.glob("graphics/*.mpg")),
 				("graphics",	glob.glob("graphics/*.gif")),
 				("graphics",	glob.glob("graphics/*.png")),
+                                ("graphics",	glob.glob("graphics/*.bmp")),
 				("graphics",	glob.glob("graphics/*.ico"))],
 )
 
@@ -243,9 +244,13 @@ elif sys.platform == 'win32':
 
 	if os.path.exists("dist"):
 		shutil.rmtree("dist")
-	bat = os.path.join("..", "scratchpad", "setup.bat")
-	if os.path.exists(bat):
-		os.system(bat)
+
+        if os.path.exists("tp"):
+                shutil.rmtree("tp")
+
+        shutil.copytree(os.path.join('libtpproto-py', 'tp', 'netlib'), os.path.join('tp', 'netlib'))
+        shutil.copytree(os.path.join('libtpclient-py', 'tp', 'client'), os.path.join('tp', 'client'))
+        open(os.path.join('tp', "__init__.py"), 'w').close()
 
 	# Py2EXE stuff
 	extra_arguments = dict(
@@ -329,6 +334,9 @@ if sys.platform == 'darwin':
 	os.system('git checkout version.py')
 
 elif sys.platform == 'win32':
+        shutil.copytree(os.path.join("prebuilt", "daneel-ai"), os.path.join("dist", "daneel-ai"))
+        shutil.copytree(os.path.join("prebuilt", "tpserver-cpp"), os.path.join("dist", "tpserver-cpp"))
+
 	# Copy in the manifest file for that "Windows XP look"
 	shutil.copy("tpclient-pywx.exe.manifest", os.path.join("dist", "tpclient-pywx.exe.manifest"))
 
@@ -347,7 +355,7 @@ elif sys.platform == 'win32':
 	shutil.copy(gdisrc, os.path.join("dist", "gdiplus.dll"))
 
 	# Repack the library.zip file
-	os.system(os.path.join("..", "scratchpad", "repack.bat"))
+	os.system("repack.bat")
 	
 	# We should now use upx on the executables to make em smaller.
 	os.system("upx --best .\dist\*.pyd")

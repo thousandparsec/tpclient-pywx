@@ -93,6 +93,75 @@ class %(windowName)sBase(wx.Panel):
 
 		# Define variables for the controls"""
 
+wizardTemplate = """\
+class %(windowName)sBase(wx.wizard.Wizard):
+	xrc = os.path.join(location(), "windows", "xrc", '%(fileName)s')
+
+	def PreCreate(self, pre):
+		\"\"\" This function is called during the class's initialization.
+		
+		Override it for custom setup before the window is created usually to
+		set additional window styles using SetWindowStyle() and SetExtraStyle().\"\"\"
+		pass
+
+	def __init__(self, parent, *args, **kw):
+		\"\"\" Pass an initialized wx.xrc.XmlResource into res \"\"\"
+		f = os.path.join(os.path.dirname(__file__), self.xrc)
+		res = XmlResourceWithHandlers(f)		
+
+		# Two stage creation (see http://wiki.wxpython.org/index.cgi/TwoStageCreation)
+		pre = wx.wizard.PreWizard()
+		res.LoadOnObject(pre, parent, "%(windowName)s", 'wxWizard')
+		self.PreCreate(pre)
+		self.PostCreate(pre)"""
+
+wizardPageTemplate = """\
+class %(windowName)sBase(wx.wizard.PyWizardPage):
+	xrc = os.path.join(location(), "windows", "xrc", '%(fileName)s')
+
+	def PreCreate(self, pre):
+		\"\"\" This function is called during the class's initialization.
+		
+		Override it for custom setup before the window is created usually to
+		set additional window styles using SetWindowStyle() and SetExtraStyle().\"\"\"
+		pass
+
+	def SetNext(self, next):
+		self.next = next
+	
+	def SetPrev(self, prev):
+		self.prev = prev
+
+	def GetNext(self):
+		return self.next
+
+	def GetPrev(self):
+		return self.prev
+
+	def validate(self):
+		return True
+
+	def __init__(self, parent, *args, **kw):
+		\"\"\" Pass an initialized wx.xrc.XmlResource into res \"\"\"
+		f = os.path.join(os.path.dirname(__file__), self.xrc)
+		res = XmlResourceWithHandlers(f)		
+
+		# Two stage creation (see http://wiki.wxpython.org/index.cgi/TwoStageCreation)
+		pre = wx.wizard.PrePyWizardPage()
+		res.LoadOnPanel(pre, parent, "%(windowName)s")
+		self.PreCreate(pre)
+		self.PostCreate(pre)
+
+		self.parent = parent
+		self.next = self.prev = None
+		self.skip = False
+
+		self.SetAutoLayout(True)
+		self.Fit()
+		self.Hide()
+
+		# Define variables for the controls"""
+
 IDmap = {
 	"wxID_CANCEL":		"Cancel",
 	"wxID_CLOSE":		"Close",
@@ -103,6 +172,7 @@ IDmap = {
 	"wxID_FIND":		"Find",
 	"wxID_REFRESH":		"Refresh",
 	"wxID_PREFERENCES":	"Config",
+	"wxID_DELETE":		"Delete",
 }
 
 Template_Default = """\
@@ -189,7 +259,10 @@ def Generate_wxPanel(xrcFile, topWindow, outFile):
 
 	windowName = topWindow.getAttribute("name")
 	print "'%s' is a '%s'"% (windowName, windowClass)
-	print >> outFile, panelTemplate % locals()
+	if windowClass == 'wx.WizardPage':
+		print >> outFile, wizardPageTemplate % locals()
+	else:
+		print >> outFile, panelTemplate % locals()
 	
 	eventFunctions = [] # a list to store the code for the event functions
 
@@ -220,9 +293,19 @@ def Generate_wxPanel(xrcFile, topWindow, outFile):
 	print >> outFile
 	print >> outFile, "\n".join(eventFunctions)
 
+def Generate_wxWizard(xrcFile, topWindow, outFile):
+	fileName = os.path.basename(xrcFile.name)
 
-#Generate_wxWizard = Generate_wxDialog
+	windowClass = topWindow.getAttribute("subclass")
+	if len(windowClass) == 0:
+		windowClass = topWindow.getAttribute("class")
+	windowClass = re.sub("^wx", "wx.", windowClass)
 
+	windowName = topWindow.getAttribute("name")
+	print "'%s' is a '%s'"% (windowName, windowClass)
+	print >> outFile, wizardTemplate % locals()
+	print >> outFile
+	
 # ------------------------- GeneratePythonForXRC ----------------------------
 def GeneratePython(xrcFile, outFile):
 	xmldoc = minidom.parse(xrcFile)

@@ -20,7 +20,7 @@ WriteINIStr "${FILENAME}.url" "InternetShortcut" "IconIndex" "${ICONINDEX}"
   CRCCheck On 
  
   ;Output File Name 
-  OutFile "tpclient-pywx-0.3.1-setup.exe" 
+  OutFile "tpclient-pywx-0.3.2-setup.exe"
  
   ;The Default Installation Directory 
   InstallDir "$PROGRAMFILES\Thousand Parsec\tpclient-pywx" 
@@ -112,6 +112,9 @@ Section "Files" Files
   WriteRegStr HKCR "tphttps\shell\open" "" ""
   WriteRegStr HKCR "tphttps\shell\open\command" "" '"$INSTDIR\tpclient-pywx.exe" "%1"'
 
+  WriteRegStr HKLM "Software\Thousand Parsec\SinglePlayer" "daneel-ai" "$INSTDIR\daneel-ai\share\tp"
+  WriteRegStr HKLM "Software\Thousand Parsec\SinglePlayer" "tpserver-cpp" "$INSTDIR\tpserver-cpp\share\tp"
+
   ;Store uninstall information
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\tpclient-pywx" \
                  "UninstallString" "$INSTDIR\uninstall.exe"
@@ -120,7 +123,7 @@ Section "Files" Files
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\tpclient-pywx" \
                  "DisplayIcon" "$INSTDIR\tpclient-pywx.exe"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\tpclient-pywx" \
-                 "DisplayVersion" "0.3.1"
+                 "DisplayVersion" "0.3.2"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\tpclient-pywx" \
                  "URLInfoAbout" "http://www.thousandparsec.net/tp/"
   WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\tpclient-pywx" \
@@ -130,7 +133,7 @@ Section "Files" Files
   WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\tpclient-pywx" \
                  "VersionMajor" 3
   WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\tpclient-pywx" \
-                 "VersionMinor" 1
+                 "VersionMinor" 2
 
   ;Create uninstaller
   WriteUninstaller "$INSTDIR\Uninstall.exe"

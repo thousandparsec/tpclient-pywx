@@ -86,6 +86,10 @@ This is so that a the same XRC can be used for both MDI and non-MDI frames.
 		if hasattr(self, "OnConfig"):
 			self.Bind(wx.EVT_BUTTON, self.OnConfig, self.Config)
 
+		self.SinglePlayer = XRCCTRL(self, "SinglePlayer")
+		if hasattr(self, "OnSinglePlayer"):
+			self.Bind(wx.EVT_BUTTON, self.OnSinglePlayer, self.SinglePlayer)
+
 
 
 def strings():
@@ -105,3 +109,4 @@ def strings():
 	_("&OK");
 	_("&Cancel");
 	_("&Preferences");
+	_("&Single Player");

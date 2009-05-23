@@ -77,9 +77,12 @@ class panelPicture(panelPictureBase):
 
 	def GetPaneInfo(self):
 		info = wx.aui.AuiPaneInfo()
-		info.MinSize(wx.Size(128,150))
-		info.MaxSize(wx.Size(128,150))
-		info.FloatingSize(wx.Size(128,150))
+
+		s = wx.Size(128, 150)
+		info.MinSize(s)
+		info.BestSize(s)
+		info.MaxSize(s)
+		info.FloatingSize(s)
 		info.Fixed()
 
 		info.Left()

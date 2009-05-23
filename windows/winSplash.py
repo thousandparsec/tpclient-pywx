@@ -11,7 +11,7 @@ try:
 
 	os.environ['SDL_VIDEO_CENTERED'] = '1'
 	os.environ['SDL_VIDEO_WINDOW_POS'] = "center"
-	import pygame
+	import pygame.display, pygame.movie, pygame.event
 
 	if not os.path.exists(os.path.join(graphicsdir, "intro-high.mpg")):
 		print "Could not find the intro movie", os.path.join(graphicsdir, "intro-high.mpg")
@@ -55,7 +55,8 @@ try:
 		def Post(self, evt):
 			pass
 
-except ImportError:
+except ImportError, e:
+        print e
 	import wx
 
 	class winSplash(wx.SplashScreen):

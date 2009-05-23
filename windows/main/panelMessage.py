@@ -75,7 +75,7 @@ class FilterManager(FilterManagerBase, wx.Frame):
 		"""
 		self.control.PopDown()
 
-class FilterManagerControl():
+class FilterManagerControl(object):
 	"""\
 	This class is a button that can be clicked to open a checklist of filters,
 	and which takes the data from that window to create a list of the checked
@@ -237,6 +237,7 @@ class panelMessage(panelMessageBase, ShiftMixIn):
 	def GetPaneInfo(self):
 		info = wx.aui.AuiPaneInfo()
 		info.MinSize(self.GetBestSize())
+		info.BestSize(self.GetBestSize())
 		info.Bottom()
 		info.Layer(1)
 		return info
@@ -313,6 +314,25 @@ class panelMessage(panelMessageBase, ShiftMixIn):
 	
 	def RebuildMessageList(self):
 		self.messagelist=ChangeList()
+		
+		if len(self.messages) == 0:
+			message_subject = _("No messages")
+			message_counter = _("")
+			message_body = self.html_nomessage
+			message_filter = False
+			message_buttons = [False, False, False, False]
+			
+			self.Title.SetLabel(message_subject)
+			self.Counter.SetLabel(message_counter)
+			self.Message.SetPage(message_body)
+
+			self.Prev.Enable(message_buttons[0])
+			self.First.Enable(message_buttons[0])
+			self.Goto.Enable(message_buttons[1])
+			self.Last.Enable(message_buttons[2])
+			self.Next.Enable(message_buttons[2])
+			self.Delete.Enable(message_buttons[3])
+		
 		for node in self.application.cache.messages[self.bid]:
 			message = node.CurrentOrder
 			messagefiltered = False
@@ -346,7 +366,7 @@ class panelMessage(panelMessageBase, ShiftMixIn):
 		# Are there any messages?
 		if len(self.messages) == 0:
 			message_subject = _("No messages")
-			message_counter = _("")
+			message_counter = ""
 			message_body = self.html_nomessage
 			message_filter = False
 			message_buttons = [False, False, False, False]
@@ -388,7 +408,7 @@ class panelMessage(panelMessageBase, ShiftMixIn):
 				not self.node.right is None,
 				True
 			]
-			message_counter = _("%i of %i") % (self.messages.index(self.node)+1, len(self.messages))
+			message_counter = _("%(msgnum)i of %(allmsgs)i") % {'msgnum': self.messages.index(self.node)+1, 'allmsgs': len(self.messages)}
 
 		self.Title.SetLabel(message_subject)
 		self.Counter.SetLabel(message_counter)
@@ -417,7 +437,16 @@ class panelMessage(panelMessageBase, ShiftMixIn):
 		self.MessageSet(-1)
 		
 	def OnDelete(self, evt=None):
+		if len(self.messages) == 0:
+			print "OnDelete: No messages to delete."
+			return
+			
 		node = self.application.cache.messages[self.bid].find(self.node._what)
+		
+		if node == None:
+			print "OnDelete: Failed to find message to remove."
+			return
+			
 		# Tell everyone about the change
 		self.application.Post(self.application.cache.apply("messages", "remove", self.bid, node, None), source=self)
 

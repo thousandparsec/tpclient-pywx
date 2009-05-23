@@ -5,21 +5,30 @@ person enter the server/username/password.
 
 # Python imports
 import string
+import pprint
 import re
 
 # wxPython Imports
 import wx
 import wx.gizmos
+import wx.wizard as wiz
+import wx.lib.filebrowsebutton as filebrowse
+import types
 
 from extra.decorators import freeze_wrapper
+from extra.Opener import open
 
 # Local Imports
 from winBase import winBaseXRC
 from xrc.winConnect import winConnectBase
 from xrc.configConnect import configConnectBase
+from xrc.SinglePlayerWizard import *
 from utils import *
 
+from requirements import graphicsdir
+
 from tp.netlib.client import url2bits
+from tp.client.SinglePlayer import DownloadList, SinglePlayerGame
 
 # FIXME: The game really isn't part of the username, it's part of the server information
 # You could be playing multiple different games on the same server!
@@ -155,6 +164,582 @@ class configConnect(configConnectBase, usernameMixIn):
 		self.Password.SetValue("")
 		self.AutoConnect.Disable()
 
+
+# single player wizard
+
+class OptValidator(wx.PyValidator):
+	def __init__(self, type = None, pyVar = None):
+		wx.PyValidator.__init__(self)
+		self.type = type
+		self.Bind(wx.EVT_CHAR, self.OnChar)
+
+		self.allowed = { 'I' : string.digits,
+						 'S' : string.digits + string.letters + '-_',
+			}
+	
+	def Clone(self):
+		return OptValidator(self.type)
+	
+	def Validate(self, win):
+		tc = self.GetWindow()
+		val = tc.GetValue()
+		for x in val:
+			if x not in self.allowed[self.type]:
+				return False
+		return True
+	
+	def OnChar(self, event):
+		key = event.GetKeyCode()
+		if key < wx.WXK_SPACE or key == wx.WXK_DELETE or key > 255:
+			event.Skip()
+			return
+		if chr(key) in self.allowed[self.type]:
+			event.Skip()
+			return
+		return
+	
+	def TransferToWindow(self):
+		return True
+
+	def TransferFromWindow(self):
+		return True
+
+class OptFileBrowseButton(filebrowse.FileBrowseButton):
+	def __init__ (self, parent, id = -1,
+				  pos = wx.DefaultPosition,
+				  size = wx.DefaultSize,
+				  style = wx.TAB_TRAVERSAL,
+				  name = 'fileBrowseButton',
+		):
+		filebrowse.FileBrowseButton.__init__(self, parent, id, pos, size, style,
+			"", _("Browse"), _("Type filename or click browse to choose."),
+			_("Choose a File"), ".", "", "*.*", wx.OPEN, lambda x:x, 0)
+	
+	def createDialog(self, parent, id, pos, size, style, name=""):
+		wx.Panel.__init__(self, parent, id, pos, size, style, name)
+		self.SetMinSize(size)
+		box = wx.BoxSizer(wx.HORIZONTAL)
+		self.textControl = self.createTextControl()
+		box.Add( self.textControl, 1, wx.CENTER, 0)
+		self.browseButton = self.createBrowseButton()
+		box.Add(self.browseButton, 0, wx.LEFT|wx.CENTER, 5)
+		outsidebox = wx.BoxSizer(wx.VERTICAL)
+		outsidebox.Add(box, 1, wx.EXPAND|wx.ALL, 0)
+		outsidebox.Fit(self)
+		self.SetAutoLayout(True)
+		self.SetSizer(outsidebox)
+		self.Layout()
+		if type(size) == types.TupleType:
+			size = apply(wx.Size, size)
+		self.SetDimensions(-1, -1, size.width, size.height, wx.SIZE_USE_EXISTING)
+
+
+def PopulateOpts(paramlist, page, sizer, label=None):
+	sizer.Clear(deleteWindows = True)
+	page.Params = {}
+	if len(paramlist) > 0:
+		if label is not None:
+			label.Show()
+		for opt in paramlist.keys():
+			sizer.Add(wx.StaticText(page, -1, paramlist[opt]['longname']), 1, flag=wx.ALIGN_RIGHT|wx.ALIGN_CENTRE_VERTICAL)
+			if paramlist[opt]['default'] is None:
+				default = ''
+			else:
+				default = str(paramlist[opt]['default'])
+			if paramlist[opt]['type'] == 'I' or paramlist[opt]['type'] == 'S':
+				page.Params[opt] = wx.TextCtrl(page, -1, default,
+											   validator = OptValidator(paramlist[opt]['type']))
+			elif paramlist[opt]['type'] == 'F':
+				page.Params[opt] = OptFileBrowseButton(page, -1)
+			elif paramlist[opt]['type'] == 'B':
+				page.Params[opt] = wx.CheckBox(page, -1, default)
+			sizer.Add(page.Params[opt], 1, flag=wx.EXPAND)
+	else:
+		if label is not None:
+			label.Hide()
+	sizer.Layout()
+
+class StartPage(StartPageBase):
+	def __init__(self, parent, *args, **kw):
+		StartPageBase.__init__(self, parent, *args, **kw)
+		self.PageDesc.SetLabel(_("""\
+This wizard sets up a single player Thousand Parsec game using the servers, \
+rulesets, and AI clients installed locally on your system."""))
+		self.PageDesc.Wrap(self.PageDesc.GetSize()[0])
+
+		# ensure there are some servers/rulesets installed
+		if len(parent.game.rulesets) > 0:
+			self.ProceedDesc.SetLabel(_("""\
+You have at least one server installed on your system. Click the link below \
+to install more."""))
+			self.ProceedDesc.Wrap(self.ProceedDesc.GetSize()[0])
+			self.proceed = True
+		else:
+			self.ProceedDesc.SetLabel(_("""\
+No servers were found on your system. You need a server to play a single \
+player game. Click the link below for a list and installation instructions."""))
+			self.ProceedDesc.Wrap(self.ProceedDesc.GetSize()[0])
+			self.proceed = False
+
+		self.DownloadLink.SetURL(parent.dllist.linkurl('server'))
+
+	def GetNext(self):
+		if self.proceed:
+			return self.next
+		return None
+
+class RulesetPage(RulesetPageBase):
+	def __init__(self, parent, *args, **kw):
+		RulesetPageBase.__init__(self, parent, *args, **kw)
+		for ruleset in parent.game.rulesets:
+			rs = parent.game.ruleset_info(ruleset)['longname']
+			self.Ruleset.Insert(rs, self.Ruleset.GetCount())
+
+	def GetNext(self):
+		next = self.next
+		while next.skip:
+			next = next.next
+		return next
+
+	def OnRuleset(self, event):
+		# set ruleset
+		self.parent.game.rname = self.parent.game.rulesets[self.Ruleset.GetSelection()]
+
+		# set current game server to first supported.
+		self.parent.game.sname = self.parent.game.list_servers_with_ruleset()[0]
+
+		# show ruleset description
+		self.RulesetDesc.SetLabel(self.parent.game.ruleset_info()['description'])
+		self.RulesetDesc.Wrap(self.RulesetDesc.GetSize()[0])
+
+		# show additional downloads
+		if len(self.parent.dllist.rulesets) > len(self.parent.game.rulesets):
+			self.DownloadDesc.SetLabel(_("""\
+Additional rulesets are available by installing other servers. Click the link \
+below for a list and installation instructions.""")) 
+			self.DownloadDesc.Wrap(self.DownloadDesc.GetSize()[0])
+			self.DownloadLink.SetURL(self.parent.dllist.linkurl('server'))
+		else:
+			self.DownloadDesc.Hide()
+			self.DownloadLink.Hide()
+
+		# If multiple servers provide a ruleset, let the player select which
+		# server to use.
+		self.next.servers = self.parent.game.list_servers_with_ruleset()
+		if len(self.next.servers) == 1:
+			self.next.skip = True
+		else:
+			self.next.skip = False
+
+		self.next.Server.SetItems([])
+		for server in self.next.servers:
+			ss = self.parent.game.server_info(server)['longname']
+			self.next.Server.Insert(ss, self.next.Server.GetCount())
+		self.next.Server.SetSelection(0)
+		self.next.OnServer(None)
+
+		# populate ruleset parameter page
+		if len(self.parent.game.list_rparams()) == 0:
+			self.next.next.skip = True
+		else:
+			self.next.next.skip = False
+			self.next.next.PageDesc.SetLabel(_("""\
+Configure options for the %(longname)s ruleset (leave blank to use default):""") % self.parent.game.ruleset_info())
+			self.next.next.PageDesc.Wrap(self.next.next.PageDesc.GetSize()[0])
+			self.next.next.RefreshOpts()
+
+		# populate opponent page
+		op = self.next.next.next.next
+		op.aiclients = self.parent.game.list_aiclients_with_ruleset()
+		if len(op.aiclients) == 0:
+			op.skip = True
+			op.next.skip = False
+			op.next.PageDesc.SetLabel(_("""\
+You do not appear to have any AI clients installed which support the \
+%(longname)s ruleset. If you proceed, you will have no opponents in the game. \
+Click the link below for a list and installation instructions.""") % self.parent.game.ruleset_info(self.parent.game.rname))
+		else:
+			op.skip = False
+			op.next.skip = True
+
+		op.AIClient.SetItems([])
+
+		for aiclient in op.aiclients:
+			os = self.parent.game.aiclient_info(aiclient)['longname']
+			op.AIClient.Insert(os, op.AIClient.GetCount())
+
+class ServerPage(ServerPageBase):
+	def __init__(self, parent, *args, **kw):
+		ServerPageBase.__init__(self, parent, *args, **kw)
+		self.PageDesc.SetLabel(_("Multiple servers implement the ruleset you selected. Please select a server to use:"))
+
+	def GetNext(self):
+		next = self.next
+		while next.skip:
+			next = next.next
+		return next
+
+	def OnServer(self, event):
+		# show server description
+		self.parent.game.sname = self.servers[self.Server.GetSelection()]
+		self.ServerDesc.SetLabel(self.parent.game.server_info()['description'])
+		self.ServerDesc.Wrap(self.ServerDesc.GetSize()[0])
+
+		# show info about ruleset implementation
+		rinfo = self.parent.game.ruleset_info()
+		self.ServerRulesetDesc.SetLabel(_("Implements %(longname)s version %(version)s.") % rinfo)
+		self.ServerDesc.Wrap(self.ServerDesc.GetSize()[0])
+
+		# populate server parameter page
+		if len(self.parent.game.list_sparams()) == 0:
+			self.next.next.skip = True
+		else:
+			self.next.next.skip = False
+
+		self.next.next.RefreshOpts()
+
+class RulesetOptsPage(RulesetOptsPageBase):
+	def __init__(self, parent, *args, **kw):
+		RulesetOptsPageBase.__init__(self, parent, *args, **kw)
+		self.RulesetOptSizer = self.SizerRef.GetContainingSizer()
+
+	def GetNext(self):
+		next = self.next
+		while next.skip:
+			next = next.next
+		return next
+
+	def GetPrev(self):
+		prev = self.prev
+		while prev.skip:
+			prev = prev.prev
+		return prev
+
+	def RefreshOpts(self):
+		"""\
+		Clear and repopulate the parameter fields.
+		"""
+		PopulateOpts(self.parent.game.list_rparams(), self, self.RulesetOptSizer)
+
+class ServerOptsPage(ServerOptsPageBase):
+	def __init__(self, parent, *args, **kw):
+		ServerOptsPageBase.__init__(self, parent, *args, **kw)
+		self.PageDesc.SetLabel(_("Configure options for this server (leave blank to use default):"))
+		self.PageDesc.Wrap(self.PageDesc.GetSize()[0])
+		self.ServerOptSizer = self.SizerRef.GetContainingSizer()
+
+	def GetNext(self):
+		next = self.next
+		while next.skip:
+			next = next.next
+		return next
+
+	def GetPrev(self):
+		prev = self.prev
+		while prev.skip:
+			prev = prev.prev
+		return prev
+
+	def RefreshOpts(self):
+		"""\
+		Clear and repopulate the parameter fields.
+		"""
+		PopulateOpts(self.parent.game.list_sparams(), self, self.ServerOptSizer)
+
+class OpponentPage(OpponentPageBase):
+	Columns = [_("Name"), _("Type")]
+	Columns_Sizes = [100, wx.LIST_AUTOSIZE]
+
+	def __init__(self, parent, *args, **kw):
+		OpponentPageBase.__init__(self, parent, *args, **kw)
+
+		self.AIOptSizer = self.SizerRef.GetContainingSizer()
+		self.Box = self.BoxRef.GetContainingSizer().GetStaticBox()
+
+		self.Opponents.Bind(wx.EVT_LIST_ITEM_SELECTED, self.OnOpponentsSelect)
+
+
+	def GetNext(self):
+		next = self.next
+		while next.skip:
+			next = next.next
+		return next
+
+	def GetPrev(self):
+		prev = self.prev
+		while prev.skip:
+			prev = prev.prev
+		return prev
+	
+	def OnAIClient(self, event):
+		"""\
+		Show AI client description.
+		"""
+		self.AIClientDesc.SetLabel(self.parent.game.aiclient_info(self.parent.game.aiclients[self.AIClient.GetSelection()])['description'])
+		self.AIClientDesc.Wrap(self.AIClientDesc.GetSize()[0])
+		self.RefreshOpts(self.parent.game.aiclients[self.AIClient.GetSelection()])
+
+	def OnOpponentsSelect(self, event):
+		opponent = self.Opponents.GetItemPyData(event.GetIndex())
+		self.Populate(opponent)
+
+		self.New.Hide()
+
+		self.Save.Show()
+		self.Delete.Show()
+
+		self.Box.SetLabel(_("Edit Opponent"))
+
+		self.Layout()
+
+	def OnDelete(self, event):
+		self.Opponents.DeleteItem(self.Opponents.GetSelected()[0])
+
+		self.ResetAdd()
+
+	def OnSave(self, event):
+		self.AddOpponent(self.Opponents.GetSelected()[0])
+		self.ResetAdd()
+
+	def OnNew(self, event):
+		"""\
+		Called when the AI is added...
+		"""
+		self.AddOpponent(-1)
+		self.ResetAdd()
+
+	def AddOpponent(self, i):
+		name = self.parent.game.aiclients[self.AIClient.GetSelection()]
+		user = self.AIUser.GetValue()
+		if len(user) == 0:
+			# FIXME: Add a pop-up telling them to add a username.
+			return
+
+		# FIXME: Check that the username is not already used
+
+		# Check the input values
+		opponent = {
+			'name': name,
+			'user': user,
+			'parameters': {}}
+
+		# Get the optional parameters
+		parameters = {}
+		for opt in self.parent.game.list_aiparams(name).keys():
+			opponent['parameters'][opt] = str(self.Params[opt].GetValue())
+
+		if i == -1:
+			i = self.Opponents.GetItemCount()
+			self.Opponents.InsertStringItem(i, "")
+		self.Opponents.SetStringItem(i, self.Columns.index(_("Name")), user)
+		self.Opponents.SetStringItem(i, self.Columns.index(_("Type")), 
+			self.parent.game.aiclient_info(name)['longname'])
+		self.Opponents.SetItemPyData(i, opponent)
+	
+	def RefreshOpts(self, ainame):
+		"""\
+		Dynamically clear and repopulate parameter fields.
+
+		@param ainame The name of the selected AI client.
+		"""
+		PopulateOpts(self.parent.game.list_aiparams(ainame), self, self.AIOptSizer, self.AIOptionsLabel)
+
+	def Populate(self, opponent):
+		"""\
+		Populates the page with details about an opponent.
+
+		@param opponent The opponent dict object (can be popped off the opponent list).
+		"""
+		# populate username
+		self.AIUser.SetValue(opponent['user'])
+
+		# determine which AI client selection this is
+		for i, ainame in enumerate(self.parent.game.aiclients):
+			if opponent['name'] == ainame:
+				break
+		self.AIClient.SetSelection(i)
+
+		# show and populate options
+		self.RefreshOpts(opponent['name'])
+		for opt in opponent['parameters'].keys():
+			self.Params[opt].SetValue(opponent['parameters'][opt])
+
+	def ResetAdd(self):
+		self.Opponents.SetSelected([])
+
+		# clear name and client selection
+		self.AIUser.SetValue('')
+		self.AIClient.SetSelection(0)
+		self.OnAIClient(None)
+
+		# clear AI client parameters
+		self.AIOptSizer.Clear(deleteWindows = True)
+		self.Params = {}
+
+		self.New.Show()
+		self.Save.Hide()
+		self.Delete.Hide()
+		self.Box.SetLabel(_("New Opponent"))
+
+		self.Layout()
+
+	def Reset(self):
+		"""\
+		Resets the page.
+		"""
+		self.ResetAdd()
+
+		# write opponent list
+		self.WriteOpponentList()
+
+	def WriteOpponentList(self):
+		"""\
+		Writes a list of current opponents into the page description text.
+		"""
+		self.Opponents.ClearAll()
+		# Add the columns
+		for i, name in enumerate(self.Columns):
+			self.Opponents.InsertColumn(i, name)
+		# Set the column widths
+		for i, name in enumerate(self.Columns):
+			self.Opponents.SetColumnWidth(i, self.Columns_Sizes[i])
+
+		for i, opponent in enumerate(self.parent.game.opponents):
+			self.Opponents.InsertStringItem(i, "")
+			self.Opponents.SetStringItem(i, self.Columns.index(_("Name")), opponent['user'])
+			self.Opponents.SetStringItem(i, self.Columns.index(_("Type")),
+				self.parent.game.aiclient_info(opponent['name'])['longname'])
+			self.Opponents.SetItemPyData(i, opponent)
+
+	
+class NoOpponentPage(NoOpponentPageBase):
+	def __init__(self, parent, *args, **kw):
+		NoOpponentPageBase.__init__(self, parent, *args, **kw)
+		self.DownloadLink.SetURL(parent.dllist.linkurl('ai'))
+
+	def GetPrev(self):
+		prev = self.prev
+		while prev.skip:
+			prev = prev.prev
+		return prev
+
+class EndPage(EndPageBase):
+	def __init__(self, parent, *args, **kw):
+		EndPageBase.__init__(self, parent, *args, **kw)
+		self.PageDesc.SetLabel(_("The Thousand Parsec client will now connect to your local single player game."))
+		self.PageDesc.Wrap(self.PageDesc.GetSize()[0])
+
+	def GetPrev(self):
+		prev = self.prev
+		while prev.skip:
+			prev = prev.prev
+		return prev
+
+class SinglePlayerWizard(SinglePlayerWizardBase):
+	def __init__(self, parent, *args, **kw):
+		kw['bitmap'] = wx.Image(os.path.join(graphicsdir, "sidebar.bmp")).ConvertToBitmap()
+		SinglePlayerWizardBase.__init__(self, parent, *args, **kw)
+
+		self.parent = parent
+
+		self.parent.application.game = SinglePlayerGame()
+		self.dllist = DownloadList()
+		self.game = self.parent.application.game
+
+		self.pages = []
+
+		self.AddPage(StartPage(self))
+		self.AddPage(RulesetPage(self))
+		self.AddPage(ServerPage(self))
+		self.AddPage(RulesetOptsPage(self))
+		self.AddPage(ServerOptsPage(self))
+		self.AddPage(OpponentPage(self))
+		self.AddPage(NoOpponentPage(self))
+		self.AddPage(EndPage(self))
+
+		self.Bind(wx.wizard.EVT_WIZARD_PAGE_CHANGED, self.OnPageChanged)
+		self.Bind(wx.wizard.EVT_WIZARD_PAGE_CHANGING, self.OnPageChanging)
+		self.Bind(wx.wizard.EVT_WIZARD_CANCEL, self.OnCancelWizard)
+		self.Bind(wx.EVT_HYPERLINK, self.OnLink)
+
+	def AddPage(self, page):
+		"""\
+		Adds a page to the wizard and chains it.
+
+		@param page The wxWizardPage object to add.
+		"""
+		i = len(self.pages)
+		self.pages.append(page)
+		if i > 0:
+			self.pages[i].SetPrev(self.pages[i - 1])
+			self.pages[i - 1].SetNext(self.pages[i])
+		self.GetPageAreaSizer().Add(self.pages[i])
+
+
+	def Run(self):
+		"""\
+		Runs the wizard.
+		"""
+		if self.RunWizard(self.pages[0]):
+			return self.game.sname != '' and self.game.rname != ''
+
+	def OnPageChanged(self, event):
+		pass
+
+	def OnPageChanging(self, event):
+		if not(event.GetPage().validate()):
+			event.Veto()
+			return
+
+		if isinstance(event.GetPage(), StartPage) and self.game.sname == '':
+			# initialize ruleset selection
+			if len(self.game.rulesets) > 0:
+				event.GetPage().next.Ruleset.SetSelection(0)
+				event.GetPage().next.OnRuleset(None)
+			return
+
+		if isinstance(event.GetPage(), RulesetOptsPage):
+			# store ruleset parameters
+			self.game.rparams = {}
+			for opt in self.game.list_rparams().keys():
+				self.game.rparams[opt] = str(event.GetPage().Params[opt].GetValue())
+			return
+	
+		if isinstance(event.GetPage(), ServerOptsPage):
+			# store server parameters
+			self.game.sparams = {}
+			for opt in self.game.list_sparams().keys():
+				self.game.sparams[opt] = str(event.GetPage().Params[opt].GetValue())
+			# clear AI client page
+			if not event.GetPage().next.skip:
+				event.GetPage().next.Reset()
+			return
+
+		if isinstance(event.GetPage(), OpponentPage):
+			self.game.opponents = []
+			for i in range(0, event.GetPage().Opponents.GetItemCount()):
+				opponent = event.GetPage().Opponents.GetItemPyData(i)
+				self.game.add_opponent(**opponent)
+			return
+
+		if isinstance(event.GetPage(), EndPage):
+			# similar to opponent page backward, but no page change veto required
+			if not event.GetDirection() and not event.GetPage().prev.skip and len(self.game.opponents) > 0:
+				i = len(self.game.opponents) - 1
+				# populate page with last added opponent info
+				event.GetPage().prev.Populate(self.game.opponents[i])
+				# remove the last added opponent
+				del self.game.opponents[i]
+			return
+
+	
+	def OnCancelWizard(self, event):
+		pass
+
+	def OnLink(self, event):
+		open(event.GetURL())
+
+
 USERNAME=0
 PASSWORD=1
 AUTOCONNECT=2
@@ -178,6 +763,8 @@ class winConnect(winConnectBase, winBaseXRC, usernameMixIn):
 
 		self.Bind(wx.EVT_CLOSE, self.OnExit)
 		self.Bind(wx.EVT_COMBOBOX, self.OnChangeServer, self.Server)
+
+		self.singleplayer = False
 
 	def OnChangeServer(self, evt):
 		server = self.Server.GetValue()
@@ -246,7 +833,7 @@ class winConnect(winConnectBase, winBaseXRC, usernameMixIn):
 		else:
 			(oldusername, oldpassword, oldautoconnect) = (username, password, False)
 
-		if server not in self.config['servers'] or username != username:
+		if (server not in self.config['servers'] or username != username) and not self.singleplayer:
 			# Popup a dialog asking if we want to add the account
 			msg = _("""\
 It appears you havn't access this account before.
@@ -285,6 +872,23 @@ information with the new password?
 
 	def OnConfig(self, evt):
 		self.application.ConfigDisplay()
+
+	def OnSinglePlayer(self, evt):
+		wizard = SinglePlayerWizard(self)
+		if wizard.Run():
+			# FIXME: This is a blocking call and will cause the UI to freeze!
+			port = wizard.game.start()
+			if port:
+				self.singleplayer = True
+				self.ShowURL("tp://player:player@localhost:" + str(port))
+				self.OnOkay(None)
+			else:
+				msg = _("""\
+Could not start single player game. Please check the console log for more information. \
+""")
+				dlg = wx.MessageDialog(self, msg, _("Single Player Error"), wx.OK|wx.ICON_ERROR)
+				dlg.ShowModal()
+		wizard.Destroy()
 
 	def OnFind(self, evt):
 		self.application.gui.Show(self.application.gui.servers)
@@ -449,10 +1053,10 @@ information with the new password?
 				if not details[2]: 
 					continue
 				msg = _("""
-The client is already set to autoconnect to %s.
+The client is already set to autoconnect to %(key)s.
 
-Would you instead like to autoconnect to %s.
-""") % (key, server)
+Would you instead like to autoconnect to %(server)s.
+""") % {'key': key, 'server': server}
 				dlg = wx.MessageDialog(self.ConfigPanel, msg, _("Autoconnect to?"), wx.OK|wx.CANCEL|wx.ICON_INFORMATION)
 				if dlg.ShowModal() == wx.ID_OK:
 					details[2] = False

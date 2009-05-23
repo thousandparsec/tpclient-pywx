@@ -285,6 +285,7 @@ class GUI(wx.App):
 
 		except:
 			utils.do_traceback()
+
 		self.Call(self.Show, self.connectto)
 
 	def __str__(self):
@@ -295,6 +296,11 @@ class GUI(wx.App):
 			window.Close()
 		while self.application.network.isAlive() or self.application.media.isAlive():
 			time.sleep(0.1)
+		try:
+			self.application.game.stop()
+		except:
+			pass
+
 		sys.exit()
 
 	# Config Functions ------------------------------------------------
@@ -389,6 +395,8 @@ class GUI(wx.App):
 			dlg = wx.MessageDialog(self.application.gui.current, unicode(evt), _("Network Error"), wx.OK|wx.ICON_ERROR)
 			dlg.ShowModal()
 			dlg.Destroy()
+
+	OnNetworkFailureUser = OnNetworkFailure
 
 from tp.client.threads import NetworkThread
 class Network(NetworkThread):
