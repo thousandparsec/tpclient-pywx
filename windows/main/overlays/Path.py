@@ -51,7 +51,13 @@ def FindPath(cache, obj):
 			if subtype == constants.ARG_ABS_COORD:
 				locations.append((node, getattr(order, argument_name)))
 			elif subtype == constants.ARG_OBJECT:
-				locations.append((node, cache.objects[getattr(order, argument_name)].pos))
+				positionslist = get_position_list(cache.objects[getattr(order, argument_name)])
+				
+				if positionslist == []:
+					raise TypeError("Could not find position for object referenced by order: %r" % cache.objects[getattr(order, argument_name)])
+					continue
+					
+				locations.append((node, positionslist[0]))
 
 	if len(locations) == 1:
 		return None
