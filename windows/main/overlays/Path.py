@@ -16,6 +16,7 @@ from extra.StateTracker import TrackerObjectOrder
 from tp.netlib.objects import constants
 from tp.netlib.objects                        import Object, OrderDescs
 from tp.netlib.objects                        import Order
+from extra									  import objectutils
 #from tp.netlib.objects.ObjectExtra.Universe   import Universe
 #from tp.netlib.objects.ObjectExtra.Galaxy     import Galaxy
 
@@ -31,20 +32,26 @@ def FindPath(cache, obj):
 	if not isinstance(obj, Object):
 		raise TypeError("Object must be an object not %r" % obj)
 
-	locations = [(-1, obj.pos)]
-	for listpos, node in enumerate(cache.orders[obj.id]):
-		order = node.CurrentOrder
-
-		# FIXME: Needs to be a better way to do this...
-		orderdesc = OrderDescs()[order._subtype]
-		if len(orderdesc.names) != 1:
-			continue
-
-		argument_name, subtype = orderdesc.names[0]
-		if subtype == constants.ARG_ABS_COORD:
-			locations.append((node, getattr(order, argument_name)))
-		elif subtype == constants.ARG_OBJECT:
-			locations.append((node, cache.objects[getattr(order, argument_name)].pos))
+	positions = objectutils.get_position_list(obj)
+	# Note: Should probably do something about objects with multiple positions here?
+	if positions == []:
+		raise TypeError("Object must have at least one position: %r" % obj)
+	locations = [(-1, positions[0][:3])]
+	
+	if cache.orders.has_key(obj.id):
+		for listpos, node in enumerate(cache.orders[obj.id]):
+			order = node.CurrentOrder
+	
+			# FIXME: Needs to be a better way to do this...
+			orderdesc = OrderDescs()[order._subtype]
+			if len(orderdesc.names) != 1:
+				continue
+	
+			argument_name, subtype = orderdesc.names[0]
+			if subtype == constants.ARG_ABS_COORD:
+				locations.append((node, getattr(order, argument_name)))
+			elif subtype == constants.ARG_OBJECT:
+				locations.append((node, cache.objects[getattr(order, argument_name)].pos))
 
 	if len(locations) == 1:
 		return None
