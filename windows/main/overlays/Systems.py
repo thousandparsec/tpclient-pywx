@@ -22,6 +22,10 @@ from tp.netlib.objects                        import Object, OrderDescs
 #from tp.netlib.objects.ObjectExtra.Fleet      import Fleet
 #from tp.netlib.objects.ObjectExtra.Wormhole   import Wormhole
 
+from tp.netlib import GenericRS
+
+from extra import objectutils
+
 from Overlay   import SystemLevelOverlay, Holder
 from Colorizer import *
 
@@ -105,8 +109,6 @@ class SystemIcon(Group, Holder, IconMixIn):
 		return SystemIcon(self.cache, self.primary, self.Colorizer)
 
 	def __init__(self, cache, system, colorizer=None):
-		if not isinstance(system, StarSystem):
-			raise TypeError('SystemIcon must be given a StarSystem, %r' % system)
 
 		Holder.__init__(self, system, FindChildren(cache, system))
 
@@ -117,19 +119,26 @@ class SystemIcon(Group, Holder, IconMixIn):
 		# Create a list of the objects
 		ObjectList = []
 
-		# The center point
-		ObjectList.append(Point(system.pos[0:2], type, self.PrimarySize, False))
+		positionlist = objectutils.getPositionList(system)
+		if positionlist == []:
+			raise TypeError('Object passed to SystemIcon has no coordinates, %r' % system)
+
+		# The center point for each position
+		for position in positionlist:
+			ObjectList.append(Point(position[0:2], type, self.PrimarySize, False))
 
 		if len(self.children) > 0:
 			# The orbit bits
-			ObjectList.insert(0, Point(system.pos[0:2], "Black", 8, InForeground=True))
-			ObjectList.insert(0, Point(system.pos[0:2], "Grey",  9, InForeground=True))
+			for position in positionlist:
+				ObjectList.insert(0, Point(position[0:2], "Black", 8, InForeground=True))
+				ObjectList.insert(0, Point(position[0:2], "Grey",  9, InForeground=True))
 	
 			# The orbiting children
 			for i, childtype in enumerate(childtype):
-				ObjectList.append(
-					RelativePoint(system.pos[0:2], childtype, self.ChildSize, True, self.ChildOffset(i))
-				)
+				for position in positionlist:
+					ObjectList.append(
+						RelativePoint(position[0:2], childtype, self.ChildSize, True, self.ChildOffset(i))
+					)
 
 		Group.__init__(self, ObjectList, False)
 
@@ -142,9 +151,6 @@ class FleetIcon(Group, Holder, IconMixIn):
 		return FleetIcon(self.cache, self.primary, self.Colorizer)
 
 	def __init__(self, cache, fleet, colorizer=None):
-		if not isinstance(fleet, Fleet):
-			raise TypeError('FleetIcon must be given a Fleet, %r' % system)
-
 		if len(FindChildren(cache, fleet)) > 0:
 			raise TypeError('The fleet has children! WTF?')
 
@@ -157,9 +163,14 @@ class FleetIcon(Group, Holder, IconMixIn):
 		# Create a list of the objects
 		ObjectList = []
 
-		# The little ship icon
-		ObjectList.append(Point(fleet.pos[0:2], None, 12))
-		ObjectList.append(PolygonShip(fleet.pos[0:2], type))
+		positionlist = objectutils.getPositionList(fleet)
+		if positionlist == []:
+			raise TypeError('Object passed to FleetIcon has no coordinates, %r' % system)
+
+		for position in positionlist:
+			# The little ship icon
+			ObjectList.append(Point(position[0:2], None, 12))
+			ObjectList.append(PolygonShip(position[0:2], type))
 
 		Group.__init__(self, ObjectList, False)
 
@@ -249,12 +260,13 @@ class Systems(SystemLevelOverlay, TrackerObjectOrder):
 		self['selected-arrow'] = PolygonArrow((0,0), "Red", True)
 
 	def Icon(self, obj):
-		if isinstance(obj, Fleet):
-			return FleetIcon(self.cache, obj, self.Colorizer)
-		elif isinstance(obj, Wormhole):
-			return WormholeIcon(self.cache, obj, self.Colorizer)
-		else:
-			return SystemIcon(self.cache, obj, self.Colorizer)
+		# TODO: FIX FOR TP04 OBJECTS
+		for propertygroup in obj.properties:
+			positionattrsstruct = getattr(obj, propertygroup.name)
+			if hasattr(positionattrsstruct, 'Ship List'):
+				return FleetIcon(self.cache, obj, self.Colorizer)
+		
+		return SystemIcon(self.cache, obj, self.Colorizer)
 
 	def ArrowTo(self, arrow, icon, object):
 		arrow.SetPoint(icon.XY)
@@ -471,12 +483,25 @@ class Systems(SystemLevelOverlay, TrackerObjectOrder):
 			color = icon.Colorizer(FindOwners(self.cache, cobj))
 
 			s += "<font style='%s' color='%s'>%s" % (style, color, cobj.name)
-			if isinstance(cobj, Fleet):
-				for shipid, amount in cobj.ships:
-					try:
-						s+= "\n  %s %ss" % (amount, self.cache.designs[shipid].name)
-					except KeyError:
-						s+= "\n  %s %ss" % (amount, "Unknown Ship")
+						
+			for propertygroup in cobj.properties:
+				positionattrsstruct = getattr(cobj, propertygroup.name)
+				if hasattr(positionattrsstruct, 'Ship List'):
+					shiplists = getattr(positionattrsstruct, 'Ship List').references
+					
+					for shiplist in shiplists:
+						reftype = shiplist[0]
+						shipid = shiplist[1]
+						shipcount = shiplist[2]
+						if reftype == GenericRS.Types["Design"]:
+							try:
+								s+= "\n  %s %ss" % (shipcount, self.cache.designs[shipid].name)
+							except KeyError:
+								s+= "\n  %s %ss" % (shipcount, "Unknown Ships")
+						elif reftype == GenericRS.Types["Object"]:
+							s+= "\n  %s %ss" % (shipcount, self.cache.objects[shipid].name)
+						else:
+							s+= "\n  %s %ss" % (shipcount, "Unknown Ships")
 
 			s += "</font>\n"
 

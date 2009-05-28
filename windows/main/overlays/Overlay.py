@@ -6,6 +6,7 @@ Starmap.
 import sys
 
 from tp.netlib.objects import Object
+from extra import objectutils
 
 class Overlay(dict):
 	"""\
@@ -275,13 +276,14 @@ class SystemLevelOverlay(Overlay, TrackerObject):
 		"""
 		obj = self.cache.objects[oid]
 
-		# Only draw top level objects
-		if isinstance(obj, self.TopLevel) or not hasattr(obj, 'parent'):
+		# Don't draw top level objects.
+		if objectutils.isTopLevel(self.cache, oid):
+			self[oid] = []
 			return
-
-		# Don't draw objects which parent's are not top level objects
-		parent = self.cache.objects[obj.parent]
-		if not isinstance(parent, self.TopLevel):
+					
+		# Don't draw objects whose parents are not top level objects:
+		if not objectutils.isTopLevel(self.cache, obj.parent):
+			self[oid] = []
 			return
 
 		icon = self.Icon(obj)

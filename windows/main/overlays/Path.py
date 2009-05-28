@@ -32,7 +32,7 @@ def FindPath(cache, obj):
 	if not isinstance(obj, Object):
 		raise TypeError("Object must be an object not %r" % obj)
 
-	positions = objectutils.get_position_list(obj)
+	positions = objectutils.getPositionList(obj)
 	# Note: Should probably do something about objects with multiple positions here?
 	if positions == []:
 		raise TypeError("Object must have at least one position: %r" % obj)
@@ -51,7 +51,7 @@ def FindPath(cache, obj):
 			if subtype == constants.ARG_ABS_COORD:
 				locations.append((node, getattr(order, argument_name)))
 			elif subtype == constants.ARG_OBJECT:
-				positionslist = get_position_list(cache.objects[getattr(order, argument_name)])
+				positionslist = getPositionList(cache.objects[getattr(order, argument_name)])
 				
 				if positionslist == []:
 					raise TypeError("Could not find position for object referenced by order: %r" % cache.objects[getattr(order, argument_name)])
