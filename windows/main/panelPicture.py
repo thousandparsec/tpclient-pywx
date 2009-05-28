@@ -28,6 +28,8 @@ from extra.decorators import freeze_wrapper
 #from tp.netlib.objects.ObjectExtra.Planet import Planet
 #from tp.netlib.objects.ObjectExtra.Fleet import Fleet
 
+from extra import objectutils
+
 # Config imports
 from requirements import graphicsdir
 
@@ -226,16 +228,29 @@ class panelPicture(panelPictureBase):
 
 		# Figure out the right graphic
 		try:
-			if isinstance(object, (Universe, Galaxy)):
+			if objectutils.isTopLevel(self.application.cache, evt.id):
 				images = self.images['nebula']
-			elif isinstance(object, StarSystem):
-				images = self.images['star']
-			elif isinstance(object, Planet):
-				images = self.images['planet']
-			elif isinstance(object, Fleet):
+			elif objectutils.isFleet(self.application.cache, evt.id):
 				images = self.images['ship']
+			elif objectutils.hasResources(self.application.cache, evt.id):
+				images = self.images['planet']
 			else:
-				images = {'still': []}
+				# if object doesn't have anything except position properties and its
+				# parent is a top level object, assume it's a starsystem.
+				starsystem = True
+				for propertygroup in object.properties:
+					if propertygroup.name != "Positional":
+						starsystem = False
+				
+				if not hasattr(object, 'parent'):
+					starsystem = False
+				
+				if starsystem == True and objectutils.isTopLevel(self.application.cache, object.parent):
+					images = self.images['star']
+				else:
+					# Unknown object.
+					images = {'still': []}
+					
 		except KeyError, e:
 			print e
 			images = {'still': []}

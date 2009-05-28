@@ -67,3 +67,30 @@ def isTopLevel(cache, oid):
 	
 	# If it only has a positional property list, it's a galaxy.
 	return True
+
+def isFleet(cache, oid):
+	"""
+	Returns true if this object is a fleet. Relies on the fact that fleets have ship lists.
+	"""
+	
+	obj = cache.objects[oid]
+	
+	for propertygroup in obj.properties:
+		positionattrsstruct = getattr(obj, propertygroup.name)
+		if hasattr(positionattrsstruct, 'Ship List'):
+			return True
+	
+	return False
+
+def hasResources(cache, oid):
+	"""
+	Returns true if this object has resources.
+	"""
+	
+	obj = cache.objects[oid]
+	
+	for propertygroup in obj.properties:
+		if propertygroup.name == "Resources":
+			return True
+	
+	return False
