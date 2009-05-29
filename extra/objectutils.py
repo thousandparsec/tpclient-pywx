@@ -94,3 +94,20 @@ def hasResources(cache, oid):
 			return True
 	
 	return False
+	
+def getOrderTypes(cache, oid):
+	"""
+	Returns a dictionary of lists of order types an object can support for each order queue,
+	or [] if none. Keyed by order queue ID.
+	"""
+	ordertypes = {}
+	obj = cache.objects[oid]
+	for propertygroup in obj.properties:
+		group = getattr(obj, propertygroup.name)
+		
+		for queue in group.structures:
+			if type(queue) != parameters.ObjectParamOrderQueue:
+				continue;
+			
+			ordertypes[queue.queueid] = queue.ordertypes
+	return ordertypes

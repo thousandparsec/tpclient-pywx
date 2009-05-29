@@ -24,6 +24,8 @@ from overlays.Path     import Paths
 from windows.xrc.panelStarMap import panelStarMapBase
 
 from tp.netlib.objects import OrderDescs
+from tp.netlib.objects import parameters
+from extra import objectutils
 
 import extra.wxFloatCanvas.GUIMode as GUIMode
 class GUIWaypoint(GUIMode.GUIMouse):
@@ -348,16 +350,25 @@ class panelStarMap(panelStarMapBase, TrackerObjectOrder):
 		"""
 		self.SetMode(self.GUISelect)	
 
+		ordertypes = objectutils.getOrderTypes(self.application.cache, id)
 		# Check if this object can move so we can enable waypoint mode
 		canmove = False
-		for orderid in self.application.cache.objects[id].order_types:
-			order = OrderDescs()[orderid]
+		for queueid, typelist in ordertypes.items():
+			for otype in typelist:
+				order = OrderDescs()[otype]
 
-			# FIXME: Needs to be a better way to do this...
-			if order._name in ("Move", "Move To", "Intercept"):
-				canmove = True
+				# FIXME: Needs to be a better way to do this... what if there's an order
+				# type where the object can't move but it can place or throw something to
+				# a specific point? Then the order will have coordinates, and this will
+				# give a false positive, enabling the waypoint button.
+				for property in order.properties:
+					if type(property) == parameters.OrderParamAbsSpaceCoords \
+						or type(property) == parameters.OrderParamRelSpaceCoords:
+						canmove = True
+						break
+			if canmove:
 				break
-
+		
 		if canmove:
 			self.WaypointButton.Enable()
 		else:
