@@ -123,9 +123,13 @@ class SystemIcon(Group, Holder, IconMixIn):
 		if positionlist == []:
 			raise TypeError('Object passed to SystemIcon has no coordinates, %r' % system)
 
+		prevpos = ()
 		# The center point for each position
 		for position in positionlist:
 			ObjectList.append(Point(position[0:2], type, self.PrimarySize, False))
+			if prevpos != ():
+				ObjectList.append(Line((prevpos[0:2], position[0:2]), type))
+			prevpos = position
 
 		if len(self.children) > 0:
 			# The orbit bits
