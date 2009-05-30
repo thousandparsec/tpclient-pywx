@@ -60,10 +60,10 @@ def isTopLevel(cache, oid):
 	if cache.objects[obj.parent].id != 0:
 		return False
 	
-	# If the object has any properties other than Positional ones, it's not a
+	# If the object has any properties other than Positional and Media ones, it's not a
 	# galaxy.
 	for propertygroup in obj.properties:
-		if propertygroup.name != "Positional":
+		if propertygroup.name != "Positional" and propertygroup.name != "Media":
 			return False
 	
 	# If it only has a positional property list, it's a galaxy.
