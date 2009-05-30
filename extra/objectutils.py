@@ -3,6 +3,7 @@ This file contains functions used to deal with objects.
 """
 from tp.netlib.objects			  			  import Structures
 from tp.netlib.objects						  import parameters
+from tp.netlib import GenericRS
 
 def getPositionList(obj):
 	"""
@@ -111,3 +112,25 @@ def getOrderTypes(cache, oid):
 			
 			ordertypes[getattr(group, queue.name).queueid] = getattr(group, queue.name).ordertypes
 	return ordertypes
+	
+def getOwner(cache, oid):
+	"""
+	Returns the ID of the object's owner, if it has one, or -1 if it does not.
+	"""
+	ordertypes = {}
+	obj = cache.objects[oid]
+	for propertygroup in obj.properties:
+		if not "Owner" in propertygroup.name:
+			continue
+			
+		group = getattr(obj, propertygroup.name)
+		for struct in group.structures:
+			if type(struct) != parameters.ObjectParmReference:
+				continue
+			
+			ownerref = getattr(group, struct.name)
+			if ownerref.type != GenericRS.Types["Player"]:
+				continue
+		
+			return ownerref.id
+	return -1

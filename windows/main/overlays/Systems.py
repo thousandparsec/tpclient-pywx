@@ -54,12 +54,11 @@ def FindOwners(cache, obj):
 
 	owners = set()
 	for child in [obj]+FindChildren(cache, obj):
-		if not hasattr(child, 'owner'):
-			continue
+		owner = objectutils.getOwner(cache, child.id)
 
-		if child.owner in (0, -1):
+		if owner in (0, -1):
 			continue
-		owners.add(child.owner)
+		owners.add(owner)
 	return list(owners)
 
 class IconMixIn:
