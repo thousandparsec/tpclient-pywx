@@ -109,5 +109,5 @@ def getOrderTypes(cache, oid):
 			if type(queue) != parameters.ObjectParamOrderQueue:
 				continue;
 			
-			ordertypes[queue.queueid] = queue.ordertypes
+			ordertypes[getattr(group, queue.name).queueid] = getattr(group, queue.name).ordertypes
 	return ordertypes
