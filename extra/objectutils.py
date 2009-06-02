@@ -134,3 +134,65 @@ def getOwner(cache, oid):
 		
 			return ownerref.id
 	return -1
+
+def getMediaURLs(cache, oid):
+	"""
+	Returns a dictionary of media URLs for this object, keyed by the name of the media.
+	"""
+	obj = cache.objects[oid]
+	mediaurls = {}
+	for propertygroup in obj.properties:
+		group = getattr(obj, propertygroup.name)
+		
+		for param in group.structures:
+			if type(param) == parameters.ObjectParamMedia:
+				url = getattr(group, param.name).url
+				if url == "":
+					continue
+					
+				mediaurls[param.name] = url
+	
+	return mediaurls
+
+def getImages(application, oid):
+	"""
+	Returns a list of image URLs for this object.
+	"""
+	cache = application.cache
+	mediaurls = getMediaURLs(cache, oid)
+	imageurls = {}
+	animationurls = []
+	staticurls = []
+	for (name, url) in mediaurls.items():
+		if "Icon" in name:
+			continue
+		
+		filenames = application.media.GetFilenames(url)
+		for filename in filenames:
+			if filename.endswith("png"):
+				staticurls.append(filename)
+			elif filename.endswith("gif"):
+				animationurls.append(filename)
+	
+	imageurls['animation'] = animationurls
+	imageurls['still'] = staticurls
+
+	return imageurls
+	
+def getIconURLs(application, oid):
+	"""
+	Returns a list of icon URLs for this object.
+	"""
+	cache = application.cache
+	mediaurls = getMediaURLs(cache, oid)
+	iconurls = []
+	
+	for (name, url) in mediaurls.items():
+		if not "Icon" in name:
+			continue
+		
+		filenames = application.media.GetFilenames(url)
+		for filename in filenames:
+			iconurls.append(filename)
+			
+	return iconurls

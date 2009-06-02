@@ -15,6 +15,8 @@ import wx.gizmos
 # Local imports
 from requirements import graphicsdir
 
+from extra import objectutils
+
 NAME = 0
 DESC = 1
 
@@ -33,6 +35,8 @@ class panelSystem(panelSystemBase, TrackerObject):
 		self.SelectIgnore     = False
 		self.SelectedPrevious = None
 
+		self.waitingimages = {}
+
 		self.icons = {}
 		self.icons['Blank']      = wx.Image(os.path.join(graphicsdir, "blank-icon.png")).ConvertToBitmap()
 		self.icons['Root']       = wx.Image(os.path.join(graphicsdir, "tp-icon.png")).ConvertToBitmap()
@@ -41,7 +45,8 @@ class panelSystem(panelSystemBase, TrackerObject):
 		self.icons['Fleet']      = wx.Image(os.path.join(graphicsdir, "ship-icon.png")).ConvertToBitmap()
 		self.icons['Planet']     = wx.Image(os.path.join(graphicsdir, "planet-icon.png")).ConvertToBitmap()
 		self.icons['Wormhole']   = wx.Image(os.path.join(graphicsdir, "link-icon.png")).ConvertToBitmap()
-		self.icons['Unknown']    = wx.Image(os.path.join(graphicsdir, "blank-icon.png")).ConvertToBitmap()
+		self.icons['Unknown']    = wx.Image(os.path.join(graphicsdir, "unknown-icon.png")).ConvertToBitmap()
+		self.icons['Loading']    = wx.Image(os.path.join(graphicsdir, "blank-icon.png")).ConvertToBitmap()
 
 		self.il = wx.ImageList(16, 16)
 		self.il.Add(wx.Image(os.path.join(graphicsdir, "blank.png")).ConvertToBitmap())
@@ -61,6 +66,8 @@ class panelSystem(panelSystemBase, TrackerObject):
 		self.Search.Bind(wx.EVT_SEARCHCTRL_SEARCH_BTN, self.Rebuild)
 		self.Search.Bind(wx.EVT_SEARCHCTRL_CANCEL_BTN, self.OnSearchCancel)
 
+		self.application.gui.Binder(self.application.MediaClass.MediaUpdateEvent, self.OnMediaUpdate)
+		self.application.gui.Binder(self.application.MediaClass.MediaDownloadDoneEvent,	self.OnMediaDownloadDone)
 		self.application.gui.Binder(self.application.CacheClass.CacheUpdateEvent, self.OnCacheUpdate)
 		self.application.gui.Binder(self.application.gui.SelectObjectEvent, self.OnSelectObject)
 		
@@ -68,6 +75,20 @@ class panelSystem(panelSystemBase, TrackerObject):
 		self.Layout()
 
 		TrackerObject.__init__(self)
+
+	def OnMediaDownloadDone(self, evt):
+		self.Layout()
+		self.Update()
+
+		if evt is None:
+			return
+
+		if self.waitingimages.has_key(evt.file):
+			del self.waitingimages[evt.file]
+			self.Rebuild()
+		
+	def OnMediaUpdate(self, evt):
+		self.Rebuild()
 
 	def OnResize(self, evt):
 		if sys.platform == "darwin":
@@ -173,7 +194,20 @@ class panelSystem(panelSystemBase, TrackerObject):
 			from fnmatch import fnmatch as match
 			if match(caption.lower(), self.Filter.lower()):
 				try:
-					icon = self.icons[object.__class__.__name__]
+					iconurls = objectutils.getIconURLs(self.application, object.id)
+					# Just use the first one, if there are more than one.
+					if len(iconurls) == 0:
+						icon = self.icons['Unknown']
+					else:
+						file = self.application.media.GetFile(iconurls[0])
+						if file == None or self.waitingimages.has_key(iconurls[0]):
+							# Add this file to the waiting files list.
+							self.waitingimages[iconurls[0]] = object.id
+							icon = self.icons['Loading']
+						else:
+							iconimage = wx.Image(file).ConvertToBitmap()
+							icon = self.il.Add(iconimage)
+				
 				except KeyError:
 					icon = self.icons['Unknown']
 

@@ -56,6 +56,8 @@ class panelPicture(panelPictureBase):
 		self.application = application
 		self.current = -1
 
+		self.image_waiting = ""
+
 		self.Animation.Hide()
 		self.Static.Hide()
 
@@ -228,34 +230,14 @@ class panelPicture(panelPictureBase):
 
 		# Figure out the right graphic
 		try:
-			if objectutils.isTopLevel(self.application.cache, evt.id):
-				images = self.images['nebula']
-			elif objectutils.isFleet(self.application.cache, evt.id):
-				images = self.images['ship']
-			elif objectutils.hasResources(self.application.cache, evt.id):
-				images = self.images['planet']
-			else:
-				# if object doesn't have anything except position properties and its
-				# parent is a top level object, assume it's a starsystem.
-				starsystem = True
-				for propertygroup in object.properties:
-					if propertygroup.name != "Positional":
-						starsystem = False
-				
-				if not hasattr(object, 'parent'):
-					starsystem = False
-				
-				if starsystem == True and objectutils.isTopLevel(self.application.cache, object.parent):
-					images = self.images['star']
-				else:
-					# Unknown object.
-					images = {'still': []}
+			# Try to get any images the object specifies for itself.
+			images = objectutils.getImages(self.application, evt.id)
 					
 		except KeyError, e:
 			print e
 			images = {'still': []}
 
-		if images.has_key("animation"):
+		if images.has_key("animation") and len(images["animation"]) > 0:
 			images = images["animation"]
 		else:
 			images = images["still"]

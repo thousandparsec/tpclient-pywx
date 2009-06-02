@@ -413,8 +413,15 @@ class Network(NetworkThread):
 		if NetworkThread.ConnectTo(self, host, username, password, debug, up, cs="tpclient-pywx/%s.%s.%s" % version):
 			self.CacheUpdate()
 
+			(gameusername, gamename) = gui.connectto.GetUsernameGame()
+
+			medialocation = ""
+			for game in self.application.network.connection.games():
+				if gamename == "" or game.name == gamename:
+					medialocation = game.media
+				
 			media = self.application.media
-			media.Call(media.ConnectTo, host, username)
+			media.Call(media.ConnectTo, medialocation, username, password)
 		else:
 			print "Connecting to failed"
 
