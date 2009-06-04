@@ -389,23 +389,22 @@ class panelStarMap(panelStarMapBase, TrackerObjectOrder):
 		foundhomeworld = 0
 		if not homeresource is None:
 			for oid in self.application.cache.objects.keys():
-				# Is this object ownable?
-				if not hasattr(self.application.cache.objects[oid], "owner"):
-					continue
-
 				# Does the player own this object
-				if self.application.cache.objects[oid].owner != self.application.cache.players[0].id:
+				objowner = objectutils.getOwner(self.application.cache, oid)
+				if objowner != self.application.cache.players[0].id:
 					continue
 			
 				# Does this object have any resources?
-				if not (hasattr(self.application.cache.objects[oid], "resources")):
+				if not objectutils.hasResources(self.application.cache, oid):
 					continue
 
-				for resources in self.application.cache.objects[oid].resources:
-					if not resources[0] == homeresource:
+				# Check if the object has a homeworld resource.
+				resourcelist = objectutils.getResources(self.application.cache, oid)
+				for resource in resourcelist:
+					if resource[0] != homeresource:
 						continue
-
-					if sum(resources[1:]) == 0:
+						
+					if resource[1] == 0:
 						continue
 
 					foundhomeworld = oid
@@ -416,7 +415,12 @@ class panelStarMap(panelStarMapBase, TrackerObjectOrder):
 
 		# Select the object
 		self.SelectObject(foundhomeworld)
-		self.Canvas.Zoom(1, self.application.cache.objects[foundhomeworld].pos[:2])
+		
+		poslist = objectutils.getPositionList(self.application.cache.objects[foundhomeworld])
+		if len(poslist) > 0:
+			# FIXME: Just use the first position?
+			pos = poslist[0]
+			self.Canvas.Zoom(1, pos[:2])
 		self.Canvas.Draw()
 		
 	def OnFind(self, evt):

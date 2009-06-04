@@ -96,6 +96,27 @@ def hasResources(cache, oid):
 	
 	return False
 	
+def getResources(cache, oid):
+	"""
+	Returns a list of tuples of resource information, each of which has the structure 
+	(id, amount stored, amount available to be mined, amount unavailable)
+	"""
+	
+	obj = cache.objects[oid]
+	resources = []
+	
+	for propertygroup in obj.properties:
+		group = getattr(obj, propertygroup.name)
+		
+		for paramlist in group.structures:
+			if type(paramlist) != parameters.ObjectParamResourceList:
+				continue
+				
+			resourcelist = getattr(group, paramlist.name).resources
+			for resource in resourcelist:
+				resources.append(resource)
+	return resources
+	
 def getOrderTypes(cache, oid):
 	"""
 	Returns a dictionary of lists of order types an object can support for each order queue,
