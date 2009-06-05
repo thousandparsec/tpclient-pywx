@@ -11,6 +11,7 @@ from extra.wxFloatCanvas import PieChart
 from extra.wxFloatCanvas.FloatCanvas   import Point, Group, Line
 #from tp.netlib.objects.ObjectExtra.StarSystem import StarSystem
 from tp.netlib.objects                        import Object
+from extra import objectutils
 
 from Overlay import SystemLevelOverlay, Holder
 
@@ -72,7 +73,11 @@ class SystemIcon(Group, Holder, IconMixIn):
 		ObjectList = []
 
 		# The center point
-		ObjectList.append(FloatCanvas.Point(system.pos[0:2], 'White', self.proportion*self.scale))
+		positionlist = objectutils.getPositionList(system)
+		if len(positionlist) <= 0:
+			return
+		# FIXME: Should we do anything about multiple coords here?
+		ObjectList.append(FloatCanvas.Point(positionlist[0][0:2], 'White', self.proportion*self.scale))
 
 		Group.__init__(self, ObjectList, False)
 		
@@ -105,37 +110,27 @@ class Proportional(SystemLevelOverlay):
 		"""\
 				
 		""" 
-		
 		c = self.cache
-
-		# Remove all the objects.
-		self.CleanUp()
-
 		# Calculate all the values so we can figure min/max.
 		values = {}
 		for oid in c.objects.keys():
-			#print oid, self.Amount(oid)
 			# Disregard the Universe and the Galaxy
 			if (c.objects[oid].subtype > 1):
 				values[oid] = self.Amount(oid)
 
 		import pprint
-		#pprint.pprint(values)
 
 		# Get min/max values.
 		v = values.values()
 		self.min = min(v)
 		self.max = max(v)
+		if self.min == self.max:
+			self.max += 1
+			
+		SystemLevelOverlay.UpdateAll(self)
 
 		for oid, value in sorted(values.items(), key=operator.itemgetter(1), reverse=True):
-			self.UpdateOne(oid, value)
-
-	def UpdateOne(self, oid, value=None):
-		"""\
-
-		"""
-		if isinstance(self.cache.objects[oid], StarSystem):
-			SystemLevelOverlay.UpdateOne(self, oid)
+			self.UpdateOne(oid)
 	
 	def Proportion(self, oid, value=None):
 		c = self.cache
@@ -172,7 +167,13 @@ class Proportional(SystemLevelOverlay):
 			return proportional
 	
 	def Icon(self, obj):
-		if isinstance(obj, StarSystem):
+		child_has_resources = False
+		for cid in obj.contains:
+			if objectutils.hasResources(self.application.cache, cid):
+				child_has_resources = True
+				break
+				
+		if child_has_resources:
 			return SystemIcon(self.cache, obj, self.Proportion(obj.id), self.scale)
 	
 	def ObjectHoverEnter(self, icon, pos):

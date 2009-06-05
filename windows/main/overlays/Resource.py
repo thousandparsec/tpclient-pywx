@@ -19,9 +19,11 @@ import operator
 
 from extra.wxFloatCanvas.NavCanvas import NavCanvas
 
-from Proportional import SystemIcon, FindChildren
+from Proportional import SystemIcon, FindChildren, IconMixIn
 
 from Overlay import SystemLevelOverlay, Holder
+
+from extra import objectutils
 
 from windows.xrc.winResourceSelect import ResourceSelectBase
 class ResourceSelect(ResourceSelectBase, wx.Frame):
@@ -153,10 +155,16 @@ class PieChartIcon(SystemIcon):
 		ObjectList = []
 
 		# The center point
+		positionlist = objectutils.getPositionList(system)
+		if len(positionlist) <= 0:
+			return
+		
+		# FIXME: Should we just use the first position here?
+		position = positionlist[0]
 		if (self.proportional*self.scale != 0 and self.valuesforchart != ()):
-			ObjectList.append(PieChart.PieChart(system.pos[0:2], self.proportional*self.scale, self.valuesforchart, Scaled=False, LineColor="Black"))
+			ObjectList.append(PieChart.PieChart(positionlist[0][0:2], self.proportional*self.scale, self.valuesforchart, Scaled=False, LineColor="Black"))
 		else:
-			ObjectList.append(PieChart.PieChart(system.pos[0:2], .0001, (1,1), Scaled=False, LineColor="Black"))
+			ObjectList.append(PieChart.PieChart(positionlist[0][0:2], .0001, (1,1), Scaled=False, LineColor="Black"))
 
 		Group.__init__(self, ObjectList, False)
 
@@ -212,7 +220,7 @@ class Resource(Proportional):
 		"""\
 		Updates a specific pie chart.
 		"""
-		proportional = Proportional.UpdateOne(self, oid, value)
+		proportional = Proportional.UpdateOne(self, oid)
 			
 	def Icon(self, obj):
 		"""\
@@ -225,7 +233,7 @@ class Resource(Proportional):
 		self.valuesforchart = ()
 		self.valuesresources = {}
 		
-		if (o.subtype != 2):
+		if o.subtype != 2:
 			pass
 			return PieChartIcon(self.cache, obj, 0.001, 1, (1,1))
 		
@@ -234,10 +242,10 @@ class Resource(Proportional):
 			return PieChartIcon(self.cache, obj, 0.001, 1, (1,1))
 			
 		for child in o.contains:
-			if not hasattr(c.objects[child], "resources"):
+			if not objectutils.hasResources(c, child):
 				continue
 				
-			for resource in c.objects[child].resources:
+			for resource in objectutils.getResources(c, child):
 				if sum(resource[1:]) == 0:
 					continue
 					
@@ -249,30 +257,24 @@ class Resource(Proportional):
 				else:
 					self.valuesresources[resource[0]] = sum(resource[1:])
 		
+		smallresources = 0
 		for resource, amount in self.valuesresources.items():
 			if amount > (self.Amount(obj.id) * .10):
 				continue
 				
-			if self.valuesresources.has_key(100000):
-				self.valuesresources[100000] += amount
-			else:
-				self.valuesresources[100000] = amount
+			smallresources += amount
+			
 			del self.valuesresources[resource]
 					
 		for resource, amount in sorted(self.valuesresources.iteritems(), key=operator.itemgetter(1), reverse=True):
-			if (resource == 100000):
-				continue
-				
 			self.valuesforchart += (amount,)
 		
-		if (self.valuesresources.has_key(100000)):
-			self.valuesforchart += (self.valuesresources[100000],)
+		if smallresources != 0:
+			self.valuesforchart += (smallresources,)
 			
 		if proportional*self.scale > 0:
-			pass
 			return PieChartIcon(self.cache, obj, proportional, self.scale, self.valuesforchart)
 		else:
-			pass
 			return PieChartIcon(self.cache, obj, 0.001, 1, (1,1))
 
 	def Amount(self, oid):
@@ -287,12 +289,13 @@ class Resource(Proportional):
 			for child in o.contains:
 				amount += self.Amount(child)
 
-		if hasattr(o, "resources"):
+		if objectutils.hasResources(c, oid):
+			resources = objectutils.getResources(c, oid)
 			if self.type == Resource.TOTAL:
-				for resource in o.resources:
+				for resource in resources:
 					amount += sum(resource[1:])
 			else:
-				for resource in o.resources:
+				for resource in resources:
 					if resource[0] == self.type:
 						amount += sum(resource[1:])
 		
@@ -317,13 +320,10 @@ class Resource(Proportional):
 		for c in system.contains:
 			child = self.cache.objects[c]
 			
-			if not hasattr(child, "resources"):
-				continue
-			
 			if len(self.selectpanel.selector.selected) != 0:
 				returnstring += "\n " + child.name + ":"
-				
-			for resource in child.resources:
+			
+			for resource in objectutils.getResources(self.cache, c):
 				if sum(resource[1:]) <= 0:
 					continue
 					

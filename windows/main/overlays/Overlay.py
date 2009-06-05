@@ -332,6 +332,9 @@ class SystemLevelOverlay(Overlay, TrackerObject):
 		system = self.cache.objects[parentid]
 		real   = self.cache.objects[oid]
 
+		if self[system.id] == []:
+			return
+		
 		icon = self[system.id].copy()
 		icon.SetLoop(real)
 		self.Selected = icon

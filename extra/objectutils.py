@@ -91,15 +91,21 @@ def hasResources(cache, oid):
 	obj = cache.objects[oid]
 	
 	for propertygroup in obj.properties:
-		if propertygroup.name == "Resources":
+		group = getattr(obj, propertygroup.name)
+		
+		for paramlist in group.structures:
+			if type(paramlist) != parameters.ObjectParamResourceList:
+				continue
+				
 			return True
 	
 	return False
 	
 def getResources(cache, oid):
 	"""
-	Returns a list of tuples of resource information, each of which has the structure 
-	(id, amount stored, amount available to be mined, amount unavailable)
+	Get a list of tuples of resources in an object.
+	
+	@return a list of tuples in the form (id, amount stored, amount available to be mined, amount unavailable)
 	"""
 	
 	obj = cache.objects[oid]
