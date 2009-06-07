@@ -263,7 +263,6 @@ class Systems(SystemLevelOverlay, TrackerObjectOrder):
 		self['selected-arrow'] = PolygonArrow((0,0), "Red", True)
 
 	def Icon(self, obj):
-		# TODO: FIX FOR TP04 OBJECTS
 		for propertygroup in obj.properties:
 			positionattrsstruct = getattr(obj, propertygroup.name)
 			if hasattr(positionattrsstruct, 'Ship List'):

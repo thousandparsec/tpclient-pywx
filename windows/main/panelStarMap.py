@@ -19,6 +19,7 @@ from extra.wxFloatCanvas import FloatCanvas
 
 from overlays.Resource import Resource
 from overlays.Systems  import Systems
+from overlays.SystemIcons  import SystemIcons
 from overlays.Path     import Paths
 
 from windows.xrc.panelStarMap import panelStarMapBase
@@ -62,7 +63,7 @@ class GUIWaypointEdit(GUIWaypoint):
 class panelStarMap(panelStarMapBase, TrackerObjectOrder):
 	title = _("StarMap")
 
-	Overlays = [(Paths, Systems), (Paths, Resource)]
+	Overlays = [(Paths, Systems), (Paths, Resource), (Paths, SystemIcons)]
 	def __init__(self, application, parent):
 		panelStarMapBase.__init__(self, parent)
 		self.parent = parent
