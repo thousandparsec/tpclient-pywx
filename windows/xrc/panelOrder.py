@@ -35,6 +35,10 @@ class panelOrderBase(wx.Panel):
 
 		# Define variables for the controls
 		self.Master = XRCCTRL(self, "Master")
+		self.Queues = XRCCTRL(self, "Queues")
+		if hasattr(self, "OnQueues"):
+			self.Queues.Bind(wx.EVT_CHOICE, self.OnQueues)
+
 		self.Orders = XRCCTRL(self, "Orders")
 		self.Possible = XRCCTRL(self, "Possible")
 		if hasattr(self, "OnPossible"):
@@ -66,9 +70,9 @@ class panelOrderBase(wx.Panel):
 
 def strings():
 	pass
-	_("Insert new order.");
 	_("&New");
+	_("Insert new order.");
 	_("&Save");
 	_("&Revert");
-	_("Delete the currently selected order(s)");
 	_("&Delete");
+	_("Delete the currently selected order(s)");

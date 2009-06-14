@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource>
+  <object class="wxPanel" name="orderUnimplemented">
+    <object class="wxFlexGridSizer">
+      <object class="sizeritem">
+        <object class="wxStaticText" name="Unimplemented">
+          <label>Unimplemented</label>
+        </object>
+        <option>0</option>
+      </object>
+      <cols>1</cols>
+      <rows>1</rows>
+      <growablecols>0</growablecols>
+    </object>
+  </object>
+</resource>

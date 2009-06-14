@@ -15,8 +15,11 @@ import wx
 # Protocol Imports
 from tp.netlib import objects
 from tp.netlib.objects import constants
+from tp.netlib.objects import parameters
 
 from tp.client.ChangeList import ChangeNode, ChangeHead
+
+from extra import objectutils
 
 TURNS_COL = 0
 ORDERS_COL = 1
@@ -27,9 +30,9 @@ CREATING = wx.Color(0, 0, 150)
 UPDATING = wx.Color(150, 150, 0)
 REMOVING = wx.Color(150, 0, 0)
 
-from extra.StateTracker import TrackerObjectOrder
+from extra.StateTracker import TrackerObjectOrder, TrackerObject, TrackerOrder
 from windows.xrc.panelOrder import panelOrderBase
-class panelOrder(panelOrderBase, TrackerObjectOrder):
+class panelOrder(panelOrderBase, TrackerObject, TrackerOrder):
 	title = _("Orders")
 
 	def __init__(self, application, parent):
@@ -38,7 +41,8 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 		self.application = application
 		self.parent = parent
 
-		TrackerObjectOrder.__init__(self)
+		TrackerObject.__init__(self)
+		TrackerOrder.__init__(self)
 
 		self.clipboard = None
 		self.ignore = False
@@ -48,6 +52,8 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 		self.Orders.InsertColumn(ORDERS_COL, _("Order Information"))
 		self.Orders.SetColumnWidth(ORDERS_COL, 140)
 		self.Orders.SetFont(wx.local.normalFont)
+
+		self.Queues.Bind(wx.EVT_CHOICE, self.OnQueueSelect)
 
 		self.DetailsSizer = self.DetailsPanel.GetSizer()
 
@@ -169,7 +175,7 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 		self.Orders.DeleteAllItems()
 		self.Possible.Clear()
 
-		if object.order_number == 0 and len(object.order_types) == 0:
+		if len(objectutils.getOrderTypes(self.application.cache, object.id)) <= 0:
 			# No orders and no possible orders on this object!
 			self.Master.Hide()
 		else:
@@ -179,21 +185,35 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 
 		self.Orders.SetToolTipDefault(_("Current orders on %s.") % object.name)
 		
-		orders = self.application.cache.orders[self.oid]
+		orderqueuelist = objectutils.getOrderQueueList(self.application.cache, object.id)
+		if len(orderqueuelist) <= 0:
+			self.Master.Hide()
+			return
+		
+		self.Queues.Clear()
+		for itemname, itemid in orderqueuelist:
+			self.Queues.Append(itemname, itemid)
+		
+		self.Queues.Select(0)
+		
+		self.OrderQueueSelect(self.Queues.GetClientData(self.Queues.GetSelection()))
 
+		orders = self.application.cache.orders[self.qid]
+		
 		# Add all the orders to the list
 		for listpos, node in enumerate(orders):
 			self.InsertListItem(listpos, node)
 	
 		# Set which order types can be added to this object
 		self.Possible.SetToolTipDefault(_("Order type to create"))
-		for type in object.order_types:
+		
+		ordertypes = objectutils.getOrderTypes(self.application.cache, object.id)
+		for type in ordertypes[self.qid]:
 			if not objects.OrderDescs().has_key(type):
 				print "WARNING: Unknown order type with id %s" % type
 				continue
 
 			od = objects.OrderDescs()[type]
-			
 			self.Possible.Append(od._name, type)
 			if hasattr(od, "doc"):
 				desc = od.doc
@@ -204,7 +224,7 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 			self.Possible.SetToolTipItem(self.Possible.GetCount()-1, desc)
 		
 		# Set the order types to the first selection
-		if len(object.order_types) > 0:
+		if len(objectutils.getOrderTypes(self.application.cache, object.id)) > 0:
 			self.Possible.Enable()
 			self.Possible.SetSelection(0)
 		else:
@@ -217,8 +237,9 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 	def OrdersSelect(self, nodes):
 		# Orders Select is only valid when an object is selected
 		assert self.oid != None
-
-		d = self.application.cache.orders[self.oid]
+		assert self.qid != None
+		
+		d = self.application.cache.orders[self.qid]
 
 		listpos = []
 		for node in nodes:
@@ -247,8 +268,9 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 		Inserts the order into a slot.
 		"""
 		assert self.oid != None
-
-		d = self.application.cache.orders[self.oid]
+		assert self.qid != None
+		
+		d = self.application.cache.orders[self.qid]
 
 		assert afterme in d
 		assert toinsert in d
@@ -265,8 +287,9 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 		Inserts the order into a slot.
 		"""
 		assert self.oid != None
-
-		d = self.application.cache.orders[self.oid]
+		assert self.qid != None
+		
+		d = self.application.cache.orders[self.qid]
 
 		assert beforeme in d
 		assert toinsert in d
@@ -282,8 +305,10 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 		"""\
 		"""
 		assert self.oid != None
-
-		d = self.application.cache.orders[self.oid]
+		assert self.qid != None
+		
+		d = self.application.cache.orders[self.qid]
+		
 		assert node in d
 
 		assert self.Orders.GetItemPyData(d.index(node)) is node
@@ -299,8 +324,9 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 		Deletes the order from a slot.
 		"""
 		assert self.oid != None
-
-		d = self.application.cache.orders[self.oid]
+		assert self.qid != None
+		
+		d = self.application.cache.orders[self.qid]
 
 		listposes = []
 		for i in range(0, self.Orders.GetItemCount()):
@@ -322,6 +348,48 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 	####################################################
 	# Local Event Handlers
 	####################################################
+	@freeze_wrapper
+	def OnQueueSelect(self, evt):
+		self.OrderQueueSelect(self.Queues.GetClientData(self.Queues.GetSelection()))
+		# Do the clean up first
+		self.Orders.DeleteAllItems()
+		self.Possible.Clear()
+		
+		object = self.application.cache.objects[self.oid]
+		orders = self.application.cache.orders[self.qid]
+		
+		# Add all the orders to the list
+		for listpos, node in enumerate(orders):
+			self.InsertListItem(listpos, node)
+	
+		# Set which order types can be added to this object
+		self.Possible.SetToolTipDefault(_("Order type to create"))
+		
+		ordertypes = objectutils.getOrderTypes(self.application.cache, object.id)
+		for type in ordertypes[self.qid]:
+			if not objects.OrderDescs().has_key(type):
+				print "WARNING: Unknown order type with id %s" % type
+				continue
+
+			od = objects.OrderDescs()[type]
+			self.Possible.Append(od._name, type)
+			if hasattr(od, "doc"):
+				desc = od.doc
+			else:
+				desc = od.__doc__
+			desc = desc.strip()
+
+			self.Possible.SetToolTipItem(self.Possible.GetCount()-1, desc)
+		
+		# Set the order types to the first selection
+		if len(objectutils.getOrderTypes(self.application.cache, object.id)) > 0:
+			self.Possible.Enable()
+			self.Possible.SetSelection(0)
+		else:
+			self.Possible.Disable()
+		
+		self.BuildPanel()
+		
 	def OnOrderDeselect(self, evt):
 		wx.CallAfter(self.OnOrderSelect, evt)
 
@@ -356,12 +424,40 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 		type = self.Possible.GetClientData(type)
 		
 		# Build the argument list
-		orderdesc = objects.OrderDescs()[type]	
+		orderdesc = objects.OrderDescs()[type]
 
 		# sequence, id, slot, type, turns, resources
 		args = [0, self.oid, -1, type, 0, []]
-		for name, type in orderdesc.names:
-			args += defaults[type]
+		for property in orderdesc.properties:
+			# FIXME: These could probably be made into better functions that create 
+			# more reasonable initial values.
+			if isinstance(property, parameters.OrderParamAbsSpaceCoords):
+				args += [[[0, 0, 0]]]
+			elif isinstance(property, parameters.OrderParamRelSpaceCoords):
+				args += [[0, [0, 0, 0]]]
+			elif isinstance(property, parameters.OrderParamList):
+				args += [[[], []]]
+			elif isinstance(property, parameters.OrderParamString):
+				args += [[0, ""]]
+			elif isinstance(property, parameters.OrderParamTime):
+				args += [[0, 0]]
+			elif isinstance(property, parameters.OrderParamObject):
+				args += [[0, []]]
+			elif isinstance(property, parameters.OrderParamPlayer):
+				args += [[0, 0]]
+			elif isinstance(property, parameters.OrderParamRange):
+				args += [[-1, -1, -1, -1]]
+			elif isinstance(property, parameters.OrderParamReference):
+				args += [[0, [0]]]
+			elif isinstance(property, parameters.OrderParamReferenceList):
+				args += [[[0], [0]]]
+			elif isinstance(property, parameters.OrderParamResourceList):
+				args += [[[0,0], 0, 0, [0,0]]]
+			elif isinstance(property, parameters.OrderParamGenericReferenceQuantityList):
+				args += [[[0, []], [0, "", 0, [], []], []]]
+			else:
+				print "Unknown: ", type(property)
+				return
 
 		# Create the new order
 		new = objects.Order(*args)
@@ -431,8 +527,8 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 			object = self.application.cache.objects[self.oid]
 			nodes = self.nodes
 
-			if object.order_number == 0 and len(object.order_types) == 0:
-				node = _("No orders avaliable")
+			if len(objectutils.getOrderTypes(self.application.cache, object.id)) <= 0:
+				node = _("No orders available")
 			elif len(nodes) > 1:
 				node = _("Multiple orders selected.")
 			elif len(nodes) < 1:
@@ -478,34 +574,58 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 			# List for the argument subpanels
 			self.ArgumentsChildren = []
 				
-			for name, subtype in orderdesc.names:
+			for property in orderdesc.properties:
+				name = property.name
 				# Add there name..
 				name_text = wx.StaticText( self.ArgumentsPanel, -1, name.title().replace("_","") )
 				name_text.SetFont(wx.local.tinyFont)
 
 				# Add the arguments bit
 				namepos = wx.LEFT
-				if subtype == constants.ARG_ABS_COORD:
+				if isinstance(property, parameters.OrderParamAbsSpaceCoords):
 					subpanel = PositionArgumentPanel(self.ArgumentsPanel)
 					subpanel.application = self.application
 					subpanel.set_value(list(getattr(order, name)))
-				elif subtype == constants.ARG_LIST:
+				elif isinstance(property, parameters.OrderParamRelSpaceCoords):
+					subpanel = RelativePositionArgumentPanel(self.ArgumentsPanel)
+					subpanel.application = self.application
+					subpanel.set_value(list(getattr(order, name)))
+				elif isinstance(property, parameters.OrderParamList):
 					subpanel = ListArgumentPanel(self.ArgumentsPanel)
 					subpanel.set_value(list(getattr(order, name)))
-				elif subtype == constants.ARG_STRING:
+				elif isinstance(property, parameters.OrderParamString):
 					subpanel = TextArgumentPanel(self.ArgumentsPanel)
 					subpanel.set_value([getattr(order, name)])
-				elif subtype == constants.ARG_TIME:
+				elif isinstance(property, parameters.OrderParamTime):
 					subpanel = TimeArgumentPanel(self.ArgumentsPanel)
 					subpanel.set_value([getattr(order,name)])
-				elif subtype == constants.ARG_OBJECT:
+				elif isinstance(property, parameters.OrderParamObject):
 					subpanel = ObjectArgumentPanel(self.ArgumentsPanel)
 					subpanel.application(self.application)
 					subpanel.set_value([getattr(order,name)])
+				elif isinstance(property, parameters.OrderParamPlayer):
+					subpanel = PlayerArgumentPanel(self.ArgumentsPanel)
+					subpanel.application(self.application)
+					subpanel.set_value([getattr(order,name)])
+				elif isinstance(property, parameters.OrderParamRange):
+					subpanel = RangeArgumentPanel(self.ArgumentsPanel)
+					subpanel.set_value([getattr(order,name)])
+				elif isinstance(property, parameters.OrderParamReference):
+					subpanel = UnimplementedArgumentPanel(self.ArgumentsPanel)
+					subpanel.set_value(["Unimplemented: OrderParamReference"])
+				elif isinstance(property, parameters.OrderParamReferenceList):
+					subpanel = UnimplementedArgumentPanel(self.ArgumentsPanel)
+					subpanel.set_value(["Unimplemented: OrderParamReferenceList"])
+				elif isinstance(property, parameters.OrderParamResourceList):
+					subpanel = UnimplementedArgumentPanel(self.ArgumentsPanel)
+					subpanel.set_value(["Unimplemented: OrderParamResourceList"])
+				elif isinstance(property, parameters.OrderParamGenericReferenceQuantityList):
+					subpanel = UnimplementedArgumentPanel(self.ArgumentsPanel)
+					subpanel.set_value(["Unimplemented: OrderParamGenericReferenceList"])
 				else:
 					return
 
-				subpanel.SetToolTip(wx.ToolTip(getattr(orderdesc, name+'__doc__')))
+				#subpanel.SetToolTip(wx.ToolTip(getattr(order, name+'__doc__')))
 				subpanel.SetFont(wx.local.normalFont)
 				self.ArgumentsChildren.append( subpanel )
 				
@@ -525,7 +645,7 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 
 				self.ArgumentsPanel.Layout()
 
-			if len(orderdesc.names) == 0:
+			if len(orderdesc.properties) == 0:
 				name_text = wx.StaticText( self.ArgumentsPanel, -1, "No arguments" )
 				name_text.SetFont(wx.local.normalFont)
 				self.ArgumentsSizer.Add( name_text, 0, wx.ALIGN_CENTER|wx.CENTER, 4 )
@@ -566,16 +686,15 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 		self.Master.Layout()
 		self.DetailsPanel.Layout()
 		self.Layout()
-		self.Orders._doResize()
 
 	def FromPanel(self, order):
 		orderdesc = objects.OrderDescs()[order.subtype]
 		
 		args = [order.sequence, order.id, -1, order.subtype, 0, []]
 		subpanels = copy.copy(self.ArgumentsChildren)
-		for name, type in orderdesc.names:
+		for property in orderdesc.properties:
 			panel = subpanels.pop(0)
-			args += panel.get_value()
+			args += [panel.get_value()]
 
 		return apply(objects.Order, args)
 
@@ -589,18 +708,22 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 		"""
 		object = self.application.cache.objects[self.oid]
 		
-		for type in object.order_types:
-			if not objects.OrderDescs().has_key(type):
-				continue
+		ordertypes = objectutils.getOrderTypes(self.application.cache, object.id)
+		
+		# FIXME: Separate the queues here?
+		for orderqueue, types in ordertypes.items():
+			for type in types:
+				if not objects.OrderDescs().has_key(type):
+					continue
 
-			od = objects.OrderDescs()[type]
+				od = objects.OrderDescs()[type]
 			
-			if hasattr(od, "doc"):
-				desc = od.doc
-			else:
-				desc = od.__doc__
-			desc = desc.strip()
-			menu.Append(-1, od._name, desc)
+				if hasattr(od, "doc"):
+					desc = od.doc
+				else:
+					desc = od.__doc__
+				desc = desc.strip()
+				menu.Append(-1, od._name, desc)
 
 	def CheckClipBoard(self):
 		"""\
@@ -726,7 +849,6 @@ class panelOrder(panelOrderBase, TrackerObjectOrder):
 			else:
 				self.OnOrderNew(None)
 
-
 class ArgumentPanel(object):
 	"""\
 	Base class for all other Argument panels.
@@ -736,6 +858,17 @@ class ArgumentPanel(object):
 	namepos = wx.LEFT
 
 	pass
+
+from windows.xrc.orderUnimplemented import orderUnimplementedBase
+class UnimplementedArgumentPanel(ArgumentPanel, orderUnimplementedBase):
+
+	def set_value(self, list):
+		print "UnimplementedArgumentPanel", list
+		self.__text = list.pop(0)
+		self.Unimplemented.SetLabel(self.__text)
+
+	def get_value(self):
+		return []
 
 from windows.xrc.orderText import orderTextBase
 class TextArgumentPanel(ArgumentPanel, orderTextBase):
@@ -791,25 +924,79 @@ class ObjectArgumentPanel(ArgumentPanel, orderObjectBase):
 	def get_value(self):
 		self.__oid = long(self.Value.GetClientData(self.Value.GetSelection()))
 		return [self.__oid]
+	
+from windows.xrc.orderPlayer import orderPlayerBase
+class PlayerArgumentPanel(ArgumentPanel, orderPlayerBase):
+
+	def __init__(self, parent, *args, **kw):
+		ArgumentPanel.__init__(self)
+		orderPlayerBase.__init__(self, parent, *args, **kw)
+
+		self.Value.SetFont(wx.local.tinyFont)
+
+	# FIXME: This is broken	
+	# FIXME: Should filter players by masking bits in parameters.py
+	def application(self, value):
+		combobox = self.Value
+
+		combobox.Freeze()
+		combobox.Append(_("No player"), -1)
+
+		# Sort the objects by name
+		players = value.cache.players.values()
+
+		for players in players:
+			combobox.Append(player.name + " (%s)" % player.id, player.id)
+
+		combobox.Thaw()
+
+	def set_value(self, list):
+		print "PlayerArgumentPanel", list
+		self.__oid = list.pop(0)
+
+		combobox = self.Value
+		combobox.SetSelection(0)
+		for slot in xrange(0, combobox.GetCount()):
+			if combobox.GetClientData(slot) == self.__oid:
+				combobox.SetSelection(slot)
+				break
+
+	def get_value(self):
+		self.__oid = long(self.Value.GetClientData(self.Value.GetSelection()))
+		return [self.__oid]
 
 
 from windows.xrc.orderRange import orderRangeBase
 class TimeArgumentPanel(ArgumentPanel, orderRangeBase):
 
 	def set_value(self, list):
-		print "RangeArgumentPanel", list
+		print "TimeArgumentPanel", list
 		self.__text, self.__max = list.pop(0)
 		self.Value.SetValue(self.__text)
 
 	def get_value(self):
 		return [long(self.Value.GetValue()), self.__max]
 		
+from windows.xrc.orderRange import orderRangeBase
+class RangeArgumentPanel(ArgumentPanel, orderRangeBase):
+
+	def set_value(self, list):
+		print "RangeArgumentPanel", list
+		self.__text, self.self.__min, self.__max, self.__increment = list.pop(0)
+		self.Value.SetMin(self.__min)
+		self.Value.SetMax(self.__max)
+		self.Value.SetValue(self.__text)
+
+	def get_value(self):
+		return [long(self.Value.GetValue()), self.__min, self.__max, self.__increment]
+
 from windows.xrc.orderPosition import orderPositionBase
 class PositionArgumentPanel(ArgumentPanel, orderPositionBase):
 	def OnSelectPosition(self, evt):
 		self.X.SetValue(unicode(evt[0]))
 		self.Y.SetValue(unicode(evt[1]))
 		self.Z.SetValue(unicode(evt[2]))
+		delattr(self.application.gui.main.panels[panelOrder.title], "OnSelectPosition")
 
 	def OnLocate(self, evt):
 		self.application.gui.main.panels[panelOrder.title].OnSelectPosition = self.OnSelectPosition
@@ -819,12 +1006,36 @@ class PositionArgumentPanel(ArgumentPanel, orderPositionBase):
 
 	def set_value(self, list):
 		print "PositionArgumentPanel", list
-		self.X.SetValue(unicode(list.pop(0)))
-		self.Y.SetValue(unicode(list.pop(0)))
-		self.Z.SetValue(unicode(list.pop(0)))
+		self.X.SetValue(unicode(list[0][0]))
+		self.Y.SetValue(unicode(list[0][1]))
+		self.Z.SetValue(unicode(list[0][2]))
 
 	def get_value(self):
-		return [long(self.X.GetValue()), long(self.Y.GetValue()), long(self.Z.GetValue())]
+		return [[long(self.X.GetValue()), long(self.Y.GetValue()), long(self.Z.GetValue())]]
+
+from windows.xrc.orderRelPosition import orderRelPositionBase
+class RelativePositionArgumentPanel(ArgumentPanel, orderRelPositionBase):
+	def OnSelectPosition(self, evt):
+		self.X.SetValue(unicode(evt[0]))
+		self.Y.SetValue(unicode(evt[1]))
+		self.Z.SetValue(unicode(evt[2]))
+		delattr(self.application.gui.main.panels[panelOrder.title], "OnSelectPosition")
+
+	def OnLocate(self, evt):
+		self.application.gui.main.panels[panelOrder.title].OnSelectPosition = self.OnSelectPosition
+		from windows.main.panelStarMap import panelStarMap
+		starmap = self.application.gui.main.panels[panelStarMap.title]
+		starmap.SetMode(starmap.GUIWaypointEdit)
+
+	def set_value(self, list):
+		print "PositionArgumentPanel", list
+		self.ObjectID.SetValue(unicode(list[0]))
+		self.X.SetValue(unicode(list[1][0]))
+		self.Y.SetValue(unicode(list[1][1]))
+		self.Z.SetValue(unicode(list[1][2]))
+
+	def get_value(self):
+		return [self.ObjectID.GetValue(), [long(self.X.GetValue()), long(self.Y.GetValue()), long(self.Z.GetValue())]]
 
 from windows.xrc.orderList import orderListBase
 class ListArgumentPanel(ArgumentPanel, orderListBase):

@@ -295,7 +295,12 @@ class Systems(SystemLevelOverlay, TrackerObjectOrder):
 			order = self.parent.application.gui.main.panels[panelOrder.title]
 
 			if hasattr(order, "OnSelectPosition"):
-				order.OnSelectPosition(self.Selected.current.pos)
+				positionlist = objectutils.getPositionList(self.Selected.current)
+				if positionlist == []:
+					raise TypeError('Object passed to FleetIcon has no coordinates, %r' % system)
+
+				# FIXME: Do something about multiple positions?
+				order.OnSelectPosition(positionlist[0])
 
 			return False
 

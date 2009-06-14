@@ -6,26 +6,28 @@
       <object class="sizeritem">
         <object class="wxPanel" name="Master">
           <object class="wxFlexGridSizer">
-            <cols>1</cols>
-            <rows>2</rows>
-            <vgap>0</vgap>
-            <hgap>0</hgap>
-            <growablecols>0</growablecols>
-            <growablerows>0</growablerows>
             <object class="sizeritem">
-              <flag>wxGROW|wxGROW|wxALL</flag>
-              <border>1</border>
-              <object class="wxListCtrl" name="Orders">
-                <size>100,100</size>
-                <style>wxLC_REPORT</style>
+              <object class="wxChoice" name="Queues">
+                <size>-1, 26</size>
               </object>
+              <option>1</option>
+              <flag>wxALL|wxEXPAND|wxGROW</flag>
             </object>
             <object class="sizeritem">
-              <flag>wxALIGN_CENTER_HORIZONTAL|wxGROW|wxALL</flag>
-              <border>2</border>
+              <object class="wxListCtrl" name="Orders">
+                <style>wxLC_REPORT</style>
+              </object>
+              <option>1</option>
+              <flag>wxGROW|wxGROW|wxALL</flag>
+              <border>1</border>
+              <minsize>100,100</minsize>
+            </object>
+            <object class="sizeritem">
               <object class="wxStaticLine" name="wxID_STATIC">
                 <style>wxLI_HORIZONTAL</style>
               </object>
+              <flag>wxALL|wxEXPAND|wxALIGN_CENTRE</flag>
+              <border>2</border>
             </object>
             <object class="sizeritem">
               <flag>wxGROW|wxGROW|wxALL</flag>
@@ -38,10 +40,7 @@
                 <growablecols>0</growablecols>
                 <growablerows>0</growablerows>
                 <object class="sizeritem">
-                  <flag>wxGROW|wxGROW|wxALL</flag>
-                  <border>1</border>
                   <object class="wxChoice" name="Possible">
-                    <content/>
                     <size>-1,24</size>
                     <font>
                       <size>8</size>
@@ -49,20 +48,24 @@
                       <face>Sans</face>
                     </font>
                   </object>
+                  <option>1</option>
+                  <flag>wxGROW|wxGROW|wxALL</flag>
+                  <border>1</border>
                 </object>
                 <object class="sizeritem">
-                  <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL</flag>
-                  <border>1</border>
                   <object class="wxButton" name="New">
                     <size>45,24</size>
-                    <tooltip>Insert new order.</tooltip>
+                    <label>&amp;New</label>
                     <font>
                       <size>8</size>
                       <family>swiss</family>
                       <face>Sans</face>
                     </font>
-                    <label>&amp;New</label>
+                    <tooltip>Insert new order.</tooltip>
                   </object>
+                  <option>1</option>
+                  <flag>wxALL|wxEXPAND|wxALIGN_CENTRE|wxALIGN_CENTRE_VERTICAL</flag>
+                  <border>1</border>
                 </object>
               </object>
             </object>
@@ -75,6 +78,7 @@
                     <object class="wxStaticLine" name="ArgumentLine">
                       <style>wxLI_HORIZONTAL</style>
                     </object>
+                    <option>0</option>
                     <flag>wxALL|wxEXPAND</flag>
                     <border>2</border>
                   </object>
@@ -110,9 +114,6 @@
                               <growablecols>0</growablecols>
                               <growablerows>0</growablerows>
                               <object class="sizeritem">
-                                <option>1</option>
-                                <flag>wxLEFT|wxRIGHT|wxEXPAND|wxGROW|wxALIGN_CENTRE|wxADJUST_MINSIZE</flag>
-                                <border>5</border>
                                 <object class="wxStaticText" name="Message">
                                   <font>
                                     <size>8</size>
@@ -120,49 +121,50 @@
                                     <face>Sans</face>
                                   </font>
                                   <style>wxALIGN_CENTRE</style>
-                                  <label></label>
                                 </object>
+                                <option>1</option>
+                                <flag>wxLEFT|wxRIGHT|wxEXPAND|wxGROW|wxALIGN_CENTRE|wxADJUST_MINSIZE</flag>
+                                <border>5</border>
                               </object>
                               <object class="sizeritem">
-                                <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL</flag>
-                                <border>1</border>
                                 <object class="wxButton" name="Save">
                                   <size>45,24</size>
-                                  <font>
-                                    <size>8</size>
-                                    <family>swiss</family>
-                                    <face>Sans</face>
-                                  </font>
                                   <label>&amp;Save</label>
                                   <default>1</default>
+                                  <font>
+                                    <size>8</size>
+                                    <family>swiss</family>
+                                    <face>Sans</face>
+                                  </font>
                                 </object>
+                                <border>1</border>
                               </object>
                               <object class="sizeritem">
-                                <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL</flag>
-                                <border>1</border>
                                 <object class="wxButton" name="Revert">
                                   <size>45,24</size>
+                                  <label>&amp;Revert</label>
                                   <font>
                                     <size>8</size>
                                     <family>swiss</family>
                                     <face>Sans</face>
                                   </font>
-                                  <label>&amp;Revert</label>
                                 </object>
-                              </object>
-                              <object class="sizeritem">
                                 <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL</flag>
                                 <border>1</border>
+                              </object>
+                              <object class="sizeritem">
                                 <object class="wxButton" name="Delete">
                                   <size>45,24</size>
-                                  <tooltip>Delete the currently selected order(s)</tooltip>
+                                  <label>&amp;Delete</label>
                                   <font>
                                     <size>8</size>
                                     <family>swiss</family>
                                     <face>Sans</face>
                                   </font>
-                                  <label>&amp;Delete</label>
+                                  <tooltip>Delete the currently selected order(s)</tooltip>
                                 </object>
+                                <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+                                <border>1</border>
                               </object>
                             </object>
                           </object>
@@ -182,13 +184,21 @@
               <option>1</option>
               <flag>wxEXPAND|wxGROW</flag>
             </object>
+            <cols>1</cols>
+            <rows>1</rows>
+            <vgap>0</vgap>
+            <hgap>0</hgap>
+            <growablecols>0</growablecols>
+            <growablerows>1</growablerows>
           </object>
         </object>
+        <option>1</option>
         <flag>wxEXPAND|wxGROW</flag>
       </object>
       <cols>1</cols>
-      <growablerows>0</growablerows>
+      <rows>1</rows>
       <growablecols>0</growablecols>
+      <growablerows>0</growablerows>
     </object>
   </object>
 </resource>

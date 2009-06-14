@@ -139,6 +139,24 @@ def getOrderTypes(cache, oid):
 			
 			ordertypes[getattr(group, queue.name).queueid] = getattr(group, queue.name).ordertypes
 	return ordertypes
+
+def getOrderQueueList(cache, oid):
+	"""
+	Returns a list of tuples representing order queues for an object.
+	
+	@return a list of tuples, each has the form (order queue name, order queue ID)
+	"""
+	orderqueuelist = []
+	obj = cache.objects[oid]
+	for propertygroup in obj.properties:
+		group = getattr(obj, propertygroup.name)
+		
+		for queue in group.structures:
+			if type(queue) != parameters.ObjectParamOrderQueue:
+				continue;
+			
+			orderqueuelist.append((queue.name, getattr(group, queue.name).queueid))
+	return orderqueuelist
 	
 def getOwner(cache, oid):
 	"""
