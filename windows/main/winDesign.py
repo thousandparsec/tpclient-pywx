@@ -328,7 +328,7 @@ class winDesign(winReportXRC, winDesignBase, ShiftMixIn):
 			dc.change(component, amount)
 		dc.update()
 	
-		if self.selected.Used == -1:
+		if self.selected.used == -1:
 			if amount > 1 or len(components) > 1:
 				reason = self.selected.feedback + _("\nWould you like to continue adding these components?")
 			else:
