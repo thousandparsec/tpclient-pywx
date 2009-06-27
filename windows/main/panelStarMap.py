@@ -351,24 +351,7 @@ class panelStarMap(panelStarMapBase, TrackerObjectOrder):
 		"""
 		self.SetMode(self.GUISelect)	
 
-		ordertypes = objectutils.getOrderTypes(self.application.cache, id)
-		# Check if this object can move so we can enable waypoint mode
-		canmove = False
-		for queueid, typelist in ordertypes.items():
-			for otype in typelist:
-				order = OrderDescs()[otype]
-
-				# FIXME: Needs to be a better way to do this... what if there's an order
-				# type where the object can't move but it can place or throw something to
-				# a specific point? Then the order will have coordinates, and this will
-				# give a false positive, enabling the waypoint button.
-				for property in order.properties:
-					if type(property) == parameters.OrderParamAbsSpaceCoords \
-						or type(property) == parameters.OrderParamRelSpaceCoords:
-						canmove = True
-						break
-			if canmove:
-				break
+		canmove = self.canObjectMove(id)
 		
 		if canmove:
 			self.WaypointButton.Enable()
@@ -449,15 +432,7 @@ class panelStarMap(panelStarMapBase, TrackerObjectOrder):
 			if self.oid is None:
 				return
 
-			# FIXME: Duplicate code!!!!
-			canmove = False
-			for orderid in self.application.cache.objects[self.oid].order_types:
-				order = OrderDescs()[orderid]
-
-				# FIXME: Needs to be a better way to do this...
-				if order._name in ("Move", "Move To", "Intercept"):
-					canmove = True
-					break
+			canmove = self.canObjectMove(self.oid)
 
 			if canmove:
 				if evt.ShiftDown():
@@ -471,3 +446,20 @@ class panelStarMap(panelStarMapBase, TrackerObjectOrder):
 		if sys.platform == "win32":
 			self.Canvas.ProcessEvent(evt)
 
+	def canObjectMove(self, id):
+		ordertypes = objectutils.getOrderTypes(self.application.cache, id)
+		# Check if this object can move so we can enable waypoint mode
+		for queueid, typelist in ordertypes.items():
+			for otype in typelist:
+				order = OrderDescs()[otype]
+
+				# FIXME: Needs to be a better way to do this... what if there's an order
+				# type where the object can't move but it can place or throw something to
+				# a specific point? Then the order will have coordinates, and this will
+				# give a false positive, enabling the waypoint button.
+				for property in order.properties:
+					if type(property) == parameters.OrderParamAbsSpaceCoords \
+						or type(property) == parameters.OrderParamRelSpaceCoords:
+						return True
+		
+		return False
