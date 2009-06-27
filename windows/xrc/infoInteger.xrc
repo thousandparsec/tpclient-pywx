@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<resource>
+  <object class="wxPanel" name="infoInteger">
+    <object class="wxFlexGridSizer">
+      <object class="sizeritem">
+        <object class="wxStaticText" name="IntegerLabel">
+          <label>0</label>
+        </object>
+        <option>1</option>
+        <flag>wxALL|wxEXPAND|wxGROW</flag>
+      </object>
+      <cols>1</cols>
+      <rows>1</rows>
+    </object>
+  </object>
+</resource>

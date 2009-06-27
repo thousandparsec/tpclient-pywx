@@ -11,8 +11,8 @@ from wx.xrc import XRCCTRL, XmlResourceWithHandlers
 # Local imports
 from requirements import location
 
-class panelInformationBase(wx.Panel):
-	xrc = os.path.join(location(), "windows", "xrc", 'panelInformation.xrc')
+class infoPosition3DBase(wx.Panel):
+	xrc = os.path.join(location(), "windows", "xrc", 'infoPosition3D.xrc')
 
 	def PreCreate(self, pre):
 		""" This function is called during the class's initialization.
@@ -28,16 +28,15 @@ class panelInformationBase(wx.Panel):
 
 		# Two stage creation (see http://wiki.wxpython.org/index.cgi/TwoStageCreation)
 		pre = wx.PrePanel()
-		if not res.LoadOnPanel(pre, parent, "panelInformation"):
-			raise IOError("Did not find the panelInformation in the XRC file")
+		if not res.LoadOnPanel(pre, parent, "infoPosition3D"):
+			raise IOError("Did not find the infoPosition3D in the XRC file")
 		self.PreCreate(pre)
 		self.PostCreate(pre)
 
 		# Define variables for the controls
-		self.Title = XRCCTRL(self, "Title")
-		self.DetailsPanel = XRCCTRL(self, "DetailsPanel")
+		self.PositionLabel = XRCCTRL(self, "PositionLabel")
 
 
 def strings():
 	pass
-	_("Name of object goes here");
+	_("(0, 0, 0)");

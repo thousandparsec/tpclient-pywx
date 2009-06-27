@@ -1,0 +1,66 @@
+<?xml version="1.0" ?>
+<resource>
+  <object class="wxPanel" name="infoOrderQueue">
+    <object class="wxFlexGridSizer">
+      <object class="sizeritem">
+        <object class="wxPanel" name="BasicData">
+          <object class="wxFlexGridSizer">
+            <object class="sizeritem">
+              <object class="wxStaticText" name="IDLabel">
+                <label>Queue ID: </label>
+              </object>
+            </object>
+            <object class="sizeritem">
+              <object class="wxStaticText" name="QueueID"/>
+            </object>
+            <object class="spacer">
+              <size>30,15</size>
+            </object>
+            <object class="sizeritem">
+              <object class="wxStaticText" name="NumLabel">
+                <label># of orders: </label>
+              </object>
+            </object>
+            <object class="sizeritem">
+              <object class="wxStaticText" name="NumOrders"/>
+            </object>
+            <cols>5</cols>
+            <rows>1</rows>
+            <growablecols/>
+            <growablerows>0</growablerows>
+          </object>
+        </object>
+        <option>1</option>
+        <flag>wxALL|wxEXPAND|wxGROW</flag>
+      </object>
+      <object class="sizeritem">
+        <object class="wxPanel" name="Types">
+          <object class="wxFlexGridSizer">
+            <object class="sizeritem">
+              <object class="wxStaticText" name="TypesLabel">
+                <label>Allowed Types: </label>
+              </object>
+            </object>
+            <object class="spacer">
+              <size>15,15</size>
+            </object>
+            <object class="sizeritem">
+              <object class="wxStaticText" name="AllowedTypes"/>
+            </object>
+            <cols>3</cols>
+            <rows>1</rows>
+            <growablecols/>
+            <growablerows>0</growablerows>
+          </object>
+        </object>
+        <option>1</option>
+        <flag>wxALL|wxEXPAND|wxGROW</flag>
+      </object>
+      <cols>1</cols>
+      <rows>2</rows>
+      <growablecols>0</growablecols>
+      <growablerows>0</growablerows>
+      <growablerows>1</growablerows>
+    </object>
+  </object>
+</resource>

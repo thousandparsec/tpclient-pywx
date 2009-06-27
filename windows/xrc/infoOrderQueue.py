@@ -11,8 +11,8 @@ from wx.xrc import XRCCTRL, XmlResourceWithHandlers
 # Local imports
 from requirements import location
 
-class panelInformationBase(wx.Panel):
-	xrc = os.path.join(location(), "windows", "xrc", 'panelInformation.xrc')
+class infoOrderQueueBase(wx.Panel):
+	xrc = os.path.join(location(), "windows", "xrc", 'infoOrderQueue.xrc')
 
 	def PreCreate(self, pre):
 		""" This function is called during the class's initialization.
@@ -28,16 +28,24 @@ class panelInformationBase(wx.Panel):
 
 		# Two stage creation (see http://wiki.wxpython.org/index.cgi/TwoStageCreation)
 		pre = wx.PrePanel()
-		if not res.LoadOnPanel(pre, parent, "panelInformation"):
-			raise IOError("Did not find the panelInformation in the XRC file")
+		if not res.LoadOnPanel(pre, parent, "infoOrderQueue"):
+			raise IOError("Did not find the infoOrderQueue in the XRC file")
 		self.PreCreate(pre)
 		self.PostCreate(pre)
 
 		# Define variables for the controls
-		self.Title = XRCCTRL(self, "Title")
-		self.DetailsPanel = XRCCTRL(self, "DetailsPanel")
+		self.BasicData = XRCCTRL(self, "BasicData")
+		self.IDLabel = XRCCTRL(self, "IDLabel")
+		self.QueueID = XRCCTRL(self, "QueueID")
+		self.NumOrders = XRCCTRL(self, "NumOrders")
+		self.NumLabel = XRCCTRL(self, "NumLabel")
+		self.Types = XRCCTRL(self, "Types")
+		self.TypesLabel = XRCCTRL(self, "TypesLabel")
+		self.AllowedTypes = XRCCTRL(self, "AllowedTypes")
 
 
 def strings():
 	pass
-	_("Name of object goes here");
+	_("Queue ID: ");
+	_("# of orders: ");
+	_("Allowed Types: ");

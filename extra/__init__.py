@@ -91,6 +91,72 @@ class EditableListBoxXmlHandler(xrc.XmlResourceHandler):
 		return ctrl
 xrc.ExtraHandlers.append(EditableListBoxXmlHandler)
 
+from wx.lib.foldpanelbar import FoldPanelBar
+class FoldPanelBarHandler(xrc.XmlResourceHandler):
+	def __init__(self):
+		xrc.XmlResourceHandler.__init__(self)
+		self.AddStyle("FPB_DEFAULT_STYLE", wx.lib.foldpanelbar.FPB_DEFAULT_STYLE)
+		self.AddStyle("FPB_SINGLE_FOLD", wx.lib.foldpanelbar.FPB_SINGLE_FOLD)
+		self.AddStyle("FPB_COLLAPSE_TO_BOTTOM", wx.lib.foldpanelbar.FPB_COLLAPSE_TO_BOTTOM)
+		self.AddStyle("FPB_EXCLUSIVE_FOLD", wx.lib.foldpanelbar.FPB_EXCLUSIVE_FOLD)
+		self.AddStyle("FPB_HORIZONTAL", wx.lib.foldpanelbar.FPB_HORIZONTAL)
+		self.AddStyle("FPB_VERTICAL", wx.lib.foldpanelbar.FPB_VERTICAL)
+		self.AddWindowStyles()
+
+	def CanHandle(self, node):
+		return self.IsOfClass(node, "wx.lib.foldpanelbar.FoldPanelBar") or self.IsOfClass(node, "FoldPanelBar")
+
+	def DoCreateResource(self):
+		# The simple method assumes that there is no existing
+		# instance.  Be sure of that with an assert.
+		assert self.GetInstance() is None
+
+		ctrl = FoldPanelBar(self.GetParentAsWindow(),
+								self.GetID(),
+								self.GetPosition(),
+								self.GetSize(),
+								self.GetStyle(),
+								)
+
+		# These two things should be done in either case:
+		# Set standard window attributes
+		self.SetupWindow(ctrl)
+		# Create any child windows of this node
+		self.CreateChildren(ctrl)
+
+		return ctrl
+xrc.ExtraHandlers.append(FoldPanelBarHandler)
+
+from  wx.lib.scrolledpanel import ScrolledPanel
+class ScrolledPanelHandler(xrc.XmlResourceHandler):
+	def __init__(self):
+		xrc.XmlResourceHandler.__init__(self)
+		self.AddWindowStyles()
+
+	def CanHandle(self, node):
+		return self.IsOfClass(node, "wx.lib.scrolledpanel.ScrolledPanel") or self.IsOfClass(node, "ScrolledPanel")
+
+	def DoCreateResource(self):
+		# The simple method assumes that there is no existing
+		# instance.  Be sure of that with an assert.
+		assert self.GetInstance() is None
+
+		ctrl = ScrolledPanel(self.GetParentAsWindow(),
+								self.GetID(),
+								self.GetPosition(),
+								self.GetSize(),
+								self.GetStyle(),
+								)
+
+		# These two things should be done in either case:
+		# Set standard window attributes
+		self.SetupWindow(ctrl)
+		# Create any child windows of this node
+		self.CreateChildren(ctrl)
+
+		return ctrl
+xrc.ExtraHandlers.append(ScrolledPanelHandler)
+
 class ListCtrlXmlHandler(xrc.XmlResourceHandler):
 	extra_styles = [
 		"LC_LIST",

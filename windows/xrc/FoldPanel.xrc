@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource>
+  <object class="wxPanel" name="FoldPanel">
+    <object class="wxFlexGridSizer">
+      <cols>1</cols>
+      <rows>1</rows>
+      <growablecols>0</growablecols>
+      <growablerows>0</growablerows>
+      <object class="sizeritem">
+        <object class="wxPanel" name="MainPanel">
+          <object class="wxFlexGridSizer">
+            <cols>1</cols>
+            <rows>1</rows>
+            <growablecols>0</growablecols>
+            <growablerows>0</growablerows>
+            <object class="sizeritem">
+              <object class="wx.lib.foldpanelbar.FoldPanelBar" name="FoldBar">
+                <size>200,-1</size>
+                <style>wxNO_BORDER|FPB_DEFAULT_STYLE</style>
+              </object>
+              <option>1</option>
+              <flag>wxALL|wxEXPAND|wxGROW</flag>
+            </object>
+          </object>
+        </object>
+        <option>1</option>
+        <flag>wxALL|wxEXPAND|wxGROW</flag>
+      </object>
+    </object>
+  </object>
+</resource>

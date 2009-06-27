@@ -1,0 +1,18 @@
+<?xml version="1.0" ?>
+<resource>
+  <object class="wxPanel" name="infoMedia">
+    <object class="wxFlexGridSizer">
+      
+      <object class="sizeritem">
+        <object class="wxStaticBitmap" name="Media"/>
+        <option>1</option>
+        <flag>wxALL|wxEXPAND|wxGROW</flag>
+      </object>
+      <cols>1</cols>
+      <rows>2</rows>
+      <growablecols>0</growablecols>
+      <growablerows>0</growablerows>
+      <growablerows>1</growablerows>
+    </object>
+  </object>
+</resource>

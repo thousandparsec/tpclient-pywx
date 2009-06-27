@@ -1,0 +1,40 @@
+<?xml version="1.0" ?>
+<resource>
+  <object class="wxPanel" name="infoResourcePanel">
+    <object class="wxFlexGridSizer">
+      <object class="sizeritem">
+        <object class="wxStaticText" name="StoredLabel">
+          <label>Stored: </label>
+        </object>
+      </object>
+      <object class="sizeritem">
+        <object class="wxStaticText" name="StoredValue"/>
+      </object>
+      <object class="spacer">
+        <size>15,15</size>
+      </object>
+      <object class="sizeritem">
+        <object class="wxStaticText" name="MinableLabel">
+          <label>Minable: </label>
+        </object>
+      </object>
+      <object class="sizeritem">
+        <object class="wxStaticText" name="MinableValue"/>
+      </object>
+      <object class="spacer">
+        <size>15,15</size>
+      </object>
+      <object class="sizeritem">
+        <object class="wxStaticText" name="InaccessibleLabel">
+          <label>Inaccessible: </label>
+        </object>
+      </object>
+      <object class="sizeritem">
+        <object class="wxStaticText" name="InaccessibleValue"/>
+      </object>
+      <cols>8</cols>
+      <rows>1</rows>
+      <growablerows>0</growablerows>
+    </object>
+  </object>
+</resource>

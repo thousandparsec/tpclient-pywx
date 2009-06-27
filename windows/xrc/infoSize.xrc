@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<resource>
+  <object class="wxPanel" name="infoSize">
+    <object class="wxFlexGridSizer">
+      <cols>1</cols>
+      <rows>3</rows>
+      <object class="sizeritem">
+        <object class="wxStaticText" name="SizeLabel">
+          <label>0</label>
+        </object>
+        <option>1</option>
+        <flag>wxALL|wxEXPAND|wxGROW</flag>
+      </object>
+    </object>
+  </object>
+</resource>

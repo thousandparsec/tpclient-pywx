@@ -1,0 +1,26 @@
+<?xml version="1.0" ?>
+<resource>
+  <object class="wxPanel" name="infoReferenceDesign">
+    <object class="wxFlexGridSizer">
+      <object class="sizeritem">
+        <object class="wxStaticText" name="Quantity"/>
+        <option>1</option>
+        <flag>wxALL|wxEXPAND|wxGROW</flag>
+      </object>
+      <object class="sizeritem">
+        <object class="wxPanel" name="Spacer">
+          <size>10,10</size>
+        </object>
+      </object>
+      <object class="sizeritem">
+        <object class="wxStaticText" name="DesignName"/>
+        <option>1</option>
+        <flag>wxALL|wxEXPAND|wxGROW</flag>
+      </object>
+      <cols>3</cols>
+      <rows>1</rows>
+      <growablecols>2</growablecols>
+      <growablerows>0</growablerows>
+    </object>
+  </object>
+</resource>

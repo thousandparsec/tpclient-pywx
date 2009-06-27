@@ -1,0 +1,28 @@
+<?xml version="1.0" ?>
+<resource>
+  <object class="wxPanel" name="infoReferenceOrderDesc">
+    <object class="wxFlexGridSizer">
+      <object class="sizeritem">
+        <object class="wxStaticText" name="Quantity"/>
+        <option>1</option>
+        <flag>wxALL|wxEXPAND|wxGROW</flag>
+      </object>
+      <object class="sizeritem">
+        <object class="wxPanel" name="Spacer">
+          <size>10,10s</size>
+        </object>
+      </object>
+      <object class="sizeritem">
+        <object class="wxStaticText" name="OrderDescName">
+          <label>0</label>
+          <style>wxALIGN_LEFT</style>
+        </object>
+        <option>1</option>
+        <flag>wxALL|wxEXPAND|wxGROW|wxALIGN_CENTRE_VERTICAL</flag>
+      </object>
+      <cols>3</cols>
+      <rows>1</rows>
+      <growablecols>2</growablecols>
+    </object>
+  </object>
+</resource>

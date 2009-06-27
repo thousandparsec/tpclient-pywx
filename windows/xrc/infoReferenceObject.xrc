@@ -1,0 +1,38 @@
+<?xml version="1.0" ?>
+<resource>
+  <object class="wxPanel" name="infoReferenceObject">
+    <object class="wxFlexGridSizer">
+      <object class="sizeritem">
+        <object class="wxStaticText" name="Quantity"/>
+        <option>1</option>
+        <flag>wxALL|wxEXPAND|wxGROW|wxALIGN_CENTRE_HORIZONTAL</flag>
+      </object>
+      <object class="sizeritem">
+        <object class="wxPanel" name="Spacer">
+          <size>10,10</size>
+        </object>
+      </object>
+      <object class="sizeritem">
+        <object class="wxStaticText" name="ObjectName">
+          <label>0</label>
+          <style>wxALIGN_LEFT</style>
+        </object>
+        <option>1</option>
+        <flag>wxALL|wxEXPAND|wxGROW|wxALIGN_CENTRE_VERTICAL</flag>
+      </object>
+      <object class="spacer">
+        <flag>wxALL|wxEXPAND|wxGROW</flag>
+      </object>
+      <object class="sizeritem">
+        <object class="wxButton" name="SelectObject">
+          <label>Select</label>
+        </object>
+      </object>
+      <cols>5</cols>
+      <rows>1</rows>
+      <growablecols>2</growablecols>
+      <growablecols>3</growablecols>
+      <growablecols>4</growablecols>
+    </object>
+  </object>
+</resource>
