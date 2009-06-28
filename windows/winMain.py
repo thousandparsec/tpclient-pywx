@@ -17,6 +17,7 @@ from wx.lib.wordwrap import wordwrap
 from requirements import docdir, graphicsdir
 from winBase import winBase
 from utils import *
+from extra import objectutils
 import version
 
 ID_MENU = 10042
@@ -336,7 +337,9 @@ class winMain(winBase):
 		# Show the "No Objects" warning message
 		foundanobject = False
 		for id in self.application.cache.objects:
-			if hasattr(self.application.cache.objects[id], "owner") and self.application.cache.objects[id].owner == self.application.cache.players[0].id:
+			owner = objectutils.getOwner(self.application.cache, id)
+			if owner == self.application.cache.players[0].id:
+
 				foundanobject = True
 		if foundanobject == False:
 			wx.CallAfter(self.ShowNoObjectsWarning)
