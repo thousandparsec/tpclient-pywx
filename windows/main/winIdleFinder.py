@@ -8,6 +8,8 @@ import wx.gizmos
 #from wx import *
 import wx.lib.anchors
 
+from extra import objectutils
+
 # Local imports
 from windows.winBase import winReportXRC, ShiftMixIn
 from windows.xrc.winIdleFinder import IdleFinderBase
@@ -49,7 +51,7 @@ class winIdleFinder(winReportXRC, IdleFinderBase, TrackerObject):
 		# Create a panel for the current window.
 		self.idlelist.InsertColumn(0, "Item ID", width = 100)
 		self.idlelist.InsertColumn(1, "Item Name", width = 200)
-		self.idlelist.InsertColumn(2, "Item Type", width = 100)
+		#self.idlelist.InsertColumn(2, "Item Type", width = 100)
 
 		self.ascending = 1
 
@@ -66,41 +68,33 @@ class winIdleFinder(winReportXRC, IdleFinderBase, TrackerObject):
 		numinlist = 0
 		universe = self.application.cache.objects.keys()
 		for object in universe:
-			numorders = 0
-			# The object must have an owner to have orders
-			if not hasattr(self.application.cache.objects[object], "owner"):
-				continue
+			hasorders = False
 			
 			# Only show objects owned by this player
-			if self.application.cache.objects[object].owner != self.application.cache.players[0].id:
+			if not objectutils.getOwner(self.application.cache, object) == self.application.cache.players[0].id:
 				continue
+			
+			orderqueuelist = objectutils.getOrderQueueList(self.application.cache, object)
+			
+			if orderqueuelist == None or len(orderqueuelist) <= 0:
+				continue
+			
+			# Find any orders for this object in any of its queues.
+			for name, queue in orderqueuelist:
+				if not self.application.cache.orders.has_key(queue):
+					continue
+				if len(self.application.cache.orders[queue]) > 0:
+					hasorders = True
+					break
+			if hasorders:
+				continue
+			
+			# If the object has no orders, add it to the list
+			self.idlelist.InsertStringItem(numinlist, "%d" % object)
+			self.idlelist.SetStringItem(numinlist, 1, self.application.cache.objects[object].name)
+			self.idlelist.SetItemData(numinlist, object)
 				
-			if object in self.application.cache.orders.keys():
-				# Find any orders for this object
-				for listpos, node in enumerate(self.application.cache.orders[object]):
-					numorders = numorders + 1
-				
-				# If the object has no orders, add it to the list
-				if numorders == 0:
-					self.idlelist.InsertStringItem(numinlist, "%d" % object)
-					self.idlelist.SetStringItem(numinlist, 1, self.application.cache.objects[object].name)
-					self.idlelist.SetItemData(numinlist, object)
-					
-					# Determine object's type
-					if isinstance(self.application.cache.objects[object], Universe):
-						self.idlelist.SetStringItem(numinlist, 2, "Universe")
-					elif isinstance(self.application.cache.objects[object], Galaxy):
-						self.idlelist.SetStringItem(numinlist, 2, "Galaxy")
-					elif isinstance(self.application.cache.objects[object], StarSystem):
-						self.idlelist.SetStringItem(numinlist, 2, "System")
-					elif isinstance(self.application.cache.objects[object], Planet):
-						self.idlelist.SetStringItem(numinlist, 2, "Planet")
-					elif isinstance(self.application.cache.objects[object], Fleet):
-						self.idlelist.SetStringItem(numinlist, 2, "Fleet")
-					else:
-						self.idlelist.SetStringItem(numinlist, 2, "Unknown")
-						
-					numinlist = numinlist + 1
+			numinlist = numinlist + 1
 		
 	def Sort(self, d1, d2):
 		"""\
