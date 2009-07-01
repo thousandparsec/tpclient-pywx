@@ -328,11 +328,14 @@ if len(notfound) == 0:
 
 			# Register the URL Handlers
 			try:
-				import gconf
+				import gconf, gobject
 				for prefix in ['tp', 'tps', 'tphttp', 'tphttps', 'tp+http', 'tp+https']:
 					prefix = gconf.escape_key(prefix, len(prefix))
-					gconf.client_get_default().set_string('/desktop/gnome/url-handlers/%s/command' % prefix, linux_location)
-					gconf.client_get_default().set_bool('/desktop/gnome/url-handlers/%s/enabled' % prefix, True)
+					try:
+						gconf.client_get_default().set_string('/desktop/gnome/url-handlers/%s/command' % prefix, linux_location)
+						gconf.client_get_default().set_bool('/desktop/gnome/url-handlers/%s/enabled' % prefix, True)
+					except gobject.GError, e:
+						print e
 			except ImportError, e:
 				print e
 
