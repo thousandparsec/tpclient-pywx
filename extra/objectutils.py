@@ -3,6 +3,7 @@ This file contains functions used to deal with objects.
 """
 from tp.netlib.objects			  			  import Structures
 from tp.netlib.objects						  import parameters
+from tp.netlib import objects
 from tp.netlib import GenericRS
 
 def getPositionList(obj):
@@ -135,7 +136,7 @@ def getOrderTypes(cache, oid):
 		
 		for queue in group.structures:
 			if type(queue) != parameters.ObjectParamOrderQueue:
-				continue;
+				continue
 			
 			ordertypes[getattr(group, queue.name).queueid] = getattr(group, queue.name).ordertypes
 	return ordertypes
@@ -153,11 +154,27 @@ def getOrderQueueList(cache, oid):
 		
 		for queue in group.structures:
 			if type(queue) != parameters.ObjectParamOrderQueue:
-				continue;
+				continue
 			
 			orderqueuelist.append((queue.name, getattr(group, queue.name).queueid))
 	return orderqueuelist
-	
+
+def getOrderQueueLimit(cache, oid, qid):
+	"""
+	Returns the maximum orders the queue with the given qid can hold, or -1 if no limit.
+	"""
+	obj = cache.objects[oid]
+	desc = objects.ObjectDescs()[obj.subtype]
+	for propertygroup in obj.properties:
+		group = getattr(obj, propertygroup.name)
+		
+		for queue in group.structures:
+			if type(queue) != parameters.ObjectParamOrderQueue:
+				continue
+			
+			return queue.maxslots
+	return -1
+
 def getOwner(cache, oid):
 	"""
 	Returns the ID of the object's owner, if it has one, or -1 if it does not.

@@ -200,9 +200,15 @@ class panelOrder(panelOrderBase, TrackerObject, TrackerOrder):
 
 		orders = self.application.cache.orders[self.qid]
 		
+		if objectutils.getOrderQueueLimit(self.application.cache, id, self.qid) == 1:
+			self.Orders.Hide()
+		
 		# Add all the orders to the list
 		for listpos, node in enumerate(orders):
 			self.InsertListItem(listpos, node)
+			if not self.Orders.IsShown():
+				self.Orders.SetSelected([listpos])
+				self.OnOrderSelect(listpos)
 	
 		# Set which order types can be added to this object
 		self.Possible.SetToolTipDefault(_("Order type to create"))
