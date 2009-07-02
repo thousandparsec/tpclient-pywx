@@ -152,7 +152,7 @@ class winDesign(winReportXRC, winDesignBase, ShiftMixIn):
 		self.DesignsTree.SetItemImage(root, 0, wx.TreeItemIcon_Normal)
 		self.DesignsTree.SetItemImage(root, 1, wx.TreeItemIcon_Expanded)
 
-		blank = Design(-1, -1, -1, [1], _("New Design"), "", -1, -1, [], "", [])
+		blank = Design(-1, -1, 0, [1], _("New Design"), "", -1, -1, [], "", [])
 		self.TreeAddItem(self.DesignsTree, root, blank)
 
 		# FIXME: Designs which have no Categories are not shown.
