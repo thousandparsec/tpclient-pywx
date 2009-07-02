@@ -285,19 +285,23 @@ class Resource(Proportional):
 		o = c.objects[oid]
 
 		amount = 0
-		if hasattr(o, "contains"):
-			for child in o.contains:
-				amount += self.Amount(child)
+		if not hasattr(o, "contains"):
+			return amount
+			
+		for child in o.contains:
+			amount += self.Amount(child)
 
-		if objectutils.hasResources(c, oid):
-			resources = objectutils.getResources(c, oid)
-			if self.type == Resource.TOTAL:
-				for resource in resources:
+		if not objectutils.hasResources(c, oid):
+			return amount
+		
+		resources = objectutils.getResources(c, oid)
+		if self.type == Resource.TOTAL:
+			for resource in resources:
+				amount += sum(resource[1:])
+		else:
+			for resource in resources:
+				if resource[0] == self.type:
 					amount += sum(resource[1:])
-			else:
-				for resource in resources:
-					if resource[0] == self.type:
-						amount += sum(resource[1:])
 		
 		return amount
 	

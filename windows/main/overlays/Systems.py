@@ -263,10 +263,8 @@ class Systems(SystemLevelOverlay, TrackerObjectOrder):
 		self['selected-arrow'] = PolygonArrow((0,0), "Red", True)
 
 	def Icon(self, obj):
-		for propertygroup in obj.properties:
-			positionattrsstruct = getattr(obj, propertygroup.name)
-			if hasattr(positionattrsstruct, 'Ship List'):
-				return FleetIcon(self.cache, obj, self.Colorizer)
+		if (objectutils.isFleet(self.cache, obj):
+			return FleetIcon(self.cache, obj, self.Colorizer)
 		
 		return SystemIcon(self.cache, obj, self.Colorizer)
 
@@ -493,22 +491,24 @@ class Systems(SystemLevelOverlay, TrackerObjectOrder):
 						
 			for propertygroup in cobj.properties:
 				positionattrsstruct = getattr(cobj, propertygroup.name)
-				if hasattr(positionattrsstruct, 'Ship List'):
-					shiplists = getattr(positionattrsstruct, 'Ship List').references
+				if not hasattr(positionattrsstruct, 'Ship List'):
+					continue;
 					
-					for shiplist in shiplists:
-						reftype = shiplist[0]
-						shipid = shiplist[1]
-						shipcount = shiplist[2]
-						if reftype == GenericRS.Types["Design"]:
-							try:
-								s+= "\n  %s %ss" % (shipcount, self.cache.designs[shipid].name)
-							except KeyError:
-								s+= "\n  %s %ss" % (shipcount, "Unknown Ships")
-						elif reftype == GenericRS.Types["Object"]:
-							s+= "\n  %s %ss" % (shipcount, self.cache.objects[shipid].name)
-						else:
+				shiplists = getattr(positionattrsstruct, 'Ship List').references
+				
+				for shiplist in shiplists:
+					reftype = shiplist[0]
+					shipid = shiplist[1]
+					shipcount = shiplist[2]
+					if reftype == GenericRS.Types["Design"]:
+						try:
+							s+= "\n  %s %ss" % (shipcount, self.cache.designs[shipid].name)
+						except KeyError:
 							s+= "\n  %s %ss" % (shipcount, "Unknown Ships")
+					elif reftype == GenericRS.Types["Object"]:
+						s+= "\n  %s %ss" % (shipcount, self.cache.objects[shipid].name)
+					else:
+						s+= "\n  %s %ss" % (shipcount, "Unknown Ships")
 
 			s += "</font>\n"
 
