@@ -263,7 +263,7 @@ class Systems(SystemLevelOverlay, TrackerObjectOrder):
 		self['selected-arrow'] = PolygonArrow((0,0), "Red", True)
 
 	def Icon(self, obj):
-		if (objectutils.isFleet(self.cache, obj):
+		if objectutils.isFleet(self.cache, obj.id):
 			return FleetIcon(self.cache, obj, self.Colorizer)
 		
 		return SystemIcon(self.cache, obj, self.Colorizer)
