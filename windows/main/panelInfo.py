@@ -35,10 +35,11 @@ class panelInformation(panelInformationBase):
 		self.application = application
 		self.current = -1
 		self.DetailsSizer = self.DetailsPanel.GetSizer()
-		self.DetailsPanel.SetVirtualSize((200, 1000))
-		self.DetailsPanel.SetWindowStyle(wx.VSCROLL)
+		self.DetailsPanel.SetWindowStyle(wx.HSCROLL | wx.VSCROLL)
 		self.ArgumentsPanel = wx.Panel(self.DetailsPanel, -1)
 		self.FoldPanelBar = FoldPanel(self.ArgumentsPanel, self.application)
+		bestsize = self.FoldPanelBar.GetPanelsLength(True, True)
+		self.DetailsPanel.SetVirtualSize((bestsize[1]/2, bestsize[2]))
 		self.application.gui.Binder(self.application.gui.SelectObjectEvent, self.OnSelectObject)
 		self.application.gui.Binder(self.application.MediaClass.MediaUpdateEvent,			self.OnMediaUpdate)
 		self.application.gui.Binder(self.application.MediaClass.MediaDownloadDoneEvent,		self.OnMediaDownloadDone)
@@ -47,9 +48,9 @@ class panelInformation(panelInformationBase):
 	def GetPaneInfo(self):
 		info = wx.aui.AuiPaneInfo()
 		info.MinSize(self.GetBestSize())
-		info.BestSize(self.GetBestSize())
-		info.Bottom()
-		info.Layer(1)
+		info.BestSize((self.GetBestSize()[0]*2,self.GetBestSize()[1]))
+		info.Left()
+		info.Layer(2)
 		return info
 
 	def OnMediaUpdate(self, evt):
@@ -119,12 +120,16 @@ class panelInformation(panelInformationBase):
 		self.ArgumentsPanel.Layout()
 
 		self.DetailsSizer.Add( self.ArgumentsPanel, flag=wx.GROW|wx.EXPAND|wx.ALIGN_CENTER|wx.ALL)
+		
+		bestsize = self.FoldPanelBar.GetPanelsLength(True, True)
+		self.DetailsPanel.SetVirtualSize((bestsize[1]/2, bestsize[2]))
+		
 		self.DetailsPanel.Layout()
-		self.DetailsPanel.SetupScrolling(False, True)
+		self.DetailsPanel.SetupScrolling(True, True)
 
 	def OnSize(self, evt):
 		bestsize = self.FoldPanelBar.GetPanelsLength(True, True)
-		self.DetailsPanel.SetVirtualSize((200, bestsize[2]))
+		self.DetailsPanel.SetVirtualSize((bestsize[1]/2, bestsize[2]))
 		self.FoldPanelBar.RedisplayFoldPanelItems()
 		self.Layout()
 

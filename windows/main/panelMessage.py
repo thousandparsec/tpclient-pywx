@@ -238,7 +238,7 @@ class panelMessage(panelMessageBase, ShiftMixIn):
 		info = wx.aui.AuiPaneInfo()
 		info.MinSize(self.GetBestSize())
 		info.BestSize(self.GetBestSize())
-		info.Bottom()
+		info.Right()
 		info.Layer(1)
 		return info
 

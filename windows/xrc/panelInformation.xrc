@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resource version="2.3.0.1" xmlns="http://www.wxwidgets.org/wxxrc">
   <object class="wxPanel" name="panelInformation" subclass="Dialog">
-    <size>400,300</size>
     <object class="wxFlexGridSizer">
       <object class="sizeritem">
         <flag>wxGROW|wxGROW|wxALL|wxADJUST_MINSIZE</flag>
@@ -30,5 +29,6 @@
       <growablecols>0</growablecols>
       <growablerows>1,2</growablerows>
     </object>
+    <size>400,300</size>
   </object>
 </resource>

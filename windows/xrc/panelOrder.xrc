@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resource version="2.3.0.1" xmlns="http://www.wxwidgets.org/wxxrc">
   <object class="wxPanel" name="panelOrder" subclass="Dialog">
-    <size>400,300</size>
     <object class="wxFlexGridSizer">
       <object class="sizeritem">
         <object class="wxPanel" name="Master">
@@ -200,5 +199,6 @@
       <growablecols>0</growablecols>
       <growablerows>0</growablerows>
     </object>
+    <size>500,300</size>
   </object>
 </resource>

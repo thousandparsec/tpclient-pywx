@@ -151,14 +151,13 @@ class winMain(winBase):
 
 		# Panel in the AUI interface...
 		from windows.main.panelInfo    import panelInformation
-		from windows.main.panelPicture import panelPicture
 		from windows.main.panelOrder   import panelOrder
 		from windows.main.panelMessage import panelMessage
 		from windows.main.panelStarMap import panelStarMap
 		from windows.main.panelSystem  import panelSystem
 
 		self.panels = {}
-		for panel in [panelStarMap, panelSystem, panelMessage, panelInformation, panelPicture, panelOrder]:
+		for panel in [panelStarMap, panelMessage, panelSystem, panelOrder, panelInformation]:
 			title = panel.title
 
 			instance = panel(application, self)
