@@ -152,7 +152,7 @@ class winDesign(winReportXRC, winDesignBase, ShiftMixIn):
 		self.DesignsTree.SetItemImage(root, 0, wx.TreeItemIcon_Normal)
 		self.DesignsTree.SetItemImage(root, 1, wx.TreeItemIcon_Expanded)
 
-		blank = Design(-1, -1, -1, [1], _("New Design"), "", -1, -1, [], "", [])
+		blank = Design(-1, -1, 0, [1], _("New Design"), "", -1, -1, [], "", [])
 		self.TreeAddItem(self.DesignsTree, root, blank)
 
 		# FIXME: Designs which have no Categories are not shown.
@@ -328,7 +328,7 @@ class winDesign(winReportXRC, winDesignBase, ShiftMixIn):
 			dc.change(component, amount)
 		dc.update()
 	
-		if self.selected.Used == -1:
+		if self.selected.used == -1:
 			if amount > 1 or len(components) > 1:
 				reason = self.selected.feedback + _("\nWould you like to continue adding these components?")
 			else:
@@ -387,7 +387,7 @@ class winDesign(winReportXRC, winDesignBase, ShiftMixIn):
 
 		# Is this a new design?
 		if design.id == -1:
-			self.application.Post(self.application.cache.CacheDirtyEvent("DesignsTree", "create", -1, design), source=self)
+			self.application.Post(self.application.cache.CacheDirtyEvent("designs", "create", -1, design), source=self)
 			self.selected = None
 		else:
 			# Add the design to ones which are being updated
@@ -398,7 +398,7 @@ class winDesign(winReportXRC, winDesignBase, ShiftMixIn):
 				self.TreeColourItem(self.DesignsTree, item, "updating")
 	
 			# Tell the world about the change
-			self.application.Post(self.application.cache.CacheDirtyEvent("DesignsTree", "change", design.id, design), source=self)
+			self.application.Post(self.application.cache.CacheDirtyEvent("designs", "change", design.id, design), source=self)
 
 		self.OnSelect(None)
 
@@ -412,7 +412,7 @@ class winDesign(winReportXRC, winDesignBase, ShiftMixIn):
 		for item in self.DesignsTree.FindAllByData(design, comparebyid):
 			self.TreeColourItem(self.DesignsTree, item, "removing")
 			
-		self.application.Post(self.application.cache.CacheDirtyEvent("DesignsTree", "remove", design.id, design), source=self)
+		self.application.Post(self.application.cache.CacheDirtyEvent("designs", "remove", design.id, design), source=self)
 
 	def OnSelect(self, evt=None):
 		# Stop any running Shift timers
@@ -506,7 +506,7 @@ class winDesign(winReportXRC, winDesignBase, ShiftMixIn):
 			self.BuildDesignList()
 			self.BuildCompList()
 
-		if evt.what is "DesignsTree":
+		if evt.what is "designs":
 			design = evt.change
 		
 			if evt.action in ("change", "remove"):
