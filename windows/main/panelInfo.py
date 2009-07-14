@@ -24,6 +24,8 @@ from tp.netlib.objects.Structures import ListStructure
 from tp.netlib.objects import parameters
 from tp.netlib import GenericRS
 from tp.netlib import objects
+from requirements import graphicsdir
+
 
 from windows.xrc.panelInformation import panelInformationBase
 class panelInformation(panelInformationBase):
