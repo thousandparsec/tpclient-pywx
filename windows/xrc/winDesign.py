@@ -57,6 +57,7 @@ This is so that a the same XRC can be used for both MDI and non-MDI frames.
 		self.Panel = XRCCTRL(self, "Panel")
 		self.DesignsSearch = XRCCTRL(self, "DesignsSearch")
 		self.TitlePanel = XRCCTRL(self, "TitlePanel")
+		self.StaticTitlePanel = XRCCTRL(self, "StaticTitlePanel")
 		self.TitleStatic = XRCCTRL(self, "TitleStatic")
 		self.TitleEditable = XRCCTRL(self, "TitleEditable")
 		self.Used = XRCCTRL(self, "Used")
@@ -64,7 +65,13 @@ This is so that a the same XRC can be used for both MDI and non-MDI frames.
 		self.DesignsPanel = XRCCTRL(self, "DesignsPanel")
 		self.DesignsTree = XRCCTRL(self, "DesignsTree")
 		self.DesignPanel = XRCCTRL(self, "DesignPanel")
+		self.CategoriesPanel = XRCCTRL(self, "CategoriesPanel")
+		self.CategoriesLabel = XRCCTRL(self, "CategoriesLabel")
+		self.spacer = XRCCTRL(self, "spacer")
 		self.Categories = XRCCTRL(self, "Categories")
+		if hasattr(self, "OnCategories"):
+			self.Bind(wx.EVT_BUTTON, self.OnCategories, self.Categories)
+
 		self.DesignInfoPanel = XRCCTRL(self, "DesignInfoPanel")
 		self.PartsList = XRCCTRL(self, "PartsList")
 		self.DesignProperties = XRCCTRL(self, "DesignProperties")
@@ -109,7 +116,8 @@ def strings():
 	_("Title");
 	_("Title");
 	_("0000");
-	_("Some Categories, Will Go, Here");
+	_("Categories");
+	_("Edit Categories");
 	_("Property 1:");
 	_("The value of property 1");
 	_("Property 2:");

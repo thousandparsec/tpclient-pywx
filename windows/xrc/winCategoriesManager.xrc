@@ -1,0 +1,23 @@
+<?xml version="1.0" ?>
+<resource>
+  <object class="wxFrame" name="CategoriesManager">
+    <object class="wxPanel" name="Panel">
+      <object class="wxFlexGridSizer">
+        
+        
+        <object class="sizeritem">
+          <object class="wxCheckListBox" name="CategoriesList"/>
+          <option>1</option>
+          <flag>wxALL|wxEXPAND|wxALIGN_CENTRE</flag>
+        </object>
+        
+        
+        
+        <cols>2</cols>
+        <rows>3</rows>
+      </object>
+      <size>300,300</size>
+    </object>
+    <style>wxSIMPLE_BORDER</style>
+  </object>
+</resource>

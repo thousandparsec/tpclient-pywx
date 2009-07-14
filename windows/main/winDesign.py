@@ -38,7 +38,77 @@ def comparebyid(a, b):
 	return False
 
 
-# Show the universe
+from windows.xrc.winCategoriesManager import CategoriesManagerBase
+class CategoriesManager(CategoriesManagerBase, wx.Frame):
+	"""\
+	This class is a popup window with a checklist of categories.
+	"""
+	def __init__(self, parent, control, cache):
+		"""\
+		Initialize the window, loading data from XRC, and add the resources.
+		"""
+		CategoriesManagerBase.__init__(self, parent)
+		self.parent = parent
+		self.control = control
+		self.idlist = []
+		self.Bind(wx.EVT_ACTIVATE, self.OnActivate)
+		self.Hide()
+
+	def SetOptions(self, categories):
+		"""\
+		Called to set the categories, takes a list of tuples of strings and their corresponding ID numbers.
+		"""
+		self.CategoriesList.Clear()
+		stringlist = []
+		
+		for name, id in categories:
+			stringlist.append(name)
+			self.idlist.append(id)
+		self.CategoriesList.InsertItems(stringlist, 0)
+	
+	def GetChecked(self):
+		"""\
+		Returns a list of the indices that are checked.
+		"""
+		returnlist = []
+		for num in self.CategoriesList.GetChecked():
+			returnlist.append(self.idlist[num])
+		
+		return returnlist
+			
+	
+	def SetCheckedStrings(self, stringlist):
+		"""\
+		Called to set which categories are checked, takes a list of strings.
+		"""
+		self.CategoriesList.SetCheckedStrings(stringlist)
+	
+	def OnActivate(self, evt):
+		"""\
+		Called when the window becomes active or inactive.
+		"""
+		self.Move(self.control.GetScreenRect().GetTopLeft()+(0,self.control.GetSizeTuple()[1]))
+		if evt.GetActive() == False:
+			self.OnDone(evt)
+
+	def Show(self, show=True):
+		"""\
+		Called when the window is shown.
+		"""
+		self.Panel.Layout()
+
+		size = self.CategoriesList.GetBestSize()
+		self.CategoriesList.SetMinSize(size)
+
+		self.SetMinSize(self.Panel.GetBestSize())
+		self.SetSize(self.Panel.GetBestSize())
+
+		wx.Frame.Show(self)
+	
+	def OnDone(self, evt):
+		self.parent.SetSelectedCategories(self.GetChecked())
+		self.Hide()
+
 class winDesign(winReportXRC, winDesignBase, ShiftMixIn):
 	title = _("Design")
 	
@@ -47,8 +117,11 @@ class winDesign(winReportXRC, winDesignBase, ShiftMixIn):
 		winReportXRC.__init__(self, application, parent)
 		ShiftMixIn.__init__(self)
 		
+		self.CategoriesWindow = CategoriesManager(self, self.Categories, self.application.cache)
+		
 		self.selected = None	# Currently selected design
 		self.updating = []		# Designs which are been saved to the server
+		self.creating = []		# Designs which are being created on the server
 
 		#Panel = wx.Panel(self, -1)
 		
@@ -79,11 +152,15 @@ class winDesign(winReportXRC, winDesignBase, ShiftMixIn):
 		self.Panel.SetAutoLayout( True )
 
 		self.Bind(wx.EVT_BUTTON, self.OnEdit,   self.Edit)
+		self.Bind(wx.EVT_BUTTON, self.OnRemove, self.Delete)
 		self.Bind(wx.EVT_BUTTON, self.OnSelect, self.Revert)
+		self.Bind(wx.EVT_BUTTON, self.OnDuplicate, self.Duplicate)
 		self.Bind(wx.EVT_BUTTON, self.OnSave,   self.Save)
 
 		self.Bind(wx.EVT_BUTTON, self.OnAdd,     self.ComponentsAdd)
 		self.Bind(wx.EVT_BUTTON, self.OnAddMany, self.ComponentsAddMany)
+
+		self.Bind(wx.EVT_BUTTON, self.OnCategories, self.Categories)
 
 		self.Bind(wx.EVT_TREE_SEL_CHANGED, self.OnSelectObject, self.DesignsTree)
 		
@@ -91,6 +168,9 @@ class winDesign(winReportXRC, winDesignBase, ShiftMixIn):
 		self.DesignsSearch.Bind(wx.EVT_TEXT_ENTER, self.BuildDesignList)
 		self.DesignsSearch.Bind(wx.EVT_SEARCHCTRL_SEARCH_BTN, self.BuildDesignList)
 		self.DesignsSearch.Bind(wx.EVT_SEARCHCTRL_CANCEL_BTN, self.OnDesignsSearchCancel)
+		
+		self.TitleEditable.Bind(wx.EVT_TEXT, self.TitleChanged)
+		self.TitleEditable.Bind(wx.EVT_TEXT_ENTER, self.TitleChanged)
 		
 		self.ComponentsSearch.Bind(wx.EVT_TEXT, self.BuildCompList)
 		self.ComponentsSearch.Bind(wx.EVT_TEXT_ENTER, self.BuildCompList)
@@ -152,11 +232,6 @@ class winDesign(winReportXRC, winDesignBase, ShiftMixIn):
 		self.DesignsTree.SetItemImage(root, 0, wx.TreeItemIcon_Normal)
 		self.DesignsTree.SetItemImage(root, 1, wx.TreeItemIcon_Expanded)
 
-		blank = Design(-1, -1, 0, [1], _("New Design"), "", -1, -1, [], "", [])
-		self.TreeAddItem(self.DesignsTree, root, blank)
-
-		# FIXME: Designs which have no Categories are not shown.
-
 		cache = self.application.cache
 		for category in cache.categories.values():
 			categoryitem = self.TreeAddCategory(self.DesignsTree, category)
@@ -170,6 +245,19 @@ class winDesign(winReportXRC, winDesignBase, ShiftMixIn):
 
 			if not self.DesignsTree.ItemHasChildren(categoryitem):
 				self.DesignsTree.Delete(categoryitem)
+		
+		for design in cache.designs.values():
+			# If the design has any categories, don't add it.
+			if len(design.categories) >= 0:
+				continue
+				
+			# Filter the list..
+			from fnmatch import fnmatch as match
+			if match(design.name.lower(), self.DesignsFilter.lower()):
+				self.TreeAddItem(self.DesignsTree, root, design)
+
+		blank = Design(-1, -1, 0, [1], _("NewDesign"), "", -1, -1, [], "", [])
+		self.TreeAddItem(self.DesignsTree, root, blank)
 
 		self.DesignsTree.SortChildren(self.DesignsTree.GetRootItem())
 		self.DesignsTree.ExpandAll()
@@ -219,7 +307,7 @@ class winDesign(winReportXRC, winDesignBase, ShiftMixIn):
 		# Set the title
 		self.TitleStatic.SetLabel(design.name)
 		self.TitleEditable.SetValue(design.name)
-
+		
 		# Set the Used
 		self.Used.SetLabel(unicode(design.used))
 		if design.used == -1:
@@ -230,14 +318,15 @@ class winDesign(winReportXRC, winDesignBase, ShiftMixIn):
 			self.Used.SetForegroundColour(wx.Color(0, 0, 0))
 
 		# Set the Categories
-		c = ""
+		c = "Categories: "
 		for cid in design.categories:
 			c += self.application.cache.categories[cid].name + ", "
 		c = c[:-2]
-		self.Categories.SetLabel(c)
+		self.CategoriesLabel.SetLabel(c)
+
 		
 	def BuildPropertiesPanel(self, design):
-		SIZER_FLAGS = wx.GROW|wx.ALIGN_CENTER_VERTICAL|wx.ALL
+		SIZER_FLAGS = wx.EXPAND|wx.GROW|wx.ALIGN_CENTER_VERTICAL|wx.ALL
 		cache = self.application.cache
 		
 		# Remove the previous Panel and stuff
@@ -256,7 +345,7 @@ class winDesign(winReportXRC, winDesignBase, ShiftMixIn):
 		Panel = wx.Panel(self.DesignProperties, -1)
 		sizer = wx.BoxSizer(wx.VERTICAL) 
 		Panel.SetSizer(sizer)
-		Panel.SetSize((250, 390))
+		Panel.SetSize((350, 390))
 
 		# Sort the properties into category groups
 		properties = {}
@@ -267,7 +356,11 @@ class winDesign(winReportXRC, winDesignBase, ShiftMixIn):
 				if not properties.has_key(cid):
 					properties[cid] = []
 				properties[cid].append((property, pstring))
-				
+		
+		if len(properties) <= 0:
+			self.DesignProperties.Hide()
+			return
+		
 		for cid in properties.keys():
 			category = cache.categories[cid]
 
@@ -284,18 +377,21 @@ class winDesign(winReportXRC, winDesignBase, ShiftMixIn):
 			for property, pstring in properties[cid]:
 				# Property name
 				name = wx.StaticText(Panel, -1, property.display_name)
-				name.SetFont(wx.local.normalFont)
+				name.SetFont(wx.local.tinyFont)
 				prop_sizer.Add(name, 0, SIZER_FLAGS|wx.ALIGN_RIGHT, 5)
 
 				# Property value
 				value = wx.StaticText(Panel, -1, pstring)
-				value.SetFont(wx.local.normalFont)
+				value.SetFont(wx.local.tinyFont)
 				prop_sizer.Add(value, 1, SIZER_FLAGS|wx.ALIGN_RIGHT, 5)
 				
 				self.design_ps.Layout()
 				Panel.Layout()
 		self.DesignProperties.Show()
 		self.design_ps.Show(Panel)
+		self.DesignProperties.SetMinSize(Panel.GetSize()-(0, 40))
+		Panel.SetSize((Panel.GetBestSize()[0], self.DesignProperties.GetSize()[1]-10))
+		self.SetSize(self.GetBestSize())
 
 		self.properties = Panel
 
@@ -307,6 +403,10 @@ class winDesign(winReportXRC, winDesignBase, ShiftMixIn):
 		
 			self.PartsList.InsertStringItem(0, unicode(number))
 			self.PartsList.SetStringItem(0, 1, component.name)
+
+	def TitleChanged(self, evt):
+		design = self.selected
+		design.name = evt.GetString()
 
 	# Functions to update the component lists
 	#################################################################################
@@ -348,8 +448,37 @@ class winDesign(winReportXRC, winDesignBase, ShiftMixIn):
 
 	# Functions to change the mode of the dialog
 	#################################################################################
+	def OnCategories(self, evt=None):
+		if self.CategoriesWindow.IsShown():
+			pass
+		else:
+			design = self.selected
+			catlist = []
+			for category in self.application.cache.categories.values():
+				catlist.append((category.name, category.id))
+				
+			self.CategoriesWindow.SetOptions(catlist)
+			
+			checkedlist = []
+			for category in self.application.cache.categories.values():
+				if category.id in design.categories:
+					checkedlist.append(category.name)
+					
+			self.CategoriesWindow.SetCheckedStrings(checkedlist)
+			
+			self.CategoriesWindow.Show()
+	
+	def SetSelectedCategories(self, categories):
+		design = self.selected
+		design.categories = categories
+		print design.categories
+		# Add the design to ones which are being updated
+		self.updating.append(design.id)
+		#self.application.Post(self.application.cache.CacheDirtyEvent("designs", "change", design.id, design), source=self)
+	
 	def OnEdit(self, evt=None):
-		# FIXME: Check if we can modify this Design.
+		if self.selected.used > 0:
+			return
 	
 		# Disable the select side
 		self.DesignsTree.Disable()
@@ -363,13 +492,15 @@ class winDesign(winReportXRC, winDesignBase, ShiftMixIn):
 		
 		# Make the title and description editable
 		self.top.Show(self.TitleEditable)
-		self.top.Hide(self.TitleStatic)
+		self.top.Hide(self.StaticTitlePanel)
 		self.top.Layout()
 
 		# Disable Edit, Duplicate, Delete
 		self.Edit.Disable()
 		self.Duplicate.Disable()
 		self.Delete.Disable()
+		
+		self.Categories.Show()
 
 		# Enable the Save, Revert
 		self.Revert.Enable()
@@ -387,6 +518,7 @@ class winDesign(winReportXRC, winDesignBase, ShiftMixIn):
 
 		# Is this a new design?
 		if design.id == -1:
+			self.creating.append(design.name)
 			self.application.Post(self.application.cache.CacheDirtyEvent("designs", "create", -1, design), source=self)
 			self.selected = None
 		else:
@@ -402,6 +534,12 @@ class winDesign(winReportXRC, winDesignBase, ShiftMixIn):
 
 		self.OnSelect(None)
 
+	def OnDuplicate(self, evt):
+		design = self.selected
+		self.creating.append(design.name)
+		self.application.Post(self.application.cache.CacheDirtyEvent("designs", "create", -1, design), source=self)
+		self.selected = None
+
 	def OnRemove(self, evt):
 		design = self.selected
 
@@ -412,7 +550,7 @@ class winDesign(winReportXRC, winDesignBase, ShiftMixIn):
 		for item in self.DesignsTree.FindAllByData(design, comparebyid):
 			self.TreeColourItem(self.DesignsTree, item, "removing")
 			
-		self.application.Post(self.application.cache.CacheDirtyEvent("designs", "remove", design.id, design), source=self)
+		self.application.Post(self.application.cache.CacheDirtyEvent("designs", "remove", design.id, design.id), source=self)
 
 	def OnSelect(self, evt=None):
 		# Stop any running Shift timers
@@ -427,10 +565,11 @@ class winDesign(winReportXRC, winDesignBase, ShiftMixIn):
 		self.ComponentsPanel.SetSize((0,0))
 		self.ComponentsSearch.SetSize((0,0))
 		self.ComponentsPanel.Layout()
+		self.TitleEditable.SetMinSize(self.TitlePanel.GetSize() - (self.Used.GetSize()[0], 0))
 
 		# Make the title and description uneditable
 		self.top.Hide(self.TitleEditable)
-		self.top.Show(self.TitleStatic)
+		self.top.Show(self.StaticTitlePanel)
 		self.top.Layout()
 
 		# Disable Save, Revert
@@ -462,6 +601,7 @@ class winDesign(winReportXRC, winDesignBase, ShiftMixIn):
 			
 			# Disable the buttons
 			self.Edit.Disable()
+			self.Categories.Disable()
 			self.Duplicate.Disable()
 			self.Delete.Disable()
 			return
@@ -483,16 +623,20 @@ class winDesign(winReportXRC, winDesignBase, ShiftMixIn):
 		# Populate the properties
 		self.BuildPropertiesPanel(self.selected)
 
+		self.Categories.Hide()
+
 		# Set if Edit can work
 		if self.selected.used <= 0:
 			self.Edit.Enable()
 			self.Edit.SetDefault()
+			self.Categories.Enable()
 
 			self.Duplicate.Enable()
 			self.Delete.Enable()
 		else:
 			self.Edit.Disable()
 			self.Delete.Disable()
+			self.Categories.Disable()
 
 			self.Duplicate.Enable()
 			self.Duplicate.SetDefault()
@@ -519,18 +663,25 @@ class winDesign(winReportXRC, winDesignBase, ShiftMixIn):
 						self.DesignsTree.Delete(categoryitem)
 				
 			if evt.action in ("change", "create"):
-				for categoryid in design.Categories:
+				if not design.name in self.creating and not design.id in self.updating:
+					return
+				
+				for categoryid in design.categories:
 					# Check the category exists
 					parent = self.DesignsTree.FindItemByData((Category, categoryid), comparetoid)
 					if parent is None:
-						parent = self.TreeAddCategory(self.DesignsTree, self.application.cache.Categories[categoryid])
+						parent = self.TreeAddCategory(self.DesignsTree, self.application.cache.categories[categoryid])
 					
 					# Add the new design under this category
 					self.TreeAddItem(self.DesignsTree, parent, design)
 
+			if design.name in self.creating:
+				self.creating.remove(design.name)
+
 			if design.id in self.updating:
 				self.updating.remove(design.id)
 
+			self.BuildDesignList()
 			self.DesignsTree.SortChildren(self.DesignsTree.GetRootItem())
 	
 	def OnDesignsSearchCancel(self, evt):

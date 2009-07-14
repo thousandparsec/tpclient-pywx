@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resource>
   <object class="wxFrame" name="winDesign">
-    <title>Design</title>
     <object class="wxPanel" name="Panel">
       <object class="wxFlexGridSizer">
-        <cols>3</cols>
-        <rows>2</rows>
         <object class="sizeritem">
           <option>1</option>
           <flag>wxALL|wxEXPAND|wxGROW</flag>
@@ -15,35 +12,75 @@
         </object>
         <object class="sizeritem">
           <object class="wxPanel" name="TitlePanel">
-            <object class="wxBoxSizer">
+            <object class="wxFlexGridSizer">
               <object class="sizeritem">
-                <object class="wxStaticText" name="TitleStatic">
-                  <label>Title</label>
-                  <style>wxALIGN_CENTRE|wxST_NO_AUTORESIZE</style>
+                <object class="wxPanel" name="StaticTitlePanel">
+                  <object class="wxGridSizer">
+                    <cols>3</cols>
+                    <rows>1</rows>
+                    <object class="sizeritem">
+                      <object class="wxPanel"/>
+                      <option>1</option>
+                      <flag>wxALL|wxEXPAND|wxGROW|wxALIGN_LEFT</flag>
+                    </object>
+                    <object class="sizeritem">
+                      <object class="wxStaticText" name="TitleStatic">
+                        <label>Title</label>
+                        <bg>#FF0000</bg>
+                        <font>
+                          <size>10</size>
+                          <style>normal</style>
+                          <weight>normal</weight>
+                          <underlined>0</underlined>
+                          <family>swiss</family>
+                          <face>Sans</face>
+                          <encoding>UTF-8</encoding>
+                        </font>
+                        <style>wxALIGN_CENTRE</style>
+                      </object>
+                    </object>
+                    <object class="sizeritem">
+                      <object class="wxPanel"/>
+                      <option>1</option>
+                      <flag>wxALL|wxEXPAND|wxGROW|wxALIGN_RIGHT</flag>
+                    </object>
+                  </object>
                 </object>
                 <option>1</option>
                 <flag>wxALL|wxEXPAND|wxGROW|wxALIGN_CENTRE</flag>
-                <border>1</border>
               </object>
               <object class="sizeritem">
                 <object class="wxTextCtrl" name="TitleEditable">
                   <value>Title</value>
+                  <font>
+                    <size>10</size>
+                    <style>normal</style>
+                    <weight>normal</weight>
+                    <underlined>0</underlined>
+                    <family>swiss</family>
+                    <face>Sans</face>
+                    <encoding>UTF-8</encoding>
+                  </font>
+                  <hidden>1</hidden>
                   <style>wxTE_CENTRE</style>
                 </object>
                 <option>1</option>
                 <flag>wxALL|wxEXPAND|wxGROW|wxALIGN_CENTRE</flag>
-                <border>1</border>
               </object>
               <object class="sizeritem">
                 <object class="wxStaticText" name="Used">
                   <label>0000</label>
+                  <bg>#FF00A2</bg>
                   <style>wxALIGN_RIGHT|wxST_NO_AUTORESIZE</style>
                 </object>
                 <option>0</option>
-                <flag>wxALL|wxEXPAND|wxGROW|wxALIGN_RIGHT</flag>
-                <border>1</border>
               </object>
-              <orient>wxHORIZONTAL</orient>
+              <cols>3</cols>
+              <rows>1</rows>
+              <growablecols>0</growablecols>
+              <growablecols>1</growablecols>
+              <growablecols>2</growablecols>
+              <growablerows>0</growablerows>
             </object>
           </object>
           <option>1</option>
@@ -83,13 +120,27 @@
           <object class="wxPanel" name="DesignPanel">
             <object class="wxFlexGridSizer">
               <object class="sizeritem">
-                <object class="wxStaticText" name="Categories">
-                  <label>Some Categories, Will Go, Here</label>
-                  <style>wxALIGN_CENTRE|wxST_NO_AUTORESIZE</style>
+                <object class="wxPanel" name="CategoriesPanel">
+                  <object class="wxFlexGridSizer">
+                    <object class="sizeritem">
+                      <object class="wxStaticText" name="CategoriesLabel">
+                        <label>Categories</label>
+                      </object>
+                    </object>
+                    <object class="sizeritem">
+                      <object class="wxPanel" name="spacer">
+                        <size>10,1</size>
+                      </object>
+                    </object>
+                    <object class="sizeritem">
+                      <object class="wxButton" name="Categories">
+                        <label>Edit Categories</label>
+                      </object>
+                    </object>
+                    <cols>3</cols>
+                    <rows>1</rows>
+                  </object>
                 </object>
-                <option>0</option>
-                <flag>wxALL|wxEXPAND|wxGROW|wxALIGN_CENTRE</flag>
-                <border>0</border>
               </object>
               <object class="sizeritem">
                 <object class="wxPanel" name="DesignInfoPanel">
@@ -107,9 +158,9 @@
                           <orient>wxVERTICAL</orient>
                           <object class="sizeritem">
                             <object class="wxPanel" name="DesignPropertyGroup1">
-                              <style></style>
+                              <style/>
                               <object class="wxStaticBoxSizer">
-                                <label></label>
+                                <label/>
                                 <orient>wxVERTICAL</orient>
                                 <object class="sizeritem">
                                   <object class="wxPanel">
@@ -149,9 +200,9 @@
                         </object>
                       </object>
                       <option>1</option>
-                      <flag>wxALL|wxGROW|wxALIGN_CENTRE</flag>
+                      <flag>wxALL|wxEXPAND|wxGROW|wxALIGN_CENTRE</flag>
                       <border>1</border>
-                      <minsize>250, 300</minsize>
+                      <minsize>350, 300</minsize>
                     </object>
                     <cols>2</cols>
                     <rows>1</rows>
@@ -162,7 +213,7 @@
                 </object>
                 <option>1</option>
                 <flag>wxALL|wxEXPAND|wxGROW|wxALIGN_CENTRE</flag>
-                <minsize></minsize>
+                <minsize/>
               </object>
               <object class="sizeritem">
                 <object class="wxPanel" name="DesignButtonsPanel">
@@ -269,11 +320,14 @@
           <option>1</option>
           <flag>wxALL|wxEXPAND|wxGROW|wxALIGN_CENTRE</flag>
         </object>
-        <growablerows>1</growablerows>
+        <cols>3</cols>
+        <rows>2</rows>
         <growablecols>1</growablecols>
+        <growablerows>1</growablerows>
       </object>
-      <style></style>
+      <style/>
     </object>
-    <size>900, 500</size>
+    <size>1024,700</size>
+    <title>Design</title>
   </object>
 </resource>
