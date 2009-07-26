@@ -3,8 +3,25 @@
   <object class="wxPanel" name="infoResourcePanel">
     <object class="wxFlexGridSizer">
       <object class="sizeritem">
+        <object class="wxStaticText" name="NameLabel">
+          <label>LABEL</label>
+        </object>
+      </object>
+      <object class="spacer">
+        <size>15,15</size>
+      </object>
+      <object class="sizeritem">
         <object class="wxStaticText" name="StoredLabel">
           <label>Stored: </label>
+          <font>
+            <size>8</size>
+            <style>normal</style>
+            <weight>normal</weight>
+            <underlined>0</underlined>
+            <family>swiss</family>
+            <face>Sans</face>
+            <encoding>UTF-8</encoding>
+          </font>
         </object>
       </object>
       <object class="sizeritem">
@@ -16,6 +33,15 @@
       <object class="sizeritem">
         <object class="wxStaticText" name="MinableLabel">
           <label>Minable: </label>
+          <font>
+            <size>8</size>
+            <style>normal</style>
+            <weight>normal</weight>
+            <underlined>0</underlined>
+            <family>swiss</family>
+            <face>Sans</face>
+            <encoding>UTF-8</encoding>
+          </font>
         </object>
       </object>
       <object class="sizeritem">
@@ -26,13 +52,22 @@
       </object>
       <object class="sizeritem">
         <object class="wxStaticText" name="InaccessibleLabel">
-          <label>Inaccessible: </label>
+          <label>Inacc.: </label>
+          <font>
+            <size>8</size>
+            <style>normal</style>
+            <weight>normal</weight>
+            <underlined>0</underlined>
+            <family>swiss</family>
+            <face>Sans</face>
+            <encoding>UTF-8</encoding>
+          </font>
         </object>
       </object>
       <object class="sizeritem">
         <object class="wxStaticText" name="InaccessibleValue"/>
       </object>
-      <cols>8</cols>
+      <cols>10</cols>
       <rows>1</rows>
       <growablerows>0</growablerows>
     </object>

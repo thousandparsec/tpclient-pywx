@@ -366,6 +366,9 @@ class infoOrderQueue(infoOrderQueueBase):
 
 from windows.xrc.infoResourcePanel import infoResourcePanelBase
 class infoResourcePanel(infoResourcePanelBase):
+	def setName(self, name):
+		self.NameLabel.SetLabel(name + ":")
+
 	def setValues(self, stored, minable, inaccessible):
 		self.StoredValue.SetLabel(str(stored))
 		self.MinableValue.SetLabel(str(minable))
@@ -468,6 +471,7 @@ class FoldPanel(ArgumentPanel, FoldPanelBase):
 			containerpanel = infoReferenceContainer(item)
 			for id, stored, minable, unavailable in attr.resources:
 				panel = infoResourcePanel(containerpanel)
+				panel.setName(self.cache.resources[id].name)
 				panel.setValues(stored, minable, unavailable)
 				containerpanel.addPanel(panel)
 				containerpanel.Layout()

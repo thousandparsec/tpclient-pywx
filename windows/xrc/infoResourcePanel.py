@@ -34,6 +34,7 @@ class infoResourcePanelBase(wx.Panel):
 		self.PostCreate(pre)
 
 		# Define variables for the controls
+		self.NameLabel = XRCCTRL(self, "NameLabel")
 		self.StoredLabel = XRCCTRL(self, "StoredLabel")
 		self.StoredValue = XRCCTRL(self, "StoredValue")
 		self.MinableLabel = XRCCTRL(self, "MinableLabel")
@@ -44,6 +45,7 @@ class infoResourcePanelBase(wx.Panel):
 
 def strings():
 	pass
+	_("LABEL");
 	_("Stored: ");
 	_("Minable: ");
-	_("LABEL");
+	_("Inaccessible: ");
