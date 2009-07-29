@@ -8,6 +8,8 @@ import sys
 from tp.netlib.objects import Object
 from extra import objectutils
 
+from windows.main.panelPicture import panelPicture
+
 class Overlay(dict):
 	"""\
 	A layer which displays something on the StarMap.
@@ -261,6 +263,10 @@ class SystemLevelOverlay(Overlay, TrackerObject):
 		self.Timer = wx.Timer()
 		self.Timer.Bind(wx.EVT_TIMER, self.SystemHovering)
 
+		self.pictureframe = wx.Frame(self.parent, style=wx.SIMPLE_BORDER)
+		self.picture = panelPicture(self.application, self.pictureframe)
+		self.pictureframe.SetSize(self.picture.GetBestSize())
+
 		self.Popup = ObjectPopup(self.canvas, wx.SIMPLE_BORDER)
 
 		TrackerObject.__init__(self)
@@ -446,6 +452,7 @@ class SystemLevelOverlay(Overlay, TrackerObject):
 		Called when a person mouses over a system icon.
 		Gets the icon and the position of the enter.
 		"""
+		
 		text = self.ObjectPopupText(icon)
 		if text != None:
 			if sys.platform == "win32":
@@ -454,6 +461,15 @@ class SystemLevelOverlay(Overlay, TrackerObject):
 			self.Popup.SetText(text)
 			self.Popup.Show()
 			self.canvas.SetFocus()
+		
+		self.picture.OnSelectObject(icon[0])
+		self.pictureframe.SetSize(self.picture.GetBestSize())
+		self.pictureframe.Move(self.canvas.ClientToScreen((self.canvas.GetSize()[0] - self.pictureframe.GetSize()[0], self.canvas.GetSize()[1] - self.pictureframe.GetSize()[1])))
+		if (pos[0] + self.Popup.GetSize()[0] > self.pictureframe.GetPosition()[0]
+			 and pos[1] + self.Popup.GetSize()[1] > self.pictureframe.GetPosition()[1]):
+			self.pictureframe.Move(self.canvas.ClientToScreen((0, 0)))
+			
+		self.pictureframe.Show()
 
 	def ObjectHovering(self, icon, object):
 		"""
@@ -468,6 +484,7 @@ class SystemLevelOverlay(Overlay, TrackerObject):
 		Called when a person mouses over a system icon.
 		"""
 		self.Popup.Hide()
+		self.pictureframe.Hide()
 
 	def ObjectPopupText(self, icon):
 		"""

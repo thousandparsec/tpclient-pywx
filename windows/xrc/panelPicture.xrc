@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resource version="2.3.0.1" xmlns="http://www.wxwidgets.org/wxxrc">
-  <object class="wxPanel" name="panelPicture" subclass="Dialog">
-    <exstyle>wxWS_EX_BLOCK_EVENTS</exstyle>
-    <size>400,300</size>
+  
+  <object class="wxPanel" name="panelPicture">
     <object class="wxFlexGridSizer">
       <cols>1</cols>
       <rows>2</rows>
@@ -94,5 +93,7 @@
         <border>3</border>
       </object>
     </object>
+    <size>400,300</size>
+    <exstyle>wxWS_EX_BLOCK_EVENTS</exstyle>
   </object>
 </resource>
