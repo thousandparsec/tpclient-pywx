@@ -7,6 +7,7 @@ import wx
 import wx.gizmos
 #from wx import *
 import wx.lib.anchors
+from tp.netlib import objects
 
 from extra import objectutils
 
@@ -15,14 +16,6 @@ from windows.winBase import winReportXRC, ShiftMixIn
 from windows.xrc.winIdleFinder import IdleFinderBase
 # Shows messages from the game system to the player.
 from extra.StateTracker import TrackerObject
-
-# tp imports
-#from tp.netlib.objects                        import Object, OrderDescs
-#from tp.netlib.objects.ObjectExtra.Universe   import Universe
-#from tp.netlib.objects.ObjectExtra.Galaxy     import Galaxy
-#from tp.netlib.objects.ObjectExtra.StarSystem import StarSystem
-#from tp.netlib.objects.ObjectExtra.Planet     import Planet
-#from tp.netlib.objects.ObjectExtra.Fleet      import Fleet
 
 class winIdleFinder(winReportXRC, IdleFinderBase, TrackerObject):
 	"""\
@@ -51,7 +44,7 @@ class winIdleFinder(winReportXRC, IdleFinderBase, TrackerObject):
 		# Create a panel for the current window.
 		self.idlelist.InsertColumn(0, "Item ID", width = 100)
 		self.idlelist.InsertColumn(1, "Item Name", width = 200)
-		#self.idlelist.InsertColumn(2, "Item Type", width = 100)
+		self.idlelist.InsertColumn(2, "Item Type", width = 100)
 
 		self.ascending = 1
 
@@ -92,6 +85,8 @@ class winIdleFinder(winReportXRC, IdleFinderBase, TrackerObject):
 			# If the object has no orders, add it to the list
 			self.idlelist.InsertStringItem(numinlist, "%d" % object)
 			self.idlelist.SetStringItem(numinlist, 1, self.application.cache.objects[object].name)
+			desc = objects.ObjectDescs()[self.application.cache.objects[object].subtype]
+			self.idlelist.SetStringItem(numinlist, 2, desc.name)
 			self.idlelist.SetItemData(numinlist, object)
 				
 			numinlist = numinlist + 1
