@@ -500,6 +500,14 @@ class TrackerObjectOrder(TrackerObject):
 		# Order must be an order, duh!
 		assert isinstance(order, Order)
 
+		orderqueuelist = objectutils.getOrderQueueList(self.application.cache, self.oid)
+		
+		if len(orderqueuelist) <= 0:
+			return
+		
+		# FIXME: Should do something about multiple order queues here.
+		queue = self.application.cache.orders[orderqueuelist[0][1]]
+
 		if node is None:
 			if len(self.nodes) > 0:
 				node = self.nodes[0]
@@ -507,9 +515,13 @@ class TrackerObjectOrder(TrackerObject):
 				node = self.application.cache.orders[self.oid].first
 			
 		assert not node is None
+		
+		# Do some sanity checking
+		d = queue
+		assert node in d
 
 		# Make the change to the cache	
-		evt = self.application.cache.apply("orders", "create before", self.oid, node, order)
+		evt = self.application.cache.apply("orders", "create before", orderqueuelist[0][1], node, order)
 
 		# Do some sanity checking
 		assert not evt.change is None
