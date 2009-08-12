@@ -736,11 +736,11 @@ class panelOrder(panelOrderBase, TrackerObject, TrackerOrder):
 		Check if the items in the clipboard could be pasted on the currently selected object.
 		"""
 		if self.clipboard != None:
-			for order in self.clipboard:
-				if not objects.OrderDescs().has_key(order.subtype):
+			for subtype, orderstring in self.clipboard:
+				if not objects.OrderDescs().has_key(subtype):
 					return False
 
-				slot = self.Possible.FindString(objects.OrderDescs()[order.subtype]._name)
+				slot = self.Possible.FindString(objects.OrderDescs()[subtype]._name)
 				if slot == wx.NOT_FOUND:
 					return False
 			return True
@@ -822,7 +822,7 @@ class panelOrder(panelOrderBase, TrackerObject, TrackerOrder):
 			self.clipboard = []
 
 			for node in self.nodes:
-				self.clipboard.append(node.CurrentOrder)
+				self.clipboard.append((node.CurrentOrder.subtype, node.CurrentOrder.__str__()))
 		
 			if t == _("Cut"):
 				self.OnOrderDelete(None)
@@ -832,9 +832,11 @@ class panelOrder(panelOrderBase, TrackerObject, TrackerOrder):
 				print _("Cant paste because the orders arn't valid on this object.")
 				return
 				
-			# Figure out whats out new position
-
-			order = copy.deepcopy(self.clipboard[0])
+			# Figure out whats our new position
+			
+			subtype, orderstring = self.clipboard[0]
+			order = objects.Header.fromstr(orderstring[:objects.Header.size])
+			order.__process__(orderstring[objects.Header.size:])
 			if t.endswith(_("After")):
 				node = self.InsertAfterOrder(order)
 			else:
