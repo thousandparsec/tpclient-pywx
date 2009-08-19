@@ -20,13 +20,15 @@ from extra import objectutils
 NAME = 0
 DESC = 1
 
+from tp.client.threads import FileTrackerMixin
 from extra.StateTracker import TrackerObject
 from windows.xrc.panelSystem import panelSystemBase
-class panelSystem(panelSystemBase, TrackerObject):
+class panelSystem(panelSystemBase, TrackerObject, FileTrackerMixin):
 	title = _("System")
 
 	def __init__(self, application, parent):
 		panelSystemBase.__init__(self, parent)
+		FileTrackerMixin.__init__(self, application)
 		self.parent = parent
 
 		# Setup to recieve game events
@@ -34,8 +36,6 @@ class panelSystem(panelSystemBase, TrackerObject):
 
 		self.SelectIgnore     = False
 		self.SelectedPrevious = None
-
-		self.waitingimages = {}
 
 		self.icons = {}
 		self.icons['Blank']      = wx.Image(os.path.join(graphicsdir, "blank-icon.png")).ConvertToBitmap()
@@ -66,8 +66,6 @@ class panelSystem(panelSystemBase, TrackerObject):
 		self.Search.Bind(wx.EVT_SEARCHCTRL_SEARCH_BTN, self.Rebuild)
 		self.Search.Bind(wx.EVT_SEARCHCTRL_CANCEL_BTN, self.OnSearchCancel)
 
-		self.application.gui.Binder(self.application.MediaClass.MediaUpdateEvent, self.OnMediaUpdate)
-		self.application.gui.Binder(self.application.MediaClass.MediaDownloadDoneEvent,	self.OnMediaDownloadDone)
 		self.application.gui.Binder(self.application.CacheClass.CacheUpdateEvent, self.OnCacheUpdate)
 		self.application.gui.Binder(self.application.gui.SelectObjectEvent, self.OnSelectObject)
 		
@@ -83,8 +81,8 @@ class panelSystem(panelSystemBase, TrackerObject):
 		if evt is None:
 			return
 
-		if self.waitingimages.has_key(evt.file):
-			del self.waitingimages[evt.file]
+		if self.CheckURL(evt.file):
+			self.RemoveURL(evt.file)
 			self.Rebuild()
 		
 	def OnMediaUpdate(self, evt):
@@ -193,23 +191,23 @@ class panelSystem(panelSystemBase, TrackerObject):
 			# Filter the list..
 			from fnmatch import fnmatch as match
 			if match(caption.lower(), self.Filter.lower()):
-				try:
-					iconurls = objectutils.getIconURLs(self.application, object.id)
-					# Just use the first one, if there are more than one.
-					if len(iconurls) == 0:
+				# Do something about multiple icons for the object?
+				images = self.application.media.getImages(object.id)
+				self.AddObjectURLs(object.id)
+				if len(images) <= 0:
+					icon = self.icons['Loading']
+				else:
+					foundimage = False
+					for name, files in images:
+						if not "Icon" in name:
+							continue
+						
+						foundimage = True
+						icon = self.il.Add(wx.Image(files[0]).ConvertToBitmap())
+						break
+					
+					if not foundimage:
 						icon = self.icons['Unknown']
-					else:
-						file = self.application.media.GetFile(iconurls[0])
-						if file == None or self.waitingimages.has_key(iconurls[0]):
-							# Add this file to the waiting files list.
-							self.waitingimages[iconurls[0]] = object.id
-							icon = self.icons['Loading']
-						else:
-							iconimage = wx.Image(file).ConvertToBitmap()
-							icon = self.il.Add(iconimage)
-				
-				except KeyError:
-					icon = self.icons['Unknown']
 
 				item = self.Tree.AppendItem(parent, caption, icon)
 				self.Tree.SetPyData(item, object.id)

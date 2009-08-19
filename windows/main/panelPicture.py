@@ -30,6 +30,8 @@ from extra.decorators import freeze_wrapper
 
 from extra import objectutils
 
+from tp.client.threads import FileTrackerMixin
+
 # Config imports
 from requirements import graphicsdir
 
@@ -47,25 +49,21 @@ def splitall(start):
 WAITING = os.path.join(graphicsdir, "loading.gif")
 
 from windows.xrc.panelPicture import panelPictureBase
-class panelPicture(panelPictureBase):
+class panelPicture(panelPictureBase, FileTrackerMixin):
 	title = _("Picture")
 
 	def __init__(self, application, parent):
 		panelPictureBase.__init__(self, parent)
-
+		FileTrackerMixin.__init__(self, application)
+		
 		self.application = application
 		self.current = -1
-
-		self.image_waiting = ""
 
 		self.Animation.Hide()
 		self.Static.Hide()
 
 		# Find the images
 		self.images = {'nebula':{'still':[]}, 'star':{'still':[]}, 'planet':{'still':[]}}
-
-		self.progress = []
-		self.averages = []
 
 		self.Download.Hide()
 		self.Static.Show()
@@ -74,9 +72,6 @@ class panelPicture(panelPictureBase):
 		self.Layout()
 		self.Update()
 
-		self.application.gui.Binder(self.application.MediaClass.MediaUpdateEvent,			self.OnMediaUpdate)
-		self.application.gui.Binder(self.application.MediaClass.MediaDownloadProgressEvent, self.OnMediaDownloadProgress)
-		self.application.gui.Binder(self.application.MediaClass.MediaDownloadDoneEvent,		self.OnMediaDownloadDone)
 		self.application.gui.Binder(self.application.gui.SelectObjectEvent, self.OnSelectObject)
 
 	def GetPaneInfo(self):
@@ -114,54 +109,6 @@ class panelPicture(panelPictureBase):
 					files[key][type] = []
 				files[key][type].append(file)
 		self.images = files
-	
-	def OnMediaDownloadProgress(self, evt):
-		self.Download.Show()
-
-		self.Layout()
-		self.Update()
-
-		#print "winPicture.MediaDownloadProgress", evt.file
-
-		self.progress.append((time.time(), evt.progress))
-		# Trim off the oldest samples
-		while len(self.progress) > 200:
-			self.progress.pop(0)
-
-		if len(self.progress) < 2:
-			return
-
-		average = []
-		time1, progress1 = self.progress[0]
-		for time2, progress2 in self.progress[1:]:
-			average.append((progress2-progress1)/(time2-time1))
-			time1, progress1 = time2, progress2
-
-		# Calculate an average
-		average = sum(average)/len(average)
-
-		self.Progress.SetRange(evt.size)
-		self.Progress.SetValue(evt.progress)
-
-		if average < 10e3:
-			self.Speed.SetLabel("%.2f kb/s" % (average/1e3))
-		elif average < 1e6:
-			self.Speed.SetLabel("%.0f kb/s" % (average/1e3))
-		else:
-			self.Speed.SetLabel("%.2f mb/s" % (average/1e6))
-
-		self.averages.append(average)
-
-		aaverage = (self.progress[-1][1]-self.progress[0][1])/(self.progress[-1][0]-self.progress[0][0])
-		eta = (evt.size - evt.progress)/aaverage
-		if eta > 60:
-			eta = (int(eta)//60, eta-int(eta)//60*60)
-			self.ETA.SetLabel("%im %is" % eta)
-		else:
-			self.ETA.SetLabel("%is" % eta)
-
-		self.Download.Layout()
-		self.Download.Update()
 
 	def OnMediaDownloadDone(self, evt):
 		self.Progress.SetRange(0)
@@ -176,12 +123,10 @@ class panelPicture(panelPictureBase):
 
 		if evt is None:
 			return
-
-		print "winInfo.MediaDownloadDone - Finished D", evt.file, evt.localfile
-		print "winInfo.MediaDownloadDone - Waiting On", self.image_waiting
-		if evt.file == self.image_waiting:
-			# FIXME: Should load the image now...
-			self.DisplayImage(evt.localfile)
+		
+		if self.CheckURL(evt.file):
+			self.RemoveURL(evt.file)
+			self.OnSelectObject(self.application.cache.objects[self.current])
 
 	@freeze_wrapper
 	def DisplayImage(self, file, background=wx.BLACK):
@@ -215,8 +160,6 @@ class panelPicture(panelPictureBase):
 		self.Layout()
 
 	def OnSelectObject(self, evt):
-		if evt.id == self.current:
-			return
 		self.current = evt.id
 
 		try:
@@ -228,34 +171,23 @@ class panelPicture(panelPictureBase):
 
 		self.Title.SetLabel(object.name)
 
-		# Figure out the right graphic
-		try:
-			# Try to get any images the object specifies for itself.
-			images = objectutils.getImages(self.application, evt.id)
-					
-		except KeyError, e:
-			print e
-			images = {'still': []}
-
-		if images.has_key("animation") and len(images["animation"]) > 0:
-			images = images["animation"]
-		else:
-			images = images["still"]
-
-		try:
-			image = images[object.id % len(images)]
-			print "Choose:", image
-
-			file = self.application.media.GetFile(image)
-		except ZeroDivisionError, e:
+		images = self.application.media.getImages(evt.id)
+		self.ClearURLs()
+		self.AddObjectURLs(evt.id)
+		
+		if len(images) <= 0:
+			self.DisplayImage(os.path.join(graphicsdir, "unknown.png"))
+		
+		foundimage = False
+		for name, files in images:
+			if "Icon" in name:
+				continue
+		
+			# Do something about multiple alternatives for the image here?
+			filename = files[0]
+			self.DisplayImage(filename)
+			foundimage = True
+		
+		if not foundimage:
 			file = os.path.join(graphicsdir, "unknown.png")
-		except Exception, e:
-			print e
-			file = None
-
-		if file is None:
-			self.image_waiting = image
-			self.DisplayImage(os.path.join(graphicsdir, "loading.png"), wx.NullColour)
-		else:
-			self.image_waiting = None
 			self.DisplayImage(file)

@@ -139,9 +139,10 @@ class winMain(winBase):
 		# Actual windows
 		from windows.main.winDesign import winDesign
 		from windows.main.winIdleFinder import winIdleFinder
+		from windows.main.winDownloadManager import winDownloadManager
 
 		self.windows = {}
-		for window in [winDesign, winIdleFinder]:
+		for window in [winDesign, winIdleFinder, winDownloadManager]:
 			title = window.title
 			self.windows[title] = window(application, self)
 			

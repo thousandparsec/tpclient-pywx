@@ -23,6 +23,8 @@ from extra import objectutils
 
 from requirements import graphicsdir
 
+from tp.client.threads import FileTrackerMixin
+
 from Overlay   import SystemLevelOverlay, Holder
 from Systems import *
 from Colorizer import *
@@ -60,7 +62,7 @@ class ImageIcon(Group, Holder, IconMixIn):
 		Group.__init__(self, ObjectList, False)
 
 from extra.StateTracker import TrackerObjectOrder
-class SystemIcons(Systems):
+class SystemIcons(Systems, FileTrackerMixin):
 	name     = "Icons"
 	toplevel = [] #Galaxy, Universe
 
@@ -68,29 +70,29 @@ class SystemIcons(Systems):
 
 	def __init__(self, parent, canvas, panel, cache, *args, **kw):
 		Systems.__init__(self, parent, canvas, panel, cache, *args, **kw)
-		
-		self.application.gui.Binder(self.application.MediaClass.MediaUpdateEvent, self.OnMediaUpdate)
-		self.application.gui.Binder(self.application.MediaClass.MediaDownloadDoneEvent,	self.OnMediaDownloadDone)
 
-		self.waitingimages = {}
-
+		FileTrackerMixin.__init__(self, self.application)
 
 	def Icon(self, obj):
-		icons = objectutils.getIconURLs(self.application, obj.id)
-		if not len(icons) == 0:
-			file = self.application.media.GetFile(icons[0])
-			
-			if file == None:
-				icon = wx.Image(os.path.join(graphicsdir, "unknown-icon.png")).ConvertToBitmap()
-				self.waitingimages[icons[0]] = 1
-			else:	
-				icon = wx.Image(file).ConvertToBitmap()
+		images = self.application.media.getImages(obj.id)
+		self.ClearURLs()
+		self.AddObjectURLs(obj.id)
+		if len(images) <= 0:
+			return SystemIcon(self.cache, obj, self.Colorizer)
+		else:
+			icon = None
+			for name, files in images:
+				if "Icon" not in name:
+					continue
 				
-			# FIXME: Should we do something about multiple icons?
-			return ImageIcon(self.cache, self.canvas, obj, icon, self.Colorizer)
+				# FIXME: Just use the first file. Might want to do something more?
+				icon = wx.Image(files[0]).ConvertToBitmap()
+				break
+			
+			if not icon:
+				return SystemIcon(self.cache, obj, self.Colorizer)
 		
-		return SystemIcon(self.cache, obj, self.Colorizer)
-		
+		return ImageIcon(self.cache, self.canvas, obj, icon, self.Colorizer)
 	
 	def OnMediaUpdate(self, evt):
 		self.UpdateAll()
@@ -99,6 +101,6 @@ class SystemIcons(Systems):
 		if evt is None:
 			return
 
-		if self.waitingimages.has_key(evt.file):
-			del self.waitingimages[evt.file]
+		if self.CheckURL(evt.file):
+			self.RemoveURL(evt.file)
 			self.UpdateAll()

@@ -26,6 +26,7 @@ from tp.netlib import GenericRS
 from tp.netlib import objects
 from requirements import graphicsdir
 
+from tp.client.threads import FileTrackerMixin
 
 from windows.xrc.panelInformation import panelInformationBase
 class panelInformation(panelInformationBase):
@@ -67,13 +68,11 @@ class panelInformation(panelInformationBase):
 		if (self.current == -1):
 			return
 
-		if self.FoldPanelBar.waitingimages.has_key(evt.file):
-			del self.FoldPanelBar.waitingimages[evt.file]
+		if self.FoldPanelBar.CheckURL(evt.file):
+			self.FoldPanelBar.RemoveURL(evt.file)
 			self.OnSelectObject(self.application.cache.objects[self.current])
 
 	def OnSelectObject(self, evt):
-		if evt.id == self.current:
-			return
 		self.current = evt.id
 
 		try:
@@ -221,18 +220,16 @@ class infoSize(infoSizeBase):
 from windows.xrc.infoMedia import infoMediaBase
 class infoMedia(infoMediaBase):
 		
-	def setImage(self, application, imageurl):
-		file = application.media.GetFile(imageurl)
+	def setImage(self, application, image):
 		
-		if file == None:
+		if image == None:
 			icon = wx.Image(os.path.join(graphicsdir, "unknown-icon.png")).ConvertToBitmap()
 			self.Media.SetBitmap(icon)
 			self.SetSize(self.Media.GetBestSize())
 			self.Layout()
 			return False
 		else:	
-			icon = wx.Image(file).ConvertToBitmap()
-			self.Media.SetBitmap(icon)
+			self.Media.SetBitmap(image)
 			self.SetSize(self.Media.GetBestSize())
 			self.Layout()
 			return True
@@ -375,12 +372,12 @@ class infoResourcePanel(infoResourcePanelBase):
 		self.InaccessibleValue.SetLabel(str(inaccessible))
 
 from windows.xrc.FoldPanel import FoldPanelBase
-class FoldPanel(ArgumentPanel, FoldPanelBase):
+class FoldPanel(ArgumentPanel, FoldPanelBase, FileTrackerMixin):
 	def __init__(self, parent, application):
 		FoldPanelBase.__init__(self, parent)
 		self.application = application
 		self.cache = self.application.cache
-		self.waitingimages = {}
+		FileTrackerMixin.__init__(self, application)
 		self.Layout()
 		
 	def add_panel(self, list):
@@ -423,14 +420,13 @@ class FoldPanel(ArgumentPanel, FoldPanelBase):
 			url = "%s" % attr.url
 			mediapanel = infoMedia(item)
 			# FIXME: Do something about multiple media options for the filename?
-			imageurls = self.application.media.GetFilenames(url)
-			if len(imageurls) <= 0:
-				return
+			images = self.application.media.getImagesForURL(url)
+			self.AddURLsFromBase(url)
+			if len(images) <= 0:
+				mediapanel.setImage(self.application, None)
 			else:
-				imageurl = self.application.media.GetFile(imageurls[0])
-			result = mediapanel.setImage(self.application, imageurl)
-			if not result:
-				self.waitingimages[imageurl] = attr
+				image = wx.Image(images[0]).ConvertToBitmap()
+				mediapanel.setImage(self.application, image)
 			self.FoldBar.AddFoldPanelWindow(item, mediapanel, fpb.FPB_ALIGN_WIDTH, 5, 20)
 			return
 		elif isinstance(group, parameters.ObjectParamInteger):
@@ -483,6 +479,12 @@ class FoldPanel(ArgumentPanel, FoldPanelBase):
 		
 	def RedisplayFoldPanelItems(self):
 		self.FoldBar.RedisplayFoldPanelItems()
+
+	def OnMediaDownloadDone(self, evt):
+		pass
+	
+	def OnMediaDownloadAborted(self, evt):
+		pass
 
 	def get_value(self):
 		return []

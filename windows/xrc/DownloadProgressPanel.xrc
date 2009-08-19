@@ -1,0 +1,98 @@
+<?xml version="1.0" ?>
+<resource>
+  <object class="wxPanel" name="DownloadProgressPanel">
+    <object class="wxFlexGridSizer">
+      <object class="sizeritem">
+        <object class="wxPanel" name="ButtonPanel">
+          <object class="wxFlexGridSizer">
+            <object class="sizeritem">
+              <object class="wxButton" name="Cancel">
+                <label>Cancel</label>
+              </object>
+              <option>1</option>
+              <flag>wxALL|wxEXPAND|wxGROW</flag>
+              <minsize>130,-1</minsize>
+            </object>
+            <object class="sizeritem">
+              <object class="wxPanel" name="Spacer">
+                <size>10,20</size>
+              </object>
+            </object>
+            <cols>2</cols>
+            <rows>1</rows>
+            <growablecols>0</growablecols>
+            <growablerows>0</growablerows>
+          </object>
+        </object>
+        <option>0</option>
+      </object>
+      <object class="sizeritem">
+        <object class="wxStaticText" name="FileName"/>
+        <flag>wxALIGN_CENTRE_VERTICAL</flag>
+      </object>
+      <object class="sizeritem">
+        <object class="wxPanel" name="SpeedETAPanel">
+          <object class="wxFlexGridSizer">
+            <object class="sizeritem">
+              <object class="wxPanel">
+                <size>5,-1</size>
+              </object>
+            </object>
+            <object class="sizeritem">
+              <object class="wxStaticText" name="Speed">
+                <label>0 kb/s</label>
+                <font>
+                  <size>8</size>
+                  <style>normal</style>
+                  <weight>normal</weight>
+                  <underlined>0</underlined>
+                  <family>swiss</family>
+                  <face>Sans</face>
+                  <encoding>UTF-8</encoding>
+                </font>
+              </object>
+              <flag>wxALIGN_CENTRE_VERTICAL</flag>
+            </object>
+            <object class="sizeritem">
+              <object class="wxPanel">
+                <size>10,25</size>
+              </object>
+            </object>
+            <object class="sizeritem">
+              <object class="wxStaticText" name="ETA">
+                <label>N/A s</label>
+                <font>
+                  <size>8</size>
+                  <style>normal</style>
+                  <weight>normal</weight>
+                  <underlined>0</underlined>
+                  <family>swiss</family>
+                  <face>Sans</face>
+                  <encoding>UTF-8</encoding>
+                </font>
+              </object>
+              <flag>wxALIGN_CENTRE_VERTICAL</flag>
+            </object>
+            <cols>4</cols>
+            <rows>1</rows>
+          </object>
+        </object>
+      </object>
+      <object class="sizeritem">
+        <object class="wxGauge" name="Progress">
+          <range>100</range>
+          <value>0</value>
+          <style>wxGA_HORIZONTAL</style>
+        </object>
+        <option>1</option>
+        <flag>wxALL|wxEXPAND|wxGROW</flag>
+      </object>
+      <cols>2</cols>
+      <rows>2</rows>
+      <growablecols>1</growablecols>
+      <growablerows>0</growablerows>
+      <growablerows>1</growablerows>
+    </object>
+    <style>wxSIMPLE_BORDER</style>
+  </object>
+</resource>

@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<resource>
+  <object class="wxFrame" name="winDownloadManager">
+    <object class="wxFlexGridSizer">
+      <cols>1</cols>
+      <rows>1</rows>
+      <growablecols>0</growablecols>
+      <growablerows>0</growablerows>
+      <object class="sizeritem">
+        <object class="wxPanel" name="MainPanel">
+          <object class="wxFlexGridSizer">
+            <cols>1</cols>
+            <rows>1</rows>
+            <growablecols>0</growablecols>
+            <growablerows>0</growablerows>
+          </object>
+        </object>
+      </object>
+    </object>
+    <title>Downloads</title>
+  </object>
+</resource>
