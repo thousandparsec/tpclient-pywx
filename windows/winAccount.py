@@ -235,6 +235,13 @@ class winAccount(winAccountBase, winBaseXRC, usernameMixIn):
 	def OnCancel(self, evt):
 		self.application.gui.Show(self.application.gui.servers)
 
+	@onlyshown
+	def OnClose(self, evt):
+		if evt.CanVeto():
+			evt.Veto(True)
+		self.Hide()
+		self.application.gui.Show(self.application.gui.servers)
+
 	# Config Functions -----------------------------------------------------------------------------
 	def ConfigDefault(self, config=None):
 		"""\

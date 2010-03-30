@@ -243,6 +243,12 @@ class winServerBrowser(winServerBrowserBase, winBaseXRC):
 	def OnFinderFinished(self, evt):
 		self.RefreshFinished(True)
 
+	def OnClose(self, evt):
+		if evt.CanVeto():
+			evt.Veto(True)
+		self.Hide()
+		self.application.gui.Show(self.application.gui.connectto)
+
 	# Config Functions -----------------------------------------------------------------------------  
 	def ConfigDefault(self, config=None):
 		"""\
