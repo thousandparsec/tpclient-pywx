@@ -317,7 +317,7 @@ class panelMessage(panelMessageBase, ShiftMixIn):
 		
 		if len(self.messages) == 0:
 			message_subject = _("No messages")
-			message_counter = _("")
+			message_counter = _(" ")
 			message_body = self.html_nomessage
 			message_filter = False
 			message_buttons = [False, False, False, False]
