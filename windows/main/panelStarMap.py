@@ -281,6 +281,8 @@ class panelStarMap(panelStarMapBase, TrackerObjectOrder):
 		info.Center()
 		info.PinButton(True)
 		info.MaximizeButton(True)
+		info.CaptionVisible(True)
+		info.Caption(self.title)
 		return info
 
 	def OnSize(self, evt):

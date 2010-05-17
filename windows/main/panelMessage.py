@@ -240,6 +240,8 @@ class panelMessage(panelMessageBase, ShiftMixIn):
 		info.BestSize(self.GetBestSize())
 		info.Right()
 		info.Layer(1)
+		info.CaptionVisible(True)
+		info.Caption(self.title)
 		return info
 
 	def Show(self, show=True):

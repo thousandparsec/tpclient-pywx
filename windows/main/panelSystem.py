@@ -110,6 +110,8 @@ class panelSystem(panelSystemBase, TrackerObject, FileTrackerMixin):
 		info.Right()
 		info.Layer(1)
 		info.PinButton(True)
+		info.CaptionVisible(True)
+		info.Caption(self.title)
 		return info
 
 	def ObjectTurnSummary(self, object):

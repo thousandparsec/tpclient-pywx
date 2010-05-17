@@ -86,6 +86,8 @@ class panelPicture(panelPictureBase, FileTrackerMixin):
 
 		info.Left()
 		info.Layer(2)
+		info.CaptionVisible(True)
+		info.Caption(self.title)
 		return info
 
 	def OnMediaUpdate(self, evt):

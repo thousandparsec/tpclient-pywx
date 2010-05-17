@@ -72,6 +72,8 @@ class panelOrder(panelOrderBase, TrackerObject, TrackerOrder):
 		info.BestSize((self.GetBestSize()[0]*2,self.GetBestSize()[1]))
 		info.Left()
 		info.Layer(2)
+		info.CaptionVisible(True)
+		info.Caption(self.title)
 		return info
 
 	def DockBestSize(self):
