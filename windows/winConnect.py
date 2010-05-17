@@ -5,8 +5,6 @@ person enter the server/username/password.
 
 # Python imports
 import string
-import pprint
-import re
 
 # wxPython Imports
 import wx
@@ -791,7 +789,7 @@ class winConnect(winConnectBase, winBaseXRC, usernameMixIn):
 		self.Panel.Layout()
 		size = self.Panel.GetBestSize()
 		self.SetClientSize(size)
-		
+
 		self.CenterOnScreen(wx.BOTH)
 
 		autoconnect = False
@@ -836,7 +834,7 @@ class winConnect(winConnectBase, winBaseXRC, usernameMixIn):
 		if (server not in self.config['servers'] or username != username) and not self.singleplayer:
 			# Popup a dialog asking if we want to add the account
 			msg = _("""\
-It appears you havn't access this account before.
+It appears you haven't accessed this account before.
 
 Would you like to save this account's details?
 """)
@@ -853,7 +851,7 @@ Would you like to save this account's details?
 
 		elif password != oldpassword:
 			msg = _("""\
-It appears you are using a different password for 
+It appears that you are using a different password for
 this account, would you like to update the saved 
 information with the new password?
 """)
