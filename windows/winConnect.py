@@ -789,6 +789,7 @@ class winConnect(winConnectBase, winBaseXRC, usernameMixIn):
 		self.Panel.Layout()
 		size = self.Panel.GetBestSize()
 		self.SetClientSize(size)
+		self.SetMinSize(size)
 
 		self.CenterOnScreen(wx.BOTH)
 
