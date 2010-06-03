@@ -61,10 +61,10 @@ class FilterManager(FilterManagerBase, wx.Frame):
 		self.Panel.Layout()
 
 		size = self.FilterList.GetBestSize()
-		self.FilterList.SetMinSize(size+(30,30))
+		self.FilterList.SetMinSize(size+(10,10))
 
-		self.SetMinSize(self.Panel.GetBestSize()+(30,30))
-		self.SetSize(self.Panel.GetBestSize()+(30,30))
+		self.SetMinSize(self.Panel.GetBestSize()+(10,10))
+		self.SetSize(self.Panel.GetBestSize()+(10,10))
 		#self.SetMaxSize(size)
 
 		wx.Frame.Show(self)
