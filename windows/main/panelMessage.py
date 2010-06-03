@@ -99,8 +99,8 @@ class FilterManagerControl(object):
 		Called when the button is clicked.
 		"""
 		if not self.win.IsShown():
-			self.win.Move(self.button.GetScreenRect().GetTopLeft()-(0,self.win.GetSizeTuple()[1]))
 			self.win.Show()
+			self.win.Move(self.button.GetScreenRect().GetTopLeft()-(0,self.win.GetSizeTuple()[1]))
 		else:
 			self.PopDown()
 		
