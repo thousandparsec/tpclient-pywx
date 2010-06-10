@@ -35,7 +35,7 @@
           <flag>wxALL|wxEXPAND|wxALIGN_CENTRE</flag>
         </object>
         <object class="spacer"/>
-        <object class="spacer"/>
+        
         <object class="sizeritem">
           <object class="wxCheckBox" name="ShowFiltered">
             <label>Show filtered messages</label>
@@ -46,6 +46,24 @@
         <rows>4</rows>
         <vgap>2</vgap>
         <hgap>2</hgap>
+        <object class="sizeritem">
+          <object class="wxButton" name="DoneButton">
+            <pos>0, 145</pos>
+            <label>Done</label>
+            <font>
+              <size>8</size>
+              <style>normal</style>
+              <weight>normal</weight>
+              <underlined>0</underlined>
+              <family>swiss</family>
+              <face>Sans</face>
+              <encoding>UTF-8</encoding>
+            </font>
+            <style>wxBU_EXACTFIT</style>
+          </object>
+          <option>0</option>
+          <flag>wxALIGN_RIGHT</flag>
+        </object>
       </object>
       <size>300,300</size>
     </object>

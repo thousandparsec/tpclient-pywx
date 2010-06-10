@@ -100,7 +100,14 @@ class FilterManagerControl(object):
 		"""
 		if not self.win.IsShown():
 			self.win.Show()
-			self.win.Move(self.button.GetScreenRect().GetTopLeft()-(0,self.win.GetSizeTuple()[1]))
+
+			# Calculate window coordinates
+			button_top_left = self.button.GetScreenRect().GetTopLeft()
+			win_height = (0, self.win.GetSizeTuple()[1])
+			button_height = (0, self.button.GetRect().GetHeight())
+			coords = button_top_left - win_height + button_height
+			
+			self.win.Move(coords)
 		else:
 			self.PopDown()
 		
