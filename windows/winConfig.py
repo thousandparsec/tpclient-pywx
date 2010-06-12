@@ -69,6 +69,9 @@ class winConfig(winBase):
 		self.Bind(wx.EVT_SHOW, self.OnShow)
 
 	def OnShow(self, evt):
+		self.CenterOnParent(wx.BOTH)
+		self.MakeModal(evt.GetShow())
+
 		for page in xrange(self.notebook.GetPageCount()):
 			if self.notebook.GetPageText(page) == self.application.gui.current.title:
 				self.notebook.SetSelection(page)
