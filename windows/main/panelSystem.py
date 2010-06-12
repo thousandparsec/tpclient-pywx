@@ -171,7 +171,7 @@ class panelSystem(panelSystemBase, TrackerObject, FileTrackerMixin):
 		if len(filter) == 0:
 			return "*"
 		elif not '*' in filter:
-			return filter.lower()+'*'
+			return '*'+filter.lower()+'*'
 		else:
 			return filter
 
