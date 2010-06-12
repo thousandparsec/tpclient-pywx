@@ -3,12 +3,28 @@
   <object class="wxPanel" name="panelInformation" subclass="Dialog">
     <object class="wxFlexGridSizer">
       <object class="sizeritem">
+        <object class="wxStaticText" name="Title">
+          <label>Name of object goes here</label>
+          <font>
+            <size>10</size>
+            <style>normal</style>
+            <weight>bold</weight>
+            <underlined>0</underlined>
+            <family>swiss</family>
+            <face>Sans</face>
+            <encoding>UTF-8</encoding>
+          </font>
+          <style>wxALIGN_CENTRE|wxST_NO_AUTORESIZE</style>
+        </object>
         <flag>wxGROW|wxGROW|wxALL|wxADJUST_MINSIZE</flag>
         <border>0</border>
-        <object class="wxStaticText" name="Title">
-          <style>wxALIGN_CENTRE|wxST_NO_AUTORESIZE</style>
-          <label>Name of object goes here</label>
+      </object>
+      <object class="sizeritem">
+        <object class="wxStaticLine">
+          <size>-1, 5</size>
+          <style>wxLI_HORIZONTAL</style>
         </object>
+        <flag>wxGROW</flag>
       </object>
       <object class="sizeritem">
         <object class="wx.lib.scrolledpanel.ScrolledPanel" name="DetailsPanel">
@@ -27,7 +43,7 @@
       <vgap>0</vgap>
       <hgap>0</hgap>
       <growablecols>0</growablecols>
-      <growablerows>1,2</growablerows>
+      <growablerows>2</growablerows>
     </object>
     <size>400,300</size>
   </object>
