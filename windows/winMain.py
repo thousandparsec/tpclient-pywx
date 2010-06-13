@@ -35,18 +35,22 @@ ID_ONLINE = 10058
 ID_ABOUT  = 10059
 
 class StatusBar(wx.StatusBar):
-	TEXT_TIMER = 1
+	TURN_NUMBER = 1
+	TEXT_TIMER = 2
 
 	def __init__(self, application, parent):
 		wx.StatusBar.__init__(self, parent, -1)
 
 		self.application = application
 
-		self.SetFieldsCount(2)
-		self.SetStatusWidths([-10, -2])
+		self.SetFieldsCount(3)
+		self.SetStatusWidths([-10, -1, -2])
 
 		self.StatusTextCtrl = wx.TextCtrl(self, -1, "")
 		self.StatusTextCtrl.SetEditable(False)
+
+		self.TurnTextCtrl = wx.TextCtrl(self, -1, "")
+		self.TurnTextCtrl.SetEditable(False)
 
 		self.endtime = 0
 		self.parent = parent
@@ -84,7 +88,14 @@ class StatusBar(wx.StatusBar):
 	def SetEndTime(self, endtime):
 		self.endtime = endtime
 
+	def SetTurnNumber(self, turn):
+		self.TurnTextCtrl.SetValue("Year: %s" % turn)
+
 	def Reposition(self):
+		rect = self.GetFieldRect(StatusBar.TURN_NUMBER)
+		self.TurnTextCtrl.SetPosition((rect.x, rect.y))
+		self.TurnTextCtrl.SetSize((rect.width, rect.height))
+
 		rect = self.GetFieldRect(StatusBar.TEXT_TIMER)
 		self.StatusTextCtrl.SetPosition((rect.x, rect.y))
 		self.StatusTextCtrl.SetSize((rect.width, rect.height))

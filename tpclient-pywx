@@ -451,6 +451,7 @@ class Network(NetworkThread):
 		if failed(timeRemaining[0]):
 			return
 		gui.Call( gui.main.statusbar.SetEndTime, timeRemaining[0]+timeRemaining[1] )
+		gui.Call( gui.main.statusbar.SetTurnNumber, self.application.cache.objects[0].Informational.Year.value )
 
 from tp.client.threads import Application as ClientApplication
 class Application(ClientApplication):
