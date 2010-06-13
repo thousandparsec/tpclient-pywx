@@ -173,6 +173,8 @@ class winMain(winBase):
 			title = panel.title
 
 			instance = panel(application, self)
+			# Catch closing panel by X sign
+			instance.Bind(wx.EVT_SHOW, self.MenuPanelUpdate)
 
 			self.mgr.AddPane(instance, instance.GetPaneInfo())
 			self.panels[title] = instance
@@ -284,13 +286,28 @@ class winMain(winBase):
 		win.AppendSeparator()
 		win.Append(ID_WIN_TIPS, _("Show Tips"), "", True )
 
+		# Panels Menu
+		panels_menu = wx.Menu()
+		self.menu_id_to_panel = {}
+
+		# Create menu item for every panel
+		for panel in self.panels.values():
+			id = wx.NewId()
+			self.menu_id_to_panel[id] = panel
+			panels_menu.Append(id, _("Show %s" % panel.title), "Show or hide %s panel.", True)
+
+			# All panels are initially shown, so check corresponding item
+			panels_menu.Check(id, True)
+			source.Bind(wx.EVT_MENU, source.OnMenuPanelItem, id=id)
+
 		help = wx.Menu()
 		help.Append( ID_ONLINE, _("Online Help"), _("Go to the online help page."))
 		help.Append( ID_ABOUT,  _("About"),  _("About the client you are running...") )
 
+		# Menu bar and menu bindings
 		bar.Append( file, _("File") )
-		#bar.Append( stat, _("Statistics") )
 		bar.Append( win,  _("Windows") )
+		bar.Append( panels_menu, _("Panels"))
 		bar.Append( help, _("&Help") )
 
 		source.Bind(wx.EVT_MENU, self.OnConnect,     id=ID_OPEN)
@@ -304,6 +321,34 @@ class winMain(winBase):
 
 		source.Bind(wx.EVT_MENU, self.ShowTips, id=ID_WIN_TIPS)
 		return bar
+
+	def OnMenuPanelItem(self, evt):
+		id = evt.GetId()
+		panel = self.menu_id_to_panel[evt.GetId()]
+
+		self.mgr.GetPane(panel).Show(evt.Checked())
+		self.mgr.Update()
+
+	def MenuPanelUpdate(self, evt=None):
+		"""\
+		Update menu items in Panels submenu according to currenly shown panels.
+
+		This function can be called directly (and then whole menu is rechecked)
+		or as a handler to EVT_SHOW from panel.
+		"""
+		menubar = self.GetMenuBar()
+		if(evt is None):
+			# Update all menu items
+			for id in self.menu_id_to_panel.keys():
+				panel = self.menu_id_to_panel[id]
+				menubar.FindItemById(id).Check(self.mgr.GetPane(panel).IsShown())
+		elif(not evt.GetShow() and evt.EventObject in self.panels.values()):
+			# Handle only 'not shown' case, it occurs when the user clicks on X mark in panel title
+
+			# Invert menu_id_to_panel dict
+			panel_to_menu_id = dict(zip(self.menu_id_to_panel.values(), self.menu_id_to_panel.keys()))
+			id = panel_to_menu_id[evt.EventObject]
+			menubar.FindItemById(id).Check(False)
 
 	def AccelTable(self, source):
 		source.Bind(wx.EVT_KEY_DOWN, self.temp)
