@@ -7,40 +7,38 @@
         <object class="wxOrderedTreeCtrl" name="Tree">
           <style>wxTR_DEFAULT_STYLE | wxTR_HAS_VARIABLE_ROW_HEIGHT</style>
         </object>
+        <option>1</option>
         <flag>wxEXPAND|wxGROW</flag>
       </object>
       <object class="sizeritem">
         <object class="wxBoxSizer">
-          <orient>wxHORIZONTAL</orient>
           <object class="sizeritem">
             <object class="wxBitmapButton" name="PrevObject">
-              <bitmap stock_id="wxART_GO_BACK"></bitmap>
+              <bitmap stock_id="wxART_GO_BACK"/>
             </object>
-            <option>1</option>
           </object>
           <object class="sizeritem">
             <object class="wxBitmapButton" name="NextObject">
-              <bitmap stock_id="wxART_GO_FORWARD"></bitmap>
+              <bitmap stock_id="wxART_GO_FORWARD"/>
             </object>
-            <option>1</option>
           </object>
           <object class="sizeritem">
             <object class="wxBitmapButton" name="StepInto">
-              <bitmap stock_id="wxART_GO_DOWN"></bitmap>
+              <bitmap stock_id="wxART_GO_DOWN"/>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <object class="wxSearchCtrl" name="Search">
+              <style>wxSEARCH_CANCEL_BTN|wxSEARCH_SEARCH_BTN|wxTE_PROCESS_ENTER</style>
             </object>
             <option>1</option>
+            <flag>wxALL|wxEXPAND</flag>
           </object>
+          <orient>wxHORIZONTAL</orient>
         </object>
-        <option>100</option>
-        <flag>wxALL|wxALIGN_CENTRE</flag>
+        <flag>wxALL|wxEXPAND|wxALIGN_CENTRE</flag>
       </object>
-      <object class="sizeritem">
-        <object class="wxSearchCtrl" name="Search">
-          <style>wxSEARCH_CANCEL_BTN|wxSEARCH_SEARCH_BTN|wxTE_PROCESS_ENTER</style>
-        </object>
-        <option>70</option>
-        <flag>wxEXPAND|wxGROW</flag>
-      </object>
+      
       <orient>wxVERTICAL</orient>
     </object>
   </object>
