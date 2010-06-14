@@ -187,6 +187,7 @@ class panelSystem(panelSystemBase, TrackerObject, FileTrackerMixin):
 		if parent is None:
 			if self.Filter == '*':
 				item = self.Tree.AddRoot(_("Known Universe"), self.icons['Root'])
+				self.Tree.SetPyData(item, 0)
 			else:
 				item = self.Tree.AddRoot(_("Finding %s") % self.Filter, self.icons['Root'])
 		else:
