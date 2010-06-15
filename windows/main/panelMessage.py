@@ -203,7 +203,7 @@ class panelMessage(panelMessageBase, ShiftMixIn):
 <center>
 	<table cols=1 width="100%">
 		<tr>
-			<td><b>Subject:</b> You are unloved!
+			<td><b>Subject:</b> You are unloved!</td>
 		</tr>
 		<tr>
 			<td>
@@ -224,7 +224,7 @@ class panelMessage(panelMessageBase, ShiftMixIn):
 <center>
 	<table cols=1 width="100%" background="%GRAPHICS/graphics/filtered.png">
 		<tr>
-			<td><b>Subject:</b> All messages filtered
+			<td><b>Subject:</b> All messages filtered</td>
 		</tr>
 		<tr>
 			<td>All messages you have received this turn have been filtered.</td>

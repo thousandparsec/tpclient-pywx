@@ -69,11 +69,11 @@
 &lt;center&gt;
 	&lt;table cols=1 width=&quot;100%&quot;&gt;
 		&lt;tr&gt;
-			&lt;td&gt;&lt;b&gt;Subject:&lt;/b&gt; You are unloved!
+			&lt;td&gt;&lt;b&gt;Subject:&lt;/b&gt; You are unloved!&lt;/td&gt;
 		&lt;/tr&gt;
 		&lt;tr&gt;
 			&lt;td&gt;
-			You have received no messages during this turn!&lt;br&gt;&lt;br&gt;
+			You have received no messages this turn!&lt;br&gt;&lt;br&gt;
 			Actually if you didn't receive any messages it most probably
 			means that your client couldn't load the results from the server.
 			Try reload/restart the client.
