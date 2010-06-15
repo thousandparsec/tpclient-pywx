@@ -29,19 +29,8 @@ class winUpdate(winUpdateBase, winBaseXRC):
 		self.GoDown = False
 
 		if wx.Platform == "__WXMAC__":
-			self.ConnectingText.SetLabel("___________")
-			self.ConnectingText.SetMinSize(self.ConnectingText.GetBestSize())
-			self.ProgressText.SetLabel("___________")
-			self.ProgressText.SetMinSize(self.ProgressText.GetBestSize())
-			self.ProgressTitle.SetLabel("_________________________________")
-			self.ProgressTitle.SetMaxSize(self.ProgressTitle.GetBestSize())
-			self.ProgressTitle.SetMinSize(self.ProgressTitle.GetBestSize())
-			self.ProgressTitle.SetSize(self.ProgressTitle.GetBestSize())
-
 			self.ProgressAnim.SetMinSize((32, 32))
 			self.ConnectingAnim.SetMinSize((32, 32))
-		else:
-			self.Panel.GetSizer().GetItem(2).GetSizer().RemoveGrowableCol(1)
 
 		self.Panel.Layout()
 		self.Panel.Update()
@@ -86,7 +75,6 @@ class winUpdate(winUpdateBase, winBaseXRC):
 		# Enable the cancel button
 		self.Cancel.Enable()
 
-		#self.TopText.SetLabel("")
 		self.Message.SetValue("")
 
 		self.ConnectingGauge.Enable()
@@ -190,13 +178,12 @@ class winUpdate(winUpdateBase, winBaseXRC):
 				self.ConnectingGauge.SetValue(self.ConnectingGauge.GetRange())
 
 				# Set the progress text
+				self.ConnectingTitle.SetLabel(_("Connected!"))
 				self.ConnectingText.SetLabel(_("Done!"))
 
 			elif state == "alreadydone":
 				self.ConnectingGauge.SetRange(1)
 				self.ConnectingGauge.SetValue(1)
-				#self.ConnectingGauge.Disable()
-				self.ConnectingText.Disable()
 				animation.Disable()
 
 		elif mode == "finishing":
@@ -222,7 +209,7 @@ class winUpdate(winUpdateBase, winBaseXRC):
 
 			if state == "start":
 				# Set the progress title
-				self.ProgressTitle.SetLabel(_("Getting %s" % mode.title()))
+				self.ProgressTitle.SetLabel(_("%s" % mode.title()))
 
 				# Set the progress guage to be empty
 				self.ProgressGauge.Enable()

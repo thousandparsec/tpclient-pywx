@@ -1,415 +1,434 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resource version="2.3.0.1" xmlns="http://www.wxwidgets.org/wxxrc">
-    <object class="wxFrame" name="winUpdate">
-        <style>wxCAPTION|wxRESIZE_BORDER|wxSYSTEM_MENU|wxCLOSE_BOX</style>
-        <size>600,600</size>
-        <title>TP: Universe update</title>
-        <object class="wxPanel" name="Panel">
-            <style>wxSUNKEN_BORDER|wxTAB_TRAVERSAL</style>
-            <object class="wxFlexGridSizer">
-                <cols>1</cols>
-                <rows>2</rows>
-                <vgap>0</vgap>
-                <hgap>0</hgap>
-                <growablecols>0</growablecols>
-                <growablerows>1</growablerows>
-                <object class="sizeritem">
-                    <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE</flag>
-                    <border>5</border>
-                    <object class="wxStaticText" name="TopText">
-                        <font>
-                            <size>14</size>
-                            <family>swiss</family>
-                            <weight>bold</weight>
-                            <face>Sans</face>
-                        </font>
-                        <label>Universe Download</label>
-                    </object>
-                </object>
-                <object class="sizeritem">
-                    <flag>wxGROW|wxGROW|wxALL</flag>
-                    <border>5</border>
-                    <object class="wxTextCtrl" name="Message">
-                        <size>100,100</size>
-                        <style>wxTE_MULTILINE|wxDOUBLE_BORDER|wxTE_READONLY</style>
-                    </object>
-                </object>
-                <object class="sizeritem">
-                    <flag>wxALIGN_CENTER_HORIZONTAL|wxGROW|wxALL</flag>
-                    <border>5</border>
-                    <object class="wxFlexGridSizer">
-                        <cols>3</cols>
-                        <rows>2</rows>
-                        <vgap>0</vgap>
-                        <hgap>0</hgap>
-                        <growablecols>0,1</growablecols>
-                        <object class="sizeritem">
-                            <flag>wxALIGN_CENTER_HORIZONTAL|wxGROW|wxALL</flag>
-                            <border>5</border>
-                            <object class="wxGauge" name="ConnectingGauge">
-                                <style>wxGA_HORIZONTAL</style>
-                                <value>1</value>
-                                <range>100</range>
-                            </object>
-                        </object>
-                        <object class="sizeritem">
-                            <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE</flag>
-                            <border>5</border>
-                            <object class="wxStaticText" name="ConnectingText">
-                                <label>Done!</label>
-                            </object>
-                        </object>
-                        <object class="sizeritem">
-                            <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL</flag>
-                            <border>5</border>
-                            <object class="wxGIFAnimationCtrl" name="ConnectingAnim">
-                                <size>32,32</size>
-                            </object>
-                        </object>
-                        <object class="sizeritem">
-                            <flag>wxGROW|wxGROW|wxALL</flag>
-                            <border>5</border>
-                            <object class="wxFlexGridSizer">
-                                <cols>2</cols>
-                                <rows>2</rows>
-                                <vgap>0</vgap>
-                                <hgap>0</hgap>
-                                <growablecols>1</growablecols>
-                                <object class="sizeritem">
-                                    <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE</flag>
-                                    <border>5</border>
-                                    <object class="wxStaticText" name="ProgressTitle">
-                                        <style>wxALIGN_CENTRE</style>
-                                        <label>Progress</label>
-                                    </object>
-                                </object>
-                                <object class="sizeritem">
-                                    <flag>wxALIGN_CENTER_HORIZONTAL|wxGROW|wxALL</flag>
-                                    <border>5</border>
-                                    <object class="wxGauge" name="ProgressGauge">
-                                        <style>wxGA_HORIZONTAL</style>
-                                        <value>1</value>
-                                        <range>100</range>
-                                    </object>
-                                </object>
-                            </object>
-                        </object>
-                        <object class="sizeritem">
-                            <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE</flag>
-                            <border>5</border>
-                            <object class="wxStaticText" name="ProgressText">
-                                <label>Done!</label>
-                            </object>
-                        </object>
-                        <object class="sizeritem">
-                            <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL</flag>
-                            <border>5</border>
-                            <object class="wxGIFAnimationCtrl" name="ProgressAnim">
-                                <size>32,32</size>
-                            </object>
-                        </object>
-                    </object>
-                </object>
-                <object class="spacer">
-                    <flag>wxGROW|wxGROW|wxALL</flag>
-                    <border>5</border>
-                    <size>5,5</size>
-                </object>
-                <object class="sizeritem">
-                    <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL</flag>
-                    <border>5</border>
-                    <object class="wxGridSizer">
-                        <cols>5</cols>
-                        <rows>2</rows>
-                        <vgap>0</vgap>
-                        <hgap>0</hgap>
-                        <object class="sizeritem">
-                            <flag>wxGROW|wxGROW|wxALL</flag>
-                            <border>5</border>
-                            <object class="wxBoxSizer">
-                                <orient>wxVERTICAL</orient>
-                                <object class="sizeritem">
-                                    <flag>wxALIGN_CENTER_HORIZONTAL|wxALL</flag>
-                                    <border>5</border>
-                                    <object class="wxGIFAnimationCtrl" name="ObjectdescsAnim">
-                                        <size>32,32</size>
-                                    </object>
-                                </object>
-                                <object class="sizeritem">
-                                    <flag>wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE</flag>
-                                    <border>5</border>
-                                    <object class="wxStaticText" name="wxID_STATIC">
-                                        <label>Objects Descs</label>
-                                    </object>
-                                </object>
-                            </object>
-                        </object>
-                        <object class="sizeritem">
-                            <flag>wxGROW|wxGROW|wxALL</flag>
-                            <border>5</border>
-                            <object class="wxBoxSizer">
-                                <orient>wxVERTICAL</orient>
-                                <object class="sizeritem">
-                                    <flag>wxALIGN_CENTER_HORIZONTAL|wxALL</flag>
-                                    <border>5</border>
-                                    <object class="wxGIFAnimationCtrl" name="OrderdescsAnim">
-                                        <size>32,32</size>
-                                    </object>
-                                </object>
-                                <object class="sizeritem">
-                                    <flag>wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE</flag>
-                                    <border>5</border>
-                                    <object class="wxStaticText" name="wxID_STATIC">
-                                        <label>Order Descs</label>
-                                    </object>
-                                </object>
-                            </object>
-                        </object>
-                        <object class="sizeritem">
-                            <flag>wxGROW|wxGROW|wxALL</flag>
-                            <border>5</border>
-                            <object class="wxBoxSizer">
-                                <orient>wxVERTICAL</orient>
-                                <object class="sizeritem">
-                                    <flag>wxALIGN_CENTER_HORIZONTAL|wxALL</flag>
-                                    <border>5</border>
-                                    <object class="wxGIFAnimationCtrl" name="ObjectsAnim">
-                                        <size>32,32</size>
-                                    </object>
-                                </object>
-                                <object class="sizeritem">
-                                    <flag>wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE</flag>
-                                    <border>5</border>
-                                    <object class="wxStaticText" name="wxID_STATIC">
-                                        <label>Objects</label>
-                                    </object>
-                                </object>
-                            </object>
-                        </object>
-                        <object class="sizeritem">
-                            <flag>wxGROW|wxGROW|wxALL</flag>
-                            <border>5</border>
-                            <object class="wxBoxSizer">
-                                <orient>wxVERTICAL</orient>
-                                <object class="sizeritem">
-                                    <flag>wxALIGN_CENTER_HORIZONTAL|wxALL</flag>
-                                    <border>5</border>
-                                    <object class="wxGIFAnimationCtrl" name="OrdersAnim">
-                                        <size>32,32</size>
-                                    </object>
-                                </object>
-                                <object class="sizeritem">
-                                    <flag>wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE</flag>
-                                    <border>5</border>
-                                    <object class="wxStaticText" name="wxID_STATIC">
-                                        <label>Orders</label>
-                                    </object>
-                                </object>
-                            </object>
-                        </object>
-                        <object class="sizeritem">
-                            <flag>wxGROW|wxGROW|wxALL</flag>
-                            <border>5</border>
-                            <object class="wxBoxSizer">
-                                <orient>wxVERTICAL</orient>
-                                <object class="sizeritem">
-                                    <flag>wxALIGN_CENTER_HORIZONTAL|wxALL</flag>
-                                    <border>5</border>
-                                    <object class="wxGIFAnimationCtrl" name="BoardsAnim">
-                                        <size>32,32</size>
-                                    </object>
-                                </object>
-                                <object class="sizeritem">
-                                    <flag>wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE</flag>
-                                    <border>5</border>
-                                    <object class="wxStaticText" name="wxID_STATIC">
-                                        <label>Boards</label>
-                                    </object>
-                                </object>
-                            </object>
-                        </object>
-                        <object class="sizeritem">
-                            <flag>wxGROW|wxGROW|wxALL</flag>
-                            <border>5</border>
-                            <object class="wxBoxSizer">
-                                <orient>wxVERTICAL</orient>
-                                <object class="sizeritem">
-                                    <flag>wxALIGN_CENTER_HORIZONTAL|wxALL</flag>
-                                    <border>5</border>
-                                    <object class="wxGIFAnimationCtrl" name="MessagesAnim">
-                                        <size>32,32</size>
-                                    </object>
-                                </object>
-                                <object class="sizeritem">
-                                    <flag>wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE</flag>
-                                    <border>5</border>
-                                    <object class="wxStaticText" name="wxID_STATIC">
-                                        <label>Messages</label>
-                                    </object>
-                                </object>
-                            </object>
-                        </object>
-                        <object class="sizeritem">
-                            <flag>wxGROW|wxGROW|wxALL</flag>
-                            <border>5</border>
-                            <object class="wxBoxSizer">
-                                <orient>wxVERTICAL</orient>
-                                <object class="sizeritem">
-                                    <flag>wxALIGN_CENTER_HORIZONTAL|wxALL</flag>
-                                    <border>5</border>
-                                    <object class="wxGIFAnimationCtrl" name="CategoriesAnim">
-                                        <size>32,32</size>
-                                    </object>
-                                </object>
-                                <object class="sizeritem">
-                                    <flag>wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE</flag>
-                                    <border>5</border>
-                                    <object class="wxStaticText" name="wxID_STATIC">
-                                        <label>Categories</label>
-                                    </object>
-                                </object>
-                            </object>
-                        </object>
-                        <object class="sizeritem">
-                            <flag>wxGROW|wxGROW|wxALL</flag>
-                            <border>5</border>
-                            <object class="wxBoxSizer">
-                                <orient>wxVERTICAL</orient>
-                                <object class="sizeritem">
-                                    <flag>wxALIGN_CENTER_HORIZONTAL|wxALL</flag>
-                                    <border>5</border>
-                                    <object class="wxGIFAnimationCtrl" name="DesignsAnim">
-                                        <size>32,32</size>
-                                    </object>
-                                </object>
-                                <object class="sizeritem">
-                                    <flag>wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE</flag>
-                                    <border>5</border>
-                                    <object class="wxStaticText" name="wxID_STATIC">
-                                        <label>Designs</label>
-                                    </object>
-                                </object>
-                            </object>
-                        </object>
-                        <object class="sizeritem">
-                            <flag>wxGROW|wxGROW|wxALL</flag>
-                            <border>5</border>
-                            <object class="wxBoxSizer">
-                                <orient>wxVERTICAL</orient>
-                                <object class="sizeritem">
-                                    <flag>wxALIGN_CENTER_HORIZONTAL|wxALL</flag>
-                                    <border>5</border>
-                                    <object class="wxGIFAnimationCtrl" name="ComponentsAnim">
-                                        <size>32,32</size>
-                                    </object>
-                                </object>
-                                <object class="sizeritem">
-                                    <flag>wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE</flag>
-                                    <border>5</border>
-                                    <object class="wxStaticText" name="wxID_STATIC">
-                                        <label>Components</label>
-                                    </object>
-                                </object>
-                            </object>
-                        </object>
-                        <object class="sizeritem">
-                            <flag>wxGROW|wxGROW|wxALL</flag>
-                            <border>5</border>
-                            <object class="wxBoxSizer">
-                                <orient>wxVERTICAL</orient>
-                                <object class="sizeritem">
-                                    <flag>wxALIGN_CENTER_HORIZONTAL|wxALL</flag>
-                                    <border>5</border>
-                                    <object class="wxGIFAnimationCtrl" name="PropertiesAnim">
-                                        <size>32,32</size>
-                                    </object>
-                                </object>
-                                <object class="sizeritem">
-                                    <flag>wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE</flag>
-                                    <border>5</border>
-                                    <object class="wxStaticText" name="wxID_STATIC">
-                                        <label>Properties</label>
-                                    </object>
-                                </object>
-                            </object>
-                        </object>
-                        <object class="sizeritem">
-                            <flag>wxGROW|wxGROW|wxALL</flag>
-                            <border>5</border>
-                            <object class="wxBoxSizer">
-                                <orient>wxVERTICAL</orient>
-                                <object class="sizeritem">
-                                    <flag>wxALIGN_CENTER_HORIZONTAL|wxALL</flag>
-                                    <border>5</border>
-                                    <object class="wxGIFAnimationCtrl" name="PlayersAnim">
-                                        <size>32,32</size>
-                                    </object>
-                                </object>
-                                <object class="sizeritem">
-                                    <flag>wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE</flag>
-                                    <border>5</border>
-                                    <object class="wxStaticText" name="wxID_STATIC">
-                                        <label>Players</label>
-                                    </object>
-                                </object>
-                            </object>
-                        </object>
-                        <object class="sizeritem">
-                            <flag>wxGROW|wxGROW|wxALL</flag>
-                            <border>5</border>
-                            <object class="wxBoxSizer">
-                                <orient>wxVERTICAL</orient>
-                                <object class="sizeritem">
-                                    <flag>wxALIGN_CENTER_HORIZONTAL|wxALL</flag>
-                                    <border>5</border>
-                                    <object class="wxGIFAnimationCtrl" name="ResourcesAnim">
-                                        <size>32,32</size>
-                                    </object>
-                                </object>
-                                <object class="sizeritem">
-                                    <flag>wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE</flag>
-                                    <border>5</border>
-                                    <object class="wxStaticText" name="wxID_STATIC">
-                                        <label>Resources</label>
-                                    </object>
-                                </object>
-                            </object>
-                        </object>
-                    </object>
-                </object>
-                <object class="sizeritem">
-                    <flag>wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxALL</flag>
-                    <border>5</border>
-                    <object class="wxBoxSizer">
-                        <orient>wxHORIZONTAL</orient>
-                        <object class="sizeritem">
-                            <flag>wxALIGN_CENTER_VERTICAL|wxALL</flag>
-                            <border>5</border>
-                            <object class="wxButton" name="wxID_OK">
-                                <tooltip>Continue to the main game window.</tooltip>
-                                <label>&amp;OK</label>
-                                <default>1</default>
-                            </object>
-                        </object>
-                        <object class="sizeritem">
-                            <flag>wxALIGN_CENTER_VERTICAL|wxALL</flag>
-                            <border>5</border>
-                            <object class="wxButton" name="wxID_SAVE">
-                                <tooltip>Save a copy of the message box window to a file.</tooltip>
-                                <label>&amp;Save</label>
-                            </object>
-                        </object>
-                        <object class="sizeritem">
-                            <flag>wxALIGN_CENTER_VERTICAL|wxALL</flag>
-                            <border>5</border>
-                            <object class="wxButton" name="wxID_CANCEL">
-                                <tooltip>Cancel the current update and go back to the connect screen.</tooltip>
-                                <label>&amp;Cancel</label>
-                            </object>
-                        </object>
-                    </object>
-                </object>
-            </object>
+  <object class="wxFrame" name="winUpdate">
+    <object class="wxPanel" name="Panel">
+      <style>wxSUNKEN_BORDER|wxTAB_TRAVERSAL</style>
+      <object class="wxFlexGridSizer">
+        <object class="sizeritem">
+          <object class="wxStaticText" name="TopText">
+            <label>Universe Download</label>
+            <font>
+              <size>14</size>
+              <weight>bold</weight>
+              <family>swiss</family>
+              <face>Sans</face>
+            </font>
+          </object>
+          <flag>wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL|wxADJUST_MINSIZE</flag>
+          <border>5</border>
         </object>
+        <object class="sizeritem">
+          <object class="wxTextCtrl" name="Message">
+            <size>-1, 135</size>
+            <style>wxDOUBLE_BORDER|wxTE_MULTILINE|wxTE_READONLY</style>
+          </object>
+          <option>1</option>
+          <flag>wxALL|wxGROW</flag>
+          <border>5</border>
+        </object>
+        <object class="sizeritem">
+          <object class="wxFlexGridSizer">
+            <object class="sizeritem">
+              <object class="wxBoxSizer">
+                <object class="sizeritem">
+                  <object class="wxStaticText" name="ConnectingTitle">
+                    <size>95, -1</size>
+                    <label>Connection</label>
+                    <style>wxALIGN_CENTRE</style>
+                  </object>
+                  <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
+                  <border>5</border>
+                </object>
+                <object class="sizeritem">
+                  <object class="wxGauge" name="ConnectingGauge">
+                    <range>100</range>
+                    <value>1</value>
+                    <style>wxGA_HORIZONTAL</style>
+                  </object>
+                  <option>1</option>
+                  <flag>wxALL|wxGROW</flag>
+                  <border>5</border>
+                </object>
+                <object class="sizeritem">
+                  <object class="wxStaticText" name="ConnectingText">
+                    <label>Done!</label>
+                  </object>
+                  <flag>wxALL|wxALIGN_CENTRE_VERTICAL|wxRESERVE_SPACE_EVEN_IF_HIDDEN</flag>
+                  <border>5</border>
+                </object>
+                <object class="sizeritem">
+                  <object class="wxGIFAnimationCtrl" name="ConnectingAnim">
+                    <size>32, 32</size>
+                  </object>
+                  <flag>wxALL|wxALIGN_CENTRE_VERTICAL|wxRESERVE_SPACE_EVEN_IF_HIDDEN</flag>
+                  <border>5</border>
+                </object>
+                <orient>wxHORIZONTAL</orient>
+              </object>
+              <option>1</option>
+              <flag>wxGROW</flag>
+              <border>5</border>
+            </object>
+            <object class="sizeritem">
+              <object class="wxBoxSizer">
+                <object class="sizeritem">
+                  <object class="wxStaticText" name="ProgressTitle">
+                    <size>95, -1</size>
+                    <label>Progress</label>
+                    <style>wxALIGN_CENTRE</style>
+                  </object>
+                  <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
+                  <border>5</border>
+                </object>
+                <object class="sizeritem">
+                  <object class="wxGauge" name="ProgressGauge">
+                    <range>100</range>
+                    <value>1</value>
+                    <style>wxGA_HORIZONTAL</style>
+                  </object>
+                  <option>1</option>
+                  <flag>wxALL|wxGROW|wxRESERVE_SPACE_EVEN_IF_HIDDEN</flag>
+                  <border>5</border>
+                </object>
+                <object class="sizeritem">
+                  <object class="wxStaticText" name="ProgressText">
+                    <label>Done!</label>
+                  </object>
+                  <flag>wxALL|wxALIGN_CENTRE_VERTICAL|wxRESERVE_SPACE_EVEN_IF_HIDDEN</flag>
+                  <border>5</border>
+                </object>
+                <object class="sizeritem">
+                  <object class="wxGIFAnimationCtrl" name="ProgressAnim">
+                    <size>32,32</size>
+                  </object>
+                  <flag>wxALL|wxALIGN_CENTRE_VERTICAL|wxRESERVE_SPACE_EVEN_IF_HIDDEN</flag>
+                  <border>5</border>
+                </object>
+                <orient>wxHORIZONTAL</orient>
+              </object>
+              <option>1</option>
+              <flag>wxGROW</flag>
+            </object>
+            <cols>1</cols>
+            <rows>2</rows>
+            <vgap>1</vgap>
+            <hgap>1</hgap>
+            <growablecols>0</growablecols>
+            <growablerows/>
+          </object>
+          <option>1</option>
+          <flag>wxGROW</flag>
+          <border>5</border>
+        </object>
+        <object class="spacer">
+          <size>5,5</size>
+          <flag>wxGROW|wxALL</flag>
+          <border>5</border>
+        </object>
+        <object class="sizeritem">
+          <object class="wxGridSizer">
+            <object class="sizeritem">
+              <flag>wxGROW|wxGROW|wxALL</flag>
+              <border>5</border>
+              <object class="wxBoxSizer">
+                <orient>wxVERTICAL</orient>
+                <object class="sizeritem">
+                  <flag>wxALIGN_CENTER_HORIZONTAL|wxALL</flag>
+                  <border>5</border>
+                  <object class="wxGIFAnimationCtrl" name="ObjectdescsAnim">
+                    <size>32,32</size>
+                  </object>
+                </object>
+                <object class="sizeritem">
+                  <flag>wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE</flag>
+                  <border>5</border>
+                  <object class="wxStaticText" name="wxID_STATIC">
+                    <label>Objects Descs</label>
+                  </object>
+                </object>
+              </object>
+            </object>
+            <object class="sizeritem">
+              <flag>wxGROW|wxGROW|wxALL</flag>
+              <border>5</border>
+              <object class="wxBoxSizer">
+                <orient>wxVERTICAL</orient>
+                <object class="sizeritem">
+                  <flag>wxALIGN_CENTER_HORIZONTAL|wxALL</flag>
+                  <border>5</border>
+                  <object class="wxGIFAnimationCtrl" name="OrderdescsAnim">
+                    <size>32,32</size>
+                  </object>
+                </object>
+                <object class="sizeritem">
+                  <flag>wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE</flag>
+                  <border>5</border>
+                  <object class="wxStaticText" name="wxID_STATIC">
+                    <label>Order Descs</label>
+                  </object>
+                </object>
+              </object>
+            </object>
+            <object class="sizeritem">
+              <flag>wxGROW|wxGROW|wxALL</flag>
+              <border>5</border>
+              <object class="wxBoxSizer">
+                <orient>wxVERTICAL</orient>
+                <object class="sizeritem">
+                  <flag>wxALIGN_CENTER_HORIZONTAL|wxALL</flag>
+                  <border>5</border>
+                  <object class="wxGIFAnimationCtrl" name="ObjectsAnim">
+                    <size>32,32</size>
+                  </object>
+                </object>
+                <object class="sizeritem">
+                  <flag>wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE</flag>
+                  <border>5</border>
+                  <object class="wxStaticText" name="wxID_STATIC">
+                    <label>Objects</label>
+                  </object>
+                </object>
+              </object>
+            </object>
+            <object class="sizeritem">
+              <flag>wxGROW|wxGROW|wxALL</flag>
+              <border>5</border>
+              <object class="wxBoxSizer">
+                <orient>wxVERTICAL</orient>
+                <object class="sizeritem">
+                  <flag>wxALIGN_CENTER_HORIZONTAL|wxALL</flag>
+                  <border>5</border>
+                  <object class="wxGIFAnimationCtrl" name="OrdersAnim">
+                    <size>32,32</size>
+                  </object>
+                </object>
+                <object class="sizeritem">
+                  <flag>wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE</flag>
+                  <border>5</border>
+                  <object class="wxStaticText" name="wxID_STATIC">
+                    <label>Orders</label>
+                  </object>
+                </object>
+              </object>
+            </object>
+            <object class="sizeritem">
+              <flag>wxGROW|wxGROW|wxALL</flag>
+              <border>5</border>
+              <object class="wxBoxSizer">
+                <orient>wxVERTICAL</orient>
+                <object class="sizeritem">
+                  <flag>wxALIGN_CENTER_HORIZONTAL|wxALL</flag>
+                  <border>5</border>
+                  <object class="wxGIFAnimationCtrl" name="BoardsAnim">
+                    <size>32,32</size>
+                  </object>
+                </object>
+                <object class="sizeritem">
+                  <flag>wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE</flag>
+                  <border>5</border>
+                  <object class="wxStaticText" name="wxID_STATIC">
+                    <label>Boards</label>
+                  </object>
+                </object>
+              </object>
+            </object>
+            <object class="sizeritem">
+              <flag>wxGROW|wxGROW|wxALL</flag>
+              <border>5</border>
+              <object class="wxBoxSizer">
+                <orient>wxVERTICAL</orient>
+                <object class="sizeritem">
+                  <flag>wxALIGN_CENTER_HORIZONTAL|wxALL</flag>
+                  <border>5</border>
+                  <object class="wxGIFAnimationCtrl" name="MessagesAnim">
+                    <size>32,32</size>
+                  </object>
+                </object>
+                <object class="sizeritem">
+                  <flag>wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE</flag>
+                  <border>5</border>
+                  <object class="wxStaticText" name="wxID_STATIC">
+                    <label>Messages</label>
+                  </object>
+                </object>
+              </object>
+            </object>
+            <object class="sizeritem">
+              <flag>wxGROW|wxGROW|wxALL</flag>
+              <border>5</border>
+              <object class="wxBoxSizer">
+                <orient>wxVERTICAL</orient>
+                <object class="sizeritem">
+                  <flag>wxALIGN_CENTER_HORIZONTAL|wxALL</flag>
+                  <border>5</border>
+                  <object class="wxGIFAnimationCtrl" name="CategoriesAnim">
+                    <size>32,32</size>
+                  </object>
+                </object>
+                <object class="sizeritem">
+                  <flag>wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE</flag>
+                  <border>5</border>
+                  <object class="wxStaticText" name="wxID_STATIC">
+                    <label>Categories</label>
+                  </object>
+                </object>
+              </object>
+            </object>
+            <object class="sizeritem">
+              <flag>wxGROW|wxGROW|wxALL</flag>
+              <border>5</border>
+              <object class="wxBoxSizer">
+                <orient>wxVERTICAL</orient>
+                <object class="sizeritem">
+                  <flag>wxALIGN_CENTER_HORIZONTAL|wxALL</flag>
+                  <border>5</border>
+                  <object class="wxGIFAnimationCtrl" name="DesignsAnim">
+                    <size>32,32</size>
+                  </object>
+                </object>
+                <object class="sizeritem">
+                  <flag>wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE</flag>
+                  <border>5</border>
+                  <object class="wxStaticText" name="wxID_STATIC">
+                    <label>Designs</label>
+                  </object>
+                </object>
+              </object>
+            </object>
+            <object class="sizeritem">
+              <flag>wxGROW|wxGROW|wxALL</flag>
+              <border>5</border>
+              <object class="wxBoxSizer">
+                <orient>wxVERTICAL</orient>
+                <object class="sizeritem">
+                  <flag>wxALIGN_CENTER_HORIZONTAL|wxALL</flag>
+                  <border>5</border>
+                  <object class="wxGIFAnimationCtrl" name="ComponentsAnim">
+                    <size>32,32</size>
+                  </object>
+                </object>
+                <object class="sizeritem">
+                  <flag>wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE</flag>
+                  <border>5</border>
+                  <object class="wxStaticText" name="wxID_STATIC">
+                    <label>Components</label>
+                  </object>
+                </object>
+              </object>
+            </object>
+            <object class="sizeritem">
+              <flag>wxGROW|wxGROW|wxALL</flag>
+              <border>5</border>
+              <object class="wxBoxSizer">
+                <orient>wxVERTICAL</orient>
+                <object class="sizeritem">
+                  <flag>wxALIGN_CENTER_HORIZONTAL|wxALL</flag>
+                  <border>5</border>
+                  <object class="wxGIFAnimationCtrl" name="PropertiesAnim">
+                    <size>32,32</size>
+                  </object>
+                </object>
+                <object class="sizeritem">
+                  <flag>wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE</flag>
+                  <border>5</border>
+                  <object class="wxStaticText" name="wxID_STATIC">
+                    <label>Properties</label>
+                  </object>
+                </object>
+              </object>
+            </object>
+            <object class="sizeritem">
+              <flag>wxGROW|wxGROW|wxALL</flag>
+              <border>5</border>
+              <object class="wxBoxSizer">
+                <orient>wxVERTICAL</orient>
+                <object class="sizeritem">
+                  <flag>wxALIGN_CENTER_HORIZONTAL|wxALL</flag>
+                  <border>5</border>
+                  <object class="wxGIFAnimationCtrl" name="PlayersAnim">
+                    <size>32,32</size>
+                  </object>
+                </object>
+                <object class="sizeritem">
+                  <flag>wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE</flag>
+                  <border>5</border>
+                  <object class="wxStaticText" name="wxID_STATIC">
+                    <label>Players</label>
+                  </object>
+                </object>
+              </object>
+            </object>
+            <object class="sizeritem">
+              <flag>wxGROW|wxGROW|wxALL</flag>
+              <border>5</border>
+              <object class="wxBoxSizer">
+                <orient>wxVERTICAL</orient>
+                <object class="sizeritem">
+                  <flag>wxALIGN_CENTER_HORIZONTAL|wxALL</flag>
+                  <border>5</border>
+                  <object class="wxGIFAnimationCtrl" name="ResourcesAnim">
+                    <size>32,32</size>
+                  </object>
+                </object>
+                <object class="sizeritem">
+                  <flag>wxALIGN_CENTER_HORIZONTAL|wxALL|wxADJUST_MINSIZE</flag>
+                  <border>5</border>
+                  <object class="wxStaticText" name="wxID_STATIC">
+                    <label>Resources</label>
+                  </object>
+                </object>
+              </object>
+            </object>
+            <cols>4</cols>
+            <rows>3</rows>
+            <vgap>0</vgap>
+            <hgap>0</hgap>
+          </object>
+          <flag>wxGROW|wxALIGN_CENTRE_VERTICAL|wxALIGN_CENTRE_HORIZONTAL</flag>
+          <border>5</border>
+        </object>
+        <object class="sizeritem">
+          <flag>wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+          <border>5</border>
+          <object class="wxBoxSizer">
+            <orient>wxHORIZONTAL</orient>
+            <object class="sizeritem">
+              <flag>wxALIGN_CENTER_VERTICAL|wxALL</flag>
+              <border>5</border>
+              <object class="wxButton" name="wxID_OK">
+                <tooltip>Continue to the main game window.</tooltip>
+                <label>&amp;OK</label>
+                <default>1</default>
+              </object>
+            </object>
+            <object class="sizeritem">
+              <flag>wxALIGN_CENTER_VERTICAL|wxALL</flag>
+              <border>5</border>
+              <object class="wxButton" name="wxID_SAVE">
+                <tooltip>Save a copy of the message box window to a file.</tooltip>
+                <label>&amp;Save</label>
+              </object>
+            </object>
+            <object class="sizeritem">
+              <flag>wxALIGN_CENTER_VERTICAL|wxALL</flag>
+              <border>5</border>
+              <object class="wxButton" name="wxID_CANCEL">
+                <tooltip>Cancel the current update and go back to the connect screen.</tooltip>
+                <label>&amp;Cancel</label>
+              </object>
+            </object>
+          </object>
+        </object>
+        <cols>1</cols>
+        <rows>6</rows>
+        <vgap>1</vgap>
+        <hgap>1</hgap>
+        <growablecols>0</growablecols>
+        <growablerows>1</growablerows>
+      </object>
     </object>
+    <size>550, 600</size>
+    <title>TP: Universe update</title>
+    <style>wxCAPTION|wxSYSTEM_MENU|wxRESIZE_BORDER|wxCLOSE_BOX</style>
+  </object>
 </resource>

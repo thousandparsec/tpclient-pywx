@@ -57,6 +57,7 @@ This is so that a the same XRC can be used for both MDI and non-MDI frames.
 		self.Panel = XRCCTRL(self, "Panel")
 		self.TopText = XRCCTRL(self, "TopText")
 		self.Message = XRCCTRL(self, "Message")
+		self.ConnectingTitle = XRCCTRL(self, "ConnectingTitle")
 		self.ConnectingGauge = XRCCTRL(self, "ConnectingGauge")
 		self.ConnectingText = XRCCTRL(self, "ConnectingText")
 		self.ConnectingAnim = XRCCTRL(self, "ConnectingAnim")
@@ -92,8 +93,8 @@ This is so that a the same XRC can be used for both MDI and non-MDI frames.
 
 def strings():
 	pass
-	_("TP: Universe update");
 	_("Universe Download");
+	_("Connection");
 	_("Done!");
 	_("Progress");
 	_("Done!");
@@ -115,3 +116,4 @@ def strings():
 	_("&Save");
 	_("Cancel the current update and go back to the connect screen.");
 	_("&Cancel");
+	_("TP: Universe update");
