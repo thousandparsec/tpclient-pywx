@@ -210,7 +210,8 @@ class winMain(winBase):
 		# Get the details from there children
 		for window in self.children.values():
 			try:
-				self.config[window.title] = window.ConfigSave()
+				if hasattr(window, "ConfigSave"):
+				        self.config[window.title] = window.ConfigSave()
 			except Exception, e:
 				print e
 
