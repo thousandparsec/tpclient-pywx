@@ -159,6 +159,7 @@ class panelMessage(panelMessageBase, ShiftMixIn):
 
 		self.application.gui.Binder(self.application.CacheClass.CacheUpdateEvent, self.OnCacheUpdate)
 		self.Layout()
+		self.Show()
 
 	def OnLinkEvent(self, evt):
 		link = evt.GetLinkInfo().GetHref()
