@@ -284,7 +284,7 @@ class winMain(winBase):
 			app.Bind(wx.EVT_UPDATE_UI, source.OnMenuWindowUpdate, id=id)
 
 		win.AppendSeparator()
-		win.Append(ID_WIN_TIPS, _("Show Tips"), "", True )
+		win.Append(ID_WIN_TIPS, _("Show Tips"), "", False )
 
 		# Panels Menu
 		panels_menu = wx.Menu()
