@@ -248,7 +248,7 @@ class winMain(winBase):
 
 		# File Menu
 		file = wx.Menu()
-		file.Append( ID_OPEN, _("C&onnect to Game\tCtrl-O"),       _("Connect to a diffrent Game") )
+		file.Append( ID_OPEN, _("C&onnect to Game\tCtrl-O"),       _("Connect to a different Game") )
 		file.Append( ID_UNIV, _("Download the &Universe\tCtrl-U"), _("Download the Universe") )
 		file.Append( ID_TURN, _("Request End of &Turn\tCtrl-T"),   _("Send a message to the server requesting the turn end soon.") )
 		file.AppendSeparator()
