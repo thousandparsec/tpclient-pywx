@@ -118,9 +118,6 @@ class panelStarMap(panelStarMapBase, TrackerObjectOrder):
 		self.FindPopup.SetSize(pf.GetBestSize())
 
 		self.Bind(wx.EVT_SIZE, self.OnSize)
-				
-		self.Home.Bind(wx.EVT_BUTTON, self.OnHome)
-		self.Find.Bind(wx.EVT_BUTTON, self.OnFind)
 
 		# Populate the overlay chooser
 		self.Overlay = None
