@@ -2649,7 +2649,7 @@ class FloatCanvas(wx.Panel):
         if self.GUIMode is not None:
             self.GUIMode.UpdateScreen()
 
-        if self.Debug: print "Drawing took %f seconds of CPU time"%(clock()-start)
+        if self.Debug: print "Drawing the map took %f seconds of CPU time"%(clock()-start)
 
         ## Clear the font cache. If you don't do this, the X font server
         ## starts to take up Massive amounts of memory This is mostly a

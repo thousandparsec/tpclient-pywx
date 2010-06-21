@@ -165,12 +165,10 @@ class panelStarMap(panelStarMapBase, TrackerObjectOrder):
 		self.SetFocusIgnoringChildren()
 
 	def OnMouseEnter(self, evt):
-		print "OnMouseEnter!", evt
 		# FIXME: Should make sure we gain the keyboard focus
 		self.SetFocusIgnoringChildren()
 
 	def OnMouseLeave(self, evt):
-#		print "OnMouseLeave!", evt
 		# FIXME: Put the keyboard focus back where it was
 		pass
 

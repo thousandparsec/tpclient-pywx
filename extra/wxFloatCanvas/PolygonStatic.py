@@ -22,7 +22,6 @@ class PolygonStatic(Polygon, XYObjectMixin):
 		self.Offset.shape = (2,) # Make sure it is a length 2 vector
 
 	def _Draw(self, dc , WorldToPixel, ScaleWorldToPixel = None, HTdc=None):
-		print "Drawing Arrow!"
 		Points = self.Points + self.Offset + WorldToPixel(self.XY)
 
 		dc.SetPen(self.Pen)

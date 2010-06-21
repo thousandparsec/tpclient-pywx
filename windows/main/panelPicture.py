@@ -137,18 +137,13 @@ class panelPicture(panelPictureBase, FileTrackerMixin):
 		self.Static.SetBackgroundColour(background)
 		self.Animation.SetBackgroundColour(background)
 
-		print "Displaying", file
+		print "Displaying image ", file
 		if file.endswith(".gif"):
-			print "Animated image!"
-			self.Static.Hide()
-			print "Showing the Image"	
+			self.Static.Hide()	
 			self.Animation.Show()
-			print "Loading Image"
 			self.Animation.LoadFile(file)
-			print "Playing the Image"
 			self.Animation.Play()
 		else:
-			print "Still image!"
 			self.Static.Show()
 			self.Animation.Stop()
 			self.Animation.Hide()
