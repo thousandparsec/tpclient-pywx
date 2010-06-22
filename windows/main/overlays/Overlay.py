@@ -248,6 +248,10 @@ from extra.StateTracker import TrackerObject
 class SystemLevelOverlay(Overlay, TrackerObject):
 	"""
 	A SystemLevelOverlay groups objects together at the Systems level.
+
+	* Top Level objects are represented by empty lists.
+	* System objects are represented as icon objects.
+	* Other objects are not represented as they are drawn as part of their parent object.
 	"""
 	TopLevel = [] #Galaxy, Universe
 
@@ -272,13 +276,16 @@ class SystemLevelOverlay(Overlay, TrackerObject):
 		TrackerObject.__init__(self)
 
 	def CleanUp(self):
+		"""
+		Remove this overlay from the Canvas.
+		"""
 		if self.Hovering != None:
 			self.SystemLeave(self.Hovering)
 		Overlay.CleanUp(self)
 
 	def UpdateOne(self, oid):
-		"""\
-
+		"""
+		Update an object in the Overlay.
 		"""
 		obj = self.cache.objects[oid]
 
@@ -287,9 +294,8 @@ class SystemLevelOverlay(Overlay, TrackerObject):
 			self[oid] = []
 			return
 					
-		# Don't draw objects whose parents are not top level objects:
+		# Don't save key for sub-objects because they are drawn as part of systems:
 		if not objectutils.isTopLevel(self.cache, obj.parent):
-			self[oid] = []
 			return
 
 		icon = self.Icon(obj)
