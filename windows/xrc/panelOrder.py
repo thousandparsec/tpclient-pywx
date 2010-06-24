@@ -39,15 +39,15 @@ class panelOrderBase(wx.Panel):
 		if hasattr(self, "OnQueues"):
 			self.Queues.Bind(wx.EVT_CHOICE, self.OnQueues)
 
-		self.Orders = XRCCTRL(self, "Orders")
-		self.Possible = XRCCTRL(self, "Possible")
-		if hasattr(self, "OnPossible"):
-			self.Possible.Bind(wx.EVT_CHOICE, self.OnPossible)
-
 		self.New = XRCCTRL(self, "New")
 		if hasattr(self, "OnNew"):
 			self.Bind(wx.EVT_BUTTON, self.OnNew, self.New)
 
+		self.Possible = XRCCTRL(self, "Possible")
+		if hasattr(self, "OnPossible"):
+			self.Possible.Bind(wx.EVT_CHOICE, self.OnPossible)
+
+		self.Orders = XRCCTRL(self, "Orders")
 		self.DetailsParentPanel = XRCCTRL(self, "DetailsParentPanel")
 		self.ArgumentLine = XRCCTRL(self, "ArgumentLine")
 		self.DetailsBorderPanel = XRCCTRL(self, "DetailsBorderPanel")

@@ -35,8 +35,13 @@ class infoPosition3DBase(wx.Panel):
 
 		# Define variables for the controls
 		self.PositionLabel = XRCCTRL(self, "PositionLabel")
+		self.GotoPosition = XRCCTRL(self, "GotoPosition")
+		if hasattr(self, "OnGotoPosition"):
+			self.Bind(wx.EVT_BUTTON, self.OnGotoPosition, self.GotoPosition)
+
 
 
 def strings():
 	pass
 	_("(0, 0, 0)");
+	_("Zoom To Here");

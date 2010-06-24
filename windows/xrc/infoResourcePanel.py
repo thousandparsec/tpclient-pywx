@@ -48,4 +48,4 @@ def strings():
 	_("LABEL");
 	_("Stored: ");
 	_("Minable: ");
-	_("Inaccessible: ");
+	_("Inacc.: ");

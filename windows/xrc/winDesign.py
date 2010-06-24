@@ -112,7 +112,6 @@ This is so that a the same XRC can be used for both MDI and non-MDI frames.
 
 def strings():
 	pass
-	_("Design");
 	_("Title");
 	_("Title");
 	_("0000");
@@ -129,3 +128,4 @@ def strings():
 	_("Save");
 	_("Add");
 	_("Add Many");
+	_("Design");
