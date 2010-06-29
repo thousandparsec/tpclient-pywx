@@ -487,8 +487,13 @@ class Systems(SystemLevelOverlay, TrackerObjectOrder):
 
 			color = icon.Colorizer(FindOwners(self.cache, cobj))
 
+			# Tabulate non-systems
+			if not objectutils.isTopLevel(self.cache, cobj.parent):
+				s += "  "
+				
 			s += "<font style='%s' color='%s'>%s" % (style, color, cobj.name)
-						
+
+			# Add text about ships
 			for propertygroup in cobj.properties:
 				positionattrsstruct = getattr(cobj, propertygroup.name)
 				if not hasattr(positionattrsstruct, 'Ship List'):
@@ -502,13 +507,13 @@ class Systems(SystemLevelOverlay, TrackerObjectOrder):
 					shipcount = shiplist[2]
 					if reftype == GenericRS.Types["Design"]:
 						try:
-							s+= "\n  %s %ss" % (shipcount, self.cache.designs[shipid].name)
+							s += "\n    %s %ss" % (shipcount, self.cache.designs[shipid].name)
 						except KeyError:
-							s+= "\n  %s %ss" % (shipcount, "Unknown Ships")
+							s += "\n  %s %ss" % (shipcount, "Unknown Ships")
 					elif reftype == GenericRS.Types["Object"]:
-						s+= "\n  %s %ss" % (shipcount, self.cache.objects[shipid].name)
+						s += "\n  %s %ss" % (shipcount, self.cache.objects[shipid].name)
 					else:
-						s+= "\n  %s %ss" % (shipcount, "Unknown Ships")
+						s += "\n  %s %ss" % (shipcount, "Unknown Ships")
 
 			s += "</font>\n"
 
