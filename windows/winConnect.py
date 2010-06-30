@@ -803,6 +803,10 @@ class winConnect(winConnectBase, winBaseXRC, usernameMixIn):
 					continue
 				self.SetFromConfig(key)
 				autoconnect = True
+			
+			# Set the last tried server if there's a valid one
+			if len(self.config['last_server']) > 0 and self.config['last_server'] in self.config['servers']:
+				autoconnect = self.SetFromConfig(self.config['last_server'])
 
 			# Is it still empty?
 			if len(self.Server.GetValue()) == 0 and len(self.config['servers']) > 0:
@@ -824,6 +828,10 @@ class winConnect(winConnectBase, winBaseXRC, usernameMixIn):
 		password = self.Password.GetValue()
 		if server == "" or username == "":
 			return
+
+		# Save info about a connection attempt
+		self.config['last_server'] = server
+		self.application.ConfigSave()
 
 		# Check if this server exists in the config
 		if server in self.config['servers']:
@@ -934,6 +942,14 @@ Could not start single player game. Please check the console log for more inform
 
 		except (ValueError, KeyError), e:
 			config['servers'] = ["demo1.thousandparsec.net", "demo2.thousandparsec.net", "127.0.0.1"]
+
+		#check the last selected server
+		try:
+			if not isinstance(config['last_server'], (str, unicode)):
+				raise ValueError('Config-%s: the last server is not set' % self)
+			
+		except (ValueError, KeyError), e:
+			config['last_server'] = ""
 
 		try:
 			if not isinstance(config['details'], dict):
