@@ -263,7 +263,7 @@ class SystemLevelOverlay(Overlay, TrackerObject):
 		self.Timer = wx.Timer()
 		self.Timer.Bind(wx.EVT_TIMER, self.SystemHovering)
 
-		self.pictureframe = wx.Frame(self.parent, style=wx.SIMPLE_BORDER)
+		self.pictureframe = wx.Frame(self.parent, style=wx.SIMPLE_BORDER | wx.FRAME_NO_TASKBAR)
 		self.picture = panelPicture(self.application, self.pictureframe)
 		self.pictureframe.SetSize(self.picture.GetBestSize())
 
