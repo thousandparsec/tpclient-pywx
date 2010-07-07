@@ -331,6 +331,7 @@ class SystemLevelOverlay(Overlay, TrackerObject):
 		Simulates this as a mouse click.
 		"""
 		if oid == None:
+			self.Selected = None
 			return
 
 		# Figure out which Icon this object is under
@@ -339,12 +340,14 @@ class SystemLevelOverlay(Overlay, TrackerObject):
 			try:
 				parentid = self.cache.objects[parentid].parent
 			except AttributeError:
+				self.Selected = None
 				return
 
 		system = self.cache.objects[parentid]
 		real   = self.cache.objects[oid]
 
 		if self[system.id] == []:
+			self.Selected = None
 			return
 		
 		icon = self[system.id].copy()
@@ -352,7 +355,7 @@ class SystemLevelOverlay(Overlay, TrackerObject):
 		self.Selected = icon
 
 		self.ObjectLeftClick(icon, real)
-		#self.SystemEnter(self.Selected)
+		return
 
 	def SystemRightClick(self, icon):
 		# Leave the currently hovered system
@@ -498,7 +501,7 @@ class SystemLevelOverlay(Overlay, TrackerObject):
 
 		Return None to prevent the popup.
 		"""
-		pass	
+		pass
 
 import wx
 from wx.lib.fancytext import StaticFancyText

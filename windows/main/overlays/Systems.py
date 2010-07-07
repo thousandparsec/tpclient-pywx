@@ -261,6 +261,8 @@ class Systems(SystemLevelOverlay, TrackerObjectOrder):
 		self['preview-arrow'] = PolygonArrow((0,0), "#555555", True)
 		self['preview-arrow'].Hide()
 		self['selected-arrow'] = PolygonArrow((0,0), "Red", True)
+		if self.Selected is None:
+			self['selected-arrow'].Hide()
 
 	def Icon(self, obj):
 		if objectutils.isFleet(self.cache, obj.id):
@@ -275,6 +277,7 @@ class Systems(SystemLevelOverlay, TrackerObjectOrder):
 		i = icon.index(object)
 		if i > 0:
 			arrow.SetOffset(icon.ChildOffset(i-1))
+		arrow.Show()
 
 	def ObjectLeftClick(self, icon, obj, samesystem=False):
 		"""
@@ -433,6 +436,18 @@ class Systems(SystemLevelOverlay, TrackerObjectOrder):
 		
 	def OnContextMenuClose(self, evt):
 		pass
+
+	def ObjectSelect(self, oid):
+		"""
+		Called on object selection by external event.
+		"""
+		SystemLevelOverlay.ObjectSelect(self, oid)
+		if self.Selected is not None:
+			self['selected-arrow'].Show()
+		else:
+			self['selected-arrow'].Hide()
+
+		self.canvas.Draw()
 
 	def ObjectHoverEnter(self, icon, pos):
 		"""
