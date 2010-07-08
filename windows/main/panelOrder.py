@@ -170,32 +170,30 @@ class panelOrder(panelOrderBase, TrackerObject, TrackerOrder):
 			self.Master.Hide()
 			return
 
-		# Check the object exists
-		object = self.application.cache.objects[self.oid]
-
 		# Do the clean up first
 		self.Orders.DeleteAllItems()
 		self.Possible.Clear()
+		self.Queues.Clear()
 
-		if len(objectutils.getOrderTypes(self.application.cache, object.id)) <= 0:
-			# No orders and no possible orders on this object!
-			self.Master.Hide()
-		else:
+		# Get objects, its queues and possible order types
+		object = self.application.cache.objects[self.oid]
+		orderqueuelist = objectutils.getOrderQueueList(self.application.cache, object.id)
+		ordertypes = objectutils.getOrderTypes(self.application.cache, object.id)
+
+		# Display queues with possible order types or with existing orders
+		for itemname, itemid in orderqueuelist:
+			if len(ordertypes[itemid]) > 0 or len(self.application.cache.orders[itemid]) > 0:
+				self.Queues.Append(itemname, itemid)
+
+		if self.Queues.GetCount() > 0:
 			self.Master.Show()
 			self.Master.Layout()
 			self.Master.Update()
-
-		self.Orders.SetToolTipDefault(_("Current orders on %s.") % object.name)
-		
-		orderqueuelist = objectutils.getOrderQueueList(self.application.cache, object.id)
-		if len(orderqueuelist) <= 0:
+		else:
+			# No possible orders on this object
 			self.Master.Hide()
 			return
-		
-		self.Queues.Clear()
-		for itemname, itemid in orderqueuelist:
-			self.Queues.Append(itemname, itemid)
-		
+
 		self.Queues.Select(0)
 		
 		self.OrderQueueSelect(self.Queues.GetClientData(self.Queues.GetSelection()))
