@@ -14,6 +14,7 @@ from extra.wxFloatCanvas.PolygonStatic import PolygonArrow, PolygonShip
 
 # tp imports
 from tp.netlib.objects import constants
+from tp.netlib.objects.parameters import OrderParamAbsSpaceCoords, OrderParamObject
 from tp.netlib.objects                        import Object, OrderDescs
 #from tp.netlib.objects.ObjectExtra.Universe   import Universe
 #from tp.netlib.objects.ObjectExtra.Galaxy     import Galaxy
@@ -360,74 +361,106 @@ class Systems(SystemLevelOverlay, TrackerObjectOrder):
 		"""
 		self.menumap = {}
 
-		orders = []
-		if not self.oid is None:
-			obj = self.cache.objects[self.oid]
-
-			for id in obj.order_types:
-				orderdesc = OrderDescs()[id]
-
-				if len(orderdesc.names) != 1:
-					continue
-
-				argument_name, subtype = orderdesc.names[0]
-				if subtype == constants.ARG_ABS_COORD:
-					def s(to, what=obj, how=orderdesc):
-						print "order what: %r to: %r (%r) how: %r" % (what, to, to.pos, how)
-
-						neworder = how(0, what.id, -1, how.subtype, 0, [], to.pos)
-						neworder._dirty = True
-
-						self.InsertAfterOrder(neworder)
-					moveorder = s
-
-				elif subtype == constants.ARG_OBJECT:
-					def s(to, what=obj, how=orderdesc):
-						print "order what: %r to: %r how: %r" % (what, to, how)
-						neworder = how(0, what.id, -1, how.subtype, 0, [], to.id)
-						neworder._dirty = True
-
-						self.InsertAfterOrder(neworder)
-					moveorder = s
-				else:
-					continue
-
-				orders.append((orderdesc._name, moveorder))
-
+		# Create popup menu with objects from clicked icon
 		menu = wx.Menu()
 		for obj in icon:
 			id = wx.NewId()
 
-			def s(evt, obj=obj):
+			# A callback function for a menu item
+			def ObjectItemSelected(evt, obj=obj):
 				self.SelectObject(obj.id)
-			self.menumap[id] = s
 
-			if obj == hover:
-				menu.AppendCheckItem(id, obj.name)
-				menu.Check(id, True)
+			self.menumap[id] = ObjectItemSelected
+
+			if obj != hover:
+				menu.Append(id, obj.name, "Select previewed %s" % obj.name)
 			else:
-				menu.Append(id, obj.name)
+				menu.AppendCheckItem(id, obj.name, "Select %s" % obj.name)
+				menu.Check(id, True)
 
-		if len(orders) > 0:
+
+		# This function returns list of tuples (order description, callback function)
+		def MenuOrders():
+			orders = []
+
+			# Find possible orders for the currently selected (not clicked) object
+			if self.oid is None:
+				return orders
+
+			queuelist = objectutils.getOrderQueueList(self.cache, self.oid)
+			ordertypes = objectutils.getOrderTypes(self.cache, self.oid)
+
+			# Find possible order types in all order queues
+			for queuename, queueid in queuelist:
+				for typeid in ordertypes[queueid]:
+					orderdesc = OrderDescs()[typeid]
+
+					# An order should have absolute coordinates
+					# or another object as a single parameter
+					properties = orderdesc.properties
+					if len(properties) != 1:
+						continue
+
+					if isinstance(properties[0], OrderParamAbsSpaceCoords):
+						# A callback function for a menu item with abs. coordinates order parameter
+						def AbsCoordsOrderItemSelected(toobject, toqueueid=queueid, how=orderdesc):
+							# Compose arguments list for Order
+							# FIXME Handle multiple positions somehow
+							positions = objectutils.getPositionList(toobject)
+
+							if len(positions) <= 0:
+								raise TypeError("Object must have at least one position: %r" % toobject)
+
+							coords = [positions[0][:3]]
+							args = [-1, toqueueid, -1, how.subtype, 0, [], coords]
+
+							neworder = how(*args)
+							neworder._dirty = True
+							self.InsertAfterOrder(neworder)
+
+						callback = AbsCoordsOrderItemSelected
+
+					elif isinstance(properties[0],OrderParamObject):
+						# A callback function for a menu item with object order parameter
+						def ObjectOrderItemSelected(toobject, toqueueid=queueid, how=orderdesc):
+							# Compose arguments list for Order
+							args = [-1, toqueueid, -1, how.subtype, 0, [], toobject.id]
+							
+							neworder = how(*args)
+							neworder._dirty = True
+
+							self.InsertAfterOrder(neworder)
+						
+						callback = ObjectOrderItemSelected
+					else:
+						continue
+
+					orders.append((orderdesc._name, callback))
+
+			return orders
+
+		orders = MenuOrders()
+
+		# Add found orders to menu if they exist
+		if len(orders) > 0 and self.Selected != None:
 			for name, order in orders:
 				submenu = wx.Menu()
 
 				for obj in icon:
 					id = wx.NewId()
 
-					def s(evt, obj=obj, order=order):
+					def OrderItemSelected(evt, obj=obj, order=order):
 						order(obj)
 
-					self.menumap[id] = s
+					self.menumap[id] = OrderItemSelected
 					submenu.Append(id, "to %s" % obj.name)
 
 				menu.AppendSeparator()
 				menu.AppendMenu(wx.NewId(), "%s %s" % (name ,self.Selected.current.name), submenu)	
 
-		self.parent.Bind(wx.EVT_MENU, 		self.OnContextMenu)
+		self.parent.Bind(wx.EVT_MENU, self.OnContextMenu)
 		self.parent.Bind(wx.EVT_MENU_CLOSE, self.OnContextMenuClose)
 
-		#pos	= self.canvas.WorldToPixel(icon.XY)
 		self.parent.PopupMenu(menu)
 		self.menumap = None
 
