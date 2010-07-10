@@ -433,7 +433,7 @@ class panelOrder(panelOrderBase, TrackerObject, TrackerOrder):
 		orderdesc = objects.OrderDescs()[type]
 
 		# sequence, id, slot, type, turns, resources
-		args = [0, self.oid, -1, type, 0, []]
+		args = [-1, self.qid, -1, type, 0, []]
 		for property in orderdesc.properties:
 			# FIXME: These could probably be made into better functions that create 
 			# more reasonable initial values.
