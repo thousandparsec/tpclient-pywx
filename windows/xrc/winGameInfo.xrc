@@ -1,0 +1,163 @@
+<?xml version="1.0" ?>
+<resource>
+  <object class="wxFrame" name="winGameInfo">
+    <object class="wxPanel" name="Panel">
+      <object class="wxBoxSizer">
+        <orient>wxVERTICAL</orient>
+        <object class="sizeritem">
+          <object class="wxFlexGridSizer">
+            <object class="sizeritem">
+              <object class="wxStaticText">
+                <label>Server Info</label>
+                <font>
+                  <size>14</size>
+                  <style>normal</style>
+                  <weight>bold</weight>
+                  <underlined>0</underlined>
+                  <family>swiss</family>
+                  <face>Sans</face>
+                  <encoding>UTF-8</encoding>
+                </font>
+              </object>
+              <flag>wxALL</flag>
+              <border>10</border>
+            </object>
+            <object class="spacer"/>
+            <object class="sizeritem">
+              <object class="wxStaticText">
+                <label>Server URL</label>
+              </object>
+              <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+              <border>5</border>
+            </object>
+            <object class="sizeritem">
+              <object class="wxTextCtrl" name="ServerUrlTextCtrl">
+                <style>wxTE_READONLY</style>
+              </object>
+              <flag>wxALL|wxEXPAND</flag>
+              <border>5</border>
+            </object>
+            <object class="sizeritem">
+              <object class="wxStaticText">
+                <label>Server version</label>
+              </object>
+              <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+              <border>5</border>
+            </object>
+            <object class="sizeritem">
+              <object class="wxTextCtrl" name="ServerVersionTextCtrl">
+                <style>wxTE_READONLY</style>
+              </object>
+              <flag>wxALL|wxEXPAND</flag>
+              <border>5</border>
+            </object>
+            <object class="sizeritem">
+              <object class="wxStaticText">
+                <label>Admin email</label>
+              </object>
+              <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+              <border>5</border>
+            </object>
+            <object class="sizeritem">
+              <object class="wxTextCtrl" name="AdminEmailTextCtrl">
+                <style>wxTE_READONLY</style>
+              </object>
+              <flag>wxALL|wxEXPAND</flag>
+              <border>5</border>
+            </object>
+            <object class="sizeritem">
+              <object class="wxStaticText">
+                <label>Game info</label>
+                <font>
+                  <size>14</size>
+                  <style>normal</style>
+                  <weight>bold</weight>
+                  <underlined>0</underlined>
+                  <family>swiss</family>
+                  <face>Sans</face>
+                  <encoding>UTF-8</encoding>
+                </font>
+              </object>
+              <flag>wxALL</flag>
+              <border>10</border>
+            </object>
+            <object class="spacer"/>
+            <object class="sizeritem">
+              <object class="wxStaticText">
+                <label>Game</label>
+              </object>
+              <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+              <border>5</border>
+            </object>
+            <object class="sizeritem">
+              <object class="wxTextCtrl" name="GameTextCtrl">
+                <style>wxTE_READONLY</style>
+              </object>
+              <flag>wxALL|wxEXPAND</flag>
+              <border>5</border>
+            </object>
+            <object class="sizeritem">
+              <object class="wxStaticText">
+                <label>Ruleset</label>
+              </object>
+              <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+              <border>5</border>
+            </object>
+            <object class="sizeritem">
+              <object class="wxTextCtrl" name="RulesetTextCtrl">
+                <style>wxTE_READONLY</style>
+              </object>
+              <flag>wxALL|wxEXPAND</flag>
+              <border>5</border>
+            </object>
+            <object class="sizeritem">
+              <object class="wxStaticText">
+                <label>Number of players</label>
+              </object>
+              <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+              <border>5</border>
+            </object>
+            <object class="sizeritem">
+              <object class="wxTextCtrl" name="PlayersNumberTextCtrl">
+                <style>wxTE_READONLY</style>
+              </object>
+              <flag>wxALL|wxEXPAND</flag>
+              <border>5</border>
+            </object>
+            <object class="sizeritem">
+              <object class="wxStaticText">
+                <label>Your username</label>
+              </object>
+              <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+              <border>5</border>
+            </object>
+            <object class="sizeritem">
+              <object class="wxTextCtrl" name="PlayerNameTextCtrl">
+                <style>wxTE_READONLY</style>
+              </object>
+              <flag>wxALL|wxEXPAND</flag>
+              <border>5</border>
+            </object>
+            <cols>2</cols>
+            <rows>3</rows>
+            <growablecols>1</growablecols>
+            <growablerows></growablerows>
+          </object>
+          <option>1</option>
+          <flag>wxEXPAND</flag>
+        </object>
+        <object class="sizeritem">
+          <object class="wxButton" name="Okay">
+            <label>OK</label>
+          </object>
+          <flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTRE_VERTICAL</flag>
+          <border>5</border>
+        </object>
+      </object>
+      <size>300, 200</size>
+    </object>
+    <title>Game Info</title>
+    <centered>1</centered>
+    <style>wxDEFAULT_FRAME_STYLE</style>
+  </object>
+</resource>
