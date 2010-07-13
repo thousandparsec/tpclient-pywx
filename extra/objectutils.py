@@ -5,6 +5,7 @@ from tp.netlib.objects			  			  import Structures
 from tp.netlib.objects						  import parameters
 from tp.netlib import objects
 from tp.netlib import GenericRS
+#from tp.netlib.objects import OrderDescs
 
 def getPositionList(obj):
 	"""
@@ -83,6 +84,25 @@ def isFleet(cache, oid):
 		if hasattr(positionattrsstruct, 'Ship List'):
 			return True
 	
+	return False
+
+
+def canObjectMove(cache, oid):
+	ordertypes = getOrderTypes(cache, oid)
+	# Check if this object can move so we can enable waypoint mode
+	for queueid, typelist in ordertypes.items():
+		for otype in typelist:
+			order = objects.OrderDescs()[otype]
+
+			# FIXME: Needs to be a better way to do this... what if there's an order
+			# type where the object can't move but it can place or throw something to
+			# a specific point? Then the order will have coordinates, and this will
+			# give a false positive, enabling the waypoint button.
+			for property in order.properties:
+				if type(property) == parameters.OrderParamAbsSpaceCoords \
+					or type(property) == parameters.OrderParamRelSpaceCoords:
+					return True
+
 	return False
 
 def hasResources(cache, oid):
