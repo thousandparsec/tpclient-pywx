@@ -113,7 +113,7 @@ class PathSegment(Group):
 
 			start = self.previous.endat
 		elif isinstance(previous, Object):
-			start = self.previous.pos[0:2]		
+			start = self.previous.Positional.Position.vector[0:2]
 		else:
 			raise TypeError("The previous item must either be an Object or another PathSegment")
 
