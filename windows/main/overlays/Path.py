@@ -37,40 +37,25 @@ def FindPath(cache, obj):
 	# Note: Should probably do something about objects with multiple positions here?
 	if positions == []:
 		raise TypeError("Object must have at least one position: %r" % obj)
+
 	locations = [(-1, positions[0][:3])]
-	
-	if cache.orders.has_key(obj.id):
-		for listpos, node in enumerate(cache.orders[obj.id]):
+	orderqueues = objectutils.getOrderQueueList(cache, obj.id)
+
+	# FIXME: Need correct way to handle all order queues
+	for queuename, queueid in orderqueues:
+		for listpos, node in enumerate(cache.orders[queueid]):
 			order = node.CurrentOrder
-	
 			# FIXME: Needs to be a better way to do this...
-			orderdesc = OrderDescs()[order._subtype]
-			print order._subtype
 			for property in order.properties:
 				if isinstance(property, parameters.OrderParamAbsSpaceCoords):
 					coordinates = getattr(order, property.name).coordinates
 					locations.append((node, (coordinates.x, coordinates.y, coordinates.z)))
 				elif isinstance(property, parameters.OrderParamObject):
 					pointedobject = cache.objects[getattr(order, property.name).objectid]
-					positions = objectutils.getPositionList[pointedobject]
+					positions = objectutils.getPositionList(pointedobject)
 					if len(positions) > 0:
 						# FIXME: Do something about multiple positions?
 						locations.append((node, positions[0]))
-				
-#			if len(orderdesc.names) != 1:
-#				continue
-#	
-#			argument_name, subtype = orderdesc.names[0]
-#			if subtype == constants.ARG_ABS_COORD:
-#				locations.append((node, getattr(order, argument_name)))
-#			elif subtype == constants.ARG_OBJECT:
-#				positionslist = getPositionList(cache.objects[getattr(order, argument_name)])
-#				
-#				if positionslist == []:
-#					raise TypeError("Could not find position for object referenced by order: %r" % cache.objects[getattr(order, argument_name)])
-#					continue
-#					
-#				locations.append((node, positionslist[0]))
 
 	if len(locations) == 1:
 		return None
