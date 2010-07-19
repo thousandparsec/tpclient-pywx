@@ -1004,6 +1004,13 @@ class PositionArgumentPanel(ArgumentPanel, orderPositionBase):
 		self.X.SetValue(unicode(evt[0]))
 		self.Y.SetValue(unicode(evt[1]))
 		self.Z.SetValue(unicode(evt[2]))
+
+		# Go back to selection mode
+		from windows.main.panelStarMap import panelStarMap
+		starmap = self.application.gui.main.panels[panelStarMap.title]
+		starmap.SetMode(starmap.GUISelect)
+
+		# Remove selection handler
 		delattr(self.application.gui.main.panels[panelOrder.title], "OnSelectPosition")
 
 	def OnLocate(self, evt):
@@ -1027,6 +1034,13 @@ class RelativePositionArgumentPanel(ArgumentPanel, orderRelPositionBase):
 		self.X.SetValue(unicode(evt[0]))
 		self.Y.SetValue(unicode(evt[1]))
 		self.Z.SetValue(unicode(evt[2]))
+
+		# Go back to selection mode
+		from windows.main.panelStarMap import panelStarMap
+		starmap = self.application.gui.main.panels[panelStarMap.title]
+		starmap.SetMode(starmap.GUISelect)
+
+		# Remove selection handler
 		delattr(self.application.gui.main.panels[panelOrder.title], "OnSelectPosition")
 
 	def OnLocate(self, evt):
