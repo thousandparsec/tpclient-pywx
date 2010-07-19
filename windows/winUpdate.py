@@ -55,7 +55,8 @@ class winUpdate(winUpdateBase, winBaseXRC):
 
 	@onlyshown
 	@onlyenabled("Okay")
-	def OnOkay(self, evt):
+	def OnOkay(self, evt=None):
+		self.application.ConfigSave()
 		self.application.gui.Show(self.application.gui.main)
 		self.application.Post(self.application.cache.CacheUpdateEvent(None))
 
@@ -199,6 +200,10 @@ class winUpdate(winUpdateBase, winBaseXRC):
 			self.Save.Enable()
 			self.Cancel.Disable()
 
+			# Close automatically if checked
+			if self.AutoClose.IsChecked():
+				self.OnOkay()
+
 		else:	
 			animation = getattr(self, "%sAnim" % mode.title())
 
@@ -285,25 +290,32 @@ class winUpdate(winUpdateBase, winBaseXRC):
 		"""\
 		Fill out the config with defaults (if the options are not valid or nonexistant).
 		"""
-		return {}
+		if config is None:
+			config = {}
+		config["auto_close"] = True
+		return config
 
 	def ConfigSave(self):
 		"""\
 		Returns the configuration of the Window (and it's children).
 		"""
-		return {}
-	
+		self.ConfigUpdate()
+
+		self.ConfigLoad(self.config)
+		return self.config
+
 	def ConfigLoad(self, config={}):
 		"""\
 		Loads the configuration of the Window (and it's children).
 		"""
-		pass
+		self.config = config
+		self.ConfigDisplayUpdate(None)
 
 	def ConfigUpdate(self):
 		"""\
 		Updates the config details using external sources.
 		"""
-		pass
+		self.config["auto_close"] = self.AutoClose.IsChecked()
 
 	def ConfigDisplay(self, panel, sizer):
 		"""\
@@ -315,5 +327,8 @@ class winUpdate(winUpdateBase, winBaseXRC):
 		"""\
 		Update the Display because it's changed externally.
 		"""
+		if self.config.has_key("auto_close"):
+			self.AutoClose.SetValue(self.config["auto_close"])
+
 		pass
 

@@ -77,6 +77,10 @@ This is so that a the same XRC can be used for both MDI and non-MDI frames.
 		self.PropertiesAnim = XRCCTRL(self, "PropertiesAnim")
 		self.PlayersAnim = XRCCTRL(self, "PlayersAnim")
 		self.ResourcesAnim = XRCCTRL(self, "ResourcesAnim")
+		self.AutoClose = XRCCTRL(self, "AutoClose")
+		if hasattr(self, "OnAutoClose"):
+			self.Bind(wx.EVT_CHECKBOX, self.OnAutoClose, self.AutoClose)
+
 		self.Okay = XRCCTRL(self, "wxID_OK")
 		if hasattr(self, "OnOkay"):
 			self.Bind(wx.EVT_BUTTON, self.OnOkay, self.Okay)
@@ -110,10 +114,12 @@ def strings():
 	_("Properties");
 	_("Players");
 	_("Resources");
-	_("Continue to the main game window.");
+	_("Automatically close");
+	_("Check this to automatically close this window on successfull download.");
 	_("&OK");
-	_("Save a copy of the message box window to a file.");
+	_("Continue to the main game window.");
 	_("&Save");
-	_("Cancel the current update and go back to the connect screen.");
+	_("Save a copy of the message box window to a file.");
 	_("&Cancel");
+	_("Cancel the current update and go back to the connect screen.");
 	_("TP: Universe update");

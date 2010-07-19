@@ -387,44 +387,58 @@
           <flag>wxGROW|wxALIGN_CENTRE_VERTICAL|wxALIGN_CENTRE_HORIZONTAL</flag>
           <border>5</border>
         </object>
-        <object class="sizeritem">
-          <flag>wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxALL</flag>
-          <border>5</border>
-          <object class="wxBoxSizer">
-            <orient>wxHORIZONTAL</orient>
-            <object class="sizeritem">
-              <flag>wxALIGN_CENTER_VERTICAL|wxALL</flag>
-              <border>5</border>
-              <object class="wxButton" name="wxID_OK">
-                <tooltip>Continue to the main game window.</tooltip>
-                <label>&amp;OK</label>
-                <default>1</default>
-              </object>
-            </object>
-            <object class="sizeritem">
-              <flag>wxALIGN_CENTER_VERTICAL|wxALL</flag>
-              <border>5</border>
-              <object class="wxButton" name="wxID_SAVE">
-                <tooltip>Save a copy of the message box window to a file.</tooltip>
-                <label>&amp;Save</label>
-              </object>
-            </object>
-            <object class="sizeritem">
-              <flag>wxALIGN_CENTER_VERTICAL|wxALL</flag>
-              <border>5</border>
-              <object class="wxButton" name="wxID_CANCEL">
-                <tooltip>Cancel the current update and go back to the connect screen.</tooltip>
-                <label>&amp;Cancel</label>
-              </object>
-            </object>
-          </object>
-        </object>
         <cols>1</cols>
         <rows>6</rows>
         <vgap>1</vgap>
         <hgap>1</hgap>
         <growablecols>0</growablecols>
         <growablerows>1</growablerows>
+        <object class="sizeritem">
+          <object class="wxFlexGridSizer">
+            <object class="sizeritem">
+              <object class="wxCheckBox" name="AutoClose">
+                <label>Automatically close</label>
+                <tooltip>Check this to automatically close this window on successfull download.</tooltip>
+              </object>
+              <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
+              <border>5</border>
+            </object>
+            <object class="spacer">
+              <option>1</option>
+              <flag>wxEXPAND|wxGROW</flag>
+            </object>
+            <object class="sizeritem">
+              <object class="wxButton" name="wxID_OK">
+                <label>&amp;OK</label>
+                <default>1</default>
+                <tooltip>Continue to the main game window.</tooltip>
+              </object>
+              <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
+              <border>5</border>
+            </object>
+            <object class="sizeritem">
+              <object class="wxButton" name="wxID_SAVE">
+                <label>&amp;Save</label>
+                <tooltip>Save a copy of the message box window to a file.</tooltip>
+              </object>
+              <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
+              <border>5</border>
+            </object>
+            <object class="sizeritem">
+              <object class="wxButton" name="wxID_CANCEL">
+                <label>&amp;Cancel</label>
+                <tooltip>Cancel the current update and go back to the connect screen.</tooltip>
+              </object>
+              <flag>wxALL|wxALIGN_CENTRE_VERTICAL</flag>
+              <border>5</border>
+            </object>
+            <cols>5</cols>
+            <rows>1</rows>
+            <growablecols>1</growablecols>
+          </object>
+          <flag>wxALL|wxGROW</flag>
+          <border>5</border>
+        </object>
       </object>
     </object>
     <size>550, 600</size>
