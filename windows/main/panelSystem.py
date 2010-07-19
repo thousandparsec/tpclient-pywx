@@ -120,9 +120,23 @@ class panelSystem(panelSystemBase, TrackerObject, FileTrackerMixin):
 		on the given object's current order, and the total number of turns
 		allocated to all future scheduled orders.
 		"""
-		orders = self.application.cache.orders[object.id]
+
+		orderqueues = objectutils.getOrderQueueList(self.application.cache, object.id)
+		ordertypes = objectutils.getOrderTypes(self.application.cache, object.id)
+ 
+		# TODO Do something about multiple order queues
+		if len(orderqueues) <= 0:
+			return ""
+
+		# Take the first queue
+		queueid = orderqueues[0][1]
+		orders = self.application.cache.orders[queueid]
+
 		if len(orders) == 0:
-			return "#"
+			if len(ordertypes[queueid]) > 0:
+                                return "#"
+			else:
+                                return ""
 		elif len(orders) == 1:
 			return unicode(orders.first.CurrentOrder.turns)
 		else:
@@ -180,9 +194,11 @@ class panelSystem(panelSystemBase, TrackerObject, FileTrackerMixin):
 	def Add(self, parent, object, selected=None):
 		# Figure out the caption for this text...
 		caption = object.name
-		if object != None and hasattr(object, "order_types") and len(object.order_types) > 0:
-			caption += "  [" + self.ObjectTurnSummary(object) + "]"
-			
+		# Add turn summary if needed
+		turnsummary = self.ObjectTurnSummary(object)
+		if len(turnsummary) > 0:
+			caption += "  [%s]" % turnsummary
+
 		# Add the item
 		if parent is None:
 			if self.Filter == '*':
