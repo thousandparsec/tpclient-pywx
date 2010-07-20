@@ -4,7 +4,6 @@
     <object class="wxFlexGridSizer">
       <object class="sizeritem">
         <object class="wxStaticText" name="Title">
-          <label>Name of object goes here</label>
           <font>
             <size>10</size>
             <style>normal</style>

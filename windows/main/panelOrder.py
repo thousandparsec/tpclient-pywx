@@ -44,6 +44,8 @@ class panelOrder(panelOrderBase, TrackerObject, TrackerOrder):
 		TrackerObject.__init__(self)
 		TrackerOrder.__init__(self)
 
+		self.Master.Hide()
+
 		self.clipboard = None
 		self.ignore = False
 
@@ -188,7 +190,7 @@ class panelOrder(panelOrderBase, TrackerObject, TrackerOrder):
 		if self.Queues.GetCount() > 0:
 			self.Master.Show()
 			self.Master.Layout()
-			self.Master.Update()
+			self.Master.Refresh()
 		else:
 			# No possible orders on this object
 			self.Master.Hide()
