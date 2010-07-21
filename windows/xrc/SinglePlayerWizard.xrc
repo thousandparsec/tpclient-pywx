@@ -52,7 +52,7 @@
       </object>
       <vgap>5</vgap>
       <growablecols>1</growablecols>
-      <growablerows></growablerows>
+      <growablerows/>
     </object>
   </object>
   <object class="wxPanel" name="RulesetPage" subclass="wxWizardPage">
@@ -117,6 +117,7 @@
       <cols>1</cols>
       <vgap>5</vgap>
       <growablecols>1</growablecols>
+      <growablerows>4,5</growablerows>
     </object>
     <pos>0,0</pos>
     <size>400,299</size>
