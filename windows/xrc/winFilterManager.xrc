@@ -35,7 +35,6 @@
           <flag>wxALL|wxEXPAND|wxALIGN_CENTRE</flag>
         </object>
         <object class="spacer"/>
-        
         <object class="sizeritem">
           <object class="wxCheckBox" name="ShowFiltered">
             <label>Show filtered messages</label>
@@ -67,6 +66,6 @@
       </object>
       <size>300,300</size>
     </object>
-    <style>wxSIMPLE_BORDER</style>
+    <style>wxSIMPLE_BORDER|wxFRAME_TOOL_WINDOW</style>
   </object>
 </resource>
