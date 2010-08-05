@@ -255,7 +255,7 @@ class winMain(winBase):
 		file.Append( ID_UNIV, _("Download the &Universe\tCtrl-U"), _("Download the Universe") )
 		file.Append( ID_TURN, _("Request End of &Turn\tCtrl-T"),   _("Send a message to the server requesting the turn end soon.") )
 		file.AppendSeparator()
-		file.Append( wx.ID_PREFERENCES, _("&Preferences"), _("Configure the Client") )
+		file.Append( wx.ID_PREFERENCES, _("&Preferences\tCtrl-P"), _("Configure the Client") )
 		file.AppendSeparator()
 		file.Append( ID_EXIT, _("Exit"), _("Exit") )
 
