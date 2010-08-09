@@ -454,10 +454,12 @@ class FoldPanel(ArgumentPanel, FoldPanelBase, FileTrackerMixin):
 		elif isinstance(group, parameters.ObjectParamOrderQueue):
 			orderpanel = infoOrderQueue(item)
 			orderpanel.setQueueID(attr.queueid)
-			orderpanel.setNumOrders(attr.numorders)
+
+			queue = self.cache.orderqueues[attr.queueid]
+			orderpanel.setNumOrders(queue.numorders)
 			types = "["
-			if len(attr.ordertypes) > 0:
-				for ordertype in attr.ordertypes:
+			if len(queue.ordertypes) > 0:
+				for ordertype in queue.ordertypes:
 					types += "%s, " % objects.OrderDescs()[ordertype]._name
 				types = types[:-2]
 			types += "]"

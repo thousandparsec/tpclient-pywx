@@ -130,13 +130,14 @@ class panelSystem(panelSystemBase, TrackerObject, FileTrackerMixin):
 
 		# Take the first queue
 		queueid = orderqueues[0][1]
+	
 		orders = self.application.cache.orders[queueid]
 
 		if len(orders) == 0:
 			if len(ordertypes[queueid]) > 0:
-                                return "#"
+				return "#"
 			else:
-                                return ""
+				return ""
 		elif len(orders) == 1:
 			return unicode(orders.first.CurrentOrder.turns)
 		else:

@@ -158,7 +158,10 @@ class winUpdate(winUpdateBase, winBaseXRC):
 
 		# We do a little bit different for this mode
 		if mode == "connecting":
-			animation = getattr(self, "%sAnim" % mode.title())
+			try:
+				animation = getattr(self, "%sAnim" % mode.title())
+			except AttributeError:
+				return 
 
 			if state == "start":
 				# Start the connection throbber
@@ -204,8 +207,11 @@ class winUpdate(winUpdateBase, winBaseXRC):
 			if self.AutoClose.IsChecked():
 				self.OnOkay()
 
-		else:	
-			animation = getattr(self, "%sAnim" % mode.title())
+		else:
+			try:	
+				animation = getattr(self, "%sAnim" % mode.title())
+			except AttributeError:
+				return 
 
 			self.ProgressTitle.Show()
 			self.ProgressGauge.Show()
