@@ -124,7 +124,11 @@ class panelInformation(panelInformationBase):
 
 		self.DetailsSizer.Add( self.ArgumentsPanel, flag=wx.GROW|wx.EXPAND|wx.ALIGN_CENTER|wx.ALL)
 		
-		self.OnSize(None)
+		bestsize = self.FoldPanelBar.GetPanelsLength(True, True)
+		self.DetailsPanel.SetVirtualSize((bestsize[1]/2, bestsize[2]))
+		
+		self.DetailsPanel.Layout()
+		self.DetailsPanel.SetupScrolling(True, True)
 
 	def OnSize(self, evt):
 		bestsize = self.FoldPanelBar.GetPanelsLength(True, True)
