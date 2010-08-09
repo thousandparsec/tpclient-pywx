@@ -4,8 +4,7 @@ import wx
 from extra.decorators import *
 
 from tp.client.ChangeList import ChangeNode
-
-from extra import objectutils
+from tp.client import objectutils
 
 # Raised when the game cache is made dirty. Contains a reference to what was updated.
 #  -- CacheDirtyEvent

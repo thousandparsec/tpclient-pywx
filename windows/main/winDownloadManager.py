@@ -15,7 +15,7 @@ from tp.netlib import objects
 from requirements import graphicsdir
 from windows.winBase import winReportXRC
 
-from extra import objectutils
+from tp.client import objectutils
 
 from windows.xrc.DownloadProgressPanel import DownloadProgressPanelBase
 class DownloadProgressPanel(DownloadProgressPanelBase):

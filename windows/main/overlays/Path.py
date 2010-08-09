@@ -14,14 +14,12 @@ from extra.StateTracker import TrackerObjectOrder
 
 # tp imports
 from tp.netlib.objects import constants
-from tp.netlib.objects                        import Object, OrderDescs
-from tp.netlib.objects                        import Order
+from tp.netlib.objects import Object, OrderDescs
+from tp.netlib.objects import Order
 from tp.netlib.objects import parameters
-from extra									  import objectutils
-#from tp.netlib.objects.ObjectExtra.Universe   import Universe
-#from tp.netlib.objects.ObjectExtra.Galaxy     import Galaxy
+from tp.client import objectutils
 
-from Overlay   import Overlay
+from Overlay import Overlay
 
 def FindPath(cache, obj):
 	"""

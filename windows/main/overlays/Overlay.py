@@ -6,7 +6,7 @@ Starmap.
 import sys
 
 from tp.netlib.objects import Object
-from extra import objectutils
+from tp.client import objectutils
 
 from windows.main.panelPicture import panelPicture
 

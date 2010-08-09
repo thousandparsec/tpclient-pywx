@@ -15,7 +15,7 @@ import wx.gizmos
 # Local imports
 from requirements import graphicsdir
 
-from extra import objectutils
+from tp.client import objectutils
 
 NAME = 0
 DESC = 1

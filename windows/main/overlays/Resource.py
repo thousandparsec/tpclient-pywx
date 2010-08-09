@@ -4,6 +4,7 @@ resource found in that object.
 """
 # Python imports
 import os
+import operator
 from math import *
 
 import numpy as N
@@ -15,15 +16,12 @@ from extra.wxFloatCanvas import PieChart
 from extra.wxFloatCanvas.RelativePoint import RelativePoint
 from extra.wxFloatCanvas.FloatCanvas   import Point, Group, Line
 
-import operator
-
 from extra.wxFloatCanvas.NavCanvas import NavCanvas
 
 from Proportional import SystemIcon, FindChildren, IconMixIn
-
 from Overlay import SystemLevelOverlay, Holder
 
-from extra import objectutils
+from tp.client import objectutils
 
 from windows.xrc.winResourceSelect import ResourceSelectBase
 class ResourceSelect(ResourceSelectBase, wx.Frame):

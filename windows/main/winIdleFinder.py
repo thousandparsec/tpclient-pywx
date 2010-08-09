@@ -7,9 +7,9 @@ import wx
 import wx.gizmos
 #from wx import *
 import wx.lib.anchors
-from tp.netlib import objects
 
-from extra import objectutils
+from tp.netlib import objects
+from tp.client import objectutils
 
 # Local imports
 from windows.winBase import winReportXRC, ShiftMixIn

@@ -8,10 +8,10 @@ import operator
 # wxPython imports
 from extra.wxFloatCanvas import FloatCanvas
 from extra.wxFloatCanvas import PieChart
-from extra.wxFloatCanvas.FloatCanvas   import Point, Group, Line
-#from tp.netlib.objects.ObjectExtra.StarSystem import StarSystem
-from tp.netlib.objects                        import Object
-from extra import objectutils
+from extra.wxFloatCanvas.FloatCanvas import Point, Group, Line
+
+from tp.netlib.objects import Object
+from tp.client import objectutils
 
 from Overlay import SystemLevelOverlay, Holder
 

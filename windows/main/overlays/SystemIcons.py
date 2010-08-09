@@ -15,17 +15,17 @@ from extra.wxFloatCanvas.PolygonStatic import PolygonArrow, PolygonShip
 
 # tp imports
 from tp.netlib.objects import constants
-from tp.netlib.objects                        import Object, OrderDescs
+from tp.netlib.objects import Object, OrderDescs
 
 from tp.netlib import GenericRS
 
-from extra import objectutils
+from tp.client import objectutils
 
 from requirements import graphicsdir
 
 from tp.client.threads import FileTrackerMixin
 
-from Overlay   import SystemLevelOverlay, Holder
+from Overlay import SystemLevelOverlay, Holder
 from Systems import *
 from Colorizer import *
 

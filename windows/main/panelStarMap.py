@@ -26,7 +26,7 @@ from windows.xrc.panelStarMap import panelStarMapBase
 
 from tp.netlib.objects import OrderDescs
 from tp.netlib.objects import parameters
-from extra import objectutils
+from tp.client import objectutils
 
 import extra.wxFloatCanvas.GUIMode as GUIMode
 class GUIWaypoint(GUIMode.GUIMouse):

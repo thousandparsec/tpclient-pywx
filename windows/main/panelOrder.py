@@ -17,9 +17,8 @@ from tp.netlib import objects
 from tp.netlib.objects import constants
 from tp.netlib.objects import parameters
 
+from tp.client import objectutils
 from tp.client.ChangeList import ChangeNode, ChangeHead
-
-from extra import objectutils
 
 TURNS_COL = 0
 ORDERS_COL = 1

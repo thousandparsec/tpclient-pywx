@@ -25,7 +25,7 @@ from tp.netlib.objects                        import Object, OrderDescs
 
 from tp.netlib import GenericRS
 
-from extra import objectutils
+from tp.client import objectutils
 
 from Overlay   import SystemLevelOverlay, Holder
 from Colorizer import *

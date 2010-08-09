@@ -28,7 +28,7 @@ from extra.decorators import freeze_wrapper
 #from tp.netlib.objects.ObjectExtra.Planet import Planet
 #from tp.netlib.objects.ObjectExtra.Fleet import Fleet
 
-from extra import objectutils
+from tp.client import objectutils
 
 from tp.client.threads import FileTrackerMixin
 

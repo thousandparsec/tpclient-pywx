@@ -13,11 +13,12 @@ import wx
 from wx.lib.wordwrap import wordwrap
 
 
+from tp.client import objectutils
+
 # Local imports
 from requirements import docdir, graphicsdir
 from winBase import winBase
 from utils import *
-from extra import objectutils
 import version
 
 ID_MENU = 10042
