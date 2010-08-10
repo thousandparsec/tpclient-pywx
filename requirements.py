@@ -9,9 +9,6 @@ sys.path.insert(0, '.')
 import os.path
 
 modules = ["libtpproto-py", "libtpclient-py", "schemepy"]
-for module in modules:
-	if os.path.exists(module):
-		sys.path.insert(0, module)
 
 import version
 if hasattr(version, "version_git"):
@@ -19,6 +16,10 @@ if hasattr(version, "version_git"):
 		if os.path.exists(module) and not os.path.exists(os.path.join(module, ".git")):
 			os.system("git submodule init")
 	os.system("git submodule update")
+
+for module in modules:
+	if os.path.exists(module):
+		sys.path.insert(0, module)
 
 import time
 
