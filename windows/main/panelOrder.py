@@ -411,8 +411,6 @@ class panelOrder(panelOrderBase, TrackerObject, TrackerOrder):
 		for listpos in self.Orders.GetSelected():
 			nodes.append(self.Orders.GetItemPyData(listpos))
 
-		if self.nodes == nodes:
-			return
 		self.SelectOrders(nodes)
 		
 	@freeze_wrapper

@@ -325,7 +325,7 @@ class panelStarMap(panelStarMapBase, TrackerObjectOrder):
 
 		self.ZoomLevel.SetMark(0, len(self.ZoomLevel.GetValue()))
 
-	def OnCacheUpdate(self, evt):
+	def OnObjectCacheUpdate(self, evt):
 		"""\
 		Called when the cache has been updated.
 		"""
@@ -341,6 +341,8 @@ class panelStarMap(panelStarMapBase, TrackerObjectOrder):
 			self.OnZoomLevel('fit')
 			self.OnHome(None)
 			self.Canvas.Draw()
+
+		TrackerObjectOrder.OnObjectCacheUpdate(self, evt)
 
 	def ObjectSelect(self, id):
 		"""\
