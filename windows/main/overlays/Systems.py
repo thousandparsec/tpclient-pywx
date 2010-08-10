@@ -521,9 +521,9 @@ class Systems(SystemLevelOverlay, TrackerObjectOrder):
 		s = "<font size='%s'>" % wx.local.normalFont.GetPointSize()
 		for i, cobj in enumerate(icon):
 			# Italics the currently selected object
-			style = 'normal'
+			weight = 'normal'
 			if self.Selected != None and self.Selected.current == cobj:
-				style = 'italic'
+				weight = 'bold'
 
 			color = icon.Colorizer(FindOwners(self.application.cache, cobj))
 
@@ -531,7 +531,7 @@ class Systems(SystemLevelOverlay, TrackerObjectOrder):
 			if not objectutils.isTopLevel(self.application.cache, cobj.parent):
 				s += "  "
 				
-			s += "<font style='%s' color='%s'>%s" % (style, color, cobj.name)
+			s += "<font weight='%s' color='%s'>%s" % (weight, color, cobj.name)
 
 			# Add text about ships
 			for propertygroup in cobj.properties:
