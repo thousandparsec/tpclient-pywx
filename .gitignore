@@ -7,4 +7,4 @@ build-stamp
 html
 tp
 wxversion
-*.swp
+*.sw[po]
