@@ -46,7 +46,7 @@
                 <vgap>0</vgap>
                 <hgap>0</hgap>
                 <growablecols>1</growablecols>
-                <growablerows></growablerows>
+                <growablerows/>
               </object>
               <flag>wxALL|wxGROW</flag>
               <border>0</border>
@@ -170,7 +170,6 @@
                   </object>
                   <growablecols>0</growablecols>
                   <growablerows>1</growablerows>
-                
                 </object>
               </object>
               <option>1</option>
@@ -185,7 +184,7 @@
           </object>
         </object>
         <option>1</option>
-        <flag>wxEXPAND|wxGROW</flag>
+        <flag>wxEXPAND|wxGROW|wxRESERVE_SPACE_EVEN_IF_HIDDEN</flag>
       </object>
       <cols>1</cols>
       <rows>1</rows>

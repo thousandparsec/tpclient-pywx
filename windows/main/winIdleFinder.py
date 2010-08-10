@@ -61,25 +61,32 @@ class winIdleFinder(winReportXRC, IdleFinderBase, TrackerObject):
 		numinlist = 0
 		universe = self.application.cache.objects.keys()
 		for object in universe:
-			hasorders = False
+			isidle = False
 			
 			# Only show objects owned by this player
 			if not objectutils.getOwner(self.application.cache, object) == self.application.cache.players[0].id:
 				continue
 			
 			orderqueuelist = objectutils.getOrderQueueList(self.application.cache, object)
-			
-			if orderqueuelist == None or len(orderqueuelist) <= 0:
+			ordertypes = objectutils.getOrderTypes(self.application.cache, object)
+
+			if orderqueuelist == None or len(orderqueuelist) <= 0 or len(ordertypes) <= 0:
 				continue
 			
 			# Find any orders for this object in any of its queues.
 			for name, queue in orderqueuelist:
 				if not self.application.cache.orders.has_key(queue):
 					continue
-				if len(self.application.cache.orders[queue]) > 0:
-					hasorders = True
+
+				# Consider only queues with non-empty order types
+				if len(ordertypes[queue]) <= 0:
+					continue
+
+				if len(self.application.cache.orders[queue]) <= 0:
+					isidle = True
 					break
-			if hasorders:
+
+			if not isidle:
 				continue
 			
 			# If the object has no orders, add it to the list
