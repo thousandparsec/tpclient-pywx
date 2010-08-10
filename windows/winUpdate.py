@@ -35,6 +35,11 @@ class winUpdate(winUpdateBase, winBaseXRC):
 		self.Panel.Layout()
 		self.Panel.Update()
 
+	def OnClose(self, evt):
+		winBaseXRC.OnClose(self, evt)
+		self.application.network.Reset()
+		self.application.gui.Show(self.application.gui.connectto)
+
 	@onlyshown
 	@onlyenabled("Cancel")
 	def OnCancel(self, evt):
