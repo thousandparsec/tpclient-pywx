@@ -226,16 +226,13 @@ class TrackerOrder(object):
 	##########################################################################
 	def OnOrderCacheUpdate(self, evt):
 		assert not self is evt.source, "Got event %s which was sent by %s which is me (%s)!" % (evt, evt.source, self)
-
+	
 		# If there was a whole cache update
 		if evt.what is None:
-			# Refresh the currently selected order
-			if len(self.nodes) > 0:
-				for node in self.nodes:
-					self.OrderRefresh(node)
-
+			if self.qid:
+				self.SelectOrders([])
 			return
-	
+
 		# Only interested in an CacheUpdates which are for the selected order queue.
 		if evt.id != self.qid:
 			return
