@@ -16,12 +16,6 @@ from extra.wxFloatCanvas.PolygonStatic import PolygonArrow, PolygonShip
 from tp.netlib.objects import constants
 from tp.netlib.objects.parameters import OrderParamAbsSpaceCoords, OrderParamObject
 from tp.netlib.objects                        import Object, OrderDescs
-#from tp.netlib.objects.ObjectExtra.Universe   import Universe
-#from tp.netlib.objects.ObjectExtra.Galaxy     import Galaxy
-#from tp.netlib.objects.ObjectExtra.StarSystem import StarSystem
-#from tp.netlib.objects.ObjectExtra.Planet     import Planet
-#from tp.netlib.objects.ObjectExtra.Fleet      import Fleet
-#from tp.netlib.objects.ObjectExtra.Wormhole   import Wormhole
 
 from tp.netlib import GenericRS
 
@@ -30,7 +24,7 @@ from tp.client import objectutils
 from Overlay   import SystemLevelOverlay, Holder
 from Colorizer import *
 
-def FindChildren(cache, obj):
+def FindChildren(tmpcache, obj):
 	"""
 	Figure out all the children of this object.
 	"""
@@ -39,14 +33,14 @@ def FindChildren(cache, obj):
 
 	kids = set()
 	for cid in obj.contains:
-		child = cache.objects[cid]
+		child = tmpcache.objects[cid]
 
-		kids.update(FindChildren(cache, child))
+		kids.update(FindChildren(tmpcache, child))
 		kids.add(child)
 
 	return list(kids)
 
-def FindOwners(cache, obj):
+def FindOwners(tmpcache, obj):
 	"""
 	Figure out the owners of this oidect (and it's children).
 	"""
@@ -54,8 +48,8 @@ def FindOwners(cache, obj):
 		raise TypeError("Object must be an object not %r" % obj)
 
 	owners = set()
-	for child in [obj]+FindChildren(cache, obj):
-		owner = objectutils.getOwner(cache, child.id)
+	for child in [obj]+FindChildren(tmpcache, obj):
+		owner = objectutils.getOwner(tmpcache, child.id)
 
 		if owner in (0, -1):
 			continue
@@ -68,8 +62,8 @@ class IconMixIn:
 	PrimarySize = 3
 	ChildSize   = 3
 
-	def __init__(self, cache, colorizer):
-		self.cache = cache
+	def __init__(self, tmpcache, colorizer):
+		self.tmpcache = tmpcache
 		self.SetColorizer(colorizer)
 
 	# FIXME: Should probably just monkey patch this onto Group?
@@ -92,11 +86,11 @@ class IconMixIn:
 		self.Colorizer = colorizer
 
 	def GetColors(self):
-		parentcolor = self.Colorizer(FindOwners(self.cache, self.primary))
+		parentcolor = self.Colorizer(FindOwners(self.tmpcache, self.primary))
 		
 		childrencolors = []
 		for child in self.children:
-			childrencolors.append(self.Colorizer(FindOwners(self.cache, child)))
+			childrencolors.append(self.Colorizer(FindOwners(self.tmpcache, child)))
 	
 		return parentcolor, childrencolors
 
@@ -106,14 +100,14 @@ class SystemIcon(Group, Holder, IconMixIn):
 	"""
 	def copy(self):
 		# FIXME: Very expensive
-		return SystemIcon(self.cache, self.primary, self.Colorizer)
+		return SystemIcon(self.tmpcache, self.primary, self.Colorizer)
 
-	def __init__(self, cache, system, colorizer=None):
+	def __init__(self, tmpcache, system, colorizer=None):
 
-		Holder.__init__(self, system, FindChildren(cache, system))
+		Holder.__init__(self, system, FindChildren(tmpcache, system))
 
 		# Get the colors of the object
-		IconMixIn.__init__(self, cache, colorizer)
+		IconMixIn.__init__(self, tmpcache, colorizer)
 		type, childtype = self.GetColors()
 
 		# Create a list of the objects
@@ -152,16 +146,16 @@ class FleetIcon(Group, Holder, IconMixIn):
 	"""
 	def copy(self):
 		# FIXME: Very expensive
-		return FleetIcon(self.cache, self.primary, self.Colorizer)
+		return FleetIcon(self.tmpcache, self.primary, self.Colorizer)
 
-	def __init__(self, cache, fleet, colorizer=None):
-		if len(FindChildren(cache, fleet)) > 0:
+	def __init__(self, tmpcache, fleet, colorizer=None):
+		if len(FindChildren(tmpcache, fleet)) > 0:
 			raise TypeError('The fleet has children! WTF?')
 
 		Holder.__init__(self, fleet, [])
 
 		# Get the colors of the object
-		IconMixIn.__init__(self, cache, colorizer)
+		IconMixIn.__init__(self, tmpcache, colorizer)
 		type, childtype = self.GetColors()
 
 		# Create a list of the objects
@@ -184,23 +178,23 @@ class WormholeIcon(Group, Holder, IconMixIn):
 	"""
 	def copy(self):
 		# FIXME: Very expensive
-		return WormholeIcon(self.cache, self.primary, self.Colorizer)
+		return WormholeIcon(self.tmpcache, self.primary, self.Colorizer)
 
 	def XY(self):
 		return self.ObjectList[0].Points[0]+(self.ObjectList[0].Points[1]-self.ObjectList[0].Points[0])/2
 	XY = property(XY)
 
-	def __init__(self, cache, wormhole, colorizer=None):
+	def __init__(self, tmpcache, wormhole, colorizer=None):
 		if not isinstance(wormhole, Wormhole):
 			raise TypeError('WormholeIcon must be given a Wormhole, %r' % system)
 
-		if len(FindChildren(cache, wormhole)) > 0:
+		if len(FindChildren(tmpcache, wormhole)) > 0:
 			raise TypeError('The wormhole has children! WTF?')
 
 		Holder.__init__(self, wormhole, [])
 
 		# Get the colors of the object
-		IconMixIn.__init__(self, cache, colorizer)
+		IconMixIn.__init__(self, tmpcache, colorizer)
 		type, childtype = self.GetColors()
 
 		# Create a list of the objects
@@ -214,12 +208,10 @@ class WormholeIcon(Group, Holder, IconMixIn):
 from extra.StateTracker import TrackerObjectOrder
 class Systems(SystemLevelOverlay, TrackerObjectOrder):
 	name     = "Systems"
-	toplevel = [] #Galaxy, Universe
-
 	Colorizers = [ColorVerses, ColorEach]
 
-	def __init__(self, parent, canvas, panel, cache, *args, **kw):
-		SystemLevelOverlay.__init__(self, parent, canvas, panel, cache, *args, **kw)
+	def __init__(self, parent, canvas, panel, *args, **kw):
+		SystemLevelOverlay.__init__(self, parent, canvas, panel, *args, **kw)
 
 		self.canvas.SetCursor(wx.StockCursor(wx.CURSOR_RIGHT_ARROW))
 
@@ -249,7 +241,7 @@ class Systems(SystemLevelOverlay, TrackerObjectOrder):
 
 		if not isinstance(self.Colorizer, cls):
 			# Change the colorizer
-			self.Colorizer = cls(self.cache.players[0].id)
+			self.Colorizer = cls(self.application.cache.players[0].id)
 
 			if not evt is None:
 				self.CleanUp()
@@ -266,10 +258,10 @@ class Systems(SystemLevelOverlay, TrackerObjectOrder):
 			self['selected-arrow'].Hide()
 
 	def Icon(self, obj):
-		if objectutils.isFleet(self.cache, obj.id):
-			return FleetIcon(self.cache, obj, self.Colorizer)
+		if objectutils.isFleet(self.application.cache, obj.id):
+			return FleetIcon(self.application.cache, obj, self.Colorizer)
 		
-		return SystemIcon(self.cache, obj, self.Colorizer)
+		return SystemIcon(self.application.cache, obj, self.Colorizer)
 
 	def ArrowTo(self, arrow, icon, object):
 		arrow.SetPoint(icon.XY)
@@ -387,8 +379,8 @@ class Systems(SystemLevelOverlay, TrackerObjectOrder):
 			if self.oid is None:
 				return orders
 
-			queuelist = objectutils.getOrderQueueList(self.cache, self.oid)
-			ordertypes = objectutils.getOrderTypes(self.cache, self.oid)
+			queuelist = objectutils.getOrderQueueList(self.application.cache, self.oid)
+			ordertypes = objectutils.getOrderTypes(self.application.cache, self.oid)
 
 			# Find possible order types in all order queues
 			for queuename, queueid in queuelist:
@@ -492,7 +484,7 @@ class Systems(SystemLevelOverlay, TrackerObjectOrder):
 		# Draw the path of the object
 		paths = []
 ##		for i, cobj in enumerate(icon):
-##			path = FindPath(self.cache, cobj)
+##			path = FindPath(self.application.cache, cobj)
 ##			if path:
 ##				pr = path[0]
 ##				for p in path[1:]:
@@ -533,10 +525,10 @@ class Systems(SystemLevelOverlay, TrackerObjectOrder):
 			if self.Selected != None and self.Selected.current == cobj:
 				style = 'italic'
 
-			color = icon.Colorizer(FindOwners(self.cache, cobj))
+			color = icon.Colorizer(FindOwners(self.application.cache, cobj))
 
 			# Tabulate non-systems
-			if not objectutils.isTopLevel(self.cache, cobj.parent):
+			if not objectutils.isTopLevel(self.application.cache, cobj.parent):
 				s += "  "
 				
 			s += "<font style='%s' color='%s'>%s" % (style, color, cobj.name)
@@ -555,11 +547,11 @@ class Systems(SystemLevelOverlay, TrackerObjectOrder):
 					shipcount = shiplist[2]
 					if reftype == GenericRS.Types["Design"]:
 						try:
-							s += "\n    %s %ss" % (shipcount, self.cache.designs[shipid].name)
+							s += "\n    %s %ss" % (shipcount, self.application.cache.designs[shipid].name)
 						except KeyError:
 							s += "\n  %s %ss" % (shipcount, "Unknown Ships")
 					elif reftype == GenericRS.Types["Object"]:
-						s += "\n  %s %ss" % (shipcount, self.cache.objects[shipid].name)
+						s += "\n  %s %ss" % (shipcount, self.application.cache.objects[shipid].name)
 					else:
 						s += "\n  %s %ss" % (shipcount, "Unknown Ships")
 

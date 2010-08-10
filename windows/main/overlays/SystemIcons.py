@@ -35,14 +35,14 @@ class ImageIcon(Group, Holder, IconMixIn):
 	"""
 	def copy(self):
 		# FIXME: Very expensive
-		return SystemIcon(self.cache, self.primary, self.Colorizer)
+		return SystemIcon(self.tmpcache, self.primary, self.Colorizer)
 
-	def __init__(self, cache, canvas, system, image, colorizer=None):
+	def __init__(self, tmpcache, canvas, system, image, colorizer=None):
 
-		Holder.__init__(self, system, FindChildren(cache, system))
+		Holder.__init__(self, system, FindChildren(tmpcache, system))
 
 		# Get the colors of the object
-		IconMixIn.__init__(self, cache, colorizer)
+		IconMixIn.__init__(self, tmpcache, colorizer)
 		type, childtype = self.GetColors()
 
 		# Create a list of the objects
@@ -63,13 +63,11 @@ class ImageIcon(Group, Holder, IconMixIn):
 
 from extra.StateTracker import TrackerObjectOrder
 class SystemIcons(Systems, FileTrackerMixin):
-	name     = "Icons"
-	toplevel = [] #Galaxy, Universe
-
+	name = "Icons"
 	Colorizers = [ColorVerses, ColorEach]
 
-	def __init__(self, parent, canvas, panel, cache, *args, **kw):
-		Systems.__init__(self, parent, canvas, panel, cache, *args, **kw)
+	def __init__(self, parent, canvas, panel, *args, **kw):
+		Systems.__init__(self, parent, canvas, panel, *args, **kw)
 
 		FileTrackerMixin.__init__(self, self.application)
 
@@ -78,7 +76,7 @@ class SystemIcons(Systems, FileTrackerMixin):
 		self.ClearURLs()
 		self.AddObjectURLs(obj.id)
 		if len(images) <= 0:
-			return SystemIcon(self.cache, obj, self.Colorizer)
+			return SystemIcon(self.application.cache, obj, self.Colorizer)
 		else:
 			icon = None
 			for name, files in images:
@@ -90,9 +88,9 @@ class SystemIcons(Systems, FileTrackerMixin):
 				break
 			
 			if not icon:
-				return SystemIcon(self.cache, obj, self.Colorizer)
+				return SystemIcon(self.application.cache, obj, self.Colorizer)
 		
-		return ImageIcon(self.cache, self.canvas, obj, icon, self.Colorizer)
+		return ImageIcon(self.application.cache, self.canvas, obj, icon, self.Colorizer)
 	
 	def OnMediaUpdate(self, evt):
 		self.UpdateAll()

@@ -15,7 +15,7 @@ from tp.client import objectutils
 
 from Overlay import SystemLevelOverlay, Holder
 
-def FindChildren(cache, obj):
+def FindChildren(tmpcache, obj):
 	"""
 	Figure out all the children of this object.
 	"""
@@ -24,9 +24,9 @@ def FindChildren(cache, obj):
 
 	kids = set()
 	for cid in obj.contains:
-		child = cache.objects[cid]
+		child = tmpcache.objects[cid]
 
-		kids.update(FindChildren(cache, child))
+		kids.update(FindChildren(tmpcache, child))
 		kids.add(child)
 
 	return list(kids)
@@ -37,8 +37,8 @@ class IconMixIn:
 	PrimarySize = 3
 	ChildSize   = 3
 
-	def __init__(self, cache):
-		self.cache = cache
+	def __init__(self, tmpcache):
+		self.tmpcache = tmpcache
 
 	# FIXME: Should probably just monkey patch this onto Group?
 	def XY(self):
@@ -61,13 +61,13 @@ class SystemIcon(Group, Holder, IconMixIn):
 	
 	def copy(self):
 		# FIXME: Very expensive
-		return SystemIcon(self.cache, self.primary, self.proportion, self.scale)
+		return SystemIcon(self.tmpcache, self.primary, self.proportion, self.scale)
 
-	def __init__(self, cache, system, proportion, scale):
-		self.cache = cache
+	def __init__(self, tmpcache, system, proportion, scale):
+		self.tmpcache = tmpcache
 		self.proportion = proportion
 		self.scale = scale
-		Holder.__init__(self, system, FindChildren(cache, system))
+		Holder.__init__(self, system, FindChildren(tmpcache, system))
 
 		# Create a list of the objects
 		ObjectList = []
@@ -94,12 +94,8 @@ class Proportional(SystemLevelOverlay):
 	scale = 60L
 	#scale = 150L
 	
-	#def __init__(self, *args, **kw):
-	#	SystemLevelOverlay.__init__(self, *args, **kw)
-	def __init__(self, parent, canvas, panel, cache, *args, **kw):
-		SystemLevelOverlay.__init__(self, parent, canvas, panel, cache, *args, **kw)
-		
-		self.cache = cache
+	def __init__(self, parent, canvas, panel, *args, **kw):
+		SystemLevelOverlay.__init__(self, parent, canvas, panel, *args, **kw)
 		
 		self.max = 0
 		self.min = 0
@@ -110,7 +106,7 @@ class Proportional(SystemLevelOverlay):
 		"""\
 				
 		""" 
-		c = self.cache
+		c = self.application.cache
 		# Calculate all the values so we can figure min/max.
 		values = {}
 		for oid in c.objects.keys():
@@ -133,7 +129,7 @@ class Proportional(SystemLevelOverlay):
 			self.UpdateOne(oid)
 	
 	def Proportion(self, oid, value=None):
-		c = self.cache
+		c = self.application.cache
 		
 		# Disregard the Universe and the Galaxy
 		if (c.objects[oid].subtype > 1):
@@ -174,7 +170,7 @@ class Proportional(SystemLevelOverlay):
 				break
 				
 		if child_has_resources:
-			return SystemIcon(self.cache, obj, self.Proportion(obj.id), self.scale)
+			return SystemIcon(self.application.cache, obj, self.Proportion(obj.id), self.scale)
 	
 	def ObjectHoverEnter(self, icon, pos):
 		"""

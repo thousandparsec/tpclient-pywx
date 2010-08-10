@@ -16,6 +16,6 @@ class Size(Value):
 		"""\
 		The amount of this resource on this object.
 		"""
-		obj = self.cache.objects[oid]
+		obj = self.application.cache.objects[oid]
 		if isinstance(obj, (Planet, StarSystem)):
 			return obj.size

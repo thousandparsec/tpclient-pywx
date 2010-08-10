@@ -11,8 +11,8 @@ class Value(Overlay):
 	"""
 	scale = 1
 
-	def __init__(self, canvas, cache):
-		Overlay.__init__(self, canvas, cache)
+	def __init__(self, parent, canvas, panel):
+		Overlay.__init__(self, parent, canvas, panel)
 
 	def value(self, oid):
 		"""\
@@ -26,7 +26,7 @@ class Value(Overlay):
 		"""
 		# Remove all the objects.
 		self.cleanup()
-		for oid in self.cache.objects.keys():
+		for oid in self.application.cache.objects.keys():
 			self.updateone(oid)
 
 	def updateone(self, oid):
@@ -38,5 +38,5 @@ class Value(Overlay):
 		if value is None:
 			return
 
-		self[oid] = FloatCanvas.Circle(self.cache.objects[oid].pos[0:2], self.value(oid)*self.scale, FillColor="White", LineColor="Red")
+		self[oid] = FloatCanvas.Circle(self.application.cache.objects[oid].pos[0:2], self.value(oid)*self.scale, FillColor="White", LineColor="Red")
 

@@ -27,7 +27,7 @@ class FilterManager(FilterManagerBase, wx.Frame):
 	"""\
 	This class is a popup window with a checklist of filters.
 	"""
-	def __init__(self, control, parent, cache):
+	def __init__(self, control, parent):
 		"""\
 		Initialize the window, loading data from XRC, and add the resources.
 		"""
@@ -81,17 +81,16 @@ class FilterManagerControl(object):
 	and which takes the data from that window to create a list of the checked
 	filters.
 	"""
-	def __init__(self, cache, parent, id, button):
+	def __init__(self, application, parent, id, button):
 		"""\
 		Called to create the button and the popup window.
 		"""
 		
 		self.button = button
 		self.button.Bind(wx.EVT_BUTTON, self.OnClick)
-		self.cache = cache
 		self.parent = parent
 		self.selected = []
-		self.win = FilterManager(self, self.button, cache)
+		self.win = FilterManager(self, self.button)
 		self.showfiltered = False
 	
 	def OnClick(self, evt):
@@ -159,7 +158,7 @@ class panelMessage(panelMessageBase, ShiftMixIn):
 		self.application = application
 		self.Message.Bind(wx.html.EVT_HTML_LINK_CLICKED, self.OnLinkEvent)
 		
-		self.FilterManager = FilterManagerControl(self.application.cache, self, -1, self.Filter)
+		self.FilterManager = FilterManagerControl(self.application, self, -1, self.Filter)
 
 		# The current message slot
 		self.node = None

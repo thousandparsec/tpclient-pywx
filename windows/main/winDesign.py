@@ -43,7 +43,7 @@ class CategoriesManager(CategoriesManagerBase, wx.Frame):
 	"""\
 	This class is a popup window with a checklist of categories.
 	"""
-	def __init__(self, parent, control, cache):
+	def __init__(self, parent, control):
 		"""\
 		Initialize the window, loading data from XRC, and add the resources.
 		"""
@@ -117,7 +117,7 @@ class winDesign(winReportXRC, winDesignBase, ShiftMixIn):
 		winReportXRC.__init__(self, application, parent)
 		ShiftMixIn.__init__(self)
 		
-		self.CategoriesWindow = CategoriesManager(self, self.Categories, self.application.cache)
+		self.CategoriesWindow = CategoriesManager(self, self.Categories)
 		
 		self.selected = None	# Currently selected design
 		self.updating = []		# Designs which are been saved to the server
@@ -232,11 +232,11 @@ class winDesign(winReportXRC, winDesignBase, ShiftMixIn):
 		self.DesignsTree.SetItemImage(root, 0, wx.TreeItemIcon_Normal)
 		self.DesignsTree.SetItemImage(root, 1, wx.TreeItemIcon_Expanded)
 
-		cache = self.application.cache
-		for category in cache.categories.values():
+		tmpcache = self.application.cache
+		for category in tmpcache.categories.values():
 			categoryitem = self.TreeAddCategory(self.DesignsTree, category)
 
-			for design in cache.designs.values():
+			for design in tmpcache.designs.values():
 				if category.id in design.categories:
 					# Filter the list..
 					from fnmatch import fnmatch as match
@@ -246,7 +246,7 @@ class winDesign(winReportXRC, winDesignBase, ShiftMixIn):
 			if not self.DesignsTree.ItemHasChildren(categoryitem):
 				self.DesignsTree.Delete(categoryitem)
 		
-		for design in cache.designs.values():
+		for design in tmpcache.designs.values():
 			# If the design has any categories, don't add it.
 			if len(design.categories) >= 0:
 				continue
@@ -281,11 +281,11 @@ class winDesign(winReportXRC, winDesignBase, ShiftMixIn):
 		self.ComponentsTree.SetItemImage(root, 0, wx.TreeItemIcon_Normal)
 		self.ComponentsTree.SetItemImage(root, 1, wx.TreeItemIcon_Expanded)
 
-		cache = self.application.cache
-		for category in cache.categories.values():
+		tmpcache = self.application.cache
+		for category in tmpcache.categories.values():
 			categoryitem = self.TreeAddCategory(self.ComponentsTree, category)
 
-			for component in cache.components.values():
+			for component in tmpcache.components.values():
 				if category.id in component.categories:
 					# Filter the list..
 					from fnmatch import fnmatch as match
@@ -327,7 +327,7 @@ class winDesign(winReportXRC, winDesignBase, ShiftMixIn):
 		
 	def BuildPropertiesPanel(self, design):
 		SIZER_FLAGS = wx.EXPAND|wx.GROW|wx.ALIGN_CENTER_VERTICAL|wx.ALL
-		cache = self.application.cache
+		tmpcache = self.application.cache
 		
 		# Remove the previous Panel and stuff
 		if hasattr(self, 'properties'):
@@ -350,7 +350,7 @@ class winDesign(winReportXRC, winDesignBase, ShiftMixIn):
 		# Sort the properties into category groups
 		properties = {}
 		for pid, pstring in design.properties:
-			property = cache.properties[pid]
+			property = tmpcache.properties[pid]
 			
 			for cid in property.categories:
 				if not properties.has_key(cid):
@@ -362,7 +362,7 @@ class winDesign(winReportXRC, winDesignBase, ShiftMixIn):
 			return
 		
 		for cid in properties.keys():
-			category = cache.categories[cid]
+			category = tmpcache.categories[cid]
 
 			# The box around the properties in the category
 			box = wx.StaticBox(Panel, -1, category.name)

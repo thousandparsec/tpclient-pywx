@@ -246,7 +246,7 @@ class panelStarMap(panelStarMapBase, TrackerObjectOrder):
 		# Create the new overlay
 		self.Overlay = []
 		for Overlay in cls:
-			self.Overlay.append(Overlay(self, self.Canvas, self.DisplayModePanel, self.application.cache))
+			self.Overlay.append(Overlay(self, self.Canvas, self.DisplayModePanel))
 			try:
 				self.Overlay[-1].UpdateAll()
 			except Exception, e:

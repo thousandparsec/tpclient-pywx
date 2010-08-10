@@ -28,7 +28,7 @@ class ResourceSelect(ResourceSelectBase, wx.Frame):
 	"""\
 	This class is a popup window with a checklist of resources.
 	"""
-	def __init__(self, parent, cache):
+	def __init__(self, parent, tmpcache):
 		"""\
 		Initialize the window, loading data from XRC, and add the resources.
 		"""
@@ -37,7 +37,7 @@ class ResourceSelect(ResourceSelectBase, wx.Frame):
 		
 		self.ResourceTypeList = {}
 		
-		for number, resource in cache.resources.items():
+		for number, resource in tmpcache.resources.items():
 			self.ResourceTypeList[resource.name] = number
 		self.ResourceList.InsertItems(self.ResourceTypeList.keys(), 0)
 
@@ -78,17 +78,16 @@ class RsrcSelectorControl(wx.Button):
 	and which takes the data from that window to create a list of the checked
 	resources.
 	"""
-	def __init__(self, resourceview, cache, parent, id):
+	def __init__(self, resourceview, tmpcache, parent, id):
 		"""\
 		Called to create the button and the popup window.
 		"""
 		wx.Button.__init__(self, parent, id, "Resource Types")
 
 		self.Bind(wx.EVT_BUTTON, self.OnClick)
-		self.cache = cache
 		self.resourceview = resourceview
 		self.selected = []
-		self.win = ResourceSelect(self, cache)
+		self.win = ResourceSelect(self, tmpcache)
 	
 	def OnClick(self, evt):
 		"""\
@@ -120,12 +119,12 @@ class RsrcSelectorPanel(wx.Panel):
 	A simple panel containing a button that can be clicked to bring up a list of
 	resources. This is for use with the Resource overlay.
 	"""
-	def __init__(self, resourceview, parent, cache):
+	def __init__(self, resourceview, parent, tmpcache):
 		"""\
 		Creates the panel and its contents.
 		"""
 		wx.Panel.__init__(self, parent, -1)
-		self.selector = RsrcSelectorControl(resourceview, cache, self, -1)
+		self.selector = RsrcSelectorControl(resourceview, tmpcache, self, -1)
 
 class PieChartIcon(SystemIcon):
 	"""\
@@ -136,18 +135,18 @@ class PieChartIcon(SystemIcon):
 		"""\
 		Copies the pie chart.
 		"""
-		return PieChartIcon(self.cache, self.primary, self.proportional, self.scale, self.valuesforchart)
+		return PieChartIcon(self.tmpcache, self.primary, self.proportional, self.scale, self.valuesforchart)
 
-	def __init__(self, cache, system, proportional, scale, valuesforchart):
+	def __init__(self, tmpcache, system, proportional, scale, valuesforchart):
 		"""\
 		Creates a new pie chart, initializing the slices.
 		"""
-		self.cache = cache
+		self.tmpcache = tmpcache
 		self.proportional = proportional
 		self.scale = scale
 		self.valuesforchart = valuesforchart
 		
-		Holder.__init__(self, system, FindChildren(cache, system))
+		Holder.__init__(self, system, FindChildren(tmpcache, system))
 
 		# Create a list of the objects
 		ObjectList = []
@@ -183,15 +182,15 @@ class Resource(Proportional):
 	MINABLE		 =  2
 	INACCESSABLE =  3	
 
-	def __init__(self, parent, canvas, panel, cache, resource=None, type=-1):
+	def __init__(self, parent, canvas, panel, resource=None, type=-1):
 		"""\
 		Initializes the overlay and its resource selection panel.
 		"""
-		Proportional.__init__(self, parent, canvas, panel, cache)
+		Proportional.__init__(self, parent, canvas, panel)
 		
 		self.ResourceTypeList = {"All":Resource.TOTAL}
 		
-		for number, resource in cache.resources.items():
+		for number, resource in self.application.cache.resources.items():
 			self.ResourceTypeList[resource.name] = number
 
 		self.resource = resource
@@ -199,7 +198,7 @@ class Resource(Proportional):
 		
 		# Create a drop-down on the panel for resource selection
 		sizer = wx.FlexGridSizer(len(self.ResourceTypeList))
-		self.selectpanel = RsrcSelectorPanel(self, panel, cache)
+		self.selectpanel = RsrcSelectorPanel(self, panel, self.application.cache)
 		sizer.Add(self.selectpanel, proportion=1, flag=wx.EXPAND)
 		
 		sizer.AddGrowableRow(0)
@@ -226,18 +225,18 @@ class Resource(Proportional):
 		selected, for a specific system.
 		"""
 		proportional = Proportional.Proportion(self, obj.id)
-		c = self.cache 
+		c = self.application.cache 
 		o = obj
 		self.valuesforchart = ()
 		self.valuesresources = {}
 		
 		if o.subtype != 2:
 			pass
-			return PieChartIcon(self.cache, obj, 0.001, 1, (1,1))
+			return PieChartIcon(c, obj, 0.001, 1, (1,1))
 		
 		if not hasattr(o, "contains"):
 			pass
-			return PieChartIcon(self.cache, obj, 0.001, 1, (1,1))
+			return PieChartIcon(c, obj, 0.001, 1, (1,1))
 			
 		for child in o.contains:
 			if not objectutils.hasResources(c, child):
@@ -271,15 +270,15 @@ class Resource(Proportional):
 			self.valuesforchart += (smallresources,)
 			
 		if proportional*self.scale > 0:
-			return PieChartIcon(self.cache, obj, proportional, self.scale, self.valuesforchart)
+			return PieChartIcon(c, obj, proportional, self.scale, self.valuesforchart)
 		else:
-			return PieChartIcon(self.cache, obj, 0.001, 1, (1,1))
+			return PieChartIcon(c, obj, 0.001, 1, (1,1))
 
 	def Amount(self, oid):
 		"""\
 		The amount of a specific resource in a specific object.
 		"""
-		c = self.cache 
+		c = self.application.cache 
 		o = c.objects[oid]
 
 		amount = 0
@@ -320,12 +319,12 @@ class Resource(Proportional):
 		thisresourcetotal = 0
 		
 		for c in system.contains:
-			child = self.cache.objects[c]
+			child = self.application.cache.objects[c]
 			
 			if len(self.selectpanel.selector.selected) != 0:
 				returnstring += "\n " + child.name + ":"
 			
-			for resource in objectutils.getResources(self.cache, c):
+			for resource in objectutils.getResources(self.application.cache, c):
 				if sum(resource[1:]) <= 0:
 					continue
 					
@@ -339,17 +338,17 @@ class Resource(Proportional):
 						continue
 						
 					thisresourcetotal += sum(resource[1:]) 
-				 	returnstring += "\n  " + self.cache.resources[resource[0]].name \
+				 	returnstring += "\n  " + self.application.cache.resources[resource[0]].name \
 				 		+ ": %s " % sum(resource[1:]) \
-				 		+ [self.cache.resources[resource[0]].unit_singular, self.cache.resources[resource[0]].unit_plural] \
+				 		+ [self.application.cache.resources[resource[0]].unit_singular, self.application.cache.resources[resource[0]].unit_plural] \
 				 		[sum(resource[1:]) > 1]
 	
 		if not self.type == Resource.TOTAL:
-			returnstring += "\n\nTotal " + self.cache.resources[self.type].name + " in system: %s" % thisresourcetotal
+			returnstring += "\n\nTotal " + self.application.cache.resources[self.type].name + " in system: %s" % thisresourcetotal
 		else :
 			for resource, amount in sorted(valuesresources.iteritems(), key=operator.itemgetter(1), reverse=True):	
-				returnstring += "\n  " + self.cache.resources[resource].name + \
+				returnstring += "\n  " + self.application.cache.resources[resource].name + \
 					": %s " % amount + \
-					[self.cache.resources[resource].unit_singular, self.cache.resources[resource].unit_plural][amount > 1]
+					[self.application.cache.resources[resource].unit_singular, self.application.cache.resources[resource].unit_plural][amount > 1]
 		
 		return returnstring + "</font>"
