@@ -745,6 +745,19 @@ class panelOrder(panelOrderBase, TrackerObject, TrackerOrder):
 			return True
 		return False
 
+	def OnOrderCopy(self, evt):
+		if len(self.nodes) < 1:
+				return
+
+		self.clipboard = []
+
+		for node in self.nodes:
+			self.clipboard.append((node.CurrentOrder.subtype, node.CurrentOrder.__str__()))
+
+	def OnOrderCut(self, evt):
+		self.OnOrderCopy(evt)
+		self.OnOrderDelete(evt)
+
 	####################################################
 	# Window Event Handlers
 	####################################################
@@ -814,17 +827,12 @@ class panelOrder(panelOrderBase, TrackerObject, TrackerOrder):
 		t = item.GetText()
 		if t == _("Delete"):
 			self.OnOrderDelete(None)
-		elif t in (_("Copy"), _("Cut")):
-			if len(self.nodes) < 1:
-				return
-
-			self.clipboard = []
-
-			for node in self.nodes:
-				self.clipboard.append((node.CurrentOrder.subtype, node.CurrentOrder.__str__()))
-		
-			if t == _("Cut"):
-				self.OnOrderDelete(None)
+			
+		elif t == _("Copy"):
+			self.OnOrderCopy(None)
+			
+		elif t == _("Cut"):
+			self.OnOrderCut(None)
 				
 		elif t.startswith(_("Paste")):
 			if self.CheckClipBoard() == False:
