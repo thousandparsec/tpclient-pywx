@@ -165,7 +165,7 @@ class panelMessage(panelMessageBase, ShiftMixIn):
 
 		self.application.gui.Binder(self.application.CacheClass.CacheUpdateEvent, self.OnCacheUpdate)
 		self.Layout()
-		self.Show()
+		self.Hide()
 
 	def OnLinkEvent(self, evt):
 		link = evt.GetLinkInfo().GetHref()
@@ -325,13 +325,11 @@ class panelMessage(panelMessageBase, ShiftMixIn):
 		self.messagelist=ChangeList()
 		
 		if len(self.messages) == 0:
-			message_subject = _("No messages")
-			message_counter = _(" ")
+			message_counter = _("0 of 0")
 			message_body = self.html_nomessage
 			message_filter = False
 			message_buttons = [False, False, False, False]
 			
-			self.Title.SetLabel(message_subject)
 			self.Counter.SetLabel(message_counter)
 			self.Message.SetPage(message_body)
 
@@ -359,6 +357,7 @@ class panelMessage(panelMessageBase, ShiftMixIn):
 								
 			if not self.messages.first is None:
 				self.MessageSet(node=self.messages.first)
+		self.Show()
 
 	def BoardSet(self, id, node=None):
 		"""\
@@ -374,8 +373,7 @@ class panelMessage(panelMessageBase, ShiftMixIn):
 		"""
 		# Are there any messages?
 		if len(self.messages) == 0:
-			message_subject = _("No messages")
-			message_counter = ""
+			message_counter = "0 of 0"
 			message_body = self.html_nomessage
 			message_filter = False
 			message_buttons = [False, False, False, False]
@@ -397,7 +395,6 @@ class panelMessage(panelMessageBase, ShiftMixIn):
 			else:
 				raise SystemError("Need to give a direction or node")
 
-			message_subject = self.message.subject
 			message_filter = (self.message.types == "filtered")
 			if message_filter:
 				message_body = self.html_filtered % self.message.__dict__
@@ -419,7 +416,6 @@ class panelMessage(panelMessageBase, ShiftMixIn):
 			]
 			message_counter = _("%(msgnum)i of %(allmsgs)i") % {'msgnum': self.messages.index(self.node)+1, 'allmsgs': len(self.messages)}
 
-		self.Title.SetLabel(message_subject)
 		self.Counter.SetLabel(message_counter)
 		self.Message.SetPage(message_body)
 
