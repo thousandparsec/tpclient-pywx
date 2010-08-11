@@ -4,7 +4,7 @@ This overlay draws Star Systems on the Starmap.
 # Python imports
 from math import *
 import copy
-import numpy as N
+from cgi import escape
 
 # wxPython imports
 import wx
@@ -13,7 +13,6 @@ from extra.wxFloatCanvas.RelativePoint import RelativePoint, RelativePointSet
 from extra.wxFloatCanvas.PolygonStatic import PolygonArrow, PolygonShip
 
 # tp imports
-from tp.netlib.objects import constants
 from tp.netlib.objects.parameters import OrderParamAbsSpaceCoords, OrderParamObject
 from tp.netlib.objects                        import Object, OrderDescs
 
@@ -547,13 +546,13 @@ class Systems(SystemLevelOverlay, TrackerObjectOrder):
 					shipcount = shiplist[2]
 					if reftype == GenericRS.Types["Design"]:
 						try:
-							s += "\n    %s %ss" % (shipcount, self.application.cache.designs[shipid].name)
+							s += escape("\n  %s %ss" % (shipcount, self.application.cache.designs[shipid].name))
 						except KeyError:
-							s += "\n  %s %ss" % (shipcount, "Unknown Ships")
+							s += escape("\n  %s %ss" % (shipcount, "Unknown Ships"))
 					elif reftype == GenericRS.Types["Object"]:
-						s += "\n  %s %ss" % (shipcount, self.application.cache.objects[shipid].name)
+						s += escape("\n  %s %ss" % (shipcount, self.application.cache.objects[shipid].name))
 					else:
-						s += "\n  %s %ss" % (shipcount, "Unknown Ships")
+						s += escape("\n  %s %ss" % (shipcount, "Unknown Ships"))
 
 			s += "</font>\n"
 
