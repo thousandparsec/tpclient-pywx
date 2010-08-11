@@ -94,7 +94,6 @@ class panelSystem(panelSystemBase, TrackerObject, FileTrackerMixin):
 		else:
 			self.Tree.SetMinSize((-1,self.GetSize()[1]-self.Search.GetBestSize()[1]-self.StepInto.GetBestSize()[1]))
 		self.Layout()
-		evt.Skip()
 
 	def OnSearchCancel(self, evt):
 		self.Search.SetValue("")
@@ -102,10 +101,6 @@ class panelSystem(panelSystemBase, TrackerObject, FileTrackerMixin):
 
 	def GetPaneInfo(self):
 		info = wx.aui.AuiPaneInfo()
-
-		s = wx.Size(self.parent.GetSize()[0]/5, -1)
-		info.MinSize(s)
-		info.BestSize(s)
 
 		info.Right()
 		info.Layer(1)

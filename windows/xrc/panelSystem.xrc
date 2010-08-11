@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resource version="2.3.0.1" xmlns="http://www.wxwidgets.org/wxxrc">
   <object class="wxPanel" name="panelSystem" subclass="Dialog">
-    <size>400,300</size>
+    <size>100,300</size>
     <object class="wxBoxSizer">
       <object class="sizeritem">
         <object class="wxOrderedTreeCtrl" name="Tree">
