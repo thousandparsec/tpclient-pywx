@@ -17,6 +17,10 @@ from windows.xrc.winIdleFinder import IdleFinderBase
 # Shows messages from the game system to the player.
 from extra.StateTracker import TrackerObject
 
+ID = 0
+NAME = 1
+TYPE = 2
+
 class winIdleFinder(winReportXRC, IdleFinderBase, TrackerObject):
 	"""\
 	This window shows a list of objects you own that do not have any orders.
@@ -42,9 +46,9 @@ class winIdleFinder(winReportXRC, IdleFinderBase, TrackerObject):
 		self.application = application
 		self.oid = -1
 		# Create a panel for the current window.
-		self.idlelist.InsertColumn(0, "Item ID", width = 100)
-		self.idlelist.InsertColumn(1, "Item Name", width = 200)
-		self.idlelist.InsertColumn(2, "Item Type", width = 100)
+		self.idlelist.InsertColumn(ID, "Item ID", width = 100)
+		self.idlelist.InsertColumn(NAME, "Item Name", width = 200)
+		self.idlelist.InsertColumn(TYPE, "Item Type", width = 100)
 
 		self.ascending = 1
 
@@ -84,9 +88,9 @@ class winIdleFinder(winReportXRC, IdleFinderBase, TrackerObject):
 			
 			# If the object has no orders, add it to the list
 			self.idlelist.InsertStringItem(numinlist, "%d" % oid)
-			self.idlelist.SetStringItem(numinlist, 1, self.application.cache.objects[oid].name)
+			self.idlelist.SetStringItem(numinlist, NAME, self.application.cache.objects[oid].name)
 			desc = objects.ObjectDescs()[self.application.cache.objects[oid].subtype]
-			self.idlelist.SetStringItem(numinlist, 2, desc.name)
+			self.idlelist.SetStringItem(numinlist, TYPE, desc._name)
 			self.idlelist.SetItemData(numinlist, oid)
 				
 			numinlist = numinlist + 1
