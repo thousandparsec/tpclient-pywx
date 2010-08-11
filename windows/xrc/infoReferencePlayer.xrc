@@ -16,7 +16,7 @@
       </object>
       <object class="sizeritem">
         <object class="wxStaticText" name="PlayerName">
-          <label>0</label>
+          <label>Player Name</label>
           <style>wxALIGN_LEFT</style>
         </object>
         <option>1</option>

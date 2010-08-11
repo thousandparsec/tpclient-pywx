@@ -141,7 +141,13 @@ def GetPanelForReference(application, parent, type, id, quantity=-1):
 		pass
 	elif "Player" in reftype:
 		panel = infoReferencePlayer(parent)
-		panel.setPlayer(tmpcache.players[id].name, id, quantity)
+		if id == 0:
+			name = "No one"
+		elif id not in tmpcache.players:
+			name = "Unknown"
+		else:
+			name = tmpcache.players[id].name
+		panel.setPlayer(name, id, quantity)
 		return panel
 	elif "Object Action" in reftype:
 		pass
