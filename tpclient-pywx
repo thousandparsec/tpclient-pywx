@@ -439,19 +439,6 @@ class Network(NetworkThread):
 		NetworkThread.CacheUpdate(self, up)
 		up("finishing", "finished", "")
 
-		self.EOTUpdate()
-
-	def EOTUpdate(self):
-		# FIXME: This should go away...
-		# FIXME: This is bad :/
-		gui = self.application.gui
-
-		timeRemaining = self.connection.time(), time.time()
-
-		if failed(timeRemaining[0]):
-			return
-		gui.Call( gui.main.statusbar.SetEndTime, timeRemaining[0]+timeRemaining[1] )
-		gui.Call( gui.main.statusbar.SetTurnNumber, self.application.cache.objects[0].Informational.Year.value )
 
 from tp.client.threads import Application as ClientApplication
 class Application(ClientApplication):
