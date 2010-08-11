@@ -1,4 +1,6 @@
 
+from tp.client import objectutils
+
 class Colorizer(object):
 	"""
 	These classes deal with figuring out the color of an object.
@@ -13,7 +15,7 @@ class Colorizer(object):
 		"""
 		pass
 
-	def __call__(self, owners):
+	def __call__(self, cache, oid):
 		"""
 		This function takes a list of the owners of this object.
 		"""
@@ -33,11 +35,37 @@ class ColorVerses(Colorizer):
 	def __init__(self, pid):
 		self.pid = pid
 
-	def __call__(self, owners):
-		type = (ColorVerses.Unowned, ColorVerses.Enemy)[len(owners)>0]
-		if self.pid in owners:
-			type = (ColorVerses.Friendly, ColorVerses.Contested)[len(owners)>1]
-		return type
+	def __call__(self, cache, oid):
+		owner = objectutils.getOwner(cache, oid)
+		if owner == 0:
+			return self.Unowned
+		elif owner == -1:
+			kids = objectutils.findChildren(cache, oid)
+			
+			owners = set()
+			for kid in kids:
+				kidowner = objectutils.getOwner(cache, kid)
+				if kidowner in (-1, 0):
+					continue
+				owners.add(kidowner)
+
+			owners = list(owners)
+
+			if len(owners) == 0:
+				return self.Unowned
+			elif len(owners) == 1:
+				if owners[0] == self.pid:
+					return self.Friendly
+				else:
+					return self.Enemy
+			else:
+				return self.Contested
+
+		elif owner == self.pid:
+			return self.Friendly
+		else:
+			return self.Enemy
+
 
 class ColorEach(Colorizer):
 	"""
@@ -111,11 +139,28 @@ class ColorEach(Colorizer):
 			self.playercolor[playername] = color
 		return color
 
-	def __call__(self, owners):
-		if len(owners) > 1:
-			return "Red"
-		elif len(owners) == 0:
-			return "White"
-		else:
-			return self[owners[0]]
+	def __call__(self, cache, oid):
+		owner = objectutils.getOwner(cache, oid)
+		if owner == 0:
+			return ColorVerses.Unowned
 
+		elif owner == -1:
+			kids = objectutils.findChildren(cache, oid)
+			
+			owners = set()
+			for kid in kids:
+				kidowner = objectutils.getOwner(cache, kid)
+				if kidowner in (-1, 0):
+					continue
+				owners.add(kidowner)
+
+			owners = list(owners)
+
+			if len(owners) == 0:
+				return ColorVerses.Unowned
+			elif len(owners) == 1:
+				return self[owners[0]]
+			else:
+				return ColorVerses.Contested
+		else:
+			return self[owner]

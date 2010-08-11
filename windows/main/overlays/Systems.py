@@ -24,37 +24,6 @@ from tp.client import objectutils
 from Overlay   import SystemLevelOverlay, Holder
 from Colorizer import *
 
-def FindChildren(tmpcache, obj):
-	"""
-	Figure out all the children of this object.
-	"""
-	if not isinstance(obj, Object):
-		raise TypeError("Object must be an object not %r" % obj)
-
-	kids = set()
-	for cid in obj.contains:
-		child = tmpcache.objects[cid]
-
-		kids.update(FindChildren(tmpcache, child))
-		kids.add(child)
-
-	return list(kids)
-
-def FindOwners(tmpcache, obj):
-	"""
-	Figure out the owners of this oidect (and it's children).
-	"""
-	if not isinstance(obj, Object):
-		raise TypeError("Object must be an object not %r" % obj)
-
-	owners = set()
-	for child in [obj]+FindChildren(tmpcache, obj):
-		owner = objectutils.getOwner(tmpcache, child.id)
-
-		if owner in (0, -1):
-			continue
-		owners.add(owner)
-	return list(owners)
 
 class IconMixIn:
 	"""
@@ -86,11 +55,11 @@ class IconMixIn:
 		self.Colorizer = colorizer
 
 	def GetColors(self):
-		parentcolor = self.Colorizer(FindOwners(self.tmpcache, self.primary))
+		parentcolor = self.Colorizer(self.tmpcache, self.primary.id)
 		
 		childrencolors = []
 		for child in self.children:
-			childrencolors.append(self.Colorizer(FindOwners(self.tmpcache, child)))
+			childrencolors.append(self.Colorizer(self.tmpcache, child.id))
 	
 		return parentcolor, childrencolors
 
@@ -104,7 +73,11 @@ class SystemIcon(Group, Holder, IconMixIn):
 
 	def __init__(self, tmpcache, system, colorizer=None):
 
-		Holder.__init__(self, system, FindChildren(tmpcache, system))
+		kids = []
+		for cid in objectutils.findChildren(tmpcache, system.id):
+			kids.append(tmpcache.objects[cid])
+
+		Holder.__init__(self, system, kids)
 
 		# Get the colors of the object
 		IconMixIn.__init__(self, tmpcache, colorizer)
@@ -149,7 +122,7 @@ class FleetIcon(Group, Holder, IconMixIn):
 		return FleetIcon(self.tmpcache, self.primary, self.Colorizer)
 
 	def __init__(self, tmpcache, fleet, colorizer=None):
-		if len(FindChildren(tmpcache, fleet)) > 0:
+		if len(objectutils.findChildren(tmpcache, fleet.id)) > 0:
 			raise TypeError('The fleet has children! WTF?')
 
 		Holder.__init__(self, fleet, [])
@@ -188,7 +161,7 @@ class WormholeIcon(Group, Holder, IconMixIn):
 		if not isinstance(wormhole, Wormhole):
 			raise TypeError('WormholeIcon must be given a Wormhole, %r' % system)
 
-		if len(FindChildren(tmpcache, wormhole)) > 0:
+		if len(objectutils.findChildren(tmpcache, wormhole.id)) > 0:
 			raise TypeError('The wormhole has children! WTF?')
 
 		Holder.__init__(self, wormhole, [])
@@ -525,7 +498,7 @@ class Systems(SystemLevelOverlay, TrackerObjectOrder):
 			if self.Selected != None and self.Selected.current == cobj:
 				style = 'italic'
 
-			color = icon.Colorizer(FindOwners(self.application.cache, cobj))
+			color = icon.Colorizer(self.application.cache, cobj.id)
 
 			# Tabulate non-systems
 			if not objectutils.isTopLevel(self.application.cache, cobj.parent):
