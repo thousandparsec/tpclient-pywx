@@ -130,7 +130,7 @@ class winMixIn(object):
 
 	def OnClose(self, evt):
 		# Ignore close events
-		if evt.CanVeto():
+		if hasattr(evt, 'CanVeto') and evt.CanVeto():
 			evt.Veto(True)
 		self.Hide()
 

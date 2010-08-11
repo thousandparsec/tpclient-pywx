@@ -153,9 +153,10 @@ class winMain(winBase):
 		from windows.main.winIdleFinder import winIdleFinder
 		from windows.main.winDownloadManager import winDownloadManager
 		from windows.main.winGameInfo import winGameInfo
+		from windows.main.winWaiting import winWaiting
 
 		self.windows = {}
-		for window in [winDesign, winIdleFinder, winDownloadManager, winGameInfo]:
+		for window in [winDesign, winIdleFinder, winDownloadManager, winGameInfo, winWaiting]:
 			title = window.title
 			self.windows[title] = window(application, self)
 			

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource version="2.3.0.1" xmlns="http://www.wxwidgets.org/wxxrc">
+  <object class="wxFrame" name="winWaiting" subclass="Frame">
+    <object class="wxPanel" name="Panel">
+      <style>wxSUNKEN_BORDER|wxTAB_TRAVERSAL</style>
+      <object class="wxFlexGridSizer">
+        <object class="sizeritem">
+          <object class="wxStaticText" name="TitleText">
+            <label>End of turn requested!</label>
+            <font>
+              <size>14</size>
+              <weight>bold</weight>
+              <family>swiss</family>
+              <face>Sans</face>
+            </font>
+            <style>wxALIGN_CENTRE</style>
+          </object>
+          <flag>wxEXPAND|wxGROW|wxALIGN_CENTRE</flag>
+        </object>
+        <object class="sizeritem">
+          <object class="wxStaticText" name="Message">
+            <label>Thanks for requesting end of turn.
+
+The turn will end as soon as the other players get their buttocks into 
+gear and click the end of turn button too.</label>
+            <style>wxALIGN_CENTRE</style>
+          </object>
+        </object>
+        <object class="sizeritem">
+          <object class="wxStaticText" name="WaitingFor">
+            <label>Waiting for:</label>
+            <font>
+              <size>14</size>
+              <weight>bold</weight>
+              <family>swiss</family>
+              <face>Sans</face>
+            </font>
+            <style>wxALIGN_CENTRE</style>
+          </object>
+          <flag>wxGROW|wxGROW|wxALL|wxADJUST_MINSIZE</flag>
+          <border>5</border>
+        </object>
+        <object class="sizeritem">
+          <object class="wxListCtrl" name="WaitingList">
+            <style>wxLC_REPORT</style>
+          </object>
+          <option>1</option>
+          <flag>wxEXPAND|wxGROW</flag>
+        </object>
+        <object class="sizeritem">
+          <flag>wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxALL</flag>
+          <border>3</border>
+          <object class="wxStdDialogButtonSizer">
+            <object class="button">
+              <flag>wxALIGN_RIGHT|wxBOTTOM</flag>
+              <border>5</border>
+              <object class="wxButton" name="wxID_CANCEL">
+                <label>&amp;Cancel</label>
+              </object>
+            </object>
+          </object>
+        </object>
+        <cols>1</cols>
+        <rows>3</rows>
+        <vgap>0</vgap>
+        <hgap>0</hgap>
+        <growablecols>0</growablecols>
+        <growablerows>3</growablerows>
+      </object>
+    </object>
+    <size>600,440</size>
+    <title>TP: Connect to a Server</title>
+    <style>wxCAPTION|wxSYSTEM_MENU|wxRESIZE_BORDER|wxCLOSE_BOX</style>
+  </object>
+</resource>
