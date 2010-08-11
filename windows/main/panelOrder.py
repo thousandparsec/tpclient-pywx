@@ -846,10 +846,10 @@ class panelOrder(panelOrderBase, TrackerObject, TrackerOrder):
 			subtype, orderstring = self.clipboard[0]
 			order = objects.Header.fromstr(orderstring[:objects.Header.size])
 			order.__process__(orderstring[objects.Header.size:])
-			if t.endswith(_("After")):
-				node = self.InsertAfterOrder(order)
-			else:
+			if t.endswith(_("Before")):
 				node = self.InsertBeforeOrder(order)
+			else:
+				node = self.InsertAfterOrder(order)
 
 			for order in self.clipboard[1:]:
 				node = self.InsertAfterOrder(order, node)
