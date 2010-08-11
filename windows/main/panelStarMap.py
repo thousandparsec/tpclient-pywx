@@ -442,6 +442,6 @@ class panelStarMap(panelStarMapBase, TrackerObjectOrder):
 		else:
 			TrackerObjectOrder.OnKeyUp(self, evt)
 		
-		if sys.platform == "win32":
-			self.Canvas.ProcessEvent(evt)
+		# Possibly not needed on some operation systems
+		self.Canvas.ProcessEvent(evt)
 
