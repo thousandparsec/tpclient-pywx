@@ -39,7 +39,11 @@ class ImageIcon(Group, Holder, IconMixIn):
 
 	def __init__(self, tmpcache, canvas, system, image, colorizer=None):
 
-		Holder.__init__(self, system, FindChildren(tmpcache, system))
+		kids = []
+		for cid in objectutils.findChildren(tmpcache, system.id):
+			kids.append(tmpcache.objects[cid])	
+
+		Holder.__init__(self, system, kids)
 
 		# Get the colors of the object
 		IconMixIn.__init__(self, tmpcache, colorizer)

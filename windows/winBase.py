@@ -152,7 +152,7 @@ class winBaseMixIn(winMixIn):
 
 	def HideChildren(self):
 		for window in self.children.values():
-			if isinstance(window, winBase):
+			if isinstance(window, winMixIn):
 				window.Hide()
 
 	def RaiseChildren(self):
