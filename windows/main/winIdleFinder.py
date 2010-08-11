@@ -60,14 +60,14 @@ class winIdleFinder(winReportXRC, IdleFinderBase, TrackerObject):
 		self.idlelist.DeleteAllItems()
 		numinlist = 0
 		universe = self.application.cache.objects.keys()
-		for object in universe:
+		for oid in universe:
 			hasorders = False
 			
 			# Only show objects owned by this player
-			if not objectutils.getOwner(self.application.cache, object) == self.application.cache.players[0].id:
+			if not objectutils.getOwner(self.application.cache, oid) == self.application.cache.players[0].id:
 				continue
 			
-			orderqueuelist = objectutils.getOrderQueueList(self.application.cache, object)
+			orderqueuelist = objectutils.getOrderQueueList(self.application.cache, oid)
 			
 			if orderqueuelist == None or len(orderqueuelist) <= 0:
 				continue
@@ -83,11 +83,11 @@ class winIdleFinder(winReportXRC, IdleFinderBase, TrackerObject):
 				continue
 			
 			# If the object has no orders, add it to the list
-			self.idlelist.InsertStringItem(numinlist, "%d" % object)
-			self.idlelist.SetStringItem(numinlist, 1, self.application.cache.objects[object].name)
-			desc = objects.ObjectDescs()[self.application.cache.objects[object].subtype]
+			self.idlelist.InsertStringItem(numinlist, "%d" % oid)
+			self.idlelist.SetStringItem(numinlist, 1, self.application.cache.objects[oid].name)
+			desc = objects.ObjectDescs()[self.application.cache.objects[oid].subtype]
 			self.idlelist.SetStringItem(numinlist, 2, desc.name)
-			self.idlelist.SetItemData(numinlist, object)
+			self.idlelist.SetItemData(numinlist, oid)
 				
 			numinlist = numinlist + 1
 		
