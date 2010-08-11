@@ -187,6 +187,7 @@ class winMain(winBase):
 		self.SetMenuBar(self.Menu(self))
 
 		self.updatepending = False
+		self.beenshown = False
 		self.application.gui.Binder(self.application.NetworkClass.NetworkTimeRemainingEvent, self.OnNetworkTimeRemaining)
 
 	def Show(self, show=True):
@@ -196,7 +197,10 @@ class winMain(winBase):
 		winBase.Show(self)
 
 		# Show the tips..
-		wx.CallAfter(self.ShowTips)
+		if not self.beenshown:
+	            wx.CallAfter(self.ShowTips)
+
+		self.beenshown = True
 
 	# Config Functions -----------------------------------------------------------------------------
 	def ConfigDefault(self, config=None):
