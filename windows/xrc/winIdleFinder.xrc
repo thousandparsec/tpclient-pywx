@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resource>
-  <object class="wxFrame" name="IdleFinder">
+  <object class="wxFrame" name="winIdleFinder">
     <title>Objects Without Orders</title>
-    <object class="wxPanel" name="base">
+    <object class="wxPanel" name="Base">
       <object class="wxBoxSizer">
         <orient>wxVERTICAL</orient>
         <object class="sizeritem">
-          <object class="wxListCtrl" name="idlelist">
+          <object class="wxListCtrl" name="IdleList">
             <style>wxLC_REPORT</style>
           </object>
           <option>1</option>

@@ -11,7 +11,7 @@ from wx.xrc import XRCCTRL, XmlResourceWithHandlers
 # Local imports
 from requirements import location
 
-class IdleFinderBase:
+class winIdleFinderBase:
 	"""\
 Unlike a normal XRC generated class, this is a not a full class but a MixIn.
 Any class which uses this as a base must also inherit from a proper wx object
@@ -48,14 +48,14 @@ This is so that a the same XRC can be used for both MDI and non-MDI frames.
 		
 		# Two stage creation (see http://wiki.wxpython.org/index.cgi/TwoStageCreation)
 		pre = getattr(wx, "Pre%s" % base.__name__)()
-		if not res.LoadOnFrame(pre, parent, "IdleFinder"):
-			raise IOError("Did not find the IdleFinder in the XRC file")
+		if not res.LoadOnFrame(pre, parent, "winIdleFinder"):
+			raise IOError("Did not find the winIdleFinder in the XRC file")
 		self.PreCreate(pre)
 		self.PostCreate(pre)
 
 		# Define variables for the controls
-		self.base = XRCCTRL(self, "base")
-		self.idlelist = XRCCTRL(self, "idlelist")
+		self.Base = XRCCTRL(self, "Base")
+		self.IdleList = XRCCTRL(self, "IdleList")
 
 
 def strings():
