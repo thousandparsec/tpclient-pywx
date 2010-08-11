@@ -13,10 +13,8 @@
         <border>1</border>
         <object class="wxBoxSizer">
           <orient>wxHORIZONTAL</orient>
-          
           <object class="sizeritem">
             <object class="wxStaticText" name="Title">
-              <label>Static text</label>
               <style>wxALIGN_CENTRE|wxST_NO_AUTORESIZE</style>
             </object>
             <flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTRE_VERTICAL|wxADJUST_MINSIZE</flag>
@@ -28,7 +26,6 @@
           </object>
           <object class="sizeritem">
             <object class="wxStaticText" name="Counter">
-              <label>100 of 100</label>
               <font>
                 <size>8</size>
                 <family>swiss</family>
@@ -45,25 +42,6 @@
         <object class="wxFlexGridSizer">
           <object class="sizeritem">
             <object class="wxHtmlWindow" name="Message">
-              <htmlcode>&lt;html&gt;
-&lt;body&gt;
-&lt;center&gt;
-	&lt;table cols=1 width=&quot;100%&quot;&gt;
-		&lt;tr&gt;
-			&lt;td&gt;&lt;b&gt;Subject:&lt;/b&gt; You are unloved!&lt;/td&gt;
-		&lt;/tr&gt;
-		&lt;tr&gt;
-			&lt;td&gt;
-			You have received no messages this turn!&lt;br&gt;&lt;br&gt;
-			Actually if you didn't receive any messages it most probably
-			means that your client couldn't load the results from the server.
-			Try reload/restart the client.
-			&lt;/td&gt;
-		&lt;/tr&gt;
-	 &lt;/table&gt;
-&lt;/center&gt;
-&lt;/body&gt;
-&lt;/html&gt;</htmlcode>
               <style>wxNO_BORDER</style>
             </object>
             <option>1</option>

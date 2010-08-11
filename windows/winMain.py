@@ -187,13 +187,17 @@ class winMain(winBase):
 		self.SetMenuBar(self.Menu(self))
 
 		self.updatepending = False
+		self.beenshown = False
 		self.application.gui.Binder(self.application.NetworkClass.NetworkTimeRemainingEvent, self.OnNetworkTimeRemaining)
 
 	def Show(self, show=True):
 		winBase.Show(self)
 
 		# Show the tips..
-		wx.CallAfter(self.ShowTips)
+		if not self.beenshown:
+	            wx.CallAfter(self.ShowTips)
+
+		self.beenshown = True
 
 	def Hide(self, show=False):
 		self.HideChildren()
@@ -256,7 +260,7 @@ class winMain(winBase):
 		file.Append( ID_UNIV, _("Download the &Universe\tCtrl-U"), _("Download the Universe") )
 		file.Append( ID_TURN, _("Request End of &Turn\tCtrl-T"),   _("Send a message to the server requesting the turn end soon.") )
 		file.AppendSeparator()
-		file.Append( wx.ID_PREFERENCES, _("&Preferences"), _("Configure the Client") )
+		file.Append( wx.ID_PREFERENCES, _("&Preferences\tCtrl-P"), _("Configure the Client") )
 		file.AppendSeparator()
 		file.Append( ID_EXIT, _("Exit"), _("Exit") )
 
