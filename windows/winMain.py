@@ -190,13 +190,14 @@ class winMain(winBase):
 		self.application.gui.Binder(self.application.NetworkClass.NetworkTimeRemainingEvent, self.OnNetworkTimeRemaining)
 
 	def Show(self, show=True):
-		if not show:
-			return self.Hide()
-
 		winBase.Show(self)
 
 		# Show the tips..
 		wx.CallAfter(self.ShowTips)
+
+	def Hide(self, show=False):
+		self.HideChildren()
+		winBase.Hide(self)
 
 	# Config Functions -----------------------------------------------------------------------------
 	def ConfigDefault(self, config=None):
