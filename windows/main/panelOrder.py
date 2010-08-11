@@ -61,6 +61,9 @@ class panelOrder(panelOrderBase, TrackerObject, TrackerOrder):
 		self.Orders.Bind(wx.EVT_RIGHT_UP, self.OnRightClick)
 		self.Bind(wx.EVT_KEY_UP, self.OnKeyUp)
 
+	def OnKeySkip(self, evt):
+		pass
+
 	##########################################################################
 	# AUI interface bits
 	##########################################################################
@@ -566,6 +569,7 @@ class panelOrder(panelOrderBase, TrackerObject, TrackerOrder):
 
 			# Create a new panel
 			self.ArgumentsPanel = wx.Panel(self.DetailsPanel, -1)
+			self.ArgumentsPanel.Bind(wx.EVT_KEY_UP, self.OnKeySkip)
 
 			self.ArgumentsPanel.SetAutoLayout( True )
 			self.ArgumentsSizer = wx.FlexGridSizer( 0, 1, 0, 0)
