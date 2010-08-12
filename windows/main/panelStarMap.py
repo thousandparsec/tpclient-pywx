@@ -22,6 +22,7 @@ from overlays.Systems  import Systems
 from overlays.Influence import Influence
 from overlays.SystemIcons  import SystemIcons
 from overlays.Path     import Paths
+from overlays.Velocity     import Velocity
 
 from windows.xrc.panelStarMap import panelStarMapBase
 
@@ -64,7 +65,7 @@ class GUIWaypointEdit(GUIWaypoint):
 class panelStarMap(panelStarMapBase, TrackerObjectOrder):
 	title = _("StarMap")
 
-	Overlays = [(Influence, Paths, Systems), (Paths, Resource), (Paths, SystemIcons)]
+	Overlays = [(Influence, Velocity, Paths, Systems), (Paths, Resource), (Paths, SystemIcons)]
 	def __init__(self, application, parent):
 		panelStarMapBase.__init__(self, parent)
 		self.parent = parent
