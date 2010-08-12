@@ -40,6 +40,9 @@ class TrackerObject(object):
 
 		# If there was a whole cache update
 		if evt.what is None:
+			if self.oid not in self.application.cache.objects:
+				self.oid = None
+
 			self.ObjectRefreshAll()
 
 			# Refresh the currently selected object
@@ -229,6 +232,9 @@ class TrackerOrder(object):
 	
 		# If there was a whole cache update
 		if evt.what is None:
+			if self.qid not in self.application.cache.orderqueues:
+				self.OrderQueueSelect(None)
+
 			if self.qid:
 				self.SelectOrders([])
 			return
