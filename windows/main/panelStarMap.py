@@ -62,6 +62,24 @@ class GUIWaypoint(GUIMode.GUIMouse):
 class GUIWaypointEdit(GUIWaypoint):
 	pass
 
+class GUIMouseMoveZoom(GUIMode.GUIMouseAndMove):
+	def __init__(self, *args, **kw):
+		GUIMode.GUIMouseAndMove.__init__(self, *args, **kw)
+
+	def OnWheel(self, event):
+		pos = event.GetPosition()
+		size = self.parent.GetSize()
+		center = size[0]/2, size[1]/2
+
+		move = center[0]-pos[0], center[1]-pos[1]
+		if event.GetWheelRotation() < 0:
+			self.parent.Zoom(0.90, event.GetPosition(), 'Pixel', False)
+			self.parent.MoveImage(move, 'Pixel')
+		else:
+			self.parent.Zoom(1.10, event.GetPosition(), 'Pixel', False)
+			self.parent.MoveImage(move, 'Pixel')
+
+
 class panelStarMap(panelStarMapBase, TrackerObjectOrder):
 	title = _("StarMap")
 
@@ -127,7 +145,7 @@ class panelStarMap(panelStarMapBase, TrackerObjectOrder):
 			self.DisplayMode.Append(overlay[-1].name, overlay)
 		self.DisplayMode.SetSelection(0)
 
-		self.GUISelect   = GUIMode.GUIMouseAndMove(self.Canvas)
+		self.GUISelect   =         GUIMouseMoveZoom(self.Canvas)
 		self.GUIMove     = GUIMode.GUIMove(self.Canvas)
 		self.GUIZoomIn   = GUIMode.GUIZoomIn(self.Canvas)
 		self.GUIZoomOut  = GUIMode.GUIZoomOut(self.Canvas)
