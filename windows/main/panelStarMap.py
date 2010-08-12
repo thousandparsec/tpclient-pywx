@@ -388,7 +388,7 @@ class panelStarMap(panelStarMapBase, TrackerObjectOrder):
 				# Check if the object has a homeworld resource.
 				resourcelist = objectutils.getResources(self.application.cache, oid)
 				for resources in resourcelist:
-					if resources[0] != homeresources:
+					if resources[0] != homeresource:
 						continue
 						
 					if sum(resources[1:]) == 0:
