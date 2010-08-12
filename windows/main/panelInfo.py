@@ -480,6 +480,12 @@ class FoldPanel(ArgumentPanel, FoldPanelBase, FileTrackerMixin):
 				containerpanel.Layout()
 			self.FoldBar.AddFoldPanelWindow(item, containerpanel, fpb.FPB_ALIGN_WIDTH, 5, 20)
 			return
+		elif isinstance(group, parameters.ObjectParamInfluence):
+			integer = "%s" % attr.diameter
+			integerpanel = infoInteger(item)
+			integerpanel.setIntegerLabel(integer)
+			self.FoldBar.AddFoldPanelWindow(item, integerpanel, fpb.FPB_ALIGN_WIDTH, 5, 20)
+			return
 
 	def GetPanelsLength(self, collapsed, expanded):
 		return self.FoldBar.GetPanelsLength(collapsed, expanded)

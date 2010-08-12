@@ -19,6 +19,7 @@ from extra.wxFloatCanvas import FloatCanvas
 
 from overlays.Resource import Resource
 from overlays.Systems  import Systems
+from overlays.Influence import Influence
 from overlays.SystemIcons  import SystemIcons
 from overlays.Path     import Paths
 
@@ -63,7 +64,7 @@ class GUIWaypointEdit(GUIWaypoint):
 class panelStarMap(panelStarMapBase, TrackerObjectOrder):
 	title = _("StarMap")
 
-	Overlays = [(Paths, Systems), (Paths, Resource), (Paths, SystemIcons)]
+	Overlays = [(Influence, Paths, Systems), (Paths, Resource), (Paths, SystemIcons)]
 	def __init__(self, application, parent):
 		panelStarMapBase.__init__(self, parent)
 		self.parent = parent
@@ -229,24 +230,27 @@ class panelStarMap(panelStarMapBase, TrackerObjectOrder):
 				Overlay = None
 
 			# Remove the panel from the sizer
-			self.DisplayModeExtra.GetSizer().Remove(self.DisplayModePanel)
+			for panel in self.DisplayModePanels:
+				self.DisplayModeExtra.GetSizer().Remove(panel)
 
-			# Destroy the panel and all it's children
-			self.DisplayModePanel.Destroy()
+				# Destroy the panel and all it's children
+				panel.Destroy()
 
 			# Destory our reference to the panel
-			del self.DisplayModePanel
+			del self.DisplayModePanels
 
 		# Create a new panel
-		self.DisplayModePanel = wx.Panel(self.DisplayModeExtra)
-		#self.DisplayModePanel.SetBackgroundColour(wx.BLUE) # Only needed for debugging where the panel is covering
-		# Add the panel to the sizer
-		self.DisplayModeExtra.GetSizer().Add(self.DisplayModePanel, proportion=1, flag=wx.EXPAND)
+		self.DisplayModePanels = []
+
 
 		# Create the new overlay
 		self.Overlay = []
 		for Overlay in cls:
-			self.Overlay.append(Overlay(self, self.Canvas, self.DisplayModePanel))
+			panel = wx.Panel(self.DisplayModeExtra)
+			self.DisplayModePanels.append(panel)
+			self.DisplayModeExtra.GetSizer().Add(panel, proportion=1, flag=wx.EXPAND)
+
+			self.Overlay.append(Overlay(self, self.Canvas, panel))
 			try:
 				self.Overlay[-1].UpdateAll()
 			except Exception, e:
@@ -383,11 +387,11 @@ class panelStarMap(panelStarMapBase, TrackerObjectOrder):
 
 				# Check if the object has a homeworld resource.
 				resourcelist = objectutils.getResources(self.application.cache, oid)
-				for resource in resourcelist:
-					if resource[0] != homeresource:
+				for resources in resourcelist:
+					if resources[0] != homeresources:
 						continue
 						
-					if resource[1] == 0:
+					if sum(resources[1:]) == 0:
 						continue
 
 					foundhomeworld = oid

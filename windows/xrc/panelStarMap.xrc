@@ -69,7 +69,7 @@
           <object class="sizeritem">
             <object class="wxPanel" name="DisplayModeExtra">
               <object class="wxFlexGridSizer">
-                <cols>1</cols>
+                <cols>100</cols>
                 <rows>1</rows>
                 <growablerows>0</growablerows>
                 <growablecols>0</growablecols>

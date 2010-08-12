@@ -156,6 +156,10 @@ class Overlay(dict):
 		"""
 		raise NotImplementedError("Select Object method has not been implemented!")
 
+	def SelectObject(self, oid):
+		pass
+
+
 class Holder(list):
 	"""
 	A holder is an entity which contains a "primary" object and a bunch of
