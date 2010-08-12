@@ -11,21 +11,6 @@ from tp.client import objectutils
 
 from Overlay import Overlay
 
-class Circle(FloatCanvas.Point):
-	"""
-	Display a round dot which is sized proportionally.
-	"""
-	
-	def copy(self):
-		# FIXME: Very expensive
-		return Circle(self.tmpcache, self.obj, self.size)
-
-	def __init__(self, tmpcache, obj, size):
-		self.tmpcache = tmpcache
-		self.obj = obj
-		self.size = size
-
-		
 
 class Influence(Overlay):
 	"""\
