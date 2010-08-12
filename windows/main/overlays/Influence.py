@@ -63,7 +63,12 @@ class Influence(Overlay):
 		Overlay.UpdateAll(self)
 
 	def OnInfluenceMode(self, evt):
-		self.shown_influences = [self.InfluenceMode.GetClientData(self.InfluenceMode.GetSelection())]
+		self.shown_influences = []
+
+		value = self.InfluenceMode.GetClientData(self.InfluenceMode.GetSelection())
+		if value:
+			self.shown_influences.append(value)		
+
 		Overlay.UpdateAll(self)
 		self.canvas.Draw()
 
@@ -81,10 +86,12 @@ class Influence(Overlay):
 		if not self.shown_influences:
 			return
 
+		influences = []
 		for influence_name in self.shown_influences:
 			influence = objectutils.getInfluence(c, oid, influence_name)
 			if influence is False:
 				return
 			icon = FloatCanvas.Circle(pos[0][0:2], influence, LineColor='Blue', FillColor='Blue')
 			icon.DrawOrder = -influence
-			self[oid] = icon
+			influences.append(icon)
+		self[oid] = influences
