@@ -388,7 +388,7 @@ class Systems(SystemLevelOverlay, TrackerObjectOrder):
 						# A callback function for a menu item with object order parameter
 						def ObjectOrderItemSelected(toobject, toqueueid=queueid, how=orderdesc):
 							# Compose arguments list for Order
-							args = [-1, toqueueid, -1, how.subtype, 0, [], toobject.id]
+							args = [-1, toqueueid, -1, how.subtype, 0, [], (toobject.id, [])]
 							
 							neworder = how(*args)
 							neworder._dirty = True
