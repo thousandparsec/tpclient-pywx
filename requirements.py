@@ -15,7 +15,7 @@ if hasattr(version, "version_git"):
 	for module in modules:
 		if os.path.exists(module) and not os.path.exists(os.path.join(module, ".git")):
 			os.system("git submodule init")
-	#os.system("git submodule update")
+	os.system("git submodule update")
 
 for module in modules:
 	if os.path.exists(module):
