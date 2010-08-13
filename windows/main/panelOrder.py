@@ -6,6 +6,7 @@ The order window.
 import time
 import copy
 import sys
+import os
 
 from extra.decorators import *
 
@@ -19,6 +20,8 @@ from tp.netlib.objects import parameters
 
 from tp.client import objectutils
 from tp.client.ChangeList import ChangeNode, ChangeHead
+
+from requirements import graphicsdir
 
 TURNS_COL = 0
 ORDERS_COL = 1
@@ -78,6 +81,8 @@ class panelOrder(panelOrderBase, TrackerObject, TrackerOrder):
 		info.Layer(2)
 		info.CaptionVisible(True)
 		info.Caption(self.title)
+		info.MinimizeButton(True)
+		info.Icon(wx.Bitmap(os.path.join(graphicsdir, "order-icon.png")))
 		return info
 
 	def DockBestSize(self):

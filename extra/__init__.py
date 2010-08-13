@@ -835,24 +835,14 @@ wx.SimpleValidator = wxSimpleValidator
 from PopupCtrl import PopupCtrl
 wx.PopupCtrl = PopupCtrl
 
+
 ########################
 # Figure out which AUI we should be using.
 ########################
-if wx.VERSION_STRING < "2.8":
-		if wx.VERSION_STRING < "2.7.2" and wx.VERSION_STRING > "2.7.0":
-			import wx.aui as aui
-		else:
-			import PyAUI as aui
-			aui.AUI_BUTTON_CUSTOM1 = aui.PaneInfo.buttonCustom1
-			aui.AUI_BUTTON_CUSTOM2 = aui.PaneInfo.buttonCustom2
-			aui.AUI_BUTTON_CUSTOM3 = aui.PaneInfo.buttonCustom3
 
-		aui.AuiManager		= aui.FrameManager
-		aui.AuiManagerEvent = aui.FrameManagerEvent
-		aui.AuiPaneInfo		= aui.PaneInfo
-		aui.AuiFloatingPane = aui.FloatingPane
-else:
-	import wx.aui as aui
+try:
+    from agw import aui
+except ImportError:
+    import wx.lib.agw.aui as aui
 
 wx.aui = aui
-print "Using the following AUI", wx.aui

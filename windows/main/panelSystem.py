@@ -107,6 +107,8 @@ class panelSystem(panelSystemBase, TrackerObject, FileTrackerMixin):
 		info.PinButton(True)
 		info.CaptionVisible(True)
 		info.Caption(self.title)
+		info.MinimizeButton(True)
+		info.Icon(wx.Bitmap(os.path.join(graphicsdir, "system-icon.png")))
 		return info
 
 	def ObjectTurnSummary(self, object):

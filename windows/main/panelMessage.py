@@ -7,6 +7,7 @@ Messages are displayed using basic HTML.
 
 # Python Imports
 from sets import Set
+import os
 
 # wxPython Imports
 import wx
@@ -249,6 +250,8 @@ class panelMessage(panelMessageBase, ShiftMixIn):
 		info.Layer(1)
 		info.CaptionVisible(True)
 		info.Caption(self.title)
+		info.MinimizeButton(True)
+		info.Icon(wx.Bitmap(os.path.join(graphicsdir, "message-icon.png")))
 		return info
 
 	def Show(self, show=True):

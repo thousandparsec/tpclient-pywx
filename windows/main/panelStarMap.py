@@ -283,6 +283,8 @@ class panelStarMap(panelStarMapBase, TrackerObjectOrder):
 		info.MaximizeButton(True)
 		info.CaptionVisible(True)
 		info.Caption(self.title)
+		info.MinimizeButton(True)
+		info.Icon(wx.Bitmap(os.path.join(graphicsdir, "starmap-icon.png")))
 		return info
 
 	def OnSize(self, evt):

@@ -56,6 +56,8 @@ class panelInformation(panelInformationBase):
 		info.Layer(2)
 		info.CaptionVisible(True)
 		info.Caption(self.title)
+		info.MinimizeButton(True)
+		info.Icon(wx.Bitmap(os.path.join(graphicsdir, "info-icon.png")))
 		return info
 
 	def OnMediaUpdate(self, evt):
