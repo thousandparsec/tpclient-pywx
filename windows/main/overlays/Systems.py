@@ -86,29 +86,23 @@ class SystemIcon(Group, Holder, IconMixIn):
 		ObjectList = []
 
 		positionlist = objectutils.getPositionList(system)
-		if positionlist == []:
-			raise TypeError('Object passed to SystemIcon has no coordinates, %r' % system)
+		if len(positionlist) != 1:
+			raise TypeError('Object passed to SystemIcon has wrong number of coordinates, %r %r' % (system, positionlist))
 
-		prevpos = ()
-		# The center point for each position
-		for position in positionlist:
-			ObjectList.append(Point(position[0:2], type, self.PrimarySize, False))
-			if prevpos != ():
-				ObjectList.append(Line((prevpos[0:2], position[0:2]), type))
-			prevpos = position
+		position = positionlist[0]
+
+		ObjectList.append(Point(position[0:2], type, self.PrimarySize, False))
 
 		if len(self.children) > 0:
 			# The orbit bits
-			for position in positionlist:
-				ObjectList.insert(0, Point(position[0:2], "Black", 8, InForeground=True))
-				ObjectList.insert(0, Point(position[0:2], "Grey",  9, InForeground=True))
+			ObjectList.insert(0, Point(position[0:2], "Black", 8, InForeground=True))
+			ObjectList.insert(0, Point(position[0:2], "Grey",  9, InForeground=True))
 	
 			# The orbiting children
 			for i, childtype in enumerate(childtype):
-				for position in positionlist:
-					ObjectList.append(
-						RelativePoint(position[0:2], childtype, self.ChildSize, True, self.ChildOffset(i))
-					)
+				ObjectList.append(
+					RelativePoint(position[0:2], childtype, self.ChildSize, True, self.ChildOffset(i))
+				)
 
 		Group.__init__(self, ObjectList, False)
 
@@ -157,12 +151,6 @@ class WormholeIcon(Group, Holder, IconMixIn):
 	XY = property(XY)
 
 	def __init__(self, tmpcache, wormhole, colorizer=None):
-		if not isinstance(wormhole, Wormhole):
-			raise TypeError('WormholeIcon must be given a Wormhole, %r' % system)
-
-		if len(objectutils.findChildren(tmpcache, wormhole.id)) > 0:
-			raise TypeError('The wormhole has children! WTF?')
-
 		Holder.__init__(self, wormhole, [])
 
 		# Get the colors of the object
@@ -173,7 +161,15 @@ class WormholeIcon(Group, Holder, IconMixIn):
 		ObjectList = []
 
 		# The little ship icon
-		ObjectList.append(Line((wormhole.start[0:2], wormhole.end[0:2]), type))
+		positions = objectutils.getPositionList(wormhole)
+
+		start = positions.pop(0)
+		while len(positions) > 0:
+			end = positions.pop(0)
+		
+			ObjectList.append(Line((start[0:2], end[0:2]), type))
+
+			start = end
 
 		Group.__init__(self, ObjectList, False)
 
@@ -232,8 +228,13 @@ class Systems(SystemLevelOverlay, TrackerObjectOrder):
 	def Icon(self, obj):
 		if objectutils.isFleet(self.application.cache, obj.id):
 			return FleetIcon(self.application.cache, obj, self.Colorizer)
-		
-		return SystemIcon(self.application.cache, obj, self.Colorizer)
+	
+		if len(objectutils.getPositionList(obj)) == 1:	
+			return SystemIcon(self.application.cache, obj, self.Colorizer)
+		else:
+			icon = WormholeIcon(self.application.cache, obj, self.Colorizer)
+			icon.DrawOrder = -100
+			return icon
 
 	def ArrowTo(self, arrow, icon, object):
 		arrow.SetPoint(icon.XY)
