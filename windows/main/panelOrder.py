@@ -925,13 +925,10 @@ class ObjectArgumentPanel(ArgumentPanel, orderObjectBase):
 		for object in objects:
 			combobox.Append(object.name + " (%s)" % object.id, object.id)
 
-			#if hasattr(object, "parent"):
-			#	combobox.SetToolTipItem(combobox.GetCount()-1, _("At ") + cache.objects[object.parent].name)
 		combobox.Thaw()
 
 	def set_value(self, list):
-		print "ObjectArgumentPanel", list
-		self.__oid = list.pop(0)
+		self.__oid = list.pop(0)[0]
 
 		combobox = self.Value
 		combobox.SetSelection(0)
