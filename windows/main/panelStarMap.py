@@ -280,10 +280,8 @@ class panelStarMap(panelStarMapBase, TrackerObjectOrder):
 
 		if oid != -1:
 			for Overlay in self.Overlay:
-				try:
+				if hasattr(Overlay, "SelectObject"):
 					Overlay.SelectObject(oid)
-				except NotImplementedError:
-					pass
 
 		# Force the panel to layout
 		self.DisplayModeExtra.Layout()

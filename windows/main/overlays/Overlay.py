@@ -162,9 +162,6 @@ class Overlay(dict):
 		"""
 		raise NotImplementedError("Select Object method has not been implemented!")
 
-	def SelectObject(self, oid):
-		pass
-
 
 class Holder(list):
 	"""

@@ -558,5 +558,7 @@ class TrackerObjectOrder(TrackerObject, TrackerOrder):
 			queues = objectutils.getOrderQueueList(self.application.cache, id)
 			if len(queues) > 0:
 				qid = queues[0][1]
-			
+		
+		print "Selecting queue", qid, " on ", id
+
 		TrackerOrder.OrderQueueSelect(self, qid)
