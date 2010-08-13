@@ -60,5 +60,5 @@ class Velocity(Overlay):
 		if len(position) != 1 or len(velocity) != 1:
 			return
 
-		if sum(velocity[0][0:3]) > 0:
+		if sum(abs(i) for i in velocity[0][0:3]) > 0:
 			self[oid] = CrossLine(position[0][0:2], velocity[0][0:2], 4, LineColor="Grey")
