@@ -3,12 +3,16 @@ This overlay shows circles which are proportional to the amount of a certain
 resource found in that object.
 """
 
+import os
+
 # wxPython imports
 import wx
 from extra.wxFloatCanvas import FloatCanvas
 from extra.wxFloatCanvas.CrossLine import CrossLine
 
 from tp.client import objectutils
+
+from requirements import graphicsdir
 
 from Overlay import Overlay
 
@@ -24,9 +28,11 @@ class Velocity(Overlay):
 		"""
 		Overlay.__init__(self, parent, canvas, panel)
 
-		self.Toggle = wx.ToggleButton(panel, -1, "Velocity")
+		self.Toggle = wx.lib.buttons.ThemedGenBitmapToggleButton(
+			panel, -1, wx.Bitmap(os.path.join(graphicsdir, "velocity-icon.png")))
+
 		self.Toggle.SetValue(True)
-		self.panel.Bind(wx.EVT_TOGGLEBUTTON, self.OnToggle, self.Toggle)
+		self.panel.Bind(wx.EVT_BUTTON, self.OnToggle, self.Toggle)
 
 		# Populate the colorizer dropdown with information
 		sizer = wx.FlexGridSizer(1)

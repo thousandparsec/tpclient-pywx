@@ -19,6 +19,8 @@ from tp.netlib.objects import Order
 from tp.netlib.objects import parameters
 from tp.client import objectutils
 
+from requirements import graphicsdir
+
 from Overlay import Overlay
 
 def FindPath(tmpcache, obj):
@@ -184,9 +186,10 @@ class Paths(Overlay, TrackerObjectOrder):
 	def __init__(self, parent, canvas, panel, *args, **kw):
 		Overlay.__init__(self, parent, canvas, panel, *args, **kw)
 
-		self.Toggle = wx.ToggleButton(panel, -1, "Paths")
+		self.Toggle = wx.lib.buttons.ThemedGenBitmapToggleButton(
+			panel, -1, wx.Bitmap(os.path.join(graphicsdir, "path-icon.png")))
 		self.Toggle.SetValue(True)
-		self.panel.Bind(wx.EVT_TOGGLEBUTTON, self.OnToggle, self.Toggle)
+		self.panel.Bind(wx.EVT_BUTTON, self.OnToggle, self.Toggle)
 
 		# Populate the colorizer dropdown with information
 		sizer = wx.FlexGridSizer(1)
