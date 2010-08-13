@@ -366,6 +366,10 @@ class GUI(wx.App):
 		Change to a certain main window.
 		"""
 		if window == self.current:
+			try:
+				self.current.Hide()
+			except Exception, e:
+				utils.do_traceback()
 			self.current.Show()
 			return
 
