@@ -79,20 +79,23 @@ class SystemIcons(Systems, FileTrackerMixin):
 		images = self.application.media.getImages(obj.id)
 		self.ClearURLs()
 		self.AddObjectURLs(obj.id)
-		if len(images) <= 0:
-			return SystemIcon(self.application.cache, obj, self.Colorizer)
-		else:
-			icon = None
-			for name, files in images:
-				if "Icon" not in name:
-					continue
-				
-				# FIXME: Just use the first file. Might want to do something more?
-				icon = wx.Image(files[0]).ConvertToBitmap()
-				break
+
+		icon = None
+		for name, files in images:
+			if "Icon" not in name:
+				continue
 			
-			if not icon:
-				return SystemIcon(self.application.cache, obj, self.Colorizer)
+			# FIXME: Just use the first file. Might want to do something more?
+			icon = wx.Image(files[0]).ConvertToBitmap()
+			break
+		
+		if not icon:
+			if len(objectutils.getPositionList(obj)) == 1:
+				icon = SystemIcon(self.application.cache, obj, self.Colorizer)
+			else:
+				icon = WormholeIcon(self.application.cache, obj, self.Colorizer)
+				icon.DrawOrder = -100
+			return icon
 		
 		return ImageIcon(self.application.cache, self.canvas, obj, icon, self.Colorizer)
 	
