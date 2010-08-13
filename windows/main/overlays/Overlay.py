@@ -55,11 +55,17 @@ class Overlay(dict):
 		if type(value) in (list, tuple):
 			for v in value:
 				if not self.layer is None:
-					v.DrawOrder = self.layer
+					if hasattr(v, 'DrawOrder'):
+						v.DrawOrder = (self.layer, v.DrawOrder)
+					else:
+						v.DrawOrder = (self.layer, 0)
 				self.canvas.AddObject(v)
 		else:
 			if not self.layer is None:
-				value.DrawOrder = self.layer
+				if hasattr(value, 'DrawOrder'):
+					value.DrawOrder = (self.layer, value.DrawOrder)
+				else:
+					value.DrawOrder = (self.layer, 0)
 			self.canvas.AddObject(value)
 		dict.__setitem__(self, key, value)
 
@@ -298,6 +304,8 @@ class SystemLevelOverlay(Overlay, TrackerObject):
 			return
 
 		icon = self.Icon(obj)
+		if not icon:
+			return
 		self[oid] = icon
 
 		from extra.wxFloatCanvas.FloatCanvas import EVT_FC_ENTER_OBJECT, EVT_FC_LEAVE_OBJECT
