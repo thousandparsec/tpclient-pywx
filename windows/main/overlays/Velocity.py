@@ -24,6 +24,17 @@ class Velocity(Overlay):
 		"""
 		Overlay.__init__(self, parent, canvas, panel)
 
+		self.Toggle = wx.ToggleButton(panel, -1, "Velocity")
+		self.Toggle.SetValue(True)
+		self.panel.Bind(wx.EVT_TOGGLEBUTTON, self.OnToggle, self.Toggle)
+
+		# Populate the colorizer dropdown with information
+		sizer = wx.FlexGridSizer(1)
+		sizer.AddGrowableRow(0)
+		sizer.Add(self.Toggle, proportion=1, flag=wx.EXPAND)
+		panel.SetSizer(sizer)
+
+	def OnToggle(self, evt):
 		self.UpdateAll()
 		self.canvas.Draw()
 
@@ -31,21 +42,17 @@ class Velocity(Overlay):
 		"""\
 		The amount of a specific resource in a specific object.
 		"""
+		if not self.Toggle.GetValue():
+			return
+
 		c = self.application.cache 
 		o = c.objects[oid]
 
 		position = objectutils.getPositionList(o)
 		velocity = objectutils.getVelocityList(o)
 
-		if c.players[0].id == objectutils.getOwner(c, oid):
-			return
-
 		if len(position) != 1 or len(velocity) != 1:
 			return
 
 		if sum(velocity[0][0:3]) > 0:
-			self[oid] = CrossLine(position[0][0:2], velocity[0][0:2], 4, LineColor="Yellow")
-			print self[oid]
-
-
-
+			self[oid] = CrossLine(position[0][0:2], velocity[0][0:2], 4, LineColor="Grey")

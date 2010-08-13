@@ -940,6 +940,7 @@ class ObjectArgumentPanel(ArgumentPanel, orderObjectBase):
 	def get_value(self):
 		self.__oid = long(self.Value.GetClientData(self.Value.GetSelection()))
 		return [self.__oid, []]
+
 	
 from windows.xrc.orderPlayer import orderPlayerBase
 class PlayerArgumentPanel(ArgumentPanel, orderPlayerBase):

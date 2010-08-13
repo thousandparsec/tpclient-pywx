@@ -184,10 +184,27 @@ class Paths(Overlay, TrackerObjectOrder):
 	def __init__(self, parent, canvas, panel, *args, **kw):
 		Overlay.__init__(self, parent, canvas, panel, *args, **kw)
 
+		self.Toggle = wx.ToggleButton(panel, -1, "Paths")
+		self.Toggle.SetValue(True)
+		self.panel.Bind(wx.EVT_TOGGLEBUTTON, self.OnToggle, self.Toggle)
+
+		# Populate the colorizer dropdown with information
+		sizer = wx.FlexGridSizer(1)
+		sizer.AddGrowableRow(0)
+		sizer.Add(self.Toggle, proportion=1, flag=wx.EXPAND)
+		panel.SetSizer(sizer)
+
 		self.active = []
 		TrackerObjectOrder.__init__(self)	
 
+	def OnToggle(self, evt):
+		self.UpdateAll()
+		self.canvas.Draw()
+
 	def UpdateOne(self, oid, overrides={}):
+		if not self.Toggle.GetValue():
+			return
+
 		# Remove all the previous segments
 		for nid, nodeid in self.keys():
 			if oid == nid:

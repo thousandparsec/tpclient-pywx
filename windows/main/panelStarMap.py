@@ -243,15 +243,15 @@ class panelStarMap(panelStarMapBase, TrackerObjectOrder):
 		# Create a new panel
 		self.DisplayModePanels = []
 
-
 		# Create the new overlay
 		self.Overlay = []
-		for Overlay in cls:
+		for i, Overlay in enumerate(cls):
 			panel = wx.Panel(self.DisplayModeExtra)
 			self.DisplayModePanels.append(panel)
 			self.DisplayModeExtra.GetSizer().Add(panel, proportion=1, flag=wx.EXPAND)
 
 			self.Overlay.append(Overlay(self, self.Canvas, panel))
+			self.Overlay[-1].layer = i
 			try:
 				self.Overlay[-1].UpdateAll()
 			except Exception, e:
