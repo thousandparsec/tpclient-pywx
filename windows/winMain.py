@@ -190,7 +190,6 @@ class winMain(winBase):
 		self.updatepending = False
 		self.beenshown = False
 		self.application.gui.Binder(self.application.NetworkClass.NetworkTimeRemainingEvent, self.OnNetworkTimeRemaining)
-		self.application.gui.Binder(self.application.CacheClass.CacheUpdateEvent, self.OnCacheUpdate)
 
 	def Show(self, show=True):
 		winBase.Show(self)
@@ -425,9 +424,10 @@ The turn has ended. Would you like to download all the new details?
 		else:
 			self.statusbar.SetEndTime(evt.gotat + evt.remaining)
 
-	def OnCacheUpdate(self, evt):
-		if evt.what == None:
-			self.statusbar.SetTurnNumber(self.application.cache.objects[0].Informational.Year.value)
+		turn = "%s " % evt.frame.turn_num
+		if len(evt.frame.turn_name) > 0:
+			turn += "(%s)" % evt.frame.turn_name
+		self.statusbar.SetTurnNumber(turn)
 
 	def OnHelp(self, evt):
 		url = "http://www.thousandparsec.net/tp/documents/tpclient-pywx?version=%s" % version.version_str
